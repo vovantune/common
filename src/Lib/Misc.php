@@ -1,0 +1,57 @@
+<?php
+namespace ArtSkills\Lib;
+
+use Cake\Cache\Cache;
+
+class Misc
+{
+
+	/**
+	 * Нулевое время
+	 */
+	const ZERO_DATE = '0000-00-00 00:00:00';
+
+	/**
+	 * Чистит кэш
+	 */
+	public static function flushCache() {
+		$cacheConfigs = Cache::configured();
+		foreach ($cacheConfigs as $configName) {
+			Cache::clear(false, $configName);
+		}
+	}
+
+	/**
+	 * Разбить полное название класса на неймспейс и класс
+	 *
+	 * @param string $class
+	 * @param bool $onlyClass
+	 * @return string|string[]
+	 */
+	public static function namespaceSplit($class, $onlyClass = false) {
+		$pos = strrpos($class, '\\');
+		if ($pos === false) {
+			$res = ['', $class];
+		} else {
+			$res = [substr($class, 0, $pos), substr($class, $pos + 1)];
+		}
+		if ($onlyClass) {
+			return $res[1];
+		} else {
+			return $res;
+		}
+	}
+
+	/**
+	 * Соединить путь через DS
+	 *
+	 * @param string[] ...$parts
+	 * @return string
+	 */
+	public static function implodeDs(...$parts) {
+		return trim(implode(DS, $parts));
+	}
+
+
+
+}
