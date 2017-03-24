@@ -26,12 +26,7 @@ class EntityBuilderTest extends AppTestCase
 	 * Восстановить содержимое папки Model
 	 */
 	public static function restoreModelFolder($beforeTest) {
-		$folder = new Folder(self::MODEL_PATH);
-		$folder->delete();
-		$folder->createSelf();
-		(new Folder(__DIR__ . '/Fixture'))->copy($folder->path);
-
-		/*$modelFolder = new Folder(self::MODEL_PATH);
+		$modelFolder = new Folder(self::MODEL_PATH);
 		$backupFolder = new Folder(__DIR__ . '/Backup');
 		if ($backupFolder->exists()) {
 			// если существует папка бекапа, то восстанавливаем модели из неё
@@ -46,7 +41,7 @@ class EntityBuilderTest extends AppTestCase
 			// если папки бекапа не существует, то бекапим модели
 			$backupFolder->createSelf();
 			$modelFolder->copy($backupFolder->path);
-		}*/
+		}
 	}
 
 	/** @inheritdoc */
