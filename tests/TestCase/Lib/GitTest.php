@@ -1,5 +1,5 @@
 <?php
-namespace App\Test\TestCase\Lib\GitTest;
+namespace ArtSkills\Test\TestCase\Lib;
 
 use ArtSkills\Lib\Git;
 use ArtSkills\TestSuite\AppTestCase;

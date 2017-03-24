@@ -26,7 +26,7 @@ class Strings
 	 * @return bool
 	 */
 	public static function endsWith($string, $postfix) {
-		return (strripos($string, $postfix) === strlen($string));
+		return (strripos($string, $postfix) === (strlen($string) - strlen($postfix)));
 	}
 
 	/**

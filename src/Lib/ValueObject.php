@@ -4,9 +4,6 @@ namespace ArtSkills\Lib;
 use Cake\Error\Debugger;
 use Cake\Log\Log;
 
-// todo: valueObject builder для автогенерации phpdoc для магических методов - ?
-// todo: возможность вешать геттеры и сеттеры - ?
-// todo: возможность валидировать записываемые значения (например, по типу значения) - ?
 class ValueObject implements \JsonSerializable, \ArrayAccess
 {
 	/** Методы, которые не экспортируются через json_encode */

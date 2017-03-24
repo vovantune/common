@@ -57,6 +57,8 @@ class Url
 		if (!empty($query)) {
 			if (is_array($query)) {
 				$queryString = self::buildQuery($query);
+			} else {
+				$queryString = $query;
 			}
 			if (!empty($queryString) && ($queryString[0] !== '?')) {
 				$queryString = '?' . $queryString;

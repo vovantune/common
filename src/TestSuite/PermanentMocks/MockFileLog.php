@@ -26,13 +26,9 @@ class MockFileLog extends ClassMockEntity
 		$trace = explode("\n", $trace);
 		$test = '';
 		foreach ($trace as $line) {
-			if (
-				strstr($line, 'App\Test\TestCase') &&
-				!strstr($line, 'AppControllerTestCase') &&
-				!strstr($line, 'AppTestCase')
-			) {
+			// последняя строчка трейса в которой есть слово тест и нет пхпюнит - это строка теста, вызвавшего запись в лог
+			if (stristr($line, 'test') && !stristr($line, 'phpunit')) {
 				$test = $line;
-				break;
 			}
 		}
 		$file = $trace[4];
