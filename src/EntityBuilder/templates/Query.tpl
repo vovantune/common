@@ -1,8 +1,8 @@
 <?php
 namespace {MODEL_NAMESPACE}\Query;
 
-use {MODEL_NAMESPACE}\Entity\{ENTITY};
-{USE_BASE}
+{USE_BASE}use {MODEL_NAMESPACE}\Entity\{ENTITY};
+
 /**
  * Fake Query class {ENTITY}Query
  * @method {ENTITY}[] toArray()

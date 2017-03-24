@@ -1,0 +1,378 @@
+<?php
+namespace App\Test\TestCase\Lib\GitTest;
+
+use ArtSkills\Lib\Git;
+use ArtSkills\TestSuite\AppTestCase;
+use ArtSkills\TestSuite\Mock\MethodMocker;
+use ArtSkills\TestSuite\Mock\MethodMockerEntity;
+use ArtSkills\TestSuite\Mock\PropertyAccess;
+
+class GitTest extends AppTestCase
+{
+
+	/**
+	 * Объект git
+	 * @var Git
+	 */
+	private $_git = null;
+
+	/**
+	 * Команда обращения к гиту
+	 * @var string
+	 */
+	private $_gitCommand = '';
+
+
+	/**
+	 * Ветка до теста
+	 *
+	 * @var string
+	 */
+	private $_branchBeforeTest = '';
+
+	/**
+	 * Набор exec команд
+	 *
+	 * @var array
+	 */
+	private $_executeHistory = [];
+
+	/**
+	 * @inheritdoc
+	 */
+	public function setUp() {
+		parent::setUp();
+		$this->_git = Git::getInstance();
+		$this->_gitCommand = PropertyAccess::get($this->_git, '_gitCommand');
+		$this->_branchBeforeTest = $this->_git->getCurrentBranchName();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function tearDown() {
+		$this->_git->checkout($this->_branchBeforeTest);
+		parent::tearDown();
+	}
+
+	/**
+	 * Тест функции названия текущей ветки
+	 *
+	 */
+	public function testGetCurrentBranchName() {
+		self::assertNotEmpty($this->_git->getCurrentBranchName(), 'Не отобразилась ветка в тестовом режиме');
+	}
+
+	/**
+	 * Тест функции списка веток
+	 */
+	public function testGetBranchList() {
+		$branchesLocal = $this->_git->getBranchList(Git::BRANCH_TYPE_REMOTE);
+		self::assertContains('master', $branchesLocal, 'Выгрузился список веток, в котором нет ветки master');
+		$branchesRemote = $this->_git->getBranchList(Git::BRANCH_TYPE_LOCAL);
+		self::assertContains('master', $branchesRemote, 'Выгрузился список веток, в котором нет ветки master');
+		$branchesAll = $this->_git->getBranchList(Git::BRANCH_TYPE_ALL);
+		$branchesBoth = array_unique(array_merge($branchesLocal, $branchesRemote));
+		sort($branchesAll);
+		sort($branchesBoth);
+		self::assertEquals($branchesBoth, $branchesAll, 'Список всех веток не совпадает со списками локальных и удалённых');
+	}
+
+	/**
+	 * Проверяет работу функции выбора смерженных веток
+	 */
+	public function testMergedList() {
+		$this->_mockExecute();
+		foreach ([Git::BRANCH_TYPE_REMOTE, Git::BRANCH_TYPE_LOCAL] as $type) {
+			$branchListAll = $this->_git->getBranchList($type);
+			$branchListAll = array_combine($branchListAll, $branchListAll);
+
+			$branchListMerged = $this->_git->getMergedBranches($type);
+
+			self::assertEquals(count($branchListMerged), count(array_intersect_key($branchListAll, $branchListMerged)), 'В списке смерженных веток есть что-то лишнее');
+			self::assertEmpty(array_intersect_key($branchListMerged, [
+				Git::BRANCH_NAME_MASTER => 1,
+				Git::BRANCH_NAME_HEAD,
+			]), 'В списке смерженных веток есть мастер или хэд');
+		}
+
+		$historyExpected = array_merge(
+			[$this->_gitCommand . ' branch -r'],
+			$this->_expectedCommandListMerged($this->_branchBeforeTest, Git::BRANCH_TYPE_REMOTE),
+			[$this->_gitCommand . ' branch'],
+			$this->_expectedCommandListMerged($this->_branchBeforeTest, Git::BRANCH_TYPE_LOCAL)
+		);
+		self::assertEquals($historyExpected, $this->_executeHistory, 'Неправильный набор комманд для просмотра померженных веток');
+	}
+
+	/**
+	 * Возвращает список комманд, используемых для получения списка померженных в мастер веток
+	 *
+	 * @param string $branchBefore
+	 * @param string $type
+	 * @return array|bool
+	 */
+	private function _expectedCommandListMerged($branchBefore, $type) {
+		$expectedList = [];
+		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
+			$expectedList[] = $this->_gitCommand . ' checkout master';
+		}
+		$expectedList[] = $this->_gitCommand . ' pull';
+		if ($type == Git::BRANCH_TYPE_REMOTE) {
+			$expectedList[] = $this->_gitCommand . ' for-each-ref --format="%(refname) %(authordate:short)" refs/remotes/origin --merged';
+		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
+			$expectedList[] = $this->_gitCommand . ' for-each-ref --format="%(refname) %(authordate:short)" refs/heads --merged';
+		} else {
+			return false;
+		}
+		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
+			$expectedList[] = $this->_gitCommand . ' checkout ' . $branchBefore;
+		}
+		return $expectedList;
+	}
+
+	/**
+	 * Тестирует, что используется правильная команда для обновления ссылок
+	 */
+	public function testUpdateRefs() {
+		$this->_mockExecute();
+		$this->_git->updateRefs();
+		self::assertEquals([$this->_gitCommand . ' remote update --prune'], $this->_executeHistory, 'Неправильная команда обновления');
+	}
+
+	/**
+	 * Тест чекаута
+	 */
+	public function testCheckout() {
+		$this->_mockExecute();
+
+		$this->_executeHistory = [];
+		self::assertFalse($this->_git->checkout('someUnexistentBranchName'), 'Чекаут в несуществующую ветку вернул true');
+		self::assertEquals([$this->_gitCommand . ' branch -a'], $this->_executeHistory, 'Чекаут в несуществующую ветку вызывал неправильные команды');
+
+		$this->_executeHistory = [];
+		$currentBranch = $this->_git->getCurrentBranchName();
+		self::assertTrue($this->_git->checkout($currentBranch), 'Чекаут в текущую ветку вернул false');
+		self::assertEquals([], $this->_executeHistory, 'Чекаут в текущую ветку вызывал неправильные команды');
+
+		$otherBranches = array_diff($this->_git->getBranchList(Git::BRANCH_TYPE_ALL), [$currentBranch]);
+		if (empty($otherBranches)) {
+			return;
+		}
+		$checkoutTo = array_pop($otherBranches);
+
+		$this->_executeHistory = [];
+		self::assertTrue($this->_git->checkout($checkoutTo), 'Чекаут в другую ветку вернул false');
+		self::assertEquals([
+			$this->_gitCommand . ' branch -a',
+			$this->_gitCommand . ' checkout ' . $checkoutTo,
+		], $this->_executeHistory, 'Чекаут в другую ветку вызывал неправильные команды');
+		self::assertEquals($checkoutTo, $this->_git->getCurrentBranchName(), 'Чекаут не перезаписал название текущей ветки');
+	}
+
+
+	/**
+	 * Тестирует функцию changeCurrentBranch (checkout + pull)
+	 */
+	public function testChangeCurrentBranch() {
+		$this->_mockExecute();
+
+		$this->_executeHistory = [];
+		self::assertFalse($this->_git->changeCurrentBranch('someUnexistentBranchName'), 'Переход в несуществующую ветку вернул true');
+		self::assertEquals([$this->_gitCommand . ' branch -r'], $this->_executeHistory, 'Переход в несуществующую ветку вызывал неправильные команды');
+
+		$remoteBranches = $this->_git->getBranchList(Git::BRANCH_TYPE_REMOTE);
+
+		$this->_executeHistory = [];
+		$currentBranch = $this->_git->getCurrentBranchName();
+		if (in_array($currentBranch, $remoteBranches)) {
+			self::assertTrue($this->_git->changeCurrentBranch($currentBranch), 'Переход в текущую ветку вернул false');
+			self::assertEquals([
+				$this->_gitCommand . ' branch -r',
+				$this->_gitCommand . ' pull',
+			], $this->_executeHistory, 'Переход в текущую ветку вызывал неправильные команды');
+		}
+
+		$otherBranches = array_diff($remoteBranches, [$currentBranch]);
+		if (empty($otherBranches)) {
+			return;
+		}
+		$this->_executeHistory = [];
+		$checkoutTo = array_pop($otherBranches);
+		self::assertTrue($this->_git->changeCurrentBranch($checkoutTo), 'Переход в другую ветку вернул false');
+		self::assertEquals([
+			$this->_gitCommand . ' branch -r',
+			$this->_gitCommand . ' checkout ' . $checkoutTo,
+			$this->_gitCommand . ' pull',
+		], $this->_executeHistory, 'Переход в другую ветку вызывал неправильные команды');
+	}
+
+
+	/**
+	 * Возвращает список комманд, используемых для удаления ветки
+	 *
+	 * @param string $branchDelete
+	 * @param string $branchBefore
+	 * @param bool $canDelete
+	 * @param string $type
+	 * @return array|bool
+	 */
+	private function _expectedCommandListDelete($branchDelete, $canDelete, $branchBefore, $type) {
+		if (($branchDelete == $branchBefore) && ($type == Git::BRANCH_TYPE_LOCAL)) {
+			return [];
+		}
+		$expectedList = $this->_expectedCommandListMerged($branchBefore, $type);
+		if (empty($expectedList)) {
+			return false;
+		}
+		if (!$canDelete) {
+			return $expectedList;
+		}
+		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
+			$expectedList[] = $this->_gitCommand . ' checkout master';
+		}
+		$expectedList[] = $this->_gitCommand . ' pull';
+		if ($type == Git::BRANCH_TYPE_REMOTE) {
+			$expectedList[] = $this->_gitCommand . ' push origin --delete ' . $branchDelete;
+		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
+			$expectedList[] = $this->_gitCommand . ' branch ' . $branchDelete . ' -d';
+		} else {
+			return false;
+		}
+		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
+			$expectedList[] = $this->_gitCommand . ' checkout ' . $branchBefore;
+		}
+		return $expectedList;
+	}
+
+
+	/**
+	 * Тест удаления обычных веток
+	 */
+	public function testDeleteNormal() {
+		$this->_mockExecute();
+
+		$unexistentBranchName = 'someUnexistentBranchName';
+		foreach ([Git::BRANCH_TYPE_LOCAL, Git::BRANCH_TYPE_REMOTE] as $type) {
+			$this->_executeHistory = [];
+			$labelType = (($type == Git::BRANCH_TYPE_REMOTE) ? 'не' : '') . 'локальной';
+			self::assertFalse(
+				$this->_git->deleteBranch($unexistentBranchName, $type),
+				'Удаление несуществующей ' . $labelType . ' ветки вернуло true'
+			);
+			self::assertEquals(
+				$this->_expectedCommandListDelete($unexistentBranchName, false, $this->_branchBeforeTest, $type),
+				$this->_executeHistory,
+				'Удаление несуществующей ' . $labelType . ' ветки вызывало неправильные команды'
+			);
+
+			$branches = ['merged' => [], 'unmerged' => []];
+			$all = $this->_git->getBranchList($type);
+			$branches['merged'] = array_diff(array_keys($this->_git->getMergedBranches($type)), [$this->_branchBeforeTest]);
+			$branches['unmerged'] = array_diff($all, [
+				Git::BRANCH_NAME_MASTER,
+				Git::BRANCH_NAME_HEAD,
+				$this->_branchBeforeTest,
+			], $branches['merged']);
+			$this->_executeHistory = [];
+
+			foreach ($branches as $state => $list) {
+				if (empty($list)) {
+					continue;
+				}
+				$this->_executeHistory = [];
+				$canDelete = ($state == 'merged');
+				$labelState = (($state == 'unmerged') ? 'не' : '') . 'померженной';
+				$branch = array_pop($list);
+				self::assertEquals(
+					$canDelete,
+					$this->_git->deleteBranch($branch, $type),
+					'Удаление ' . $labelState . ' ' . $labelType . ' ветки вернуло не то, что нужно'
+				);
+				self::assertEquals(
+					$this->_expectedCommandListDelete($branch, $canDelete, $this->_branchBeforeTest, $type),
+					$this->_executeHistory,
+					'Удаление ' . $labelState . ' ' . $labelType . ' ветки вызывало неправильные команды'
+				);
+			}
+		}
+	}
+
+	/**
+	 * Тест удаления текущей ветки
+	 */
+	public function testDeleteCurrent() {
+		if ($this->_branchBeforeTest == Git::BRANCH_NAME_MASTER) {
+			return;
+		}
+		$this->_mockExecute();
+
+		self::assertFalse(
+			$this->_git->deleteBranch($this->_branchBeforeTest, Git::BRANCH_TYPE_LOCAL),
+			'Удаление текущей локальной ветки вернуло true'
+		);
+		self::assertEquals(
+			[],
+			$this->_executeHistory,
+			'Удаление текущей локальной ветки вызывало какие-то команды'
+		);
+
+		$mergedBranches = $this->_git->getMergedBranches(Git::BRANCH_TYPE_REMOTE);
+		$hasMergedRemote = !empty($mergedBranches[$this->_branchBeforeTest]);
+		$this->_executeHistory = [];
+
+		$label = 'которая ' . ($hasMergedRemote ? '' : 'не') . 'существует';
+		self::assertEquals(
+			$hasMergedRemote,
+			$this->_git->deleteBranch($this->_branchBeforeTest, Git::BRANCH_TYPE_REMOTE),
+			'Удаление текущей нелокальной ветки (' . $label . ') вернуло не то, что нужно'
+		);
+		self::assertEquals(
+			$this->_expectedCommandListDelete($this->_branchBeforeTest, $hasMergedRemote, $this->_branchBeforeTest, Git::BRANCH_TYPE_REMOTE),
+			$this->_executeHistory,
+			'Удаление текущей нелокальной ветки (' . $label . ') вызывало неправильные команды'
+		);
+	}
+
+	/**
+	 * Тест удаления мастера или хеда
+	 */
+	public function testDeleteMain() {
+		$this->_mockExecute(0);
+		foreach ([Git::BRANCH_TYPE_REMOTE, Git::BRANCH_TYPE_LOCAL] as $type) {
+			foreach ([Git::BRANCH_NAME_MASTER, Git::BRANCH_NAME_HEAD] as $branch) {
+				$this->_executeHistory = [];
+				self::assertFalse(
+					$this->_git->deleteBranch($branch, $type),
+					'Удаление ветки ' . $branch . ' вернуло true'
+				);
+				self::assertEquals(
+					[],
+					$this->_executeHistory,
+					'Удаление ветки ' . $branch . ' вызывало какие-то команды'
+				);
+			}
+		}
+	}
+
+	/**
+	 * Мокаем _execute в Git
+	 *
+	 * @param int $expectTimes
+	 * @throws \Exception
+	 */
+	private function _mockExecute($expectTimes = MethodMockerEntity::EXPECT_CALL_ONCE) {
+		$this->_executeHistory = [];
+		MethodMocker::mock(Git::class, '_execute')
+			->expectCall($expectTimes)
+			->willReturnAction(function ($args) {
+				$this->_executeHistory[] = $args[0];
+				if (preg_match('/^' . addcslashes($this->_gitCommand, '/.') . ' (branch( -[ar])?|for-each-ref.*)$/', $args[0])) {
+					exec($args[0], $output);
+					return $output;
+				} else {
+					return [];
+				}
+			});
+	}
+}

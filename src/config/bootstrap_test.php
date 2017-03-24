@@ -3,7 +3,9 @@ ini_set('soap.wsdl_cache_ttl', 1);
 
 const TEST_MODE = 1;
 
-\ArtSkills\Lib\Env::setHttpClientAdapter(\App\Test\Suite\HttpClientAdapter::class);
+\ArtSkills\Lib\Env::setHttpClientAdapter(\ArtSkills\TestSuite\HttpClientMock\HttpClientAdapter::class);
+
+//$emailTransports = Email
 
 $testConnection = \ArtSkills\Lib\DB::getConnection(\ArtSkills\Lib\DB::CONNECTION_TEST);
 $dbName = $testConnection->config()['database'];

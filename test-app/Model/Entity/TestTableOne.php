@@ -1,0 +1,25 @@
+<?php
+namespace TestApp\Model\Entity;
+
+use ArtSkills\ORM\Entity;
+use ArtSkills\Lib\Arrays;
+
+/**
+ * some comments blabla
+ * @property int $id comment1
+ * @property int $col_enum
+ * @property \Cake\I18n\Time $col_time = 'CURRENT_TIMESTAMP' asdasd
+ * @tableComment description govno
+ * more comments blabla
+ */
+class TestTableOne extends Entity
+{
+	/** @inheritdoc */
+	protected $_aliases = [
+		'bad alias' => 'ololo',
+	];
+
+	public function asd() {
+		return Arrays::encode(['asd' => 'qwe']);
+	}
+}

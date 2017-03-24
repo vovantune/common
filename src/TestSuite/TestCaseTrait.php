@@ -2,14 +2,18 @@
 
 namespace ArtSkills\TestSuite;
 
-use ArtSkills\Cake\Filesystem\Folder;
-use ArtSkills\Cake\ORM\Entity;
+use ArtSkills\Filesystem\Folder;
+use ArtSkills\Lib\Arrays;
+use ArtSkills\ORM\Entity;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Misc;
-use ArtSkills\Mock\MethodMocker;
-use ArtSkills\Mock\ConstantMocker;
+use ArtSkills\Lib\Strings;
+use ArtSkills\TestSuite\Mock\MethodMocker;
+use ArtSkills\TestSuite\Mock\ConstantMocker;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientAdapter;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientMocker;
+use ArtSkills\TestSuite\Mock\PropertyAccess;
+use ArtSkills\TestSuite\PermanentMocks\MockFileLog;
 use Cake\Datasource\ModelAwareTrait;
 use Cake\I18n\Time;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -37,29 +41,49 @@ trait TestCaseTrait
 	/**
 	 * Отключённые постоянные моки
 	 *
-	 * @var string[]
+	 * @var array className => true
 	 */
 	private $_disabledMocks = [];
 
+	/**
+	 * Отключить постоянные дефолтные моки
+	 * Для случаев, когда они будут переопределены
+	 * Или просто не нужны
+	 *
+	 * @var string[]
+	 */
+	protected $_disabledDefaultMocks = [];
+
+	/**
+	 * Список классов-одиночек, которые надо чистить в тестах
+	 *
+	 * @var string[]
+	 */
+	protected static $_singletones = [];
+
+
+	/** вызывать в реальном setUpBeforeClass */
+	protected static function _setUpBeforeClass() {
+		static::_clearSingletones();
+	}
 
 	/**
 	 * Инициализация тестового окружения
 	 */
-	public function setUpTest() {
+	protected function _setUp() {
 		$this->_clearCache();
+		$this->_disabledDefaultMocks = Arrays::keysFromValues($this->_disabledDefaultMocks);
+		$this->_disabledMocks += $this->_disabledDefaultMocks;
 		$this->_initPermanentMocks();
 		$this->_loadFixtureModels();
 
 		HttpClientAdapter::enableDebug();
-
-		/*$testConnection = DB::getConnection(DB::CONNECTION_TEST);
-		$testConnection->disableForeignKeys();*/
 	}
 
 	/**
 	 * Чиста тестового окружения
 	 */
-	public function tearDownTest() {
+	protected function _tearDown() {
 		/** @var TestCase $this */
 		MethodMocker::restore($this->hasFailed());
 		ConstantMocker::restore();
@@ -76,7 +100,7 @@ trait TestCaseTrait
 	 * @param string $mockClass
 	 */
 	protected function _disablePermanentMock($mockClass) {
-		$this->_disabledMocks[] = $mockClass;
+		$this->_disabledMocks[$mockClass] = true;
 	}
 
 	/**
@@ -95,8 +119,7 @@ trait TestCaseTrait
 		}
 		$this->modelFactory('Table', [$this->tableLocator(), 'get']);
 		foreach ($this->fixtures as $fixtureName) {
-			$splitName = pluginSplit($fixtureName);
-			$modelAlias = Inflector::camelize(array_pop($splitName));
+			$modelAlias = Inflector::camelize(Strings::lastPart('.', $fixtureName));
 			$this->loadModel($modelAlias);
 		}
 	}
@@ -107,23 +130,29 @@ trait TestCaseTrait
 	 * @throws \Exception
 	 */
 	private function _initPermanentMocks() {
-		$folder = Env::getMockFolder();
-		if (empty($folder)) {
-			return;
+		$permanentMocks = [
+			// folder => namespace
+			__DIR__ . '/PermanentMocks' => Misc::namespaceSplit(MockFileLog::class)[0],
+		];
+		$projectMockFolder = Env::getMockFolder();
+		if (!empty($projectMockFolder)) {
+			if (Env::hasMockNamespace()) {
+				$projectMockNs = Env::getMockNamespace();
+			} else {
+				throw new \Exception('Не задан неймспейс для классов-моков');
+			}
+			$permanentMocks[$projectMockFolder] = $projectMockNs;
 		}
-		if (Env::hasMockNamespace()) {
-			$mockNamespace = Env::getMockNamespace();
-		} else {
-			throw new \Exception('Не задан неймспейс для классов-моков');
-		}
-		$dir = new Folder($folder);
-		$files = $dir->find('.*\.php');
-		foreach ($files as $mockFile) {
-			$mockClass = $mockNamespace . '\\' . str_replace('.php', '', $mockFile);
-			if (!in_array($mockClass, $this->_disabledMocks)) {
-				/** @var ClassMockEntity $mockClass */
-				$mockClass::init();
-				$this->_permanentMocksList[] = $mockClass;
+		foreach ($permanentMocks as $folder => $mockNamespace) {
+			$dir = new Folder($folder);
+			$files = $dir->find('.*\.php');
+			foreach ($files as $mockFile) {
+				$mockClass = $mockNamespace . '\\' . str_replace('.php', '', $mockFile);
+				if (empty($this->_disabledMocks[$mockClass])) {
+					/** @var ClassMockEntity $mockClass */
+					$mockClass::init();
+					$this->_permanentMocksList[] = $mockClass;
+				}
 			}
 		}
 	}
@@ -143,7 +172,9 @@ trait TestCaseTrait
 	 * то, что одиночки создаются 1 раз, иногда может очень мешать
 	 */
 	protected static function _clearSingletones() {
-		// noop
+		foreach (static::$_singletones as $className) {
+			PropertyAccess::setStatic($className, '_instance', null);
+		}
 	}
 
 
@@ -172,7 +203,9 @@ trait TestCaseTrait
 	public function assertAssocArraySubset(
 		$expectedPartialArray, $testArray, $message = '', $delta = 0.0, $maxDepth = 10
 	) {
-		self::assertEquals($expectedPartialArray, array_intersect_key($testArray, $expectedPartialArray), $message, $delta, $maxDepth);
+		self::assertEquals(
+			$expectedPartialArray, array_intersect_key($testArray, $expectedPartialArray), $message, $delta, $maxDepth
+		);
 	}
 
 	/**
@@ -184,7 +217,9 @@ trait TestCaseTrait
 	 * @param float $delta
 	 * @param int $maxDepth
 	 */
-	public function assertEntitySubset(array $expectedSubset, Entity $entity, $message = '', $delta = 0.0, $maxDepth = 10) {
+	public function assertEntitySubset(
+		array $expectedSubset, Entity $entity, $message = '', $delta = 0.0, $maxDepth = 10
+	) {
 		$this->assertAssocArraySubset($expectedSubset, $entity->toArray(), $message, $delta, $maxDepth);
 	}
 
@@ -197,7 +232,9 @@ trait TestCaseTrait
 	 * @param float $delta
 	 * @param int $maxDepth
 	 */
-	public function assertEntityEqualsEntity(Entity $expectedEntity, Entity $actualEntity, $message = '', $delta = 0.0, $maxDepth = 10) {
+	public function assertEntityEqualsEntity(
+		Entity $expectedEntity, Entity $actualEntity, $message = '', $delta = 0.0, $maxDepth = 10
+	) {
 		self::assertEquals($expectedEntity->toArray(), $actualEntity->toArray(), $message, $delta, $maxDepth);
 	}
 
@@ -210,7 +247,9 @@ trait TestCaseTrait
 	 * @param float $delta
 	 * @param int $maxDepth
 	 */
-	public function assertEntityEqualsArray(array $expectedArray, Entity $actualEntity, $message = '', $delta = 0.0, $maxDepth = 10) {
+	public function assertEntityEqualsArray(
+		array $expectedArray, Entity $actualEntity, $message = '', $delta = 0.0, $maxDepth = 10
+	) {
 		self::assertEquals($expectedArray, $actualEntity->toArray(), $message, $delta, $maxDepth);
 	}
 }

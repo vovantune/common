@@ -1,7 +1,7 @@
 <?php
 namespace ArtSkills\Lib;
 
-use ArtSkills\Cake\Http\Client;
+use ArtSkills\Http\Client;
 use ArtSkills\Traits\Library;
 
 class Http

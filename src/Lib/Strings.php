@@ -42,6 +42,19 @@ class Strings
 		return $replacement . (substr($string, strlen($prefix)));
 	}
 
+	/**
+	 * Заменить или отрезать поствикс у строки
+	 * str_replace заменяет все вхождения, так что он не подходит
+	 *
+	 * @param string $string
+	 * @param string $postfix
+	 * @param string $replacement
+	 * @return string
+	 */
+	public static function replacePostfix($string, $postfix, $replacement = '') {
+		return (substr($string, 0, -strlen($postfix))) . $replacement;
+	}
+
 
 
 	/**

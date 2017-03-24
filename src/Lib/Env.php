@@ -14,6 +14,7 @@ use Cake\Core\Configure;
  * @method static string getFixtureFolder()
  * @method static string getMockFolder()
  * @method static string getMockNamespace()
+ * @method static string getDownloadPath()
  *
  * @method static bool hasSentryDsn()
  * @method static bool hasHttpClientAdapter()
@@ -38,7 +39,7 @@ class Env
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	public static function __callStatic($name, array $arguments) {
+	public static function __callStatic($name, array $arguments = []) {
 		$prefix = 'get';
 		if (Strings::startsWith($name, $prefix)) {
 			$configKey = lcfirst(Strings::replacePrefix($name, $prefix));

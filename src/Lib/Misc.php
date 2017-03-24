@@ -13,11 +13,15 @@ class Misc
 
 	/**
 	 * Чистит кэш
+	 * @param array $skipConfigs
 	 */
-	public static function flushCache() {
+	public static function flushCache($skipConfigs = []) {
+		$skipConfigs = Arrays::keysFromValues($skipConfigs);
 		$cacheConfigs = Cache::configured();
 		foreach ($cacheConfigs as $configName) {
-			Cache::clear(false, $configName);
+			if (empty($skipConfigs[$configName])) {
+				Cache::clear(false, $configName);
+			}
 		}
 	}
 

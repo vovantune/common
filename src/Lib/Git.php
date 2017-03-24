@@ -54,7 +54,7 @@ class Git
 	private function __construct() {
 		if (Env::isTestServer()) {
 			$this->_gitCommand = self::GIT_COMMAND;
-		} elseif (Env::isLocal()) {
+		} elseif (Env::isLocal() || Env::isUnitTest()) {
 			$this->_gitCommand = self::GIT_COMMAND_LOCAL;
 		}
 		if (!empty($this->_gitCommand)) {

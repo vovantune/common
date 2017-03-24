@@ -1,9 +1,8 @@
 <?php
 namespace ArtSkills\EntityBuilder;
 
-use ArtSkills\Cake\Filesystem\File;
-use ArtSkills\Cake\Filesystem\Folder;
-use ArtSkills\Cake\ORM\Entity;
+use ArtSkills\Filesystem\File;
+use ArtSkills\Filesystem\Folder;
 use ArtSkills\Lib\Misc;
 use ArtSkills\Traits\Library;
 use Cake\I18n\Time;
@@ -27,12 +26,11 @@ class TableDocumentation
 		'array' => 'Array',
 	];
 
-	protected static $_modelFolder = '';
-	protected static $_descriptionFile = 'TableList.md';
-	protected static $_jsTypesFile = 'TableEntityList.js';
-	protected static $_baseEntityClass = Entity::class;
-	protected static $_modelNamespace = 'App\Model';
-
+	/**
+	 * Конфиг
+	 * @var EntityBuilderConfig
+	 */
+	private static $_config = null;
 
 	/**
 	 * Кеш PHPDoc описаний сущностей
@@ -42,12 +40,29 @@ class TableDocumentation
 	private static $_entityAnnotationsCache = [];
 
 	/**
+	 * Задать конфиг
+	 * @param EntityBuilderConfig $config
+	 * @param $config
+	 * @throws \Exception
+	 */
+	public static function setConfig($config) {
+		static::$_config = $config;
+		if (!empty($config) && !($config instanceof EntityBuilderConfig)) {
+			throw new \Exception('Bad config');
+		}
+	}
+
+	/**
 	 * Формируем доку
 	 *
 	 * @return bool true в случае необходимости перегрузить доку
+	 * @throws \Exception
 	 */
 	public static function build() {
-
+		if (empty(static::$_config)) {
+			throw new \Exception('Не задан конфиг');
+		}
+		static::$_config->checkValid();
 		$entityList = self::_getEntityList();
 		$mdResult = self::_buildMarkDownDoc($entityList);
 		$jsRsult = self::_buildJsDoc($entityList);
@@ -62,10 +77,9 @@ class TableDocumentation
 	 * @return bool
 	 */
 	private static function _buildMarkDownDoc($entityList) {
-		$mdFile = new File(static::$_modelFolder . '/' . static::$_descriptionFile);
+		$mdFile = new File(static::$_config->modelFolder . '/' . static::$_config->descriptionFile);
 		if ($mdFile->exists()) {
 			$curContents = $mdFile->read();
-
 		} else {
 			$curContents = '';
 			$mdFile->create();
@@ -93,7 +107,7 @@ class TableDocumentation
 	 * @return bool
 	 */
 	private static function _buildJsDoc($entityList) {
-		$jsFile = new File(static::$_modelFolder . '/' . static::$_jsTypesFile);
+		$jsFile = new File(static::$_config->modelFolder . '/' . static::$_config->jsTypesFile);
 		if ($jsFile->exists()) {
 			$curContents = $jsFile->read();
 		} else {
@@ -122,9 +136,9 @@ class TableDocumentation
 	 * @return array
 	 */
 	private static function _getEntityList() {
-		$folder = new Folder(static::$_modelFolder . '/Entity');
+		$folder = new Folder(static::$_config->modelFolder . '/Entity');
 		$files = $folder->find('.*\.php', true);
-		$baseClassFile = Misc::namespaceSplit(self::$_baseEntityClass, true) . '.php';
+		$baseClassFile = Misc::namespaceSplit(static::$_config->baseEntityClass, true) . '.php';
 		$files = array_diff($files, [$baseClassFile]);
 
 		$result = [];
@@ -206,7 +220,7 @@ class TableDocumentation
 	 */
 	private static function _getEntityAnnotations($className) {
 		if (empty(self::$_entityAnnotationsCache[$className])) {
-			$reader = new Reader(self::$_modelNamespace . '\Entity\\' . $className);
+			$reader = new Reader(static::$_config->modelNamespace . '\Entity\\' . $className);
 			self::$_entityAnnotationsCache[$className] = $reader->getParameters();
 		}
 		return self::$_entityAnnotationsCache[$className];

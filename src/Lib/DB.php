@@ -24,10 +24,10 @@ class DB
 	}
 
 	/**
-	 * переподсоединиться
+	 * переподсоединиться, если отвалился
 	 * @param string $connectionName
 	 */
-	public static function reconnect($connectionName = self::CONNECTION_DEFAULT) {
+	public static function restoreConnection($connectionName = self::CONNECTION_DEFAULT) {
 		$connection = self::getConnection($connectionName);
 		if (!$connection->isConnected()) {
 			$connection->connect();

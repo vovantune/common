@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<resultset statement="SELECT * FROM common_test.test_table_one
+LIMIT 0, 5000
+"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<row>
+		<field name="id">158</field>
+		<field name="col_enum">val2</field>
+		<field name="col_text">qweqweqweqwe</field>
+		<field name="col_time">2017-03-14 11:22:33</field>
+	</row>
+</resultset>

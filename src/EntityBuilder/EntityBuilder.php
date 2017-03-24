@@ -1,14 +1,13 @@
 <?php
 namespace ArtSkills\EntityBuilder;
 
-use ArtSkills\Cake\ORM\Entity;
-use ArtSkills\Cake\ORM\Query;
-use ArtSkills\Cake\ORM\Table;
+use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\DB;
 use ArtSkills\Lib\Misc;
-use ArtSkills\Traits\Singleton;
-use ArtSkills\Cake\Filesystem\File;
-use ArtSkills\Cake\Filesystem\Folder;
+use ArtSkills\TestSuite\Mock\PropertyAccess;
+use ArtSkills\Traits\Library;
+use ArtSkills\Filesystem\File;
+use ArtSkills\Filesystem\Folder;
 use Cake\I18n\Time;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
@@ -18,11 +17,10 @@ use Cake\Utility\Inflector;
  */
 class EntityBuilder
 {
-	use Singleton;
+	use Library;
 
 	const ENTITY_TEMPLATE_STRING = '{ENTITY}';
 	const TIME_CLASS = '\\' . Time::class;
-	const TEMPLATES_DIR = __DIR__ . '/templates/';
 
 	const FILE_TYPE_TABLE = 'Table';
 	const FILE_TYPE_QUERY = 'Query';
@@ -44,30 +42,44 @@ class EntityBuilder
 		'binary' => 'string',
 	];
 
-	protected $_connectionName = DB::CONNECTION_DEFAULT;
+	/**
+	 * Конфиг
+	 * @var EntityBuilderConfig
+	 */
+	private static $_config = null;
 
-	protected $_modelNamespace = 'App\Model';
-	protected $_modelFolder = '';
+	/**
+	 * Список шаблонов магических методов для таблиц
+	 * @var array
+	 */
+	private static $_tableMethods = [];
+	/**
+	 * Список шаблонов файлов
+	 * @var array
+	 */
+	private static $_fileTemplates = [];
+	/**
+	 * Список базовых классов
+	 * @var array
+	 */
+	private static $_baseClasses = [];
 
-	protected $_baseTableClass = Table::class;
-	protected $_baseEntityClass = Entity::class;
-	protected $_baseQueryClass = Query::class;
-
-	protected $_entityTemplateFile = self::TEMPLATES_DIR . 'Entity.tpl';
-	protected $_queryTemplateFile = self::TEMPLATES_DIR . 'Query.tpl';
-	protected $_tableTemplateFile = self::TEMPLATES_DIR . 'Table.tpl';
-
-	protected $_tableNamesFile = 'table_names.php';
-
-
-	private $_tableMethods = [];
-	private $_fileTemplates = [];
-	private $_baseClasses = [];
-
-	private function __construct() {
-		$entityClassName = '\\' . $this->_modelNamespace . '\Entity\\' . self::ENTITY_TEMPLATE_STRING;
-		$queryClassName = '\\' . $this->_modelNamespace . '\Query\\' . self::ENTITY_TEMPLATE_STRING . 'Query';
-		$this->_tableMethods = [
+	/**
+	 * Задать конфиг
+	 * @param EntityBuilderConfig $config
+	 * @param $config
+	 * @throws \Exception
+	 */
+	public static function setConfig($config) {
+		static::$_config = $config;
+		if (empty($config)) {
+			return;
+		} elseif (!($config instanceof EntityBuilderConfig)) {
+			throw new \Exception('Bad config');
+		}
+		$entityClassName = self::_getClassTemplate(self::FILE_TYPE_ENTITY);
+		$queryClassName = self::_getClassTemplate(self::FILE_TYPE_QUERY);
+		static::$_tableMethods = [
 			'newEntity' => '@method ' . $entityClassName . ' newEntity(array|null $data = null, array $options = [])',
 			'newEntities' => '@method ' . $entityClassName . '[] newEntities(array $data, array $options = [])',
 			'patchEntity' => '@method ' . $entityClassName . ' patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])',
@@ -79,15 +91,15 @@ class EntityBuilder
 			'getEntity' => '@method ' . $entityClassName . '|false getEntity(' . $entityClassName . '|int $entity, array|\ArrayAccess $options = [])',
 			'updateWithLock' => '@method ' . $entityClassName . '|null updateWithLock(' . $queryClassName . '|array $queryData, array $updateData)',
 		];
-		$this->_fileTemplates = [
-			self::FILE_TYPE_TABLE => file_get_contents($this->_tableTemplateFile),
-			self::FILE_TYPE_QUERY => file_get_contents($this->_queryTemplateFile),
-			self::FILE_TYPE_ENTITY => file_get_contents($this->_entityTemplateFile),
+		static::$_fileTemplates = [
+			static::FILE_TYPE_TABLE => file_get_contents($config->tableTemplateFile),
+			static::FILE_TYPE_QUERY => file_get_contents($config->queryTemplateFile),
+			static::FILE_TYPE_ENTITY => file_get_contents($config->entityTemplateFile),
 		];
-		$this->_baseClasses = [
-			self::FILE_TYPE_TABLE => $this->_baseTableClass,
-			self::FILE_TYPE_QUERY => $this->_baseQueryClass,
-			self::FILE_TYPE_ENTITY => $this->_baseEntityClass,
+		static::$_baseClasses = [
+			static::FILE_TYPE_TABLE => $config->baseTableClass,
+			static::FILE_TYPE_QUERY => $config->baseQueryClass,
+			static::FILE_TYPE_ENTITY => $config->baseEntityClass,
 		];
 	}
 
@@ -96,19 +108,22 @@ class EntityBuilder
 	 *
 	 * @return boolean
 	 */
-	public function build() {
-		$tblList = $this->_getTableList();
+	public static function build() {
+		self::_checkConfig();
+		TableRegistry::clear();
+		$tblList = self::_getTableList();
 		$hasChanges = false;
 		foreach ($tblList as $tblName) {
-			if ($this->_buildTableDeps($tblName)) {
+			if (self::_buildTableDeps($tblName)) {
 				$hasChanges = true;
 			}
 		}
 
-		$namesUpdated = $this->_updateTableNamesFile($tblList);
+		$namesUpdated = self::_updateTableNamesFile($tblList);
 		if ($namesUpdated) {
 			$hasChanges = true;
 		}
+		TableRegistry::clear();
 
 		return $hasChanges;
 	}
@@ -119,26 +134,133 @@ class EntityBuilder
 	 * @param string $tableName
 	 * @throws \Exception
 	 */
-	public function createTableClass($tableName) {
+	public static function createTableClass($tableName) {
+		self::_checkConfig();
 		$tableName = Inflector::underscore($tableName);
-		if (!$this->_checkTableExists($tableName)) {
-			throw new \Exception('Table "' . $tableName . '" not exists in DB!');
+		if (!self::_checkTableExists($tableName)) {
+			throw new \Exception('Table "' . $tableName . '" does not exist in DB!');
 		}
 
 		$entityName = Inflector::camelize(str_replace('`', '', $tableName));
-		$tblClassName = $entityName . 'Table';
+		$tblClassName = $entityName . self::FILE_TYPE_TABLE;
 		if (class_exists($tblClassName)) {
 			throw new \Exception('Class "' . $tblClassName . '" already exists!');
 		}
 
-		$file = new File($this->_modelFolder . '/Table/' . $tblClassName . '.php');
+		$file = self::_getFile($entityName, self::FILE_TYPE_TABLE);
 		if ($file->exists()) {
 			throw new \Exception('File ' . $file->path . ' already exists!');
 		}
 
 
-		$file->write($this->_processFileTemplate($entityName, self::FILE_TYPE_TABLE));
+		if (!$file->write(self::_processFileTemplate($entityName, static::FILE_TYPE_TABLE))) {
+			throw new \Exception("File write error for $entityName; {$file->path}/{$file->name}");
+		};
 		$file->close();
+	}
+
+	/**
+	 * Методы, для которых нужны комменты
+	 *
+	 * @param string $tableAlias
+	 * @return array
+	 */
+	protected static function _getRedefineMethods($tableAlias) {
+		$methods = static::$_tableMethods;
+		$table = self::_getTable($tableAlias);
+		if ($table->hasBehavior('Timestamp')) {
+			$entityClassName = self::_getClassTemplate(self::FILE_TYPE_ENTITY);
+			$methods['touch'] = '@method ' . $entityClassName . ' touch(' . $entityClassName . ' $entity, string $eventName = \'Model.beforeSave\')';
+		}
+		return $methods;
+	}
+
+	/**
+	 * Возвращает список алиасов полей
+	 *
+	 * @param string $entityName
+	 * @param array $fields field => field
+	 * @return array alias => field
+	 */
+	protected static function _getAliases($entityName, $fields) {
+		$aliases = [];
+		$className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
+		if (class_exists($className)) {
+			$aliases = PropertyAccess::get(new $className, '_aliases');
+
+			foreach ($aliases as $alias => $field) {
+				if (empty($fields[$field])) {
+					unset($aliases[$alias]);
+				}
+			}
+		}
+		return $aliases;
+	}
+
+	/**
+	 * Получить таблицу
+	 *
+	 * @param string $tableAlias
+	 * @return \Cake\ORM\Table
+	 */
+	protected static function _getTable($tableAlias) {
+		return TableRegistry::get($tableAlias, ['notForceEntity' => true]);
+	}
+
+	/**
+	 * Файл для класса
+	 *
+	 * @param string $entityName
+	 * @param string $type
+	 * @return File
+	 */
+	private static function _getFile($entityName, $type) {
+		return new File(static::$_config->modelFolder . '/' . $type . '/' . self::_getShortClassName($entityName, $type) . '.php');
+	}
+
+	/**
+	 * Папка для классов
+	 *
+	 * @param string $type
+	 * @return Folder
+	 */
+	private static function _getFolder($type) {
+		return new Folder(static::$_config->modelFolder . $type);
+	}
+
+	/**
+	 * Шаблон полного названия класса
+	 *
+	 * @param string $type
+	 * @return string
+	 */
+	private static function _getClassTemplate($type) {
+		return '\\' . static::$_config->modelNamespace . '\\' . $type . '\\' . self::_getShortClassName(static::ENTITY_TEMPLATE_STRING, $type);
+	}
+
+	/**
+	 * Неполное название класса
+	 *
+	 * @param string $entityName
+	 * @param string $type
+	 * @return string
+	 */
+	private static function _getShortClassName($entityName, $type) {
+		$postfix = ($type == self::FILE_TYPE_ENTITY ? '' : $type);
+		return $entityName . $postfix;
+	}
+
+
+
+	/**
+	 * Проверка, что задан конфиг
+	 * @throws \Exception
+	 */
+	private static function _checkConfig() {
+		if (empty(static::$_config)) {
+			throw new \Exception('Не задан конфиг');
+		}
+		static::$_config->checkValid();
 	}
 
 	/**
@@ -148,16 +270,16 @@ class EntityBuilder
 	 * @param string $type
 	 * @return string
 	 */
-	protected function _processFileTemplate($entityName, $type) {
+	private static function _processFileTemplate($entityName, $type) {
 		$search = [
-			self::ENTITY_TEMPLATE_STRING,
+			static::ENTITY_TEMPLATE_STRING,
 			'{MODEL_NAMESPACE}',
 			'{BASE}',
 			'{USE_BASE}',
 		];
-		$baseClass = $this->_baseClasses[$type];
+		$baseClass = static::$_baseClasses[$type];
 		list($baseClassNamespace, $baseClassShort) = Misc::namespaceSplit($baseClass);
-		if ($baseClassNamespace === ($this->_modelNamespace . '\\' . $type)) {
+		if ($baseClassNamespace === (static::$_config->modelNamespace . '\\' . $type)) {
 			$useBaseClass = '';
 		} else {
 			$useBaseClass = "\nuse $baseClass;\n";
@@ -165,12 +287,12 @@ class EntityBuilder
 
 		$replace = [
 			$entityName,
-			$this->_modelNamespace,
+			static::$_config->modelNamespace,
 			$baseClassShort,
 			$useBaseClass
 		];
 
-		return str_replace($search, $replace, $this->_fileTemplates[$type]);
+		return str_replace($search, $replace, static::$_fileTemplates[$type]);
 	}
 
 	/**
@@ -179,8 +301,8 @@ class EntityBuilder
 	 * @param string $tableName
 	 * @return boolean
 	 */
-	private function _checkTableExists($tableName) {
-		$connection = DB::getConnection($this->_connectionName);
+	private static function _checkTableExists($tableName) {
+		$connection = DB::getConnection(static::$_config->connectionName);
 		$existingTables = $connection->query("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $tableName . "';")->fetchAll();
 		return $existingTables[0][0];
 	}
@@ -190,11 +312,11 @@ class EntityBuilder
 	 *
 	 * @return array
 	 */
-	private function _getTableList() {
-		$folder = new Folder($this->_modelFolder . '/Table');
+	private static function _getTableList() {
+		$folder = self::_getFolder(self::FILE_TYPE_TABLE);
 		$files = $folder->find('.*Table\.php', true);
 
-		$baseClassFile = Misc::namespaceSplit($this->_baseTableClass, true) . '.php';
+		$baseClassFile = Misc::namespaceSplit(static::$_config->baseTableClass, true) . '.php';
 		$result = [];
 		foreach ($files as $tblFile) {
 			if ($tblFile !== $baseClassFile) {
@@ -210,43 +332,27 @@ class EntityBuilder
 	 * @param string $tblName
 	 * @return boolean
 	 */
-	private function _buildTableDeps($tblName) {
-		$refClass = new \ReflectionClass($this->_modelNamespace . '\Table\\' . $tblName);
+	private static function _buildTableDeps($tblName) {
+		$refClass = new \ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tblName);
 
 		$classComment = $refClass->getDocComment();
 		$entityName = substr($tblName, 0, -5);
-		$resultComment = $this->_buildTableMethodRedefines($classComment, $entityName, $this->_getClassPublicMethods($refClass));
+		$resultComment = self::_buildTableMethodRedefines($classComment, $entityName, self::_getClassPublicMethods($refClass));
 
 		$hasChanges = false;
 		if ($resultComment !== $classComment) {
-			$this->_writeNewClassComment($refClass, $resultComment);
+			self::_writeNewClassComment($refClass, $resultComment);
 			$hasChanges = true;
 		}
 
-		if ($this->_createQueryClass($entityName)) {
+		if (self::_createQueryClass($entityName)) {
 			$hasChanges = true;
 		}
 
-		if ($this->_createEntityClass($entityName)) {
+		if (self::_createEntityClass($entityName)) {
 			$hasChanges = true;
 		}
 		return $hasChanges;
-	}
-
-	/**
-	 * Методы, для которых нужны комменты
-	 *
-	 * @param string $tableAlias
-	 * @return array
-	 */
-	protected function _getRedefineMethods($tableAlias) {
-		$methods = $this->_tableMethods;
-		$table = TableRegistry::get($tableAlias);
-		if ($table->hasBehavior('Timestamp')) {
-			$entityClassName = '\\' . $this->_modelNamespace . '\Entity\\' . self::ENTITY_TEMPLATE_STRING;
-			$methods['touch'] = '@method ' . $entityClassName . ' touch(' . $entityClassName . ' $entity, string $eventName = \'Model.beforeSave\')';
-		}
-		return $methods;
 	}
 
 	/**
@@ -257,21 +363,21 @@ class EntityBuilder
 	 * @param string[] $ownMethods
 	 * @return string
 	 */
-	private function _buildTableMethodRedefines($classComment, $entityName, $ownMethods) {
+	private static function _buildTableMethodRedefines($classComment, $entityName, $ownMethods) {
 		if ($classComment !== false) {
 			$commArr = explode("\n", $classComment);
 		} else {
 			$commArr = ['/**', ' */'];
 		}
 		$addLines = [];
-		foreach ($this->_getRedefineMethods($entityName) as $tplMethod => $template) {
+		foreach (static::_getRedefineMethods($entityName) as $tplMethod => $template) {
 			if (in_array($tplMethod, $ownMethods)) {
 				continue;
 			}
 
 			$hasMethod = false;
 
-			$template = str_replace(self::ENTITY_TEMPLATE_STRING, $entityName, $template);
+			$template = str_replace(static::ENTITY_TEMPLATE_STRING, $entityName, $template);
 			foreach ($commArr as $commIndex => $commLine) {
 				if (stristr($commLine, $template)) {
 					$hasMethod = true;
@@ -304,7 +410,7 @@ class EntityBuilder
 	 * @param \ReflectionClass $refClass
 	 * @return string[]
 	 */
-	private function _getClassPublicMethods($refClass) {
+	private static function _getClassPublicMethods($refClass) {
 		$methods = [];
 		foreach ($refClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
 			if ($method->class == $refClass->getName()) {
@@ -320,7 +426,7 @@ class EntityBuilder
 	 * @param \ReflectionClass $refClass
 	 * @param string $newComment
 	 */
-	private function _writeNewClassComment($refClass, $newComment) {
+	private static function _writeNewClassComment($refClass, $newComment) {
 		$file = new File($refClass->getFileName());
 		$curContent = $file->read();
 		if (empty($curContent)) {
@@ -345,12 +451,11 @@ class EntityBuilder
 	 * @param string $entityName
 	 * @return boolean
 	 */
-	private function _createQueryClass($entityName) {
-		$queryClassName = $entityName . 'Query';
-		$file = new File($this->_modelFolder . '/Query/' . $queryClassName . '.php');
+	private static function _createQueryClass($entityName) {
+		$file = self::_getFile($entityName, self::FILE_TYPE_QUERY);
 		if (!$file->exists()) {
 			$file->create();
-			$file->write($this->_processFileTemplate($entityName, self::FILE_TYPE_QUERY));
+			$file->write(self::_processFileTemplate($entityName, static::FILE_TYPE_QUERY));
 			$file->close();
 			return true;
 		} else {
@@ -364,10 +469,11 @@ class EntityBuilder
 	 * @param string $entityName
 	 * @return boolean
 	 */
-	private function _createEntityClass($entityName) {
-		$curTblFields = $this->_getTableFieldsComments($entityName);
-		$tableComment = $this->_getTableComment($entityName);
-		$aliases = $this->_getAliases($entityName);
+	private static function _createEntityClass($entityName) {
+		$curTblFields = self::_getTableFieldsComments($entityName);
+		$tableComment = self::_getTableComment($entityName);
+		$fieldNames = Arrays::keysFromValues(array_keys($curTblFields));
+		$aliases = static::_getAliases($entityName, $fieldNames);
 		if (!empty($tableComment)) {
 			$curTblFields[] = $tableComment;
 		}
@@ -378,9 +484,9 @@ class EntityBuilder
 		}
 		$aliasProperty .= "\t";
 
-		$file = new File($this->_modelFolder . '/Entity/' . $entityName . '.php');
+		$file = self::_getFile($entityName, self::FILE_TYPE_ENTITY);
 		if ($file->exists()) {
-			$className = $this->_modelNamespace . '\Entity\\' . $entityName;
+			$className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
 			$refClass = new \ReflectionClass($className);
 
 			$file = new File($refClass->getFileName());
@@ -392,7 +498,7 @@ class EntityBuilder
 			$classComments = $refClass->getDocComment();
 			if ($classComments === false) {
 				$newComments = implode("\n", array_merge(["/**"], $curTblFields, [" */"]));
-				$this->_writeNewClassComment($refClass, $newComments);
+				self::_writeNewClassComment($refClass, $newComments);
 				return true;
 			} else {
 				$commentsArr = explode("\n", $classComments);
@@ -411,7 +517,7 @@ class EntityBuilder
 				}
 
 				if ($hasChanges) {
-					$this->_writeNewClassComment($refClass, implode("\n", $commentsArr));
+					self::_writeNewClassComment($refClass, implode("\n", $commentsArr));
 					return true;
 				} else {
 					return false;
@@ -419,7 +525,7 @@ class EntityBuilder
 			}
 		} else {
 			$file->create();
-			$template = $this->_processFileTemplate($entityName, self::FILE_TYPE_ENTITY);
+			$template = self::_processFileTemplate($entityName, static::FILE_TYPE_ENTITY);
 			$search = ['{PROPERTIES}', '{ALIASES}'];
 			$replace = [implode("\n", $curTblFields), $aliasProperty];
 			$file->write(str_replace($search, $replace, $template));
@@ -434,8 +540,8 @@ class EntityBuilder
 	 * @param string $entityName
 	 * @return array
 	 */
-	private function _getTableFieldsComments($entityName) {
-		$table = TableRegistry::get($entityName);
+	private static function _getTableFieldsComments($entityName) {
+		$table = self::_getTable($entityName);
 		$tableSchema = $table->schema();
 
 		$columnList = $tableSchema->columns();
@@ -444,7 +550,7 @@ class EntityBuilder
 		$result = [];
 		foreach ($columnList as $column) {
 			$columnInfo = $tableSchema->column($column);
-			$result[$column] = ' * @property ' . self::SCHEMA_TYPE_MAP[$columnInfo['type']] . ' $' . $column .
+			$result[$column] = ' * @property ' . static::SCHEMA_TYPE_MAP[$columnInfo['type']] . ' $' . $column .
 				(array_key_exists($column, $defaultValues) ? ' = ' . var_export($defaultValues[$column], true) : '') .
 				(!empty($columnInfo['comment']) ? ' ' . $columnInfo['comment'] : '');
 		}
@@ -453,7 +559,7 @@ class EntityBuilder
 		/** @type \Cake\ORM\Association $assoc */
 		foreach ($associations as $assoc) {
 			$className = $assoc->className() ? $assoc->className() : $assoc->name();
-			$result[] = ' * @property ' . $className . (in_array($assoc->type(), [
+			$result[$assoc->property()] = ' * @property ' . $className . (in_array($assoc->type(), [
 					'oneToMany',
 					'manyToMany',
 				]) ? '[]' : '') . ' $' . $assoc->property() . ' `' .
@@ -470,10 +576,10 @@ class EntityBuilder
 	 * @param string $entityName
 	 * @return bool|string
 	 */
-	private function _getTableComment($entityName) {
-		$table = TableRegistry::get($entityName);
+	private static function _getTableComment($entityName) {
+		$table = self::_getTable($entityName);
 
-		$connection = DB::getConnection($this->_connectionName);
+		$connection = DB::getConnection(static::$_config->connectionName);
 		$tableComment = $connection->query("SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $table->table() . "';")->fetchAll();
 		if (!empty($tableComment) && !empty($tableComment[0][0])) {
 			return ' * @tableComment ' . $tableComment[0][0];
@@ -488,18 +594,23 @@ class EntityBuilder
 	 * @param string[] $tableList
 	 * @return bool
 	 */
-	private function _updateTableNamesFile($tableList) {
+	private static function _updateTableNamesFile($tableList) {
 		$constList = [];
 		foreach ($tableList as $className) {
 			$entityName = substr($className, 0, -5);
-			$table = TableRegistry::get($entityName);
+			$table = self::_getTable($entityName);
 			$constList[] = 'const ' . strtoupper($table->table()) . ' = "' . $table->alias() . '";';
 		}
 
 		$newContent = "<?php\n// This file is autogenerated\n" . implode("\n", $constList);
 
-		$namesFl = new File($this->_modelFolder . '/' . $this->_tableNamesFile);
-		$curContent = $namesFl->read();
+		$namesFl = new File(static::$_config->modelFolder . '/' . static::$_config->tableNamesFile);
+		if ($namesFl->exists()) {
+			$curContent = $namesFl->read();
+		} else {
+			$curContent = '';
+		}
+
 
 		if ($curContent !== $newContent) {
 			$namesFl->write($newContent);
@@ -510,13 +621,4 @@ class EntityBuilder
 		}
 	}
 
-	/**
-	 * Возвращает список алиасов полей cf_
-	 *
-	 * @param string $entityName
-	 * @return array
-	 */
-	protected function _getAliases($entityName) {
-		return [];
-	}
 }
