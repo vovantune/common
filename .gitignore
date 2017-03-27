@@ -2,3 +2,4 @@
 /.idea/
 /composer.lock
 /test-app-conf/app_local.php
+/test-app-junk

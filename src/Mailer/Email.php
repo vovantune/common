@@ -16,10 +16,35 @@ class Email extends \Cake\Mailer\Email
 	 */
 	public function __construct($config = null) {
 		if (Env::isUnitTest()) {
-			$config['transport'] = 'test';
+			$config = $this->_getTestConfig($config);
 		}
 		parent::__construct($config);
 		$this->addHeaders(['Precedence' => 'bulk']);
+	}
+
+	/**
+	 * Преобразовать конфиг для тестов
+	 *
+	 * @param array|string|null $paramConfig
+	 * @return array|null
+	 */
+	private function _getTestConfig($paramConfig) {
+		if (is_array($paramConfig)) {
+			$config = $paramConfig;
+		} else {
+			if (empty($paramConfig)) {
+				$confKey = 'default';
+			} else {
+				$confKey = $paramConfig;
+			}
+			$config = static::config($confKey);
+		}
+		if (is_array($config)) {
+			$config['transport'] = 'test';
+		} else {
+			$config = $paramConfig;
+		}
+		return $config;
 	}
 
 	/**

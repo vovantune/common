@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\ORM;
 
+use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Strings;
 use Cake\Datasource\EntityInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
@@ -14,7 +15,13 @@ class Table extends \Cake\ORM\Table
 	 * прописывание правильной сущности
 	 */
 	public function initialize(array $config) {
-		$this->_initTimeStampBehavior();
+		if (!Env::isUnitTest() || !empty($config['testInit'])) {
+			// в юнит тестах иногда инициализируются классы таблиц при том, что работы с таблицей в базе не происходит
+			// и в таких случаях фикстуры обычно не объявлены и таблица в базе не создаётся
+			// а _initTimeStampBehavior вызывает получение списка полей, для которого таблица обязательна
+			// поэтому добавил проверку
+			$this->_initTimeStampBehavior();
+		}
 		if (empty($config['notForceEntity'])) {
 			$this->entityClass(self::_getAlias());
 		}
@@ -227,8 +234,6 @@ class Table extends \Cake\ORM\Table
 	public function query() {
 		return new Query($this->connection(), $this);
 	}
-
-	//beforeM
 
 	/**
 	 * Автозаполнение полей создания/правки

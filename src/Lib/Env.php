@@ -107,6 +107,25 @@ class Env
 	}
 
 	/**
+	 * Обратная проверка, т.к. чаще всего нужна именно она
+	 *
+	 * @return bool
+	 */
+	public static function isNotProduction() {
+		return !self::isProduction();
+	}
+
+	/**
+	 * Лёгкая проверка, на линуксе юзер или нет
+	 *
+	 * @return bool
+	 */
+	public static function isUserLinux() {
+		$userAgent = env('HTTP_USER_AGENT');
+		return (empty($userAgent) || (stristr($userAgent, 'Linux') || stristr($userAgent, 'Mac OS')));
+	}
+
+	/**
 	 * Включить режим дебага
 	 */
 	public static function enableDebug() {

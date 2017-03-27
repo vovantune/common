@@ -133,6 +133,7 @@ class EntityBuilder
 	 *
 	 * @param string $tableName
 	 * @throws \Exception
+	 * @return string
 	 */
 	public static function createTableClass($tableName) {
 		self::_checkConfig();
@@ -153,10 +154,12 @@ class EntityBuilder
 		}
 
 
-		if (!$file->write(self::_processFileTemplate($entityName, static::FILE_TYPE_TABLE))) {
+		if (!$file->write(self::_processFileTemplate($entityName, self::FILE_TYPE_TABLE))) {
 			throw new \Exception("File write error for $entityName; {$file->path}/{$file->name}");
 		};
 		$file->close();
+
+		return $file->path;
 	}
 
 	/**
@@ -215,7 +218,7 @@ class EntityBuilder
 	 * @return File
 	 */
 	private static function _getFile($entityName, $type) {
-		return new File(static::$_config->modelFolder . '/' . $type . '/' . self::_getShortClassName($entityName, $type) . '.php');
+		return new File(static::$_config->modelFolder . $type . '/' . self::_getShortClassName($entityName, $type) . '.php');
 	}
 
 	/**

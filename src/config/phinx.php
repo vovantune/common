@@ -1,5 +1,13 @@
 <?php
-function getPhinxConfig($pathsFile, $dbConfFile, $baseMigrationClass = \ArtSkills\Phinx\Migration\AbstractMigration::class) {
+/**
+ * Формирование конфига для Phinx на основе конфига приложения
+ *
+ * @param string $dbConfFile кейковый конфиг с настройками БД
+ * @param string $pathsFile файл с константами путей
+ * @param string $baseMigrationClass класс, от которого наследовать миграции
+ * @return array
+ */
+function getPhinxConfig($dbConfFile, $pathsFile, $baseMigrationClass = \ArtSkills\Phinx\Migration\AbstractMigration::class) {
 	$phinxConfig = [
 		'migration_base_class' => $baseMigrationClass,
 		'paths' => [

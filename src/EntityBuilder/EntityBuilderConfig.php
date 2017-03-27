@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\EntityBuilder;
 
+use ArtSkills\Lib\Strings;
 use ArtSkills\ORM\Entity;
 use ArtSkills\ORM\Query;
 use ArtSkills\ORM\Table;
@@ -109,6 +110,12 @@ class EntityBuilderConfig extends ValueObject
 		foreach ($this->_allFieldNames as $fieldName) {
 			if (empty($this->{$fieldName})) {
 				throw new \Exception("Empty value for field '$fieldName'");
+			}
+		}
+		$trailingDsFields = ['modelFolder', 'templatesDir'];
+		foreach ($trailingDsFields as $fieldName) {
+			if (!Strings::endsWith($this->$fieldName, '/')) {
+				$this->$fieldName = $this->$fieldName . '/';
 			}
 		}
 	}

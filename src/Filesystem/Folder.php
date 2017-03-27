@@ -99,11 +99,13 @@ class Folder extends \Cake\Filesystem\Folder
 	 *
 	 * @param string $path
 	 * @param int $mode
+	 * @return string
 	 */
 	public static function createIfNotExists($path, $mode = 0755) {
 		if (!is_dir($path)) {
-			mkdir($path, 0755);
+			mkdir($path, $mode);
 		}
+		return $path;
 	}
 
 }

@@ -215,6 +215,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	public function insert(ConnectionInterface $testConnection) {
 		/**  @var Connection $testConnection */
 		try {
+			// тут всё то же самое, что и в parent::insert()
+			// но в $query->insert() не передаётся $types
 			if (isset($this->records) && !empty($this->records)) {
 				$values = $this->records;
 				$fields = array_keys($values[0]);

@@ -34,11 +34,12 @@ class Controller extends \Cake\Controller\Controller
 	 * Отправляем JSON/JSONP ответ клиенту
 	 *
 	 * @param array $jsonArray
+	 * @param bool $sendNull
 	 * @return null
 	 * @internal У нас стандартизированный JSON: _sendJsonOk и _sendJsonError
 	 */
-	protected function _sendJsonResponse($jsonArray) {
-		if (empty($jsonArray)) {
+	protected function _sendJsonResponse($jsonArray, $sendNull = false) {
+		if (empty($jsonArray) && !$sendNull) {
 			$jsonArray['status'] = self::JSON_STATUS_OK;
 		}
 

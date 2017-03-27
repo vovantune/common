@@ -4,9 +4,7 @@ namespace ArtSkills\Lib;
 use ArtSkills\Traits\Singleton;
 
 /**
- * Класс-одиночка с функционалом отображения и переключения git веток разработки для предрелизной ветки CRM
- *
- * @package App\Lib
+ * Работа с Git. Переключение веток, pull, удаление веток
  */
 class Git
 {
@@ -21,11 +19,11 @@ class Git
 
 
 	/**
-	 * Команда запуска git на тесте
+	 * Команда запуска git на сервере
 	 *
 	 * @var string
 	 */
-	const GIT_COMMAND = '/var/www/git.sh -i /var/www/github';
+	const GIT_COMMAND_SERVER = '/var/www/git.sh -i /var/www/github';
 
 	/**
 	 * Команда запуска git на локальных тачках
@@ -53,7 +51,7 @@ class Git
 	 */
 	private function __construct() {
 		if (Env::isTestServer()) {
-			$this->_gitCommand = self::GIT_COMMAND;
+			$this->_gitCommand = self::GIT_COMMAND_SERVER;
 		} elseif (Env::isLocal() || Env::isUnitTest()) {
 			$this->_gitCommand = self::GIT_COMMAND_LOCAL;
 		}

@@ -3,6 +3,7 @@ namespace ArtSkills\Lib;
 
 use ArtSkills\Http\Client;
 use ArtSkills\Traits\Library;
+use Cake\Http\Client\Response;
 
 class Http
 {
@@ -30,22 +31,25 @@ class Http
 	 * Возвращает JSON ответ на get запрос
 	 *
 	 * @param string $url
-	 * @return array mixed
+	 * @param array $data
+	 * @param array $options
+	 * @return array|null
 	 */
-	public static function getJson($url) {
+	public static function getJson($url, $data = [], $options = []) {
 		$request = static::_makeRequest();
-		return static::_getRequest($url, $request)->json;
+		return static::_getRequest($url, $request, $data, $options)->json;
 	}
 
 	/**
 	 * Возвращает Json ответ на Post запрос
 	 * @param string $url
 	 * @param array $data
-	 * @return array mixed
+	 * @param array $options
+	 * @return array|null
 	 */
-	public static function postJson($url, $data) {
+	public static function postJson($url, $data, $options = []) {
 		$request = self::_makeRequest();
-		return static::_postRequest($url, $request, $data)->json;
+		return static::_postRequest($url, $request, $data, $options)->json;
 	}
 
 
@@ -65,10 +69,12 @@ class Http
 	 *
 	 * @param string $url
 	 * @param Client $request
-	 * @return mixed
+	 * @param array $data
+	 * @param array $options
+	 * @return Response
 	 */
-	private static function _getRequest($url, $request) {
-		return $request->get($url);
+	private static function _getRequest($url, $request, $data = [], $options = []) {
+		return $request->get($url, $data, $options);
 	}
 
 	/**
@@ -77,10 +83,11 @@ class Http
 	 * @param string $url
 	 * @param Client $request
 	 * @param array $data
-	 * @return mixed
+	 * @param array $options
+	 * @return Response
 	 */
-	private static function _postRequest($url, $request, $data) {
-		return $request->post($url, $data);
+	private static function _postRequest($url, $request, $data, $options = []) {
+		return $request->post($url, $data, $options);
 	}
 
 	/**

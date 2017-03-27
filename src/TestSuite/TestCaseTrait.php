@@ -14,9 +14,8 @@ use ArtSkills\TestSuite\HttpClientMock\HttpClientAdapter;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientMocker;
 use ArtSkills\TestSuite\Mock\PropertyAccess;
 use ArtSkills\TestSuite\PermanentMocks\MockFileLog;
-use Cake\Datasource\ModelAwareTrait;
 use Cake\I18n\Time;
-use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Cake\Utility\Inflector;
 
@@ -27,9 +26,6 @@ use Cake\Utility\Inflector;
  */
 trait TestCaseTrait
 {
-
-	use ModelAwareTrait;
-	use LocatorAwareTrait;
 
 	/**
 	 * Набор постоянных моков
@@ -55,11 +51,11 @@ trait TestCaseTrait
 	protected $_disabledDefaultMocks = [];
 
 	/**
-	 * Список классов-одиночек, которые надо чистить в тестах
+	 * Список правильно проинициализированных таблиц
 	 *
-	 * @var string[]
+	 * @var array
 	 */
-	protected static $_singletones = [];
+	private static $_tableRegistry = [];
 
 
 	/** вызывать в реальном setUpBeforeClass */
@@ -78,6 +74,7 @@ trait TestCaseTrait
 		$this->_loadFixtureModels();
 
 		HttpClientAdapter::enableDebug();
+		$this->_setUpLocal();
 	}
 
 	/**
@@ -92,7 +89,19 @@ trait TestCaseTrait
 		Time::setTestNow(null); // сбрасываем тестовое время
 		$this->_destroyPermanentMocks();
 		$this->_disabledMocks = [];
+		$this->_tearDownLocal();
 	}
+
+	/** для локальных действий на setUp */
+	protected function _setUpLocal() {
+		// noop
+	}
+
+	/** для локальных действий на tearDown */
+	protected function _tearDownLocal() {
+		// noop
+	}
+
 
 	/**
 	 * Отключение постоянного мока; вызывать перед parent::setUp();
@@ -117,10 +126,15 @@ trait TestCaseTrait
 		if (empty($this->fixtures)) {
 			return;
 		}
-		$this->modelFactory('Table', [$this->tableLocator(), 'get']);
 		foreach ($this->fixtures as $fixtureName) {
 			$modelAlias = Inflector::camelize(Strings::lastPart('.', $fixtureName));
-			$this->loadModel($modelAlias);
+			if (TableRegistry::exists($modelAlias)) {
+				TableRegistry::remove($modelAlias);
+			}
+			$this->{$modelAlias} = TableRegistry::get($modelAlias, [
+				'className' => $modelAlias,
+				'testInit' => true,
+			]);
 		}
 	}
 
@@ -172,9 +186,21 @@ trait TestCaseTrait
 	 * то, что одиночки создаются 1 раз, иногда может очень мешать
 	 */
 	protected static function _clearSingletones() {
-		foreach (static::$_singletones as $className) {
+		$singletones = static::_getSingletones();
+		foreach ($singletones as $className) {
 			PropertyAccess::setStatic($className, '_instance', null);
 		}
+	}
+
+	/**
+	 * Список классов-одиночек для очистки
+	 *
+	 * @return string[]
+	 */
+	public static function _getSingletones() {
+		// Приходится использовать метод, ибо переопределить свойство при использовании трейта нельзя
+		// А заполнить свойство не получится, ибо _clearSingletones статичен
+		return [];
 	}
 
 
@@ -192,20 +218,22 @@ trait TestCaseTrait
 	}
 
 	/**
-	 * Проверка на вхождение ассоциативного массива
+	 * Проверка совпадения части массива
+	 * Замена нативного assertArraySubset, который не показывает красивые диффы
 	 *
-	 * @param array $expectedPartialArray
-	 * @param array $testArray
+	 * @param array $expected
+	 * @param array $actual
 	 * @param string $message
 	 * @param float $delta
 	 * @param int $maxDepth
+	 * @param bool $canonicalize
+	 * @param bool $ignoreCase
 	 */
-	public function assertAssocArraySubset(
-		$expectedPartialArray, $testArray, $message = '', $delta = 0.0, $maxDepth = 10
+	public function assertArraySubsetEquals(
+		array $expected, array $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false
 	) {
-		self::assertEquals(
-			$expectedPartialArray, array_intersect_key($testArray, $expectedPartialArray), $message, $delta, $maxDepth
-		);
+		$actual = array_intersect_key($actual, $expected);
+		self::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
 	}
 
 	/**
@@ -220,7 +248,7 @@ trait TestCaseTrait
 	public function assertEntitySubset(
 		array $expectedSubset, Entity $entity, $message = '', $delta = 0.0, $maxDepth = 10
 	) {
-		$this->assertAssocArraySubset($expectedSubset, $entity->toArray(), $message, $delta, $maxDepth);
+		$this->assertArraySubsetEquals($expectedSubset, $entity->toArray(), $message, $delta, $maxDepth);
 	}
 
 	/**

@@ -126,11 +126,13 @@ class EntityBuilderTest extends AppTestCase
 	 * Создание новой таблицы
 	 */
 	public function testCreate() {
-		EntityBuilder::createTableClass('test_table_four');
-		$this->assertFileEquals(__DIR__ . '/ExpectedResults/CreateTable/TestTableFourTable.php', self::MODEL_PATH . '/Table/TestTableFourTable.php', 'Ошибка создания нового класса таблицы');
+		$expectedFilePath = self::MODEL_PATH . '/Table/TestTableFourTable.php';
+		$actualFilePath = EntityBuilder::createTableClass('test_table_four');
+		self::assertEquals($expectedFilePath, $actualFilePath);
+		self::assertFileEquals(__DIR__ . '/ExpectedResults/CreateTable/TestTableFourTable.php', $actualFilePath, 'Ошибка создания нового класса таблицы');
 
 		// очень плохое решение, но я не придумал ничего лучше
-		require_once self::MODEL_PATH . '/Table/TestTableFourTable.php';
+		require_once $actualFilePath;
 		/**
 		 * table_three - был только пустой класс таблицы, всё создалось
 		 */

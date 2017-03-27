@@ -13,13 +13,6 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 {
 
 	/**
-	 * @inheritdoc
-	 * @var array
-	 */
-	protected $_mockData = [];
-
-
-	/**
 	 * Снифф флеша
 	 *
 	 * @var null|MethodMockerEntity
@@ -169,6 +162,7 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 				$this->_flashResult[] = $args;
 			});
 	}
+
 	/**
 	 * Проверка, что можно применять ассерты флеша
 	 */
@@ -196,7 +190,7 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $assertFailMessage
 	 */
 	public function assertFlashSuccess($expectedMessage, $assertFailMessage = '') {
-		$this->_assertFlashEquals([['success', [$expectedMessage]]], $assertFailMessage);
+		$this->assertFlashMany([$expectedMessage => 'success'], $assertFailMessage);
 	}
 
 	/**
@@ -206,7 +200,31 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $assertFailMessage
 	 */
 	public function assertFlashError($expectedMessage, $assertFailMessage = '') {
-		$this->_assertFlashEquals([['error', [$expectedMessage]]], $assertFailMessage);
+		$this->assertFlashMany([$expectedMessage =>'error'], $assertFailMessage);
+	}
+
+	/**
+	 * Проверка нескольких сообщений флеша
+	 *
+	 * @param array $expectedMessages сообщение => тип
+	 * @param string $assertFailMessage
+	 */
+	public function assertFlashMany(array $expectedMessages, $assertFailMessage = '') {
+		$expectedFlash = [];
+		foreach ($expectedMessages as $expectedMessage => $messageType) {
+			$expectedFlash[] = [$messageType, [$expectedMessage]];
+		}
+		$this->_assertFlashEquals($expectedFlash, $assertFailMessage);
+	}
+
+	/**
+	 * Проверка, что было много ошибок
+	 *
+	 * @param array $expectedErrors
+	 * @param string $assertFailMessage
+	 */
+	public function assertFlashManyErrors(array $expectedErrors, $assertFailMessage = '') {
+		$this->assertFlashMany(array_fill_keys($expectedErrors, 'error'), $assertFailMessage);
 	}
 
 	/**
@@ -248,6 +266,26 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	public function assertNoFlash($message = '') {
 		$this->_checkFlashInited();
 		self::assertEquals([], $this->_flashResult, $message);
+	}
+
+	/**
+	 * Задаёт хедер User-Agent, чтоб срабатывали проверки на линукс
+	 */
+	protected function _setLinuxHeaders() {
+		$this->_setHeader('User-Agent', 'linux');
+	}
+
+	/**
+	 * Задаёт хедер реферера
+	 *
+	 * @param string $refererUrl
+	 * @param string $webroot
+	 */
+	protected function _setReferer($refererUrl, $webroot = '/') {
+		$this->_setHeader('referer', $refererUrl);
+		if (!array_key_exists('webroot', $this->_request)) {
+			$this->_request['webroot'] = $webroot;
+		}
 	}
 
 	/**

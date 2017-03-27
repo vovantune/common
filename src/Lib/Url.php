@@ -29,6 +29,15 @@ class Url
 	}
 
 	/**
+	 * Текущий домен и протокол
+	 *
+	 * @return string
+	 */
+	public static function domainAndProtocol() {
+		return self::_build(self::domain(), self::protocol());
+	}
+
+	/**
 	 * Соединить путь через /
 	 *
 	 * @param string[] $parts
@@ -39,13 +48,15 @@ class Url
 	}
 
 	/**
-	 * Создать урл с текущим доменом, указанным путём и параметрами
+	 * Создать урл с текущим доменом, указанным протоколом, путём и параметрами
 	 *
+	 * @param string $domain
+	 * @param string $protocol
 	 * @param string[]|string $parts
 	 * @param array|string $query
 	 * @return string
 	 */
-	public static function withDomain($parts = [], $query = []) {
+	private static function _build($domain, $protocol, $parts = [], $query = []) {
 		$url = '';
 		if (!empty($parts)) {
 			$url = self::path((array)$parts);
@@ -64,7 +75,23 @@ class Url
 				$queryString = '?' . $queryString;
 			}
 		}
-		return self::domain() . $url . $queryString;
+		if (empty($protocol)) {
+			$protocol = '';
+		} else {
+			$protocol = $protocol . '://';
+		}
+		return $protocol . $domain . $url . $queryString;
+	}
+
+	/**
+	 * Создать урл с текущим доменом, указанным путём и параметрами
+	 *
+	 * @param string[]|string $parts
+	 * @param array|string $query
+	 * @return string
+	 */
+	public static function withDomain($parts = [], $query = []) {
+		return self::_build(self::domain(), false, $parts, $query);
 	}
 
 	/**
@@ -75,7 +102,7 @@ class Url
 	 * @return string
 	 */
 	public static function withDomainHttp($parts = [], $query = []) {
-		return self::HTTP . self::withDomain($parts, $query);
+		return self::_build(self::domain(), 'http', $parts, $query);
 	}
 
 
@@ -87,7 +114,19 @@ class Url
 	 * @return string
 	 */
 	public static function withDomainAndProtocol($parts = [], $query = []) {
-		return self::protocol() . '://' . self::withDomain($parts, $query);
+		return self::_build(self::domain(), self::protocol(), $parts, $query);
+	}
+
+	/**
+	 * Адрес с любым доменом
+	 *
+	 * @param string $domain
+	 * @param array $parts
+	 * @param array $query
+	 * @return string
+	 */
+	public static function withCustomDomain($domain, $parts = [], $query = []) {
+		return self::_build($domain, false, $parts, $query);
 	}
 
 	/**
