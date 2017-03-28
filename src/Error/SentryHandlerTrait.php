@@ -19,7 +19,7 @@ trait SentryHandlerTrait
 	 */
 	protected function _initSentry() {
 		if (Env::hasSentryDsn()) {
-			$this->_client = new Raven_Client(Env::getSentryDsn());
+			$this->_client = new Raven_Client(Env::getSentryDsn(), (Env::getSentryOptions() ?: []));
 		}
 	}
 

@@ -7,6 +7,7 @@ use Cake\Core\Configure;
  * @method static string getServerName()
  * @method static string getServerProtocol()
  * @method static string getSentryDsn()
+ * @method static string getSentryOptions()
  * @method static string getHttpClientAdapter()
  * @method static string getDebugEmail()
  * @method static string getTestServerName()

@@ -57,7 +57,7 @@ class SentryLog extends BaseLog
 		}
 
 		$message .= implode("\n", $traceArr);
-		$client = new Raven_Client($this->_dsn);
+		$client = new Raven_Client($this->_dsn, Env::getSentryOptions() ?: []);
 		$client->captureMessage($message);
 	}
 }
