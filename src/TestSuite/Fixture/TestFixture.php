@@ -3,11 +3,12 @@ namespace ArtSkills\TestSuite\Fixture;
 
 use ArtSkills\Lib\DB;
 use ArtSkills\Lib\Env;
+use ArtSkills\Lib\Misc;
+use ArtSkills\Lib\Strings;
 use Cake\Database\Connection;
 use Cake\Utility\Inflector;
 use Cake\Datasource\ConnectionInterface;
 use Exception;
-
 
 class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 {
@@ -89,9 +90,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 		if (!empty($this->table)) {
 			$this->import['table'] = $this->table;
 		} else {
-			list(, $class) = namespaceSplit(get_class($this));
-			preg_match('/^(.*)Fixture$/', $class, $matches);
-			$table = Inflector::underscore($matches[1]);
+			$class = Misc::namespaceSplit(static::class, true);
+			$table = Inflector::underscore(Strings::replacePostfix($class, 'Fixture'));
 			$this->import['table'] = $table;
 		}
 
@@ -199,9 +199,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 		}
 
 		try {
-			/**
-			 * @var Connection $testConnection
-			 */
+			/** @var Connection $testConnection */
 			$testConnection->execute($this->_createTableSqlQuery);
 		} catch (Exception $e) {
 			throw new Exception('Не удалось создать таблицу ' . $this->table . ': ' . $e->getMessage(), 0, $e);

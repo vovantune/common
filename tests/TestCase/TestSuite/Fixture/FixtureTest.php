@@ -18,8 +18,8 @@ class FixtureTest extends AppTestCase
 
 	/** @inheritdoc */
 	public $fixtures = [
-		'app.test_table_one',
-		'app.test_table_three',
+		'test_table_one', // возможность писать без app
+		'TestTableThree', // возможность в CamelCase
 		'plugin.art_skills.test_table_two', // чтобы FixtureManager подтянул классовую фикстуру, которая в необычном неймспейсе
 	];
 

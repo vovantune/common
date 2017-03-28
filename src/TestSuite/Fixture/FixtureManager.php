@@ -46,7 +46,12 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
 				continue;
 			}
 
-			list($type, $pathName) = explode('.', $fixture, 2);
+			if (stripos($fixture, '.') !== false) {
+				list($type, $pathName) = explode('.', $fixture, 2);
+			} else {
+				$type = 'app';
+				$pathName = $fixture;
+			}
 			$path = explode('/', $pathName);
 			$name = array_pop($path);
 			$additionalPath = implode('\\', $path);
@@ -64,7 +69,7 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
 				$baseNamespace = '';
 				$name = $fixture;
 			}
-			$tableName = $name;
+			$tableName = Inflector::underscore($name);
 			$name = Inflector::camelize($name);
 			$nameSegments = [
 				$baseNamespace,
