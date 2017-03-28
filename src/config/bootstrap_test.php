@@ -15,3 +15,6 @@ if (!empty($existingTables)) {
 	$testConnection->execute('DROP TABLE ' . $existingTables)->closeCursor();
 }
 unset($testConnection);
+
+\Cake\Cache\Cache::clear(false, '_cake_model_');
+\Cake\Cache\Cache::clear(false, '_cake_core_');
