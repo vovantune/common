@@ -19,8 +19,8 @@ class CsvWriterTest extends AppTestCase
 		$csvWriter->writeRow(['Вася', 'Пупкин']);
 		$csvWriter->close();
 
-		$this->assertFileExists($testFile, 'Файл не был создан');
-		$this->assertFileEquals(__DIR__ . '/csvWriterOriginalFile.csv', $testFile, 'Файлы не идентичны!');
+		self::assertFileExists($testFile, 'Файл не был создан');
+		self::assertFileEquals(__DIR__ . '/csvWriterOriginalFile.csv', $testFile, 'Файлы не идентичны!');
 		unlink($testFile);
 	}
 
@@ -70,8 +70,8 @@ class CsvWriterTest extends AppTestCase
 		$csvWriter->writeRow(['Вася', 'Пупкин']);
 		$csvWriter->close();
 
-		$this->assertFileExists($testFile, 'Файл не был создан');
-		$this->assertEquals(iconv('UTF-8', 'windows-1251', file_get_contents(__DIR__ . '/csvWriterOriginalFile.csv')), file_get_contents($testFile), 'Файлы не идентичны (кодировка)!');
+		self::assertFileExists($testFile, 'Файл не был создан');
+		self::assertEquals(iconv('UTF-8', 'windows-1251', file_get_contents(__DIR__ . '/csvWriterOriginalFile.csv')), file_get_contents($testFile), 'Файлы не идентичны (кодировка)!');
 		unlink($testFile);
 	}
 
@@ -88,8 +88,8 @@ class CsvWriterTest extends AppTestCase
 		$csvWriter->writeRow(['"\'"\'Ва;ся', 'Пупк""ин']);
 		$csvWriter->close();
 
-		$this->assertFileExists($testFile, 'Файл не был создан');
-		$this->assertFileEquals(__DIR__ . '/csvWriterOriginalFileWithSymbols.csv', $testFile, 'Файлы не идентичны!');
+		self::assertFileExists($testFile, 'Файл не был создан');
+		self::assertFileEquals(__DIR__ . '/csvWriterOriginalFileWithSymbols.csv', $testFile, 'Файлы не идентичны!');
 		unlink($testFile);
 	}
 
@@ -117,13 +117,9 @@ class CsvWriterTest extends AppTestCase
 		];
 
 		//Для проверки на корректность записанных данных
-		$csvReader = new CsvReader();
-
-		$this->assertEquals(true, CsvWriter::writeCsv($fileName, $data), 'Ошибка записи файла');
-		$this->assertEquals($data, $csvReader->parseCsv($fileName), 'Некорректный массив из CSV файла');
+		self::assertEquals(true, CsvWriter::writeCsv($fileName, $data), 'Ошибка записи файла');
+		self::assertEquals($data, (new CsvReader($fileName))->getAll(), 'Некорректный массив из CSV файла');
 		unlink($fileName);
-
-
 	}
 
 }

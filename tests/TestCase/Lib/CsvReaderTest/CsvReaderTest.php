@@ -6,27 +6,13 @@ use ArtSkills\TestSuite\AppTestCase;
 
 class CsvReaderTest extends AppTestCase
 {
-	/**
-	 * CsvReader
-	 *
-	 * @var CsvReader
-	 */
-	private $_reader = null;
-
-	/**
-	 * @inheritdoc
-	 */
-	public function setUp() {
-		parent::setUp();
-		$this->_reader = new CsvReader();
-	}
 
 	/**
 	 * Проверка чтения сложных файлов
 	 */
 	public function testReading() {
-		$fileName = __DIR__ . '/CsvFixture.csv';
-		$this->assertEquals([
+		$csv = new CsvReader(__DIR__ . '/CsvFixture.csv');
+		self::assertEquals([
 			0 => [
 				0 => 'row1',
 				1 => 'row2',
@@ -42,9 +28,9 @@ class CsvReaderTest extends AppTestCase
 				1 => '1',
 				2 => '1987-01-16',
 			],
-		], $this->_reader->parseCsv($fileName), 'Некорректный массив из CSV файла'); // обычная выгрузка
+		], $csv->getAll(), 'Некорректный массив из CSV файла'); // обычная выгрузка
 
-		$this->assertEquals([
+		self::assertEquals([
 			0 => [
 				'row1' => 'Вася',
 				'row2' => '123.45',
@@ -55,9 +41,17 @@ class CsvReaderTest extends AppTestCase
 				'row2' => '1',
 				'row3' => '1987-01-16',
 			],
-		], $this->_reader->createAssocArrayFromCsv($fileName), 'Ассоциативный массив из CSV файла некорректен'); // ассоциативный массив
+		], $csv->getAllAssoc(), 'Ассоциативный массив из CSV файла некорректен'); // ассоциативный массив
 
 	}
 
-
+	/**
+	 * Открываем несуществующий файл
+	 *
+	 * @expectedException \Exception
+	 * @expectedExceptionMessage File "bad file" does not exist
+	 */
+	public function testNotOpen() {
+		new CsvReader('bad file');
+	}
 }

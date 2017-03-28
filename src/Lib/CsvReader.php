@@ -3,36 +3,86 @@ namespace ArtSkills\Lib;
 
 class CsvReader
 {
+	const DEFAULT_ENCODING = 'UTF-8';
+	const DEFAULT_DELIMITER = ',';
+
+	/**
+	 * Указатель на открытый файл
+	 *
+	 * @var null|resource
+	 */
+	private $_handle = null;
+
+	/**
+	 * Текущий разделитель
+	 *
+	 * @var string
+	 */
+	private $_delimiter = self::DEFAULT_DELIMITER;
+
+	/**
+	 * CsvReader constructor.
+	 *
+	 * @param string $csvFl
+	 * @param string $delimiter
+	 * @param string $fileEncoding
+	 * @throws \Exception
+	 */
+	public function __construct($csvFl, $delimiter = self::DEFAULT_DELIMITER, $fileEncoding = self::DEFAULT_ENCODING) {
+		if (!is_file($csvFl)) {
+			throw new \Exception('File "' . $csvFl . '" does not exist');
+		}
+		$this->_handle = $this->_openFile($csvFl, $fileEncoding);
+		$this->_delimiter = $delimiter;
+	}
+
+	/** закрываем хэндл */
+	public function __destruct() {
+		$this->_closeFile();
+	}
+
+	/**
+	 * Одна запись
+	 *
+	 * @return string[]|false
+	 */
+	public function getRow() {
+		$row = fgetcsv($this->_handle, null, $this->_delimiter);
+		if (empty($row) || (count($row) == 1) && trim($row[0]) === '') {
+			return false;
+		} else {
+			return $row;
+		}
+	}
+
 	/**
 	 * Читает csv файл и возвращает массив
 	 *
-	 * @param string $csvFile
-	 * @param string $delimiter
-	 * @return array
+	 * @return string[]
+	 * @throws \Exception
 	 */
-	public function parseCsv($csvFile, $delimiter = ",") {
-		$result = [];
-		ini_set('auto_detect_line_endings', true);
-		$handle = fopen($csvFile, 'r');
-		if (!$handle) {
-			return [];
+	public function getAll() {
+		if (empty($this->_handle)) {
+			throw new \Exception('File is not open');
 		}
-		while (($data = fgetcsv($handle, null, $delimiter)) !== false) {
+
+		$result = [];
+		fseek($this->_handle, 0);
+		while (($data = fgetcsv($this->_handle, null, $this->_delimiter)) !== false) {
 			$result[] = $data;
 		}
-		ini_set('auto_detect_line_endings', false);
+
 		return $result;
 	}
 
 	/**
 	 * Формируем ассоциативный массив из CSV файла, первая строка - имена элементов массива
 	 *
-	 * @param string $csvFile
-	 * @param string $delimiter
 	 * @return array|bool
+	 * @throws \Exception
 	 */
-	public function createAssocArrayFromCsv($csvFile, $delimiter = ",") {
-		$lines = $this->parseCsv($csvFile, $delimiter);
+	public function getAllAssoc() {
+		$lines = $this->getAll();
 		if (count($lines) < 2) {
 			return false;
 		}
@@ -53,4 +103,28 @@ class CsvReader
 		return $result;
 	}
 
+	/**
+	 * Открываем файл на чтение
+	 *
+	 * @param string $csvFl
+	 * @param string $fileEncoding
+	 * @return resource
+	 */
+	private function _openFile($csvFl, $fileEncoding = self::DEFAULT_ENCODING) {
+		ini_set('auto_detect_line_endings', true);
+		$handle = fopen($csvFl, 'r');
+		stream_filter_append($handle, 'convert.iconv.' . $fileEncoding . '/UTF-8');
+		return $handle;
+	}
+
+	/**
+	 * Закрываем открытый файл
+	 */
+	private function _closeFile() {
+		if (!empty($this->_handle)) {
+			fclose($this->_handle);
+			ini_set('auto_detect_line_endings', false);
+			$this->_handle = null;
+		}
+	}
 }
