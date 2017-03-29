@@ -77,6 +77,15 @@ class AssetHelper extends Helper
 	 */
 	private $_newAssets = [];
 
+	/**
+	 * Ассеты, которые начали обрабатываться, но ещё не закончили
+	 * Можно было бы использовать $_newAssets, но тогда нельзя было бы отличить дублирующиеся зависимости от круговых зависимостей
+	 *
+	 * @var array
+	 */
+	private $_startedAssets = [];
+
+
 
 	/**
 	 * Загруженные переменные
@@ -306,12 +315,18 @@ class AssetHelper extends Helper
 	 * Загрузка ассета со всеми зависимостями, переменными и проверками
 	 *
 	 * @param string $assetName
+	 * @throws \Exception
 	 */
 	private function _loadAsset($assetName) {
 		if (in_array($assetName, $this->_loadedAssets) || in_array($assetName, $this->_newAssets)) {
 			return;
 		}
+		if (!empty($this->_startedAssets[$assetName])) {
+			throw new \Exception("Круговая зависимость у ассета $assetName");
+		}
+		$this->_startedAssets[$assetName] = true;
 		$this->_loadDependencies($assetName);
+		unset($this->_startedAssets[$assetName]);
 		$this->_loadVariables($assetName);
 		$this->_newAssets[] = $assetName;
 	}
@@ -421,8 +436,7 @@ class AssetHelper extends Helper
 				// так и остаётся
 				break;
 			case self::TYPE_STRING:
-				$value = "'" . addslashes($value) . "'";
-				break;
+				// строки энкодятся, чтобы не было проблем с кавычками и переносами строк
 			case self::TYPE_JSON:
 				$value = json_encode($value, JSON_UNESCAPED_UNICODE);
 				break;

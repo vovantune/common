@@ -157,7 +157,7 @@ class AssetTest extends AppTestCase {
 		]);
 		$this->_assetHelper->load('test', 'empty');
 		$expectedResult = [
-			"<script>\n camelCase0 = 'value';\n</script>"
+			"<script>\n camelCase0 = \"value\";\n</script>"
 		];
 		self::assertEquals($expectedResult, $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT), 'Неправильно сгенерировался скрипт с параметрами');
 	}
@@ -180,12 +180,27 @@ class AssetTest extends AppTestCase {
 		]);
 		$this->_assetHelper->load('test', 'empty');
 		$expectedResult = [
-			"<script>\n test1 = '';\n test2 = null;\n test3 = false;\n test4 = 0;\n test5 = [];\n test6 = 123.456;\n test7 = '1 234,00';\n test8 = 234.567;\n</script>"
+			"<script>\n test1 = \"\";\n test2 = null;\n test3 = false;\n test4 = 0;\n test5 = [];\n test6 = 123.456;\n test7 = \"1 234,00\";\n test8 = 234.567;\n</script>"
 		];
 		self::assertEquals($expectedResult, $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT), 'Неправильно сгенерировался скрипт с параметрами');
 
 		$this->_assetHelper->load('test', 'empty');
 		self::assertEquals([], $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT), 'Заново вывелись все параметры');
+	}
+
+	/**
+	 * строки с кавычками и переносами
+	 */
+	public function testRiskyStrings() {
+		$this->_assetHelper->setVars([
+			'quot' => "asd\"qwe",
+			'newLine' => "asd\r\nqwe",
+		]);
+		$this->_assetHelper->load('test', 'empty');
+		$expectedResult = [
+			"<script>\n quot = \"asd\\\"qwe\";\n newLine = \"asd\\r\\nqwe\";\n</script>"
+		];
+		self::assertEquals($expectedResult, $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT), 'Неправильно сгенерировались строки с кавычками и переносами');
 	}
 
 	/**
@@ -215,7 +230,7 @@ class AssetTest extends AppTestCase {
 
 		$this->_assetHelper->load('test', 'empty');
 		$expectedResult = [
-			"<script>\n test1 = 'qqq';\n test2 = 'qqq';\n</script>"
+			"<script>\n test1 = \"qqq\";\n test2 = \"qqq\";\n</script>"
 		];
 		self::assertEquals($expectedResult, $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT));
 	}
@@ -232,7 +247,7 @@ class AssetTest extends AppTestCase {
 
 		$this->_assetHelper->load('test', 'empty');
 		$expectedResult = [
-			"<script>\n test3 = 'ololo';\n test4 = 2;\n</script>"
+			"<script>\n test3 = \"ololo\";\n test4 = 2;\n</script>"
 		];
 		self::assertEquals($expectedResult, $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT));
 	}
@@ -278,7 +293,7 @@ class AssetTest extends AppTestCase {
 
 		$this->_assetHelper->load('test', 'empty');
 		$expectedResult = [
-			"<script>\n test5 = 'aaa';\n</script>"
+			"<script>\n test5 = \"aaa\";\n</script>"
 		];
 		self::assertEquals($expectedResult, $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT));
 	}
@@ -312,7 +327,7 @@ class AssetTest extends AppTestCase {
 
 		$this->_assetHelper->load('test', 'empty');
 		$expectedResult = [
-			"<script>\n test1 = 'уруру';\n</script>"
+			"<script>\n test1 = \"уруру\";\n</script>"
 		];
 		self::assertEquals($expectedResult, $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT));
 	}
@@ -460,6 +475,55 @@ class AssetTest extends AppTestCase {
 	}
 
 	/**
+	 * Зависимость от самого себя
+	 * Определяется на этапе записи в конфиг
+	 *
+	 * @expectedException \Exception
+	 * @expectedExceptionMessage Зависимость от самого себя test.selfDependent
+	 */
+	public function testSelfDependency() {
+		$this->_assetHelper->setConfigs([
+			'test' => [
+				'selfDependent' => [
+					AssetHelper::KEY_DEPEND => [
+						'test.selfDependent',
+					],
+				],
+			],
+		]);
+		$this->_assetHelper->load('test', 'selfDependent');
+	}
+	/**
+	 * Неявная зависимость от самого себя
+	 * Определяется при разрешении зависимостей
+	 *
+	 * @expectedException \Exception
+	 * @expectedExceptionMessage Круговая зависимость у ассета test.selfDependent
+	 */
+	public function testCircularDependencies() {
+		$this->_assetHelper->setConfigs([
+			'test' => [
+				'selfDependent' => [
+					AssetHelper::KEY_DEPEND => [
+						'test.dep1',
+					],
+				],
+				'dep1' => [
+					AssetHelper::KEY_DEPEND => [
+						'test.dep2',
+					],
+				],
+				'dep2' => [
+					AssetHelper::KEY_DEPEND => [
+						'test.selfDependent',
+					],
+				],
+			],
+		]);
+		$this->_assetHelper->load('test', 'selfDependent');
+	}
+
+	/**
 	 * тесты параметров load
 	 */
 	public function testLoadParams() {
@@ -556,7 +620,7 @@ class AssetTest extends AppTestCase {
 		self::assertEquals('', $errorMsg, 'Выбросился ексепшн при попытке загрузить скрипты с одинаковыми переменными с одинаковыми типами');
 
 		$expectedResult = [
-			"<script>\n var1 = 'asd';\n var2 = true;\n var3 = 3;\n</script>"
+			"<script>\n var1 = \"asd\";\n var2 = true;\n var3 = 3;\n</script>"
 		];
 		self::assertEquals($expectedResult, $this->_assetHelper->fetchResult(AssetHelper::BLOCK_SCRIPT), 'Неправильно сгенерировался скрипт с параметрами');
 
