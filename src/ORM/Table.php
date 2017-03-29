@@ -23,6 +23,9 @@ class Table extends \Cake\ORM\Table
 			$this->_initTimeStampBehavior();
 		}
 		if (empty($config['notForceEntity'])) {
+			// для построителя сущностей
+			// когда он запускается, то сущности может не быть
+			// он ведь и нужен, чтоб её создать
 			$this->entityClass(self::_getAlias());
 		}
 		parent::initialize($config);

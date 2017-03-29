@@ -207,6 +207,9 @@ class EntityBuilder
 	 * @return \Cake\ORM\Table
 	 */
 	protected static function _getTable($tableAlias) {
+		if (TableRegistry::exists($tableAlias)) {
+			return TableRegistry::get($tableAlias);
+		}
 		return TableRegistry::get($tableAlias, ['notForceEntity' => true]);
 	}
 
