@@ -46,23 +46,23 @@ class EntityBuilder
 	 * Конфиг
 	 * @var EntityBuilderConfig
 	 */
-	private static $_config = null;
+	protected static $_config = null;
 
 	/**
 	 * Список шаблонов магических методов для таблиц
 	 * @var array
 	 */
-	private static $_tableMethods = [];
+	protected static $_tableMethods = [];
 	/**
 	 * Список шаблонов файлов
 	 * @var array
 	 */
-	private static $_fileTemplates = [];
+	protected static $_fileTemplates = [];
 	/**
 	 * Список базовых классов
 	 * @var array
 	 */
-	private static $_baseClasses = [];
+	protected static $_baseClasses = [];
 
 	/**
 	 * Задать конфиг
