@@ -74,12 +74,12 @@ class File extends \Cake\Filesystem\File
 		}
 		switch ($extension) {
 			case '.tar.gz':
-				$unpackPath = !empty($unzipFolder) ? ' -C ' . $unzipFolder : '';
-				exec('tar -xf ' . $pathToFile . $unpackPath);
+				$unpackPath = !empty($unzipFolder) ? $unzipFolder : dirname($pathToFile);
+				exec('tar -xf ' . $pathToFile . ' -C ' . $unpackPath);
 				break;
 			default:
-				$unpackPath = !empty($unzipFolder) ? ' -d ' . $unzipFolder : '';
-				exec('unzip ' . $pathToFile . $unpackPath);
+				$unpackPath = !empty($unzipFolder) ? $unzipFolder : dirname($pathToFile);
+				exec('unzip ' . $pathToFile . ' -d ' . $unpackPath);
 				break;
 		}
 	}
