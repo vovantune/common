@@ -10,6 +10,7 @@ use ArtSkills\ORM\Entity;
  * @property TestTableOne $TestTableOne `table_one_fk` => `id`
  * @tableComment description qweqwe
  * @property int $fieldAlias blabla (алиас поля table_one_fk)
+ * @property string $virtualField
  */
 class TestTableTwo extends Entity
 {
@@ -17,4 +18,11 @@ class TestTableTwo extends Entity
 	protected $_aliases = [
 		'fieldAlias' => 'table_one_fk',
 	];
+
+	/**
+	 * @return string whoa!!!
+	 */
+	protected function _getVirtualField() {
+		return 'whoa, virtual fields!';
+	}
 }

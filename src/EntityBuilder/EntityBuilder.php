@@ -4,6 +4,7 @@ namespace ArtSkills\EntityBuilder;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\DB;
 use ArtSkills\Lib\Misc;
+use ArtSkills\Lib\Strings;
 use ArtSkills\TestSuite\Mock\PropertyAccess;
 use ArtSkills\Traits\Library;
 use ArtSkills\Filesystem\File;
@@ -11,6 +12,7 @@ use ArtSkills\Filesystem\Folder;
 use Cake\I18n\Time;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
+use DocBlockReader\Reader;
 
 /**
  * Конструктор сущностей для CakePHP
@@ -182,13 +184,15 @@ class EntityBuilder
 	 * Возвращает список алиасов полей
 	 *
 	 * @param string $entityName
-	 * @param array $fields field => field
+	 * @param array $fields field => comment
 	 * @return array alias => field
 	 */
 	protected static function _getAliases($entityName, $fields) {
 		$aliases = [];
 		$className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
 		if (class_exists($className)) {
+			// field => field
+			$fields = Arrays::keysFromValues(array_keys($fields));
 			$aliases = PropertyAccess::get(new $className, '_aliases');
 
 			foreach ($aliases as $alias => $field) {
@@ -198,6 +202,44 @@ class EntityBuilder
 			}
 		}
 		return $aliases;
+	}
+
+	/**
+	 * Формируем список виртуальных полей сущности
+	 *
+	 * @param string $entityName
+	 * @param array $fields field => comment
+	 * @return array ['имя поля' => 'тип']
+	 */
+	private static function _getVirtualFields($entityName, $fields) {
+		$virtualFields = [];
+		$className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
+		if (class_exists($className)) {
+			// field => field
+			$fields = Arrays::keysFromValues(array_keys($fields));
+			$refClass = new \ReflectionClass($className);
+			$getPrefix = '_get';
+			foreach ($refClass->getMethods(\ReflectionMethod::IS_PROTECTED) as $method) {
+				if (Strings::startsWith($method->name, $getPrefix)) {
+					$fieldName = lcfirst(Strings::replacePrefix($method->name, $getPrefix));
+					if (!empty($fields[$fieldName])) {
+						continue;
+					}
+
+					$reader = new Reader($refClass->getName(), $method->name);
+					$resultType = $reader->getParameter('return');
+					if (!$resultType) {
+						$resultType = 'mixed';
+					} elseif (stristr($resultType, ' ')) {
+						$resultType = explode(' ', $resultType)[0];
+					}
+
+					$virtualFields[$fieldName] = $resultType;
+				}
+			}
+		}
+
+		return $virtualFields;
 	}
 
 	/**
@@ -476,19 +518,28 @@ class EntityBuilder
 	 * @return boolean
 	 */
 	private static function _createEntityClass($entityName) {
+		// реальные поля
 		$curTblFields = self::_getTableFieldsComments($entityName);
-		$tableComment = self::_getTableComment($entityName);
-		$fieldNames = Arrays::keysFromValues(array_keys($curTblFields));
-		$aliases = static::_getAliases($entityName, $fieldNames);
-		if (!empty($tableComment)) {
-			$curTblFields[] = $tableComment;
-		}
+
+		// алиасы полей
+		$aliases = static::_getAliases($entityName, $curTblFields);
 		$aliasProperty = "\n";
 		foreach ($aliases as $alias => $field) {
 			$aliasProperty .= "		'$alias' => '$field',\n";
 			$curTblFields[$alias] = str_replace('$' . $field, '$' . $alias, $curTblFields[$field]) . " (алиас поля $field)";
 		}
 		$aliasProperty .= "\t";
+
+		// виртуальные поля (повешены кейковские геттеры)
+		$virtualFields = self::_getVirtualFields($entityName, $curTblFields);
+		foreach ($virtualFields as $fieldName => $fieldType) {
+			$curTblFields[$fieldName] = ' * @property ' . $fieldType . ' $' . $fieldName;
+		}
+
+		$tableComment = self::_getTableComment($entityName);
+		if (!empty($tableComment)) {
+			$curTblFields[] = $tableComment;
+		}
 
 		$file = self::_getFile($entityName, self::FILE_TYPE_ENTITY);
 		if ($file->exists()) {
