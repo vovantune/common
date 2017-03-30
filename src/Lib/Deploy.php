@@ -168,6 +168,7 @@ class Deploy
 	 */
 	protected function _exec($command) {
 		exec($command, $output);
+		$this->_addToOutput([$command]);
 		$this->_addToOutput($output);
 	}
 
