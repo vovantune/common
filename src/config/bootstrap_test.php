@@ -16,5 +16,4 @@ if (!empty($existingTables)) {
 }
 unset($testConnection);
 
-\Cake\Cache\Cache::clear(false, '_cake_model_');
-\Cake\Cache\Cache::clear(false, '_cake_core_');
+\ArtSkills\Lib\AppCache::flush();

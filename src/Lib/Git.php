@@ -50,11 +50,7 @@ class Git
 	 * Выбираем, какой командой обращаться к гиту; вытаскиваем текущую ветку
 	 */
 	private function __construct() {
-		if (Env::isTestServer()) {
-			$this->_gitCommand = self::GIT_COMMAND_SERVER;
-		} elseif (Env::isLocal() || Env::isUnitTest()) {
-			$this->_gitCommand = self::GIT_COMMAND_LOCAL;
-		}
+		$this->_gitCommand = $this->_chooseGitCommand();
 		if (!empty($this->_gitCommand)) {
 			$result = $this->_execute($this->_gitCommand . ' rev-parse --abbrev-ref HEAD');
 
@@ -62,6 +58,19 @@ class Git
 				$this->_currentBranch = $result[0];
 			}
 		}
+	}
+
+	/**
+	 * Выбираем, какой командой обращаться к гиту
+	 * @return string
+	 */
+	protected function _chooseGitCommand() {
+		if (Env::isTestServer() || Env::isProduction()) {
+			return self::GIT_COMMAND_SERVER;
+		} elseif (Env::isLocal() || Env::isUnitTest()) {
+			return self::GIT_COMMAND_LOCAL;
+		}
+		return '';
 	}
 
 	/**
@@ -149,6 +158,9 @@ class Git
 		if ($this->_currentBranch == $name) {
 			return true;
 		}
+		if (Env::isProduction()) {
+			return false;
+		}
 		$command = $this->_gitCommand . ' checkout ' . $name;
 		$this->_execute($command);
 		$this->_currentBranch = $name;
@@ -176,8 +188,8 @@ class Git
 		} else {
 			$command = $this->_gitCommand . ' branch ' . $name . ' -d';
 		}
-		$this->_execFromMaster($command);
-		return true;
+		$res = $this->_execFromMaster($command);
+		return ($res !== false);
 	}
 
 	/**
@@ -201,6 +213,9 @@ class Git
 
 		$command = $this->_gitCommand . ' for-each-ref --format="%(refname) %(authordate:short)" ' . $namePattern . ' --merged';
 		$branchList = $this->_execFromMaster($command);
+		if (empty($branchList)) {
+			return [];
+		}
 
 		$branchDates = [];
 		foreach ($branchList as $branchData) {
@@ -220,11 +235,14 @@ class Git
 	 * Исполняет команду, находясь в мастере и переключает ветку обратно. Возвращает вывод команды
 	 *
 	 * @param string $command
-	 * @return array
+	 * @return array|false
 	 */
 	private function _execFromMaster($command) {
 		$currentBranch = $this->_currentBranch;
-		$this->_checkout(self::BRANCH_NAME_MASTER);
+		$checkedOut = $this->_checkout(self::BRANCH_NAME_MASTER);
+		if (!$checkedOut) {
+			return false;
+		}
 		$this->pullCurrentBranch();
 		$output = $this->_execute($command);
 		$this->_checkout($currentBranch);
@@ -234,16 +252,16 @@ class Git
 	/**
 	 * Делаем git pull для активной ветки
 	 *
-	 * @return bool
+	 * @return array [bool, output]
 	 */
 	public function pullCurrentBranch() {
 		if (empty($this->_currentBranch)) {
-			return false;
+			return [false, ['git not inited']];
 		}
 
 		$cmd = $this->_gitCommand . ' pull';
-		$this->_execute($cmd);
-		return true;
+		$output = $this->_execute($cmd);
+		return [true, $output];
 	}
 
 	/**
@@ -271,6 +289,6 @@ class Git
 			return false;
 		}
 
-		return ($this->_checkout($branchName) && $this->pullCurrentBranch());
+		return ($this->_checkout($branchName) && $this->pullCurrentBranch()[0]);
 	}
 }

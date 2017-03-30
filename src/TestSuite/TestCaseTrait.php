@@ -3,6 +3,7 @@
 namespace ArtSkills\TestSuite;
 
 use ArtSkills\Filesystem\Folder;
+use ArtSkills\Lib\AppCache;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\ORM\Entity;
 use ArtSkills\Lib\Env;
@@ -116,7 +117,7 @@ trait TestCaseTrait
 	 * Чистка кеша
 	 */
 	protected function _clearCache() {
-		Misc::flushCache();
+		AppCache::flush(['_cake_core_', '_cake_model_']);
 	}
 
 	/**
@@ -197,7 +198,7 @@ trait TestCaseTrait
 	 *
 	 * @return string[]
 	 */
-	public static function _getSingletones() {
+	protected static function _getSingletones() {
 		// Приходится использовать метод, ибо переопределить свойство при использовании трейта нельзя
 		// А заполнить свойство не получится, ибо _clearSingletones статичен
 		return [];

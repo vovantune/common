@@ -16,6 +16,8 @@ use Cake\Core\Configure;
  * @method static string getMockFolder()
  * @method static string getMockNamespace()
  * @method static string getDownloadPath()
+ * @method static string getRedisServer()
+ * @method static string getRedisPassword()
  *
  * @method static bool hasSentryDsn()
  * @method static bool hasHttpClientAdapter()
@@ -114,6 +116,15 @@ class Env
 	 */
 	public static function isNotProduction() {
 		return !self::isProduction();
+	}
+
+	/**
+	 * Работаем из консоли или от веб-сервера?
+	 *
+	 * @return bool
+	 */
+	public static function isCli() {
+		return (php_sapi_name() === 'cli');
 	}
 
 	/**

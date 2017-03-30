@@ -1,29 +1,13 @@
 <?php
 namespace ArtSkills\Lib;
 
-use Cake\Cache\Cache;
-
 class Misc
 {
 
 	/**
 	 * Нулевое время
 	 */
-	const ZERO_DATE = '0000-00-00 00:00:00';
-
-	/**
-	 * Чистит кэш
-	 * @param array $skipConfigs
-	 */
-	public static function flushCache($skipConfigs = []) {
-		$skipConfigs = Arrays::keysFromValues($skipConfigs);
-		$cacheConfigs = Cache::configured();
-		foreach ($cacheConfigs as $configName) {
-			if (empty($skipConfigs[$configName])) {
-				Cache::clear(false, $configName);
-			}
-		}
-	}
+	const ZERO_TIME = '0000-00-00 00:00:00';
 
 	/**
 	 * Разбить полное название класса на неймспейс и класс

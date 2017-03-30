@@ -130,6 +130,18 @@ class Url
 	}
 
 	/**
+	 * Адрес без домена
+	 *
+	 * @param array $parts
+	 * @param array $query
+	 * @return string
+	 */
+	public static function withoutDomain($parts = [], $query = []) {
+		return self::_build('', false, $parts, $query);
+	}
+
+
+	/**
 	 * Распарсивает строку с параметрами запроса в массив
 	 *
 	 * @param string $queryString
