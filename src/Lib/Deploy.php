@@ -47,6 +47,13 @@ class Deploy
 	protected $_composerCommand = 'php composer.phar';
 
 	/**
+	 * Домашняя папка, без неё композер не работает
+	 *
+	 * @var string
+	 */
+	protected $_composerHome = '/var/www';
+
+	/**
 	 * Команда запуска композера
 	 *
 	 * @var string
@@ -158,6 +165,9 @@ class Deploy
 			$this->_addToOutput(['not updating dependencies']);
 			return;
 		}
+		if (!empty($this->_composerHome)) {
+			putenv('HOME=' . $this->_composerHome);
+		}
 		$this->_exec($this->_composerCommand . ' "' . implode('" "', $this->_composerDependencies) . '"');
 	}
 
@@ -167,7 +177,7 @@ class Deploy
 	 * @param string $command
 	 */
 	protected function _exec($command) {
-		exec($command, $output);
+		exec($command . ' 2>&1', $output);
 		$this->_addToOutput([$command]);
 		$this->_addToOutput($output);
 	}

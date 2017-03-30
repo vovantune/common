@@ -80,7 +80,7 @@ class Git
 	 * @return array
 	 */
 	private function _execute($command) {
-		exec($command, $output);
+		exec($command . ' 2>&1', $output);
 		return $output;
 	}
 
