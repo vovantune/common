@@ -24,6 +24,9 @@ class GitBranchTrim
 
 	/**
 	 * Удаление старых неиспользуемых веток
+	 *
+	 * @return string[]
+	 * @throws \Exception
 	 */
 	public static function run() {
 		$git = static::_git();
@@ -50,8 +53,9 @@ class GitBranchTrim
 			array_unshift($toDeleteTypes, Git::BRANCH_TYPE_REMOTE);
 		}
 
+		$log = [];
 		foreach ($toDeleteTypes as $type) {
-			static::_deleteMergedOldBranches($type, [$currentBranch]);
+			$log = array_merge($log, static::_deleteMergedOldBranches($type, [$currentBranch]));
 		}
 
 		if ($currentBranch != Git::BRANCH_NAME_MASTER) {
@@ -61,6 +65,8 @@ class GitBranchTrim
 		if (!empty($fromDir)) {
 			chdir($currentDir);
 		}
+
+		return $log;
 	}
 
 	/**
@@ -97,6 +103,7 @@ class GitBranchTrim
 	 *
 	 * @param string $type
 	 * @param string[] $skipBranches
+	 * @return string[] log
 	 */
 	protected static function _deleteMergedOldBranches($type, $skipBranches = []) {
 		$git = static::_git();
@@ -115,5 +122,6 @@ class GitBranchTrim
 				$log[] = 'Deleted old merged ' . $type . ' branch ' . $branchName . ' (last commit date: ' . $lastCommitDate . ')!';
 			}
 		}
+		return $log;
 	}
 }
