@@ -97,12 +97,11 @@ class Table extends \Cake\ORM\Table
 		if ($entity instanceof Entity) {
 			return $entity;
 		}
-		$entityId = (int)$entity;
-		if (empty($entityId) || ($entityId < 1)) {
+		if (empty($entity)) {
 			return false;
 		}
 		try {
-			return $this->get($entityId, $options);
+			return $this->get($entity, $options);
 		} catch (RecordNotFoundException $e) {
 			return false;
 		}
