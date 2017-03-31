@@ -24,7 +24,7 @@ class ValueObject implements \JsonSerializable, \ArrayAccess
 	protected $_allFieldNames = [];
 
 	/**
-	 * ResponseEntity constructor.
+	 * constructor.
 	 *
 	 * @param array $fillValues Список заполняемых свойств
 	 * @throws \Exception

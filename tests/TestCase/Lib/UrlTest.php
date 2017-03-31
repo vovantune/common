@@ -26,6 +26,8 @@ class UrlTest extends AppTestCase
 		self::assertEquals('common.artskills.ru/qwe/rty?qwe=rty&ghj=uio#lkjh', Url::withDomain(...$allParams));
 		self::assertEquals('http://common.artskills.ru/qwe/rty?qwe=rty&ghj=uio#lkjh', Url::withDomainHttp(...$allParams));
 		self::assertEquals('blabla/qwe/rty?qwe=rty&ghj=uio#lkjh', Url::withCustomDomain('blabla', ...$allParams));
+		self::assertEquals('blabla/qwe/rty?qwe=rty&ghj=uio#lkjh', Url::withCustomDomain('blabla/', ...$allParams));
+		self::assertEquals('blabla?asd=qwe', Url::withCustomDomain('blabla/', '', ['asd' => 'qwe']));
 		self::assertEquals('/qwe/rty?qwe=rty&ghj=uio#lkjh', Url::withoutDomain(...$allParams));
 	}
 }

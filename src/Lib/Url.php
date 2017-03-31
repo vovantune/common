@@ -65,6 +65,9 @@ class Url
 				$url = '/' . $url;
 			}
 		}
+		if (!empty($domain) && Strings::endsWith($domain, '/')) {
+			$domain = Strings::replacePostfix($domain, '/');
+		}
 		$queryString = '';
 		if (!empty($query)) {
 			if (is_array($query)) {
