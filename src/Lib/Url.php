@@ -54,9 +54,10 @@ class Url
 	 * @param string $protocol
 	 * @param string[]|string $parts
 	 * @param array|string $query
+	 * @param string $hash
 	 * @return string
 	 */
-	private static function _build($domain, $protocol, $parts = [], $query = []) {
+	private static function _build($domain, $protocol = '', $parts = [], $query = [], $hash = '') {
 		$url = '';
 		if (!empty($parts)) {
 			$url = self::path((array)$parts);
@@ -80,7 +81,12 @@ class Url
 		} else {
 			$protocol = $protocol . '://';
 		}
-		return $protocol . $domain . $url . $queryString;
+		if (empty($hash)) {
+			$hash = '';
+		} elseif ($hash[0] !== '#') {
+			$hash = '#' . $hash;
+		}
+		return $protocol . $domain . $url . $queryString . $hash;
 	}
 
 	/**
@@ -88,10 +94,11 @@ class Url
 	 *
 	 * @param string[]|string $parts
 	 * @param array|string $query
+	 * @param string $hash
 	 * @return string
 	 */
-	public static function withDomain($parts = [], $query = []) {
-		return self::_build(self::domain(), false, $parts, $query);
+	public static function withDomain($parts = [], $query = [], $hash = '') {
+		return self::_build(self::domain(), false, $parts, $query, $hash);
 	}
 
 	/**
@@ -99,10 +106,11 @@ class Url
 	 *
 	 * @param string[]|string $parts
 	 * @param array|string $query
+	 * @param string $hash
 	 * @return string
 	 */
-	public static function withDomainHttp($parts = [], $query = []) {
-		return self::_build(self::domain(), 'http', $parts, $query);
+	public static function withDomainHttp($parts = [], $query = [], $hash = '') {
+		return self::_build(self::domain(), 'http', $parts, $query, $hash);
 	}
 
 
@@ -111,33 +119,36 @@ class Url
 	 *
 	 * @param string[]|string $parts
 	 * @param array|string $query
+	 * @param string $hash
 	 * @return string
 	 */
-	public static function withDomainAndProtocol($parts = [], $query = []) {
-		return self::_build(self::domain(), self::protocol(), $parts, $query);
+	public static function withDomainAndProtocol($parts = [], $query = [], $hash = '') {
+		return self::_build(self::domain(), self::protocol(), $parts, $query, $hash);
 	}
 
 	/**
 	 * Адрес с любым доменом
 	 *
 	 * @param string $domain
-	 * @param array $parts
-	 * @param array $query
+	 * @param string[]|string $parts
+	 * @param array|string $query
+	 * @param string $hash
 	 * @return string
 	 */
-	public static function withCustomDomain($domain, $parts = [], $query = []) {
-		return self::_build($domain, false, $parts, $query);
+	public static function withCustomDomain($domain, $parts = [], $query = [], $hash = '') {
+		return self::_build($domain, false, $parts, $query, $hash);
 	}
 
 	/**
 	 * Адрес без домена
 	 *
-	 * @param array $parts
-	 * @param array $query
+	 * @param string[]|string $parts
+	 * @param array|string $query
+	 * @param string $hash
 	 * @return string
 	 */
-	public static function withoutDomain($parts = [], $query = []) {
-		return self::_build('', false, $parts, $query);
+	public static function withoutDomain($parts = [], $query = [], $hash = '') {
+		return self::_build('', false, $parts, $query, $hash);
 	}
 
 

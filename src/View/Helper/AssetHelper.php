@@ -197,6 +197,13 @@ class AssetHelper extends Helper
 	}
 
 	/**
+	 * Закинуть скрипт текущего экшна вниз
+	 */
+	public function setCurrentBottom() {
+		$this->setCurrentConfig([self::KEY_IS_BOTTOM => true], true);
+	}
+
+	/**
 	 * Задать зависимоси для текущего экшна
 	 *
 	 * @param string[] $dependencies
