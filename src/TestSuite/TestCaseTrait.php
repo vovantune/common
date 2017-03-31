@@ -5,6 +5,7 @@ namespace ArtSkills\TestSuite;
 use ArtSkills\Filesystem\Folder;
 use ArtSkills\Lib\AppCache;
 use ArtSkills\Lib\Arrays;
+use ArtSkills\Mailer\Transport\TestTransport;
 use ArtSkills\ORM\Entity;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Misc;
@@ -88,6 +89,7 @@ trait TestCaseTrait
 		HttpClientMocker::clean($this->hasFailed());
 
 		Time::setTestNow(null); // сбрасываем тестовое время
+		TestTransport::clearMessages();
 		$this->_destroyPermanentMocks();
 		$this->_disabledMocks = [];
 		$this->_tearDownLocal();
