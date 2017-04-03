@@ -291,4 +291,31 @@ class Git
 
 		return ($this->_checkout($branchName) && $this->pullCurrentBranch()[0]);
 	}
+
+	/**
+	 * Вернуть нужные данные из запроса хука гитхаба
+	 *
+	 * @param array $requestData
+	 * @return null|array repo branch commit
+	 */
+	public static function parseGithubRequest($requestData) {
+		if (empty($requestData['payload'])) {
+			return null;
+		}
+		$payload = Arrays::decode($requestData['payload']);
+		$branchPrefix = 'refs/heads/';
+		if (
+			empty($payload)
+			|| empty($payload['repository']['name'])
+			|| empty($payload['ref'])
+			|| !Strings::startsWith($payload['ref'], $branchPrefix)
+		) {
+			return null;
+		}
+		return [
+			'repo' => $payload['repository']['name'],
+			'branch' => Strings::replacePrefix($payload['ref'], $branchPrefix),
+			'commit' => $payload['after'],
+		];
+	}
 }

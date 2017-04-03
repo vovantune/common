@@ -67,22 +67,6 @@ class Deploy
 	 */
 	protected $_logScope = 'deployment';
 
-
-
-	/**
-	 * Текущая версия
-	 *
-	 * @var int|null
-	 */
-	protected $_version = null;
-
-	/**
-	 * Объект работы с гитом
-	 *
-	 * @var null
-	 */
-	protected $_git = null;
-
 	/**
 	 * вывод команд
 	 *
@@ -91,35 +75,16 @@ class Deploy
 	protected $_output = [];
 
 
-
-	/**
-	 * Deploy constructor.
-	 *
-	 * @param null|Git $git
-	 * @param int|null $version
-	 * @throws \Exception
-	 */
-	private function __construct($git = null, $version = null) {
-		if (empty($git)) {
-			$this->_git = Git::getInstance();
-		} elseif (!($git instanceof Git)) {
-			throw new \Exception('Передан неправильный объект для работы с гитом');
-		} else {
-			$this->_git = $git;
-		}
-		$this->_version = $version;
-	}
-
-
 	/**
 	 * Деплой
 	 *
 	 * @param string $repo обновляемая репа
 	 * @param string $branch обновляемая ветка
 	 * @param string $commit к чему обновляемся. для замиси в лог
+	 * @param null|int $currentVersion счётчик версий
 	 * @return bool
 	 */
-	public function run($repo, $branch, $commit) {
+	public function run($repo, $branch, $commit, $currentVersion = null) {
 		if (!$this->_canDeploy($repo, $branch)) {
 			return false;
 		}
@@ -130,18 +95,27 @@ class Deploy
 		$this->_updateComposer();
 
 		$this->_addToOutput(["\n\nGit pull\n"]);
-		$this->_addToOutput($this->_git->pullCurrentBranch()[1]);
+		$this->_addToOutput($this->_git()->pullCurrentBranch()[1]);
 
 		// обновление репозитория должно быть до миграции, чтобы подтянулись файлы миграции
 		$this->_migrateDb();
 
 		AppCache::flush();
-		$this->_updateVersion();
+		$this->_updateVersion($currentVersion);
 		$this->_localChanges();
 
 		$timeEnd = microtime(true);
 		chdir($currentDir);
 		$this->_log($timeStart, $timeEnd, $commit);
+		return true;
+	}
+
+	/**
+	 * Объект git
+	 * @return Git
+	 */
+	protected function _git() {
+		return Git::getInstance();
 	}
 
 
@@ -153,7 +127,15 @@ class Deploy
 	 * @return bool
 	 */
 	protected function _canDeploy($repo, $branch) {
-		return (($repo === $this->_repoName) && ($branch === $this->_git->getCurrentBranchName()));
+		return (
+			// всё проинициализировано
+			!empty($this->_rootFolder)
+			&& !empty($this->_repoName)
+			&& !empty($this->_git()->getCurrentBranchName())
+			// и всё совпадает
+			&& ($repo === $this->_repoName)
+			&& ($branch === $this->_git()->getCurrentBranchName())
+		);
 	}
 
 	/**
@@ -196,9 +178,8 @@ class Deploy
 	 */
 	protected function _migrateDb() {
 		$this->_addToOutput(["\n\nMigration\n"]);
+		// на тесте лучше мигрировать руками
 		if (!Env::isTestServer() && !empty($this->_migrateCommand)) {
-			// на тесте лучше мигрировать руками
-			$this->_addToOutput(['migration was not run']);
 			$this->_exec($this->_migrateCommand);
 		} else {
 			$this->_addToOutput(['migration was not run']);
@@ -207,10 +188,11 @@ class Deploy
 
 	/**
 	 * Обновить файл с версией
+	 * @param int|null $currentVersion
 	 */
-	protected function _updateVersion() {
-		if (!empty($this->_versionFile) && ($this->_version !== null)) {
-			file_put_contents($this->_versionFile, ++$this->_version);
+	protected function _updateVersion($currentVersion) {
+		if (!empty($this->_versionFile) && ($currentVersion !== null)) {
+			file_put_contents($this->_versionFile, ++$currentVersion);
 		}
 	}
 

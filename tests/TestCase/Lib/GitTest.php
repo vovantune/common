@@ -375,4 +375,19 @@ class GitTest extends AppTestCase
 				}
 			});
 	}
+
+	/**
+	 * Распарсить запрос с хука гитхаба
+	 */
+	public function testParseRequest() {
+		$request = [
+			'payload' => '{"ref":"refs/heads/master","after":"9876abcd","repository":{"id":12345,"name":"common","full_name":"ArtSkills/common"}}',
+		];
+		$expectedResult = [
+			'repo' => 'common',
+			'branch' => 'master',
+			'commit' => '9876abcd',
+		];
+		self::assertEquals($expectedResult, Git::parseGithubRequest($request));
+	}
 }
