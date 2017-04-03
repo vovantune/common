@@ -34,7 +34,7 @@ class DeployTest extends AppTestCase
 		$res = LocalDeploy::getInstance()->run($repo, $branch, '');
 		self::assertTrue($res);
 		$expectedCommandList = [
-			'php composer.phar "artskills/common"',
+			'php composer.phar update "artskills/common"',
     		'git pull',
     		'vendor/bin/phinx migrate',
 		];

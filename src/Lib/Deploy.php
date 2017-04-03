@@ -150,7 +150,7 @@ class Deploy
 		if (!empty($this->_composerHome)) {
 			putenv('HOME=' . $this->_composerHome);
 		}
-		$this->_exec($this->_composerCommand . ' "' . implode('" "', $this->_composerDependencies) . '"');
+		$this->_exec($this->_composerCommand . ' update "' . implode('" "', $this->_composerDependencies) . '"');
 	}
 
 	/**
