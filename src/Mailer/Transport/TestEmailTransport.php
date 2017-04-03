@@ -5,7 +5,7 @@ namespace ArtSkills\Mailer\Transport;
 use Cake\Mailer\AbstractTransport;
 use Cake\Mailer\Email;
 
-class TestTransport extends AbstractTransport
+class TestEmailTransport extends AbstractTransport
 {
 
 	/**

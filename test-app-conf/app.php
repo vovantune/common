@@ -89,7 +89,7 @@ return [
 			'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
 		],
 		'test' => [
-			'className' => 'ArtSkills.Test',
+			'className' => 'ArtSkills.TestEmail',
 		],
 	],
 

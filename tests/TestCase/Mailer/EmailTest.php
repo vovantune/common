@@ -2,7 +2,7 @@
 namespace ArtSkills\Test\TestCase\Lib\EmailTest;
 
 use ArtSkills\Mailer\Email;
-use ArtSkills\Mailer\Transport\TestTransport;
+use ArtSkills\Mailer\Transport\TestEmailTransport;
 use ArtSkills\TestSuite\AppTestCase;
 
 class EmailTest extends AppTestCase
@@ -19,7 +19,7 @@ class EmailTest extends AppTestCase
 			->addTo('test@yandex.ru', 'yandex-test')
 			->addTo('other@artskills.ru', 'artskills')
 			->send($text);
-		$emailData = TestTransport::getMessages();
+		$emailData = TestEmailTransport::getMessages();
 		$expectedData = [
 			'to' => [
 				'test@artskills-studio.ru' => 'test-name',
