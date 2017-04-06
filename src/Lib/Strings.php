@@ -11,10 +11,18 @@ class Strings
 	 * Проверка, что строка начинается с префикса
 	 *
 	 * @param string $string
-	 * @param string $prefix
+	 * @param string|string[] $prefix
 	 * @return bool
 	 */
 	public static function startsWith($string, $prefix) {
+		if (is_array($prefix)) {
+			foreach ($prefix as $prefixElement) {
+				if (stripos($string, $prefixElement) === 0) {
+					return true;
+				}
+			}
+			return false;
+		}
 		return (stripos($string, $prefix) === 0);
 	}
 

@@ -15,6 +15,10 @@ class StringsTest extends AppTestCase
 
 		$testStr = "asd{$prefix}fg";
 		self::assertFalse(Strings::startsWith($testStr, $prefix));
+
+		$testStr = "{$prefix}asdqwe";
+		self::assertTrue(Strings::startsWith($testStr, [$prefix, 'shit']));
+		self::assertFalse(Strings::startsWith($testStr, ['a', 'b']));
 	}
 
 	/** проверка постфикса */
