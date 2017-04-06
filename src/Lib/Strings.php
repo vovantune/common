@@ -16,8 +16,7 @@ class Strings
 	 * @return bool
 	 */
 	public static function startsWith($string, $prefix) {
-		$prefix = (array)$prefix;
-		foreach ($prefix as $prefixElement) {
+		foreach ((array)$prefix as $prefixElement) {
 			if (stripos($string, $prefixElement) === 0) {
 				return true;
 			}
