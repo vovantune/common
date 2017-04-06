@@ -55,6 +55,29 @@ class Arrays
 		return array_combine($values, $values);
 	}
 
+	/**
+	 * Переименовать ключи
+	 *
+	 * @param array $array исхлдный массив
+	 * @param array $map старый ключ => новый ключ
+	 * @param bool $notExistsNull если не найдено, то не добавлять или добавить null
+	 * @return array
+	 */
+	public static function remap(array $array, array $map, $notExistsNull = true) {
+		$newArray = [];
+		foreach ($map as $oldKey => $newKey) {
+			if (array_key_exists($oldKey, $array)) {
+				$value = $array[$oldKey];
+			} elseif ($notExistsNull) {
+				$value = null;
+			} else {
+				continue;
+			}
+			$newArray[$newKey] = $value;
+		}
+		return $newArray;
+	}
+
 
 
 	/**

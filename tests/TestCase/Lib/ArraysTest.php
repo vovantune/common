@@ -46,4 +46,31 @@ class ArraysTest extends AppTestCase
 		self::assertEquals($expectedResult, Arrays::trim($strings));
 	}
 
+	/**
+	 * смена ключей массива
+	 */
+	public function testRemap() {
+		$array = [
+			'before_1' => 'asd',
+			'before_2' => 'qwe',
+			'before_4' => 'zxc',
+		];
+		$map = [
+			'before_1' => 'after1',
+			'before_2' => 'after2',
+			'before_3' => 'after3',
+		];
+		$expectedWithNull = [
+			'after1' => 'asd',
+			'after2' => 'qwe',
+			'after3' => null,
+		];
+		$expectedStrict = [
+			'after1' => 'asd',
+			'after2' => 'qwe',
+		];
+		self::assertEquals($expectedWithNull, Arrays::remap($array, $map, true));
+		self::assertEquals($expectedStrict, Arrays::remap($array, $map, false));
+	}
+
 }
