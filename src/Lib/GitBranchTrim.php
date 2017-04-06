@@ -29,16 +29,18 @@ class GitBranchTrim
 	 * @throws \Exception
 	 */
 	public static function run() {
+		$currentDir = getcwd();
+		$fromDir = static::_fromDir();
+		if (!empty($fromDir)) {
+			// возможность запускать из любого места
+			// чтобы можно было работать с гитом, нужно переключиться в правильную папку
+			chdir($fromDir);
+		}
+
 		$git = static::_git();
 		$currentBranch = $git->getCurrentBranchName();
 		if (empty($currentBranch)) {
 			throw new \Exception('Гит не инициализирован');
-		}
-
-		$currentDir = getcwd();
-		$fromDir = static::_fromDir();
-		if (!empty($fromDir)) {
-			chdir($fromDir);
 		}
 
 		if ($currentBranch != Git::BRANCH_NAME_MASTER) {

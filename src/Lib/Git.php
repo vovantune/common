@@ -52,7 +52,7 @@ class Git
 	private function __construct() {
 		$this->_gitCommand = $this->_chooseGitCommand();
 		if (!empty($this->_gitCommand)) {
-			$result = $this->_execute($this->_gitCommand . ' rev-parse --abbrev-ref HEAD');
+			$result = $this->_execute($this->_gitCommand . ' rev-parse --abbrev-ref HEAD', false);
 
 			if (!empty($result)) {
 				$this->_currentBranch = $result[0];
@@ -77,10 +77,11 @@ class Git
 	 * Выполняем команду
 	 *
 	 * @param string $command
+	 * @param bool $withErrors
 	 * @return array
 	 */
-	private function _execute($command) {
-		exec($command . ' 2>&1', $output);
+	private function _execute($command, $withErrors = true) {
+		exec($command . ($withErrors ? ' 2>&1' : ''), $output);
 		return $output;
 	}
 
