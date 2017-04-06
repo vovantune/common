@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
@@ -11,11 +12,16 @@ class Strings
 	 * Проверка, что строка начинается с префикса
 	 *
 	 * @param string $string
-	 * @param string $prefix
+	 * @param string|string[] $prefix
 	 * @return bool
 	 */
 	public static function startsWith($string, $prefix) {
-		return (stripos($string, $prefix) === 0);
+		foreach ((array)$prefix as $prefixElement) {
+			if (stripos($string, $prefixElement) === 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -56,7 +62,6 @@ class Strings
 	}
 
 
-
 	/**
 	 * сделать array_pop() от результата explode()
 	 * для array_pop() нужно создавать временную переменную, что раздражает
@@ -71,7 +76,6 @@ class Strings
 	}
 
 
-
 	/**
 	 * Реализация mb_ucfirst, если её нет
 	 *
@@ -80,7 +84,9 @@ class Strings
 	 * @return string
 	 */
 	public static function mbUcFirst($string, $enc = 'utf-8') {
-		$string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_substr($string, 1, mb_strlen($string, $enc) - 1, $enc);
+		$string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_substr(
+				$string, 1, mb_strlen($string, $enc) - 1, $enc
+			);
 		return $string;
 	}
 
@@ -92,7 +98,9 @@ class Strings
 	 * @return string
 	 */
 	public static function mbLcFirst($string, $enc = 'utf-8') {
-		$string = mb_strtolower(mb_substr($string, 0, 1, $enc), $enc) . mb_substr($string, 1, mb_strlen($string, $enc) - 1, $enc);
+		$string = mb_strtolower(mb_substr($string, 0, 1, $enc), $enc) . mb_substr(
+				$string, 1, mb_strlen($string, $enc) - 1, $enc
+			);
 		return $string;
 	}
 
