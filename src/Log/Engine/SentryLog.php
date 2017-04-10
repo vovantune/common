@@ -264,27 +264,3 @@ class SentryLog extends BaseLog
 		return array_slice($trace, $toSlice);
 	}
 }
-
-// тесты:
-
-//Log::error('test error ' . uniqid(), [SentryLog::KEY_ADD_INFO => ['ololo' => 'azazaz']]); // пришло как ошибка, трейс с этой строки
-//Log::write('error', 'test write error ' . uniqid(), [SentryLog::KEY_ADD_INFO => ['ololo' => 'azazaz']]); // пришло как ошибка, трейс с этой строки
-//Log::warning('test warning' . uniqid(), [SentryLog::KEY_ADD_INFO => ['ololo' => 'azazaz']]); // пришло как warning, без алертов
-//Log::info('test info' . uniqid(), [SentryLog::KEY_ADD_INFO => ['ololo' => 'azazaz']]); // не пришло в сентри
-//Log::info('test info send' . uniqid(), [SentryLog::KEY_ADD_INFO => ['ololo' => 'azazaz'], SentryLog::KEY_SENTRY_SEND => true]); // пришло в сентри как info, без алертов
-
-//trigger_error('test error' . uniqid(), E_USER_ERROR); // пришло как ошибка, трейс с этой строки
-//trigger_error('test notice' . uniqid(), E_USER_NOTICE); // пришло как ошибка
-//trigger_error('test deprecated' . uniqid(), E_USER_DEPRECATED); // пришло как ошибка
-//trigger_error('test warning' . uniqid(), E_USER_WARNING); // пришло как ошибка
-
-//$a = $b[1]; // пришло как ошибка, трейс с этой строки
-//a(); // пришло как exception
-//b() // пришло как exception
-
-//throw new \Exception('test uncaught' . uniqid()); // пришло как exception
-/*try {
-	throw new \Exception('test caught' . uniqid()); // пришло как exception
-} catch (\Exception $e) {
-	SentryLog::logException($e);
-}*/
