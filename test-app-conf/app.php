@@ -95,18 +95,22 @@ return [
 
 	'Log' => [
 		'debug' => [
-			'className' => 'Cake\Log\Engine\FileLog',
+			'className' => 'ArtSkills.File',
 			'path' => LOGS,
 			'file' => 'debug',
 			'levels' => ['notice', 'info', 'debug'],
 			'url' => env('LOG_DEBUG_URL', null),
 		],
 		'error' => [
-			'className' => 'Cake\Log\Engine\FileLog',
+			'className' => 'ArtSkills.File',
 			'path' => LOGS,
 			'file' => 'error',
 			'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
 			'url' => env('LOG_ERROR_URL', null),
+		],
+		'sentry' => [
+			'className' => 'ArtSkills.Sentry',
+			'levels' => [],
 		],
 	],
 ];
