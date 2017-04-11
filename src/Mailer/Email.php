@@ -2,7 +2,7 @@
 namespace ArtSkills\Mailer;
 
 use ArtSkills\Lib\Env;
-use Cake\Log\Log;
+use ArtSkills\Log\Engine\SentryLog;
 
 class Email extends \Cake\Mailer\Email
 {
@@ -72,7 +72,7 @@ class Email extends \Cake\Mailer\Email
 		try {
 			$result = parent::send($content);
 		} catch (\Exception $e) {
-			Log::error($e->getMessage());
+			SentryLog::logException($e);
 			return false;
 		}
 		return $result;

@@ -2,10 +2,12 @@
 namespace ArtSkills\Log\Engine;
 
 use ArtSkills\Lib\Env;
+use ArtSkills\Lib\Strings;
 use Cake\Error\Debugger;
 use Cake\Error\FatalErrorException;
 use Cake\Log\Engine\BaseLog;
 use Cake\Log\Log;
+use Cake\Log\LogTrait;
 
 class SentryLog extends BaseLog
 {
@@ -156,6 +158,7 @@ class SentryLog extends BaseLog
 	 * @param bool $alert
 	 */
 	public static function logException(\Exception $exception, array $context = [], $alert = true) {
+		Env::checkTestException($exception);
 		if (empty($context[self::KEY_NO_FILE_LOG])) {
 			Log::error($exception->getMessage(), [self::KEY_IS_HANDLED => true] + $context);
 		}
@@ -234,7 +237,9 @@ class SentryLog extends BaseLog
 			}
 		} else {
 			if (!self::$_isShutdown) {
-				$trace = self::_sliceTrace(debug_backtrace(0));
+				$trace = debug_backtrace(0);
+				$data['extra']['_full_trace'] = self::_exportVar($trace);
+				$trace = self::_sliceTrace($trace);
 				$client->captureMessage($message, [], $data, $trace);
 			}
 		}
@@ -248,11 +253,16 @@ class SentryLog extends BaseLog
 	 */
 	private static function _sliceTrace($trace) {
 		// 0, 1, 2 - стереть
-		// 3 - Log::write, нужно стереть, если он был вызван из другого метода (например Log::error), иначе оставить
+		// 3 - Log::write, нужно стереть, если он был вызван из другого метода (например Log::error) или из LogTrait::log, иначе оставить
 		// т.е. нужно проверить 4й уровень
 		$toSlice = self::DELETE_TRACE_LEVEL_DEFAULT;
+		$logWriteCall = $trace[$toSlice];
 		$aboveLogWrite = $trace[$toSlice + 1];
-		if (!empty($aboveLogWrite['class']) && ($aboveLogWrite['class'] === Log::class)) {
+		list(, $logTrait) = namespaceSplit(LogTrait::class);
+		if (
+			(!empty($aboveLogWrite['class']) && ($aboveLogWrite['class'] === Log::class))
+			|| (!empty($logWriteCall['file']) && Strings::endsWith($logWriteCall['file'], $logTrait . '.php'))
+		) {
 			$toSlice++;
 		}
 		$toSlice += max((int)self::$_addDeleteTraceLevel, 0);

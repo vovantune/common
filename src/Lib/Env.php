@@ -143,4 +143,16 @@ class Env
 	public static function enableDebug() {
 		Configure::write('debug', true);
 	}
+
+	/**
+	 * Прокидывает PHPUnit exception'ы дальше, чтоб в тесты правильно валились
+	 *
+	 * @param \Exception $exception
+	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 */
+	public static function checkTestException(\Exception $exception) {
+		if ($exception instanceof \PHPUnit_Framework_ExpectationFailedException) {
+			throw $exception;
+		}
+	}
 }
