@@ -5,8 +5,10 @@ use ArtSkills\Log\Engine\SentryLog;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\TestSuite\Mock\MethodMockerEntity;
+use ArtSkills\TestSuite\Mock\PropertyAccess;
 use ArtSkills\TestSuite\PermanentMocks\MockFileLog;
 use Cake\Console\ConsoleErrorHandler;
+use Cake\Console\Shell;
 use Cake\Core\Configure;
 use Cake\Error\Debugger;
 use Cake\Log\Engine\FileLog;
@@ -82,6 +84,12 @@ class SentryLogTest extends AppTestCase
 					$this->assertArraySubsetEquals($expectedTraceLast, $traceLast);
 				}
 			);
+	}
+
+	/** @inheritdoc */
+	public function tearDown() {
+		parent::tearDown();
+		PropertyAccess::setStatic(SentryLog::class, '_isShutdown', false);
 	}
 
 	/** простой вызов Log::error */
@@ -329,6 +337,23 @@ class SentryLogTest extends AppTestCase
 		);
 		MethodMocker::mock(ConsoleErrorHandler::class, '_stop')->singleCall(); // если не замокать, тесты остановятся =)
 		MethodMocker::callPrivate(new \ArtSkills\Error\ConsoleErrorHandler(Configure::read('Error')), '_logShutdown', [$testError]);
+	}
+
+	/** вызов лога из лог-трейта */
+	public function testLogTrait() {
+		$message = 'test message 14';
+		$this->_fileLogMock->singleCall()->expectArgs('error', $message, self::CONTEXT_DEFAULT);
+		$this->_sentryLogMock->singleCall()->setAdditionalVar(
+			[
+				'message' => $message,
+				'trace' => [
+					'class' => Shell::class,
+					'function' => 'log',
+				],
+			]
+		);
+		$shell = new Shell();
+		$shell->log($message);
 	}
 
 }

@@ -2,7 +2,7 @@
 namespace ArtSkills\Http;
 
 use ArtSkills\Lib\Env;
-use Cake\Log\Log;
+use ArtSkills\Log\Engine\SentryLog;
 
 class Client extends \Cake\Http\Client
 {
@@ -29,7 +29,7 @@ class Client extends \Cake\Http\Client
 			$result = parent::_doRequest($method, $url, $data, $options);
 			return $result;
 		} catch (\Exception $error) {
-			Log::error($error->getMessage() . $error->getTraceAsString());
+			SentryLog::logException($error);
 			return false;
 		}
 	}
