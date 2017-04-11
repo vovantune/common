@@ -237,7 +237,9 @@ class SentryLog extends BaseLog
 			}
 		} else {
 			if (!self::$_isShutdown) {
-				$trace = self::_sliceTrace(debug_backtrace(0));
+				$trace = debug_backtrace(0);
+				$data['extra']['_full_trace'] = self::_exportVar($trace);
+				$trace = self::_sliceTrace($trace);
 				$client->captureMessage($message, [], $data, $trace);
 			}
 		}
