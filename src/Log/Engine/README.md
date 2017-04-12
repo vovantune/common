@@ -73,4 +73,6 @@ Log::error('Сообщение с тегами', [
  Log::error('Только в сентри', [SentryLog::KEY_NO_FILE_LOG => true]);
  Log::error('Только в файлы', [SentryLog::KEY_IS_HANDLED => true]);
  ```
+ 
+ Если внезапно трейс обрезается слишком сильно, то можно использовать ключ SentryLog::KEY_FULL_TRACE
 

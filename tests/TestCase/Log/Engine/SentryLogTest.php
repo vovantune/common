@@ -13,6 +13,7 @@ use Cake\Core\Configure;
 use Cake\Error\Debugger;
 use Cake\Log\Engine\FileLog;
 use Cake\Log\Log;
+use Cake\Network\Exception\NotFoundException;
 
 class SentryLogTest extends AppTestCase
 {
@@ -235,6 +236,21 @@ class SentryLogTest extends AppTestCase
 		$this->_sentryLogMock->singleCall()->setAdditionalVar(['message' => $message, 'isException' => true]);
 		SentryLog::logException(new \Exception($message));
 	}
+
+	/** логирование неинтересных ексепшнов */
+	public function testLogExceptionWarning() {
+		$message = 'test message 9.1';
+		$this->_fileLogMock->singleCall()->expectArgs(
+			'warning', $message, self::CONTEXT_DEFAULT + [SentryLog::KEY_IS_HANDLED => true]
+		);
+		$this->_sentryLogMock->singleCall()->setAdditionalVar([
+			'message' => $message,
+			'isException' => true,
+			'level' => \Raven_Client::WARN,
+		]);
+		SentryLog::logException(new NotFoundException($message));
+	}
+
 
 	/** ошибки */
 	public function testTriggerError() {
