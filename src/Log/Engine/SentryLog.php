@@ -8,6 +8,7 @@ use Cake\Error\FatalErrorException;
 use Cake\Log\Engine\BaseLog;
 use Cake\Log\Log;
 use Cake\Log\LogTrait;
+use Cake\Network\Exception\NotFoundException;
 
 class SentryLog extends BaseLog
 {
@@ -22,6 +23,7 @@ class SentryLog extends BaseLog
 	const KEY_TAGS = '_tags';
 	/** для кастомной группировки сообщений */
 	const KEY_FINGERPRINT = '_fingerprint';
+	const KEY_FULL_TRACE = '_addFullTrace';
 
 	const AUTO_SEND_LEVELS = [\Raven_Client::WARN, \Raven_Client::ERROR];
 	const LEVEL_MAP = [
@@ -155,15 +157,30 @@ class SentryLog extends BaseLog
 	 *
 	 * @param \Exception $exception
 	 * @param array $context
-	 * @param bool $alert
+	 * @param bool|null $alert
 	 */
-	public static function logException(\Exception $exception, array $context = [], $alert = true) {
+	public static function logException(\Exception $exception, array $context = [], $alert = null) {
 		Env::checkTestException($exception);
+		$level = self::_getExceptionLevel($exception, $alert);
 		if (empty($context[self::KEY_NO_FILE_LOG])) {
-			Log::error($exception->getMessage(), [self::KEY_IS_HANDLED => true] + $context);
+			Log::write($level, $exception->getMessage(), [self::KEY_IS_HANDLED => true] + $context);
 		}
-		$level = ($alert ? 'error' : 'warning');
 		self::_log($level, null, $exception, $context);
+	}
+
+	/**
+	 * Получить уровень лога для исключения, 'error' (с оповещением) или 'warning' (без)
+	 * по умолчанию оповещения шлются всегда за исключением некоторых неинтересных исключений
+	 *
+	 * @param \Exception $exception
+	 * @param bool|null $alert
+	 * @return string
+	 */
+	protected static function _getExceptionLevel(\Exception $exception, $alert = null) {
+		if ($alert === null) {
+			$alert = !($exception instanceof NotFoundException);
+		}
+		return ($alert ? 'error' : 'warning');
 	}
 
 	/**
@@ -238,8 +255,9 @@ class SentryLog extends BaseLog
 		} else {
 			if (!self::$_isShutdown) {
 				$trace = debug_backtrace(0);
-				$data['extra']['_full_trace'] = self::_exportVar($trace);
-				$trace = self::_sliceTrace($trace);
+				if (empty($context[self::KEY_FULL_TRACE])) {
+					$trace = self::_sliceTrace($trace);
+				}
 				$client->captureMessage($message, [], $data, $trace);
 			}
 		}
