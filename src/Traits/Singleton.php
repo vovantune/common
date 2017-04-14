@@ -7,7 +7,7 @@ trait Singleton {
 	 * Объект-одиночка
 	 * @var static
 	 */
-	static private $_instance;
+	private static $_instance;
 
 	/**
 	 * Защищаем от создания через new Singleton
@@ -28,7 +28,7 @@ trait Singleton {
 	 * Возвращает объект-одиночку
 	 * @return static
 	 */
-	static public function getInstance() {
+	public static function getInstance() {
 		if (empty(static::$_instance)) {
 			static::$_instance = new static();
 		}

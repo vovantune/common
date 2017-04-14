@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\Test\TestCase\Lib;
 
+use ArtSkills\Lib\Console;
 use ArtSkills\Lib\Git;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
@@ -42,17 +43,9 @@ class GitTest extends AppTestCase
 	 */
 	public function setUp() {
 		parent::setUp();
-		$this->_git = Git::getInstance();
+		$this->_git = new Git();
 		$this->_gitCommand = PropertyAccess::get($this->_git, '_gitCommand');
 		$this->_branchBeforeTest = $this->_git->getCurrentBranchName();
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function tearDown() {
-		$this->_git->checkout($this->_branchBeforeTest);
-		parent::tearDown();
 	}
 
 	/**
@@ -100,7 +93,7 @@ class GitTest extends AppTestCase
 			[$this->_gitCommand . ' branch -r'],
 			$this->_expectedCommandListMerged($this->_branchBeforeTest, Git::BRANCH_TYPE_REMOTE),
 			[$this->_gitCommand . ' branch'],
-			$this->_expectedCommandListMerged($this->_branchBeforeTest, Git::BRANCH_TYPE_LOCAL)
+			$this->_expectedCommandListMerged($this->_branchBeforeTest, Git::BRANCH_TYPE_LOCAL, false)
 		);
 		self::assertEquals($historyExpected, $this->_executeHistory, 'Неправильный набор комманд для просмотра померженных веток');
 	}
@@ -110,14 +103,17 @@ class GitTest extends AppTestCase
 	 *
 	 * @param string $branchBefore
 	 * @param string $type
+	 * @param bool $pull
 	 * @return array|bool
 	 */
-	private function _expectedCommandListMerged($branchBefore, $type) {
+	private function _expectedCommandListMerged($branchBefore, $type, $pull = true) {
 		$expectedList = [];
 		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
 			$expectedList[] = $this->_gitCommand . ' checkout master';
 		}
-		$expectedList[] = $this->_gitCommand . ' pull';
+		if ($pull) {
+			$expectedList[] = $this->_gitCommand . ' pull';
+		}
 		if ($type == Git::BRANCH_TYPE_REMOTE) {
 			$expectedList[] = $this->_gitCommand . ' for-each-ref --format="%(refname) %(authordate:short)" refs/remotes/origin --merged';
 		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
@@ -215,13 +211,14 @@ class GitTest extends AppTestCase
 	 * @param string $branchBefore
 	 * @param bool $canDelete
 	 * @param string $type
+	 * @param bool $pull
 	 * @return array|bool
 	 */
-	private function _expectedCommandListDelete($branchDelete, $canDelete, $branchBefore, $type) {
+	private function _expectedCommandListDelete($branchDelete, $canDelete, $branchBefore, $type, $pull = true) {
 		if (($branchDelete == $branchBefore) && ($type == Git::BRANCH_TYPE_LOCAL)) {
 			return [];
 		}
-		$expectedList = $this->_expectedCommandListMerged($branchBefore, $type);
+		$expectedList = $this->_expectedCommandListMerged($branchBefore, $type, $pull);
 		if (empty($expectedList)) {
 			return false;
 		}
@@ -231,7 +228,6 @@ class GitTest extends AppTestCase
 		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
 			$expectedList[] = $this->_gitCommand . ' checkout master';
 		}
-		$expectedList[] = $this->_gitCommand . ' pull';
 		if ($type == Git::BRANCH_TYPE_REMOTE) {
 			$expectedList[] = $this->_gitCommand . ' push origin --delete ' . $branchDelete;
 		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
@@ -253,6 +249,7 @@ class GitTest extends AppTestCase
 		$this->_mockExecute();
 
 		$unexistentBranchName = 'someUnexistentBranchName';
+		$pull = true;
 		foreach ([Git::BRANCH_TYPE_LOCAL, Git::BRANCH_TYPE_REMOTE] as $type) {
 			$this->_executeHistory = [];
 			$labelType = (($type == Git::BRANCH_TYPE_REMOTE) ? 'не' : '') . 'локальной';
@@ -261,10 +258,11 @@ class GitTest extends AppTestCase
 				'Удаление несуществующей ' . $labelType . ' ветки вернуло true'
 			);
 			self::assertEquals(
-				$this->_expectedCommandListDelete($unexistentBranchName, false, $this->_branchBeforeTest, $type),
+				$this->_expectedCommandListDelete($unexistentBranchName, false, $this->_branchBeforeTest, $type, $pull),
 				$this->_executeHistory,
 				'Удаление несуществующей ' . $labelType . ' ветки вызывало неправильные команды'
 			);
+			$pull = false;
 
 			$branches = ['merged' => [], 'unmerged' => []];
 			$all = $this->_git->getBranchList($type);
@@ -356,22 +354,42 @@ class GitTest extends AppTestCase
 	}
 
 	/**
-	 * Мокаем _execute в Git
+	 * Выполнение команд, когда директория гита не является текущей
+	 */
+	public function testOtherFolder() {
+		$gitFolder = ROOT;
+		$this->_mockExecute();
+
+		$git = new Git($gitFolder);
+		$git->updateRefs();
+		$git->pullCurrentBranch();
+
+		$commandStart = 'cd ' . escapeshellarg($gitFolder) . ' ; ' . $this->_gitCommand . ' ';
+		$expectedHistory = [
+			$commandStart . 'rev-parse --abbrev-ref HEAD',
+			$commandStart . 'remote update --prune',
+			$commandStart . 'pull',
+		];
+		self::assertEquals($expectedHistory, $this->_executeHistory);
+	}
+
+	/**
+	 * Мокаем выполнение консольных команд
 	 *
 	 * @param int $expectTimes
 	 * @throws \Exception
 	 */
 	private function _mockExecute($expectTimes = MethodMockerEntity::EXPECT_CALL_ONCE) {
 		$this->_executeHistory = [];
-		MethodMocker::mock(Git::class, '_execute')
+		MethodMocker::mock(Console::class, 'exec')
 			->expectCall($expectTimes)
 			->willReturnAction(function ($args) {
 				$this->_executeHistory[] = $args[0];
-				if (preg_match('/^' . addcslashes($this->_gitCommand, '/.') . ' (branch( -[ar])?|for-each-ref.*)$/', $args[0])) {
-					exec($args[0], $output);
-					return $output;
+				if (preg_match('/^(cd [^;]+;\s)?' . addcslashes($this->_gitCommand, '/.') . ' (branch( -[ar])?|for-each-ref.*|rev-parse .*)$/', $args[0])) {
+					exec($args[0], $output, $returnCode);
+					return [$returnCode === 0, $output];
 				} else {
-					return [];
+					return [true, []];
 				}
 			});
 	}

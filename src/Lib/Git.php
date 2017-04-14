@@ -8,6 +8,8 @@ use ArtSkills\Traits\Singleton;
  */
 class Git
 {
+	// одиночка оставлен для обратной совместимости
+	// todo: выпилить одиночку
 	use Singleton;
 
 	const BRANCH_NAME_MASTER = 'master';
@@ -47,15 +49,33 @@ class Git
 	private $_gitCommand = '';
 
 	/**
-	 * Выбираем, какой командой обращаться к гиту; вытаскиваем текущую ветку
+	 * Список спулленных веток, чтоб не пуллить по нескольку раз
+	 *
+	 * @var string[]
 	 */
-	private function __construct() {
+	private $_pulledBranches = [];
+
+	/**
+	 * Папка с репозиторием
+	 *
+	 * @var string
+	 */
+	private $_directory = '';
+
+	/**
+	 * Выбираем, какой командой обращаться к гиту; вытаскиваем текущую ветку
+	 * @param string $directory папка репозитория
+	 * возможность передать пустой параметр оставлена для обратной совместимости
+	 * todo: выпилить возможность использовать пустой параметр
+	 */
+	public function __construct($directory = '') {
+		$this->_directory = realpath($directory);
 		$this->_gitCommand = $this->_chooseGitCommand();
 		if (!empty($this->_gitCommand)) {
-			$result = $this->_execute($this->_gitCommand . ' rev-parse --abbrev-ref HEAD', false);
+			list($success, $output) = $this->_execute('rev-parse --abbrev-ref HEAD');
 
-			if (!empty($result)) {
-				$this->_currentBranch = $result[0];
+			if ($success && !empty($output)) {
+				$this->_currentBranch = $output[0];
 			}
 		}
 	}
@@ -77,12 +97,10 @@ class Git
 	 * Выполняем команду
 	 *
 	 * @param string $command
-	 * @param bool $withErrors
-	 * @return array
+	 * @return array [успех, вывод, код возврата]
 	 */
-	private function _execute($command, $withErrors = true) {
-		exec($command . ($withErrors ? ' 2>&1' : ''), $output);
-		return $output;
+	private function _execute($command) {
+		return Console::execFromDir($this->_directory, $this->_gitCommand . ' ' . $command);
 	}
 
 	/**
@@ -137,7 +155,10 @@ class Git
 			default:
 				return [];
 		}
-		$branchList = $this->_execute($this->_gitCommand . ' branch' . $commandParam);
+		list($success, $branchList) = $this->_execute('branch' . $commandParam);
+		if (!$success) {
+			return [];
+		}
 		$nameRegexp = '/' . $branchPrefix . '([\d\w\-\.\[\]]+)/i';
 		foreach ($branchList as $branchName) {
 			if (preg_match($nameRegexp, $branchName, $matches)) {
@@ -162,10 +183,11 @@ class Git
 		if (Env::isProduction()) {
 			return false;
 		}
-		$command = $this->_gitCommand . ' checkout ' . $name;
-		$this->_execute($command);
-		$this->_currentBranch = $name;
-		return true;
+		$success = $this->_execute('checkout ' . $name)[0];
+		if ($success) {
+			$this->_currentBranch = $name;
+		}
+		return $success;
 	}
 
 	/**
@@ -185,12 +207,11 @@ class Git
 			return false;
 		}
 		if ($type == self::BRANCH_TYPE_REMOTE) {
-			$command = $this->_gitCommand . ' push origin --delete ' . $name;
+			$command = 'push origin --delete ' . $name;
 		} else {
-			$command = $this->_gitCommand . ' branch ' . $name . ' -d';
+			$command = 'branch ' . $name . ' -d';
 		}
-		$res = $this->_execFromMaster($command);
-		return ($res !== false);
+		return $this->_execFromMaster($command)[0];
 	}
 
 	/**
@@ -212,9 +233,9 @@ class Git
 			return [];
 		}
 
-		$command = $this->_gitCommand . ' for-each-ref --format="%(refname) %(authordate:short)" ' . $namePattern . ' --merged';
-		$branchList = $this->_execFromMaster($command);
-		if (empty($branchList)) {
+		$command = 'for-each-ref --format="%(refname) %(authordate:short)" ' . $namePattern . ' --merged';
+		list($success, $branchList) = $this->_execFromMaster($command);
+		if (!$success || empty($branchList)) {
 			return [];
 		}
 
@@ -236,47 +257,53 @@ class Git
 	 * Исполняет команду, находясь в мастере и переключает ветку обратно. Возвращает вывод команды
 	 *
 	 * @param string $command
-	 * @return array|false
+	 * @return array [bool success, output]
 	 */
 	private function _execFromMaster($command) {
 		$currentBranch = $this->_currentBranch;
-		$checkedOut = $this->_checkout(self::BRANCH_NAME_MASTER);
-		if (!$checkedOut) {
-			return false;
+		if (
+			!$this->_checkout(self::BRANCH_NAME_MASTER)
+			|| !$this->pullCurrentBranch()[0]
+		) {
+			return [false, []];
 		}
-		$this->pullCurrentBranch();
-		$output = $this->_execute($command);
+
+		$result = $this->_execute($command);
 		$this->_checkout($currentBranch);
-		return $output;
+		return $result;
 	}
 
 	/**
 	 * Делаем git pull для активной ветки
 	 *
-	 * @return array [bool, output]
+	 * @return array [bool success, output]
 	 */
 	public function pullCurrentBranch() {
-		if (empty($this->_currentBranch)) {
+		$currentBranch = $this->_currentBranch;
+		if (empty($currentBranch)) {
 			return [false, ['git not inited']];
 		}
-
-		$cmd = $this->_gitCommand . ' pull';
-		$output = $this->_execute($cmd);
-		return [true, $output];
+		if (!empty($this->_pulledBranches[$currentBranch])) {
+			return [true, []];
+		}
+		$result = $this->_execute('pull');
+		if ($result[0]) {
+			// 0 - success
+			$this->_pulledBranches[$currentBranch] = true;
+		}
+		return $result;
 	}
 
 	/**
 	 * Обновляет список веток
 	 *
-	 * @return bool
+	 * @return bool success
 	 */
 	public function updateRefs() {
 		if (empty($this->_currentBranch)) {
 			return false;
 		}
-		$command = $this->_gitCommand . ' remote update --prune';
-		$this->_execute($command);
-		return true;
+		return $this->_execute('remote update --prune')[0];
 	}
 
 	/**

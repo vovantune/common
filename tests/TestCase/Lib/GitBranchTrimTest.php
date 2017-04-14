@@ -1,6 +1,7 @@
 <?php
 namespace App\Test\TestCase\Shell\TrimBranchesTest;
 
+use ArtSkills\Lib\Console;
 use ArtSkills\Lib\Git;
 use ArtSkills\Lib\GitBranchTrim;
 use ArtSkills\TestSuite\AppTestCase;
@@ -35,6 +36,7 @@ class GitBranchTrimTest extends AppTestCase
 			$expectedHistory[] = 'git checkout master';
 		}
 		$expectedHistory[] = 'git remote update --prune';
+		$expectedHistory[] = 'git pull';
 		foreach ([Git::BRANCH_TYPE_REMOTE, Git::BRANCH_TYPE_LOCAL] as $type) {
 			$expectedHistory = array_merge($expectedHistory, $this->_getCommandListMerged($type));
 			$mergedBranches = $git->getMergedBranches($type);
@@ -59,14 +61,14 @@ class GitBranchTrimTest extends AppTestCase
 	 * @throws \Exception
 	 */
 	private function _mockExecute(&$history) {
-		MethodMocker::mock(Git::class, '_execute')
+		MethodMocker::mock(Console::class, 'exec')
 			->willReturnAction(function ($args) use (&$history) {
 				$history[] = $args[0];
 				if (preg_match('/^git (branch( -[ar])?|for-each-ref.*)$/', $args[0])) {
-					exec($args[0], $output);
-					return $output;
+					exec($args[0], $output, $returnCode);
+					return [$returnCode === 0, $output];
 				} else {
-					return [];
+					return [true, []];
 				}
 			});
 	}
@@ -78,7 +80,7 @@ class GitBranchTrimTest extends AppTestCase
 	 * @return array|bool
 	 */
 	private function _getCommandListMerged($type) {
-		$list = ['git pull'];
+		$list = [];
 		if ($type == Git::BRANCH_TYPE_REMOTE) {
 			$list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/remotes/origin --merged';
 		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
@@ -101,7 +103,6 @@ class GitBranchTrimTest extends AppTestCase
 		if (empty($list)) {
 			return false;
 		}
-		$list[] = 'git pull';
 		if ($type == Git::BRANCH_TYPE_REMOTE) {
 			$list[] = 'git push origin --delete ' . $branchDelete;
 		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
