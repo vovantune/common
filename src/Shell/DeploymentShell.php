@@ -1,5 +1,5 @@
 <?php
-namespace App\Shell;
+namespace ArtSkills\Shell;
 
 use ArtSkills\Lib\Arrays;
 use Cake\Console\Shell;
