@@ -252,6 +252,7 @@ class SentryLog extends BaseLog
 			// но если это настоящий fatal error, вызовется шатдаун, и у обычной ошибки не будет трейса
 			// а у ексепшна - будет
 			if (self::$_isShutdown || !($exception instanceof FatalErrorException)) {
+				self::_addCallArgs($exception->getTrace(), 0);
 				$client->captureException($exception, $data);
 			}
 		} else {
@@ -290,16 +291,11 @@ class SentryLog extends BaseLog
 		$toSlice += max((int)self::$_addDeleteTraceLevel, 0);
 
 		$handleError = $trace[$toSlice];
-		$aboveHandleError = $trace[$toSlice + 1];
 		if (
-			// trigger_error добавляет в трейс ненужную анонимную функцию
-			(Arrays::get($aboveHandleError, 'function') === 'trigger_error')
 			// ошибочные вызовы нативных функций тоже делают нехорошо
-			|| (
-				empty(Arrays::get($handleError, 'file'))
-				&& (Arrays::get($handleError, 'function') === 'handleError')
-				&& (Arrays::get($handleError, 'type') === '->')
-			)
+			empty(Arrays::get($handleError, 'file'))
+			&& (Arrays::get($handleError, 'function') === 'handleError')
+			&& (Arrays::get($handleError, 'type') === '->')
 		) {
 			$toSlice++;
 		}
@@ -327,6 +323,7 @@ class SentryLog extends BaseLog
 			if (!empty($class)) {
 				$function = $class . '::' . $function;
 			}
+			$function = $level . ' - ' . $function;
 			$result[$function] = self::_exportVar(Arrays::get($callInfo, 'args'));
 		}
 		self::getSentry()->extra_context(['_args' => $result]);
