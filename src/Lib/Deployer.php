@@ -203,7 +203,7 @@ abstract class Deployer
 			$success = $this->_run($repo, $branch, $commit, $currentVersion);
 		} catch (\Exception $e) {
 			SentryLog::logException($e, [
-				'scope' => $this->_logScope,
+				'scope' => [$this->_logScope],
 				SentryLog::KEY_ADD_INFO => $this->_output,
 			]);
 		} finally {
