@@ -538,7 +538,7 @@ abstract class Deployer
 		], $this->_output, ["\n\n"]);
 
 		Log::info(implode("\n", $this->_output), [
-			'scope' => $this->_logScope,
+			'scope' => [$this->_logScope],
 			SentryLog::KEY_SENTRY_SEND => true,
 		]);
 
