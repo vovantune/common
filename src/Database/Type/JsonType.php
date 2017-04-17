@@ -3,6 +3,16 @@ namespace ArtSkills\Database\Type;
 
 use Cake\Database\Driver;
 
+/**
+ * Поддержка типа данных JSON в MySQL, в отличие от CakePHP позволяет сохранять null значение.
+ *
+ * # Подключение:
+ * По-умолчанию включено bootstrap.php, если нет, то прописываем следующее:
+ * ```php
+ * \Cake\Database\Type::map('json', \ArtSkills\Database\Type\JsonType::class);
+ * ```
+ * См. более подробно в мануале [CakePHP](https://book.cakephp.org/3.0/en/orm/saving-data.html#saving-complex-types)
+ */
 class JsonType extends \Cake\Database\Type\JsonType
 {
 
