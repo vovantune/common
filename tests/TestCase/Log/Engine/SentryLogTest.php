@@ -271,8 +271,19 @@ class SentryLogTest extends AppTestCase
 				],
 			]
 		);
-		MethodMocker::mock(ConsoleErrorHandler::class, '_stop')->singleCall(); // если не замокать, тесты остановятся =)
+		$this->_disableFatal();
 		trigger_error($message, E_USER_ERROR);
+	}
+
+	/** сделать, чтобы тесты не валились из-за тестируемой ошибки */
+	private function _disableFatal() {
+		MethodMocker::mock(ConsoleErrorHandler::class, '_stop')->singleCall(); // если не замокать, тесты остановятся =)
+	}
+
+	/** сделать, чтобы тестируемый нотис не мешался */
+	private function _disableNotice() {
+		MethodMocker::mock(ConsoleErrorHandler::class, '_displayError')->singleCall(); // чтоб нотис не выводился
+		MethodMocker::sniff(ConsoleErrorHandler::class, '_stop')->expectCall(0); // а тут не должно вызываться
 	}
 
 	/** нотисы шлются в сентри как ошибки */
@@ -294,8 +305,7 @@ class SentryLogTest extends AppTestCase
 				],
 			]
 		);
-		MethodMocker::mock(ConsoleErrorHandler::class, '_displayError')->singleCall(); // чтоб нотис не выводился
-		MethodMocker::sniff(ConsoleErrorHandler::class, '_stop')->expectCall(0); // а тут не должно вызываться
+		$this->_disableNotice();
 		trigger_error($message, E_USER_NOTICE);
 	}
 
@@ -319,8 +329,7 @@ class SentryLogTest extends AppTestCase
 				],
 			]
 		);
-		MethodMocker::mock(ConsoleErrorHandler::class, '_displayError')->singleCall(); // чтоб нотис не выводился
-		MethodMocker::sniff(ConsoleErrorHandler::class, '_stop')->expectCall(0); // а тут не должно вызываться
+		$this->_disableNotice();
 		$line = __LINE__ + 1; // переменная выше используется по ссылке
 		$a = $b[1]; // ошибка
 	}
@@ -351,7 +360,7 @@ class SentryLogTest extends AppTestCase
 				'isException' => true,
 			]
 		);
-		MethodMocker::mock(ConsoleErrorHandler::class, '_stop')->singleCall(); // если не замокать, тесты остановятся =)
+		$this->_disableFatal();
 		MethodMocker::callPrivate(new \ArtSkills\Error\ConsoleErrorHandler(Configure::read('Error')), '_logShutdown', [$testError]);
 	}
 
@@ -370,6 +379,31 @@ class SentryLogTest extends AppTestCase
 		);
 		$shell = new Shell();
 		$shell->log($message);
+	}
+
+	/** плохой вызов нативной функции */
+	public function testBadCall() {
+		$logMessageLike = 'Warning (2): getimagesize';
+		$this->_fileLogMock->singleCall()->willReturnAction(
+			function ($args) use ($logMessageLike) {
+				self::assertEquals('error', $args[0]);
+				self::assertContains($logMessageLike, $args[1]);
+				self::assertEquals(self::CONTEXT_DEFAULT, $args[2]);
+			}
+		);
+		$line = 0;
+		$this->_sentryLogMock->singleCall()->setAdditionalVar(
+			[
+				'messageLike' => $logMessageLike,
+				'trace' => [
+					'line' => &$line,
+					'function' => 'getimagesize',
+				],
+			]
+		);
+		$this->_disableNotice();
+		$line = __LINE__ + 1; // переменная выше используется по ссылке
+		getimagesize('govno');
 	}
 
 }

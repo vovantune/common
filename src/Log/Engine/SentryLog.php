@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\Log\Engine;
 
+use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Strings;
 use Cake\Error\Debugger;
@@ -200,6 +201,7 @@ class SentryLog extends BaseLog
 		$client->extra_context([
 			'_extra_as_string' => self::_exportVar(self::$_addInfo),
 			'_defined_vars' => self::_exportVar($vars),
+			'_args' => 'empty',
 		]);
 		if (Env::isCli()) {
 			global $argv;
@@ -250,6 +252,7 @@ class SentryLog extends BaseLog
 			// но если это настоящий fatal error, вызовется шатдаун, и у обычной ошибки не будет трейса
 			// а у ексепшна - будет
 			if (self::$_isShutdown || !($exception instanceof FatalErrorException)) {
+				self::_addCallArgs($exception->getTrace(), 0);
 				$client->captureException($exception, $data);
 			}
 		} else {
@@ -278,17 +281,51 @@ class SentryLog extends BaseLog
 		$aboveLogWrite = $trace[$toSlice + 1];
 		list(, $logTrait) = namespaceSplit(LogTrait::class);
 		if (
-			(!empty($aboveLogWrite['class']) && ($aboveLogWrite['class'] === Log::class))
-			|| (!empty($logWriteCall['file']) && Strings::endsWith($logWriteCall['file'], $logTrait . '.php'))
+			// Log::error/warning/...
+			(Arrays::get($aboveLogWrite, 'class') === Log::class)
+			// LogTrait::log
+			|| (Strings::endsWith(Arrays::get($logWriteCall, 'file'), $logTrait . '.php'))
 		) {
 			$toSlice++;
 		}
 		$toSlice += max((int)self::$_addDeleteTraceLevel, 0);
 
-		// trigger_error добавляет в трейс ненужную анонимную функцию
-		if (!empty($trace[$toSlice + 1]['function']) && ($trace[$toSlice + 1]['function'] === 'trigger_error')) {
+		$handleError = $trace[$toSlice];
+		if (
+			// ошибочные вызовы нативных функций тоже делают нехорошо
+			empty(Arrays::get($handleError, 'file'))
+			&& (Arrays::get($handleError, 'function') === 'handleError')
+			&& (Arrays::get($handleError, 'type') === '->')
+		) {
 			$toSlice++;
 		}
+		self::_addCallArgs($trace, $toSlice);
+
 		return array_slice($trace, $toSlice);
+	}
+
+	/**
+	 * Добавим в доп.инфу интересные аргументы
+	 *
+	 * @param array $trace
+	 * @param int $toSlice
+	 */
+	private static function _addCallArgs($trace, $toSlice) {
+		$result = [];
+		$argsLevels = range($toSlice - 1, $toSlice + 1);
+		foreach ($argsLevels as $level) {
+			if (empty($trace[$level])) {
+				continue;
+			}
+			$callInfo = $trace[$level];
+			$class = Arrays::get($callInfo, 'class');
+			$function = $callInfo['function'];
+			if (!empty($class)) {
+				$function = $class . '::' . $function;
+			}
+			$function = $level . ' - ' . $function;
+			$result[$function] = self::_exportVar(Arrays::get($callInfo, 'args'));
+		}
+		self::getSentry()->extra_context(['_args' => $result]);
 	}
 }
