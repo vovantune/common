@@ -87,7 +87,7 @@ class Arrays
 	 * @return mixed
 	 */
 	public static function get($array, $key, $default = null) {
-		if (!is_array($array) || array_key_exists($key, $array)) {
+		if (is_array($array) && array_key_exists($key, $array)) {
 			return $array[$key];
 		} else {
 			return $default;
