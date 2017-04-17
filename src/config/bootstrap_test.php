@@ -13,7 +13,7 @@ use \ArtSkills\Lib\DB;
 
 $testConnection = DB::getConnection(DB::CONNECTION_TEST);
 $dbName = $testConnection->config()['database'];
-$existingTables = DB::customQuery("SELECT `table_name` FROM `information_schema`.`tables` WHERE `table_schema` = '" . $dbName . "'")->fetchAll();
+$existingTables = DB::customQuery("SELECT `table_name` FROM `information_schema`.`tables` WHERE `table_schema` = '" . $dbName . "'", DB::CONNECTION_TEST)->fetchAll();
 if (!empty($existingTables)) {
 	$existingTables = '`' . implode('`, `', array_column($existingTables, 0)) . '`';
 	DB::customQuery('DROP TABLE ' . $existingTables, DB::CONNECTION_TEST)->closeCursor();
