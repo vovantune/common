@@ -17,6 +17,8 @@ require ROOT . DS . 'vendor' . DS . 'autoload.php';
  */
 require CORE_PATH . 'config' . DS . 'bootstrap.php';
 
+require __DIR__.'/../src/config/bootstrap.php';
+
 
 // You can remove this if you are confident you have intl installed.
 if (!extension_loaded('intl')) {
@@ -139,12 +141,5 @@ if (Configure::read('debug')) {
 DispatcherFactory::add('Asset');
 DispatcherFactory::add('Routing');
 DispatcherFactory::add('ControllerFactory');
-
-if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
-	function mb_ucfirst($string, $enc = 'utf-8') {
-		$string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_strtolower(mb_substr($string, 1, mb_strlen($string, $enc) - 1, $enc), $enc);
-		return $string;
-	}
-}
 
 
