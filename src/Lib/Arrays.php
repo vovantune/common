@@ -78,6 +78,22 @@ class Arrays
 		return $newArray;
 	}
 
+	/**
+	 * Получить значение по ключу с проверками
+	 *
+	 * @param array $array
+	 * @param string|int $key
+	 * @param mixed $default
+	 * @return mixed
+	 */
+	public static function get($array, $key, $default = null) {
+		if (is_array($array) && array_key_exists($key, $array)) {
+			return $array[$key];
+		} else {
+			return $default;
+		}
+	}
+
 
 
 	/**

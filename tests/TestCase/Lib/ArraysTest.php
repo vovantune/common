@@ -73,4 +73,18 @@ class ArraysTest extends AppTestCase
 		self::assertEquals($expectedStrict, Arrays::remap($array, $map, false));
 	}
 
+	/** получение */
+	public function testGet() {
+		$default = 'default';
+		$hasKey = 'hasKey';
+		$hasNotKey = 'hasNotKey';
+		$value = 'value';
+
+		$array = [$hasKey => $value];
+		self::assertEquals($value, Arrays::get($array, $hasKey));
+		self::assertEquals($default, Arrays::get($array, $hasNotKey, $default));
+		self::assertEquals(null, Arrays::get($array, $hasNotKey));
+		self::assertEquals(null, Arrays::get(null, $hasNotKey));
+	}
+
 }
