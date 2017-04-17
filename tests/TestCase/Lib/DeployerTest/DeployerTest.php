@@ -117,7 +117,7 @@ class DeployerTest extends AppTestCase
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
 			'git pull',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common'",
+			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction",
 			'vendor/bin/phinx migrate',
 			"ln -snf '{$this->_nextRoot}' '$mainRoot'",
 			"cd {$this->_currentDir}",
@@ -150,7 +150,7 @@ class DeployerTest extends AppTestCase
 			"cd $rootSub",
 			'git pull',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common'",
+			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction",
 			'vendor/bin/phinx migrate',
 			"cd {$this->_currentDir}",
 		];
@@ -194,7 +194,7 @@ class DeployerTest extends AppTestCase
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
 			'git pull',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common'",
+			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction",
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -216,7 +216,7 @@ class DeployerTest extends AppTestCase
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
 			'git pull',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common'",
+			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction",
 			'vendor/bin/phinx migrate',
 			"cd {$this->_currentDir}",
 		];
@@ -389,8 +389,8 @@ class DeployerTest extends AppTestCase
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
 	}
 
-	/** не указан omposer home и файл версии */
-	public function testNoHomeNoVersion() {
+	/** не указан composer home, файл версии и опции композера */
+	public function testNoHomeNoVersionNoOptions() {
 		$mainRoot = LocalDeployer::DIR_MAIN;
 
 		$this->_mockExec(6);
@@ -399,6 +399,8 @@ class DeployerTest extends AppTestCase
 		$deployer = new LocalDeployer([
 			'_versionFile' => '',
 			'_composerHome' => '',
+			'_composerOptions' => [],
+			'_composerRequireDev' => true,
 		]);
 		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
 		self::assertTrue($res);
@@ -408,7 +410,7 @@ class DeployerTest extends AppTestCase
 			"cd {$this->_nextRootSub}",
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
 			'git pull',
-			"php composer.phar update 'artskills/common'",
+			"php composer.phar update 'artskills/common' --no-interaction",
 			'vendor/bin/phinx migrate',
 			"ln -snf '{$this->_nextRoot}' '$mainRoot'",
 			"cd {$this->_currentDir}",

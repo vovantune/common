@@ -93,6 +93,23 @@ abstract class Deployer
 	];
 
 	/**
+	 * Ставить ли dev зависимости
+	 *
+	 * @var bool
+	 */
+	protected $_composerRequireDev = false;
+
+	/**
+	 * С какими опциями пускать композер
+	 * --no-interaction добавляется всегда автоматически
+	 *
+	 * @var string[]
+	 */
+	protected $_composerOptions = [
+		'--optimize-autoloader',
+	];
+
+	/**
 	 * Команда запуска композера
 	 *
 	 * @var string
@@ -241,11 +258,6 @@ abstract class Deployer
 	 * Сделать нужные преобразования над значениями
 	 */
 	protected function _setValues() {
-		$this->_versionFile = $this->_fullPathToRelative($this->_versionFile);
-		foreach ($this->_copyFileList as &$path) {
-			$path = $this->_fullPathToRelative($path);
-		}
-
 		$this->_runFrom = $this->_getNextRoot();
 		if (!empty($this->_cakeSubPath)) {
 			$this->_runFrom = $this->_runFrom . DS . $this->_cakeSubPath;
@@ -255,6 +267,16 @@ abstract class Deployer
 		if (empty($this->_git->getCurrentBranchName())) {
 			throw new \Exception('Не проинициализировался гит');
 		}
+
+		$this->_versionFile = $this->_fullPathToRelative($this->_versionFile);
+		foreach ($this->_copyFileList as &$path) {
+			$path = $this->_fullPathToRelative($path);
+		}
+
+		if (!$this->_composerRequireDev) {
+			$this->_composerOptions[] = '--no-dev';
+		}
+		$this->_composerOptions[] = '--no-interaction';
 	}
 
 	/**
@@ -304,6 +326,8 @@ abstract class Deployer
 
 		$timeEnd = microtime(true);
 		$this->_log($timeStart, $timeEnd, $commit);
+
+		$this->_notifySuccess();
 		return true;
 	}
 
@@ -406,7 +430,7 @@ abstract class Deployer
 		}
 		$safeDependencies = array_map('escapeshellarg', $this->_composerDependencies);
 		$this->_exec(
-			$this->_composerCommand . ' update ' . implode(' ', $safeDependencies),
+			$this->_composerCommand . ' update ' . implode(' ', $safeDependencies) . ' ' . implode(' ', $this->_composerOptions),
 			'Не удалось обновить композер'
 		);
 	}
@@ -519,6 +543,20 @@ abstract class Deployer
 		]);
 
 		$this->_output = [];
+	}
+
+	/**
+	 * Сообщить об успехе
+	 */
+	protected function _notifySuccess() {
+		// todo: написать
+	}
+
+	/**
+	 * Откатиться к предыдущей версии
+	 */
+	public function rollback() {
+		// todo: написать
 	}
 
 
