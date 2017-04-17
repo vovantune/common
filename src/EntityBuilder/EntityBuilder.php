@@ -384,7 +384,7 @@ class EntityBuilder
 	private static function _buildTableDeps($tblName) {
 		$refClass = new \ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tblName);
 
-		if ($refClass->hasProperty('useTable') && !$refClass->getProperty('useTable')->getValue()) {
+		if ($refClass->hasProperty('useTable')) {
 			return false;
 		}
 
