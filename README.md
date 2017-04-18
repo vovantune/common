@@ -1,17 +1,21 @@
+# Установка
+* В `bootstrap.php` под строкой `require CORE_PATH . 'config' . DS . 'bootstrap.php';` дописываем следующую: 
+```php
+require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . DS . 'config' . DS . 'bootstrap.php';
+```
+* Наследуем `AppController` от [ArtSkills\Controller\Controller](src/Controller/Controller.php)
+* Наследуем `AppTable` от [ArtSkills\ORM\Table](src/ORM/Table.php)
+
 # Что тут сделано
 
 ## Основные фичи
-* Построитель классов Table и Entity на основе структуры базы (перенести сюда доки)
-* Логирование ошибок в [Sentry](src/Log/Engine)
-* Полезные фичи ORM (классы Table, Entity, Query) (написать доки)
-* Helper для работы со скриптами и стилями (прокачать [доки](src/View/Helper))
-* [Подмена](src/TestSuite/Mock) (mock) любых методов классов и прочие извращения, нужные для тестов
-* Перехват и подмена Http-запросов в тестах (перенести/написать доки)
-* Прокачанные fixture для таблиц баз данных (описать)
-* Новые ассерты (общие и только для тестов контроллеров; описать)
+* Куча [дополнительных инструментов тестирования](src/TestSuite).
+* Построитель классов Table и Entity на основе структуры базы (перенести сюда доки).
+* Логирование ошибок в [Sentry](src/Log/Engine).
+* Полезные фичи ORM (классы Table, Entity, Query) (написать доки).
+* [Helper для работы со скриптами и стилями](src/View/Helper/AssetHelper.md)).
 
 ## Мелочь
-* Стандартные действия для тестового [bootstrap](src/config/bootstrap_test.php) (очистка базы и кеша, включение тестового режима)
 * [Формирование](src/config/phinx.php) конфига для phinx на основе кейковского конфига подключения
 * В [контроллере](src/Controller/Controller.php) - методы для стандартных json ответов
 * Правильная обработка вставки NULL значений в поля типа [JSON](src/Database/Type/JsonType.php)
