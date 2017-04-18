@@ -10,16 +10,22 @@ class Console
 	/**
 	 * Выполнить команду в консоли
 	 *
-	 * @param string $command
+	 * @param string|string[] $commands
 	 * @param bool $withErrors перенаправлять stderr в stdout
-	 * @return array [успех, вывод, код возврата]
+	 * @return array [успех, вывод, результирующая команда, код возврата]
 	 */
-	public static function exec($command, $withErrors = true) {
+	public static function exec($commands, $withErrors = true) {
+		$commands = (array)$commands;
+		$glue = ' ; ';
 		if ($withErrors) {
-			$command .= ' 2>&1';
+			$errorRedirect = ' 2>&1';
+			$glue = $errorRedirect . $glue;
+			$resultCommand = implode($glue, $commands) . $errorRedirect;
+		} else {
+			$resultCommand = implode($glue, $commands);
 		}
-		exec($command, $output, $returnCode);
-		return [$returnCode === 0, $output, $returnCode];
+		exec($resultCommand, $output, $returnCode);
+		return [$returnCode === 0, $output, $resultCommand, $returnCode];
 	}
 
 	/**

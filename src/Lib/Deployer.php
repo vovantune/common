@@ -230,10 +230,13 @@ abstract class Deployer
 		}
 		$newFolderFullName = escapeshellarg($newFolderFullName);
 		$projectPath = escapeshellarg($projectPath);
-		$command = "mv $projectPath $newFolderFullName ; ln -s $newFolderFullName $projectPath";
-		list($success, $output) = Console::exec($command);
+		$commands = [
+			"mv $projectPath $newFolderFullName", 
+			"ln -s $newFolderFullName $projectPath"
+		];
+		list($success, $output, $resultCommand) = Console::exec($commands);
 		if (!$success) {
-			throw new \Exception("Ошибка. Команда: $command, Вывод: " . implode("\n", $output));
+			throw new \Exception("Ошибка. Команда: $resultCommand, Вывод: " . implode("\n", $output));
 		}
 	}
 
