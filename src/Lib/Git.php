@@ -97,7 +97,7 @@ class Git
 	 * Выполняем команду
 	 *
 	 * @param string $command
-	 * @return array [успех, вывод, код возврата]
+	 * @return array [успех, вывод]
 	 */
 	private function _execute($command) {
 		return Console::execFromDir($this->_directory, $this->_gitCommand . ' ' . $command);

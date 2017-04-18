@@ -116,14 +116,14 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' ; git rev-parse --abbrev-ref HEAD",
+			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd {$this->_nextRootSub}",
-			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
-			'git pull',
+			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
+			'git pull 2>&1',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction",
-			'vendor/bin/phinx migrate',
-			"ln -snf '{$this->_nextRoot}' '$mainRoot'",
+			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction 2>&1",
+			'vendor/bin/phinx migrate 2>&1',
+			"ln -snf '{$this->_nextRoot}' '$mainRoot' 2>&1",
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -150,12 +150,12 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '$rootSub' ; git rev-parse --abbrev-ref HEAD",
+			"cd '$rootSub' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd $rootSub",
-			'git pull',
+			'git pull 2>&1',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction",
-			'vendor/bin/phinx migrate',
+			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction 2>&1",
+			'vendor/bin/phinx migrate 2>&1',
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -164,7 +164,7 @@ class DeployTest extends AppTestCase
 
 	/** Что если не удалось спуллиться */
 	public function testPullFail() {
-		$this->_mockExec(3, '/^git pull$/');
+		$this->_mockExec(3, '/^git pull 2>&1$/');
 		$this->_mockOther(2, 0, 0, 1);
 		$this->_expectException('Не удалось спуллиться');
 
@@ -173,10 +173,10 @@ class DeployTest extends AppTestCase
 		self::assertFalse($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' ; git rev-parse --abbrev-ref HEAD",
+			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd {$this->_nextRootSub}",
-			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
-			'git pull',
+			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
+			'git pull 2>&1',
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -193,12 +193,12 @@ class DeployTest extends AppTestCase
 		self::assertFalse($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' ; git rev-parse --abbrev-ref HEAD",
+			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd {$this->_nextRootSub}",
-			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
-			'git pull',
+			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
+			'git pull 2>&1',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction",
+			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction 2>&1",
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -206,7 +206,7 @@ class DeployTest extends AppTestCase
 
 	/** Что если не развернулись миграции */
 	public function testMigrateFail() {
-		$this->_mockExec(5, '/^vendor\/bin\/phinx migrate$/');
+		$this->_mockExec(5, '/^vendor\/bin\/phinx migrate 2>&1$/');
 		$this->_mockOther(2, 1, 0, 1);
 		$this->_expectException('Миграции не развернулись');
 
@@ -215,13 +215,13 @@ class DeployTest extends AppTestCase
 		self::assertFalse($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' ; git rev-parse --abbrev-ref HEAD",
+			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd {$this->_nextRootSub}",
-			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
-			'git pull',
+			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
+			'git pull 2>&1',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction",
-			'vendor/bin/phinx migrate',
+			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction 2>&1",
+			'vendor/bin/phinx migrate 2>&1',
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -235,14 +235,14 @@ class DeployTest extends AppTestCase
 	 * @throws \Exception
 	 */
 	private function _mockExec($expectTimes, $failPattern = false) {
-		MethodMocker::mock(Console::class, 'exec')
+		MethodMocker::mock(Console::class, '_exec')
 			->expectCall($expectTimes)
 			->willReturnAction(
 				function ($args) use($failPattern) {
 					$command = $args[0];
 					$this->_executeHistory[] = $command;
 					if (
-						preg_match('/^(cd [^;]+;\s)?git (branch( -[ar])?|for-each-ref.*|rev-parse.*)$/', $command)
+						preg_match('/^(cd [^&]+(&1)?\s+&&\s)?git (branch( -[ar])?|for-each-ref.*|rev-parse.*)/', $command)
 						|| Strings::startsWith($command, 'cp ')
 					) {
 						exec($args[0], $output, $returnCode);
@@ -320,7 +320,7 @@ class DeployTest extends AppTestCase
 		self::assertFalse($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' ; git rev-parse --abbrev-ref HEAD",
+			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd {$this->_nextRootSub}",
 			"cd {$this->_currentDir}",
 		];
@@ -358,11 +358,11 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' ; git rev-parse --abbrev-ref HEAD",
+			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd {$this->_nextRootSub}",
-			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
-			'git pull',
-			"ln -snf '{$this->_nextRoot}' '$mainRoot'",
+			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
+			'git pull 2>&1',
+			"ln -snf '{$this->_nextRoot}' '$mainRoot' 2>&1",
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -383,11 +383,11 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' ; git rev-parse --abbrev-ref HEAD",
+			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd {$this->_nextRootSub}",
-			'git pull',
-			'vendor/bin/phinx migrate',
-			"ln -snf '{$this->_nextRoot}' '$mainRoot'",
+			'git pull 2>&1',
+			'vendor/bin/phinx migrate 2>&1',
+			"ln -snf '{$this->_nextRoot}' '$mainRoot' 2>&1",
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -410,13 +410,13 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' ; git rev-parse --abbrev-ref HEAD",
+			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
 			"cd {$this->_nextRootSub}",
-			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "'",
-			'git pull',
-			"php composer.phar update 'artskills/common' --no-interaction",
-			'vendor/bin/phinx migrate',
-			"ln -snf '{$this->_nextRoot}' '$mainRoot'",
+			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
+			'git pull 2>&1',
+			"php composer.phar update 'artskills/common' --no-interaction 2>&1",
+			'vendor/bin/phinx migrate 2>&1',
+			"ln -snf '{$this->_nextRoot}' '$mainRoot' 2>&1",
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
