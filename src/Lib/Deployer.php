@@ -216,6 +216,7 @@ abstract class Deployer
 	/**
 	 * Заменить папку проекта на симлинк
 	 * Может не сработать, если неправильные права
+	 * Обратите внимание, что у симлинка владельцем будет текущий пользователь
 	 *
 	 * @param string $projectPath полный путь до проекта
 	 * @param string $newFolderName новое название папки, относительный путь в том же каталоге, что и проект
@@ -232,7 +233,7 @@ abstract class Deployer
 		$newFolderFullName = escapeshellarg($newFolderFullName);
 		$projectPath = escapeshellarg($projectPath);
 		$commands = [
-			"mv $projectPath $newFolderFullName", 
+			"mv $projectPath $newFolderFullName",
 			"ln -s $newFolderFullName $projectPath"
 		];
 		list($success, $output, $resultCommand) = Console::exec($commands);
