@@ -9,6 +9,18 @@
 * Добавляем в app_local.php:
 ```php
 'Log' => [
+    'debug' => [
+        'className' => 'ArtSkills.File', // И аналогично для всех других конфигов записи в файл
+        'path' => LOGS,
+        'file' => 'debug',
+        'levels' => ['notice', 'info', 'debug'],
+    ],
+    'error' => [
+        'className' => 'ArtSkills.File',
+        'path' => LOGS,
+        'file' => 'error',
+        'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
+    ],
     'sentry' => [
         'className' => 'ArtSkills.Sentry',
         'levels' => [],

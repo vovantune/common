@@ -55,8 +55,8 @@ DROP TABLE IF EXISTS `test_table_one`;
 CREATE TABLE `test_table_one` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'comment1',
   `col_enum` enum('val1','val2','val3') NOT NULL DEFAULT 'val1',
-  `col_text` text NOT NULL,
-  `col_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'comment2',
+  `col_text` longtext NOT NULL,
+  `col_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'comment2',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='description blabla';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -100,4 +100,4 @@ CREATE TABLE `test_table_two` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-04-17 17:37:01
+-- Dump completed on 2017-04-18 10:45:09
