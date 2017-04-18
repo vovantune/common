@@ -162,6 +162,7 @@ abstract class Deployer
 	 * конструктор
 	 */
 	public function __construct() {
+		$this->_normalizePaths();
 		$this->_checkProperties();
 		$this->_setValues();
 	}
@@ -249,8 +250,6 @@ abstract class Deployer
 			if (!empty($this->_currentRoot) || !empty($this->_rotateDeployFolders) || !empty($this->_mainRoot)) {
 				throw new \Exception('Заполнены конфликтующие свойства');
 			}
-			$this->_mainRoot = $this->_currentRoot = $this->_singleRoot;
-			$this->_rotateDeployFolders = [$this->_singleRoot];
 		} else {
 			if (count($this->_rotateDeployFolders) === 1) {
 				throw new \Exception('В списке указана одна папка. Для деплоя в текущую папку явно задайте свойство _singleRoot');
@@ -286,6 +285,11 @@ abstract class Deployer
 	 * Сделать нужные преобразования над значениями
 	 */
 	protected function _setValues() {
+		if (!empty($this->_singleRoot)) {
+			$this->_mainRoot = $this->_currentRoot = $this->_singleRoot;
+			$this->_rotateDeployFolders = [$this->_singleRoot];
+		}
+
 		$this->_runFrom = $this->_getNextRoot();
 		if (!empty($this->_cakeSubPath)) {
 			$this->_runFrom = $this->_runFrom . DS . $this->_cakeSubPath;
@@ -305,6 +309,36 @@ abstract class Deployer
 			$this->_composerOptions[] = '--no-dev';
 		}
 		$this->_composerOptions[] = '--no-interaction';
+	}
+
+	/**
+	 * Привести все пути к правильному формату
+	 */
+	protected function _normalizePaths() {
+		// слеши в конце пути
+		$folderProperties = [
+			'_singleRoot', '_mainRoot', '_currentRoot', '_cakeSubPath'
+		];
+		foreach ($folderProperties as $property) {
+			$this->$property = $this->_cutTrailingDs($this->$property);
+		}
+		foreach ($this->_rotateDeployFolders as &$folder) {
+			$folder = $this->_cutTrailingDs($folder);
+		}
+		unset($folder);
+	}
+
+	/**
+	 * Убрать разделитель директорий с конца пути
+	 *
+	 * @param string $path
+	 * @return string
+	 */
+	protected function _cutTrailingDs($path) {
+		if (Strings::endsWith($path, DS)) {
+			return Strings::replacePostfix($path, DS);
+		}
+		return $path;
 	}
 
 	/**
