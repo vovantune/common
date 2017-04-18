@@ -1,4 +1,4 @@
-# Четкая мокалка
+# Чёткая мокалка
 
 Любая подмена работает только в тестовом окружении. Основная цель данного подхода -
 тестировать только тот кусок, который нам необходимо без подтягивания прицепа связанных вызовов,
@@ -132,3 +132,6 @@ $result = MethodMocker::callPrivate(MockTestFixture::class, '_privateStaticFunc'
 ```php
 	PropertyAccess::setStatic(PickPointDelivery::class, '_sessionId', null);
 ```
+
+# [Перманентная подмена во время Unit тестирования](../PermanentMocks)
+# [Подмена HTTP запросов](HttpClientMock)
