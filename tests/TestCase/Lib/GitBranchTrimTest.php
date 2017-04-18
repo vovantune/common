@@ -1,7 +1,7 @@
 <?php
 namespace App\Test\TestCase\Shell\TrimBranchesTest;
 
-use ArtSkills\Lib\Console;
+use ArtSkills\Lib\Shell;
 use ArtSkills\Lib\Git;
 use ArtSkills\Lib\GitBranchTrim;
 use ArtSkills\TestSuite\AppTestCase;
@@ -61,7 +61,7 @@ class GitBranchTrimTest extends AppTestCase
 	 * @throws \Exception
 	 */
 	private function _mockExecute(&$history) {
-		MethodMocker::mock(Console::class, '_exec')
+		MethodMocker::mock(Shell::class, '_exec')
 			->willReturnAction(function ($args) use (&$history) {
 				$history[] = $args[0];
 				if (preg_match('/^git (branch( -[ar])?|for-each-ref.*)/', $args[0])) {

@@ -100,7 +100,7 @@ class Git
 	 * @return array [успех, вывод]
 	 */
 	private function _execute($command) {
-		return Console::execFromDir($this->_directory, $this->_gitCommand . ' ' . $command);
+		return Shell::execFromDir($this->_directory, $this->_gitCommand . ' ' . $command);
 	}
 
 	/**

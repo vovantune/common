@@ -1,7 +1,7 @@
 <?php
 namespace ArtSkills\Test\TestCase\Lib;
 
-use ArtSkills\Lib\Console;
+use ArtSkills\Lib\Shell;
 use ArtSkills\Lib\Git;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
@@ -381,7 +381,7 @@ class GitTest extends AppTestCase
 	 */
 	private function _mockExecute($expectTimes = MethodMockerEntity::EXPECT_CALL_ONCE) {
 		$this->_executeHistory = [];
-		MethodMocker::mock(Console::class, '_exec')
+		MethodMocker::mock(Shell::class, '_exec')
 			->expectCall($expectTimes)
 			->willReturnAction(function ($args) {
 				$this->_executeHistory[] = $args[0];

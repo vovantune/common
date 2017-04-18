@@ -2,7 +2,7 @@
 
 namespace ArtSkills\Test\TestCase\Lib\DeployerTest;
 
-use ArtSkills\Lib\Console;
+use ArtSkills\Lib\Shell;
 use ArtSkills\Lib\Deployer;
 use ArtSkills\Lib\Git;
 use ArtSkills\Lib\Strings;
@@ -235,7 +235,7 @@ class DeployTest extends AppTestCase
 	 * @throws \Exception
 	 */
 	private function _mockExec($expectTimes, $failPattern = false) {
-		MethodMocker::mock(Console::class, '_exec')
+		MethodMocker::mock(Shell::class, '_exec')
 			->expectCall($expectTimes)
 			->willReturnAction(
 				function ($args) use($failPattern) {

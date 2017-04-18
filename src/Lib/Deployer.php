@@ -182,7 +182,7 @@ abstract class Deployer
 		$params = compact('repo', 'branch', 'commit');
 		$stringParams = escapeshellarg(json_encode($params));
 		$type = escapeshellarg($type);
-		Console::execInBackground($cakeBinPath . " deployment deploy --type=$type --data=$stringParams");
+		Shell::execInBackground($cakeBinPath . " deployment deploy --type=$type --data=$stringParams");
 	}
 
 	/**
@@ -236,7 +236,7 @@ abstract class Deployer
 			"mv $projectPath $newFolderFullName",
 			"ln -s $newFolderFullName $projectPath"
 		];
-		list($success, $output, $resultCommand) = Console::exec($commands);
+		list($success, $output, $resultCommand) = Shell::exec($commands);
 		if (!$success) {
 			throw new \Exception("Ошибка. Команда: $resultCommand, Вывод: " . implode("\n", $output));
 		}
@@ -505,7 +505,7 @@ abstract class Deployer
 	 * @param string $failMessage
 	 */
 	protected function _exec($command, $failMessage) {
-		list($success, $output) = Console::execFromDir($this->_runFrom, $command);
+		list($success, $output) = Shell::execFromDir($this->_runFrom, $command);
 		$this->_addToOutput([$command]);
 		$this->_addToOutput($output);
 		$this->_checkSuccess($success, $failMessage);

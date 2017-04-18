@@ -3,7 +3,7 @@ namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
 
-class Console
+class Shell
 {
 	use Library;
 
