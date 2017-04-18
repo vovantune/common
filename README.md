@@ -17,8 +17,6 @@ require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . D
 * [Деплойщик](src/Lib/Deployer.md) проектов
 
 ## Мелочь
-* Стандартные действия для тестового [bootstrap](src/config/bootstrap_test.php) (очистка базы и кеша, включение тестового режима) и для обычного [bootstrap](src/config/bootstrap.php)
-* Стандартный [конфиг для phpunit](src/config/phpunit.xml)
 * [Формирование](src/config/phinx.php) конфига для phinx на основе кейковского конфига подключения
 * В [контроллере](src/Controller/Controller.php) - методы для стандартных json ответов
 * Правильная обработка вставки NULL значений в поля типа [JSON](src/Database/Type/JsonType.php)
