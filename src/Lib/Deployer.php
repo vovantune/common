@@ -213,6 +213,31 @@ abstract class Deployer
 	}
 
 	/**
+	 * Заменить папку проекта на симлинк
+	 * Может не сработать, если неправильные права
+	 *
+	 * @param string $projectPath полный путь до проекта
+	 * @param string $newFolderName новое название папки, относительный путь в том же каталоге, что и проект
+	 * @throws \Exception
+	 */
+	public static function makeProjectSymlink($projectPath, $newFolderName) {
+		if (is_link($projectPath) || !is_dir($projectPath)) {
+			throw new \Exception('Передан некорректный каталог проекта');
+		}
+		$newFolderFullName = dirname($projectPath) . DS . $newFolderName;
+		if (file_exists($newFolderFullName)) {
+			throw new \Exception('Такой каталог уже есть');
+		}
+		$newFolderFullName = escapeshellarg($newFolderFullName);
+		$projectPath = escapeshellarg($projectPath);
+		$command = "mv $projectPath $newFolderFullName ; ln -s $newFolderFullName $projectPath";
+		list($success, $output) = Console::exec($command);
+		if (!$success) {
+			throw new \Exception("Ошибка. Команда: $command, Вывод: " . implode("\n", $output));
+		}
+	}
+
+	/**
 	 * Делаем проверки заполненности свойств
 	 * @throws \Exception
 	 */

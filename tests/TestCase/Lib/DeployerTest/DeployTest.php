@@ -11,7 +11,11 @@ use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use Cake\Log\Log;
 
-class DeployerTest extends AppTestCase
+/**
+ * @covers \ArtSkills\Lib\Deployer
+ * Тест создания объекта и метода деплой
+ */
+class DeployTest extends AppTestCase
 {
 	const VERSION_FILE_PATH = LocalDeployer::DIR_NEXT . DS . LocalDeployer::VERSION_FILE;
 	const COPY_FILE_FROM = LocalDeployer::DIR_CURRENT . DS . LocalDeployer::COPY_FILE;

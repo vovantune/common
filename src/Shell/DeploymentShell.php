@@ -2,6 +2,8 @@
 namespace ArtSkills\Shell;
 
 use ArtSkills\Lib\Arrays;
+use ArtSkills\Lib\Deployer;
+use ArtSkills\Log\Engine\SentryLog;
 use Cake\Console\Shell;
 
 abstract class DeploymentShell extends Shell
@@ -41,6 +43,20 @@ abstract class DeploymentShell extends Shell
 					]
 				],
 			],
+			'makeProjectSymlink' => [
+				'help' => "Сделать из настоящего проекта симлинк\nОбратите внимание, есть ли у пользователя достаточно прав для этого",
+				'parser' => [
+					'options' => [
+						'project-path' => [
+							'help' => 'Полный путь до проекта',
+						],
+						'new-folder' => [
+							'help' => 'Название новой папки',
+						],
+					]
+				],
+			],
+
 
 		]);
 		return $parser;
@@ -95,6 +111,21 @@ abstract class DeploymentShell extends Shell
 		// if !$deployer->canRollBack() then out 'can't rollback'
 		// else $success = $deployer->rollBack()
 		// success or fail message
+	}
+
+	/**
+	 * Сделать из настоящего проекта симлинк
+	 */
+	public function makeProjectSymlink() {
+		if (empty($this->params['project-path']) || empty($this->params['new-folder'])) {
+			$this->abort('Переданы не все обязательные параметры');
+		}
+		try {
+			Deployer::makeProjectSymlink($this->params['project-path'], $this->params['new-folder']);
+			$this->out('OK!');
+		} catch (\Exception $e) {
+			SentryLog::logException($e);
+		}
 	}
 
 }
