@@ -44,15 +44,6 @@ trait TestCaseTrait
 	private $_disabledMocks = [];
 
 	/**
-	 * Отключить постоянные дефолтные моки
-	 * Для случаев, когда они будут переопределены
-	 * Или просто не нужны
-	 *
-	 * @var string[]
-	 */
-	protected $_disabledDefaultMocks = [];
-
-	/**
 	 * Список правильно проинициализированных таблиц
 	 *
 	 * @var array
@@ -70,8 +61,6 @@ trait TestCaseTrait
 	 */
 	protected function _setUp() {
 		$this->_clearCache();
-		$this->_disabledDefaultMocks = Arrays::keysFromValues($this->_disabledDefaultMocks);
-		$this->_disabledMocks += $this->_disabledDefaultMocks;
 		$this->_initPermanentMocks();
 		$this->_loadFixtureModels();
 
@@ -196,7 +185,12 @@ trait TestCaseTrait
 	}
 
 	/**
-	 * Список классов-одиночек для очистки
+	 * Список классов-одиночек, которые нужно чистить после каждого теста, переопределяется в классе-родителе:
+	 * ```php
+	 * protected static function _getSingletones() {
+	 *     return [PCO::class];
+	 * }
+	 * ```
 	 *
 	 * @return string[]
 	 */

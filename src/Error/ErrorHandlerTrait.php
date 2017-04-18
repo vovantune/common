@@ -124,4 +124,3 @@ trait ErrorHandlerTrait
 		return true;
 	}
 }
-

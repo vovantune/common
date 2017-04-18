@@ -98,6 +98,4 @@ class Entity extends \Cake\ORM\Entity
 		}
 		$this->dirty($childEntity, true);
 	}
-
-
 }
