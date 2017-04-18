@@ -5,6 +5,7 @@ use ArtSkills\ORM\Entity;
 
 /**
  * @property int $id
+ * @property int $table_one_fk
  * @tableComment description qqq
  */
 class TestTableFour extends Entity

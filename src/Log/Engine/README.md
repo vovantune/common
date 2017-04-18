@@ -3,7 +3,41 @@
 Добавлен Log Engine для отправки ошибок в Sentry. 
 
 То есть в Sentry можно отсылать всё то, что пишется в обычные логи. Соответственно, туда будут отправляться все ошибки, перехваченные ErrorHandler'ами.
- 
+
+## Настройка
+* Генерим в кабинете DSN ключ.
+* Добавляем в app_local.php:
+```php
+'Log' => [
+    'debug' => [
+        'className' => 'ArtSkills.File', // И аналогично для всех других конфигов записи в файл
+        'path' => LOGS,
+        'file' => 'debug',
+        'levels' => ['notice', 'info', 'debug'],
+    ],
+    'error' => [
+        'className' => 'ArtSkills.File',
+        'path' => LOGS,
+        'file' => 'error',
+        'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
+    ],
+    'sentry' => [
+        'className' => 'ArtSkills.Sentry',
+        'levels' => [],
+    ],
+],
+'sentryDsn' => '<DSN ключ Sentry>'
+```
+* В bootstrap.php заменяем обработчики ошибок на следующее:
+```php
+$isCli = php_sapi_name() === 'cli';
+if ($isCli) {
+	(new \ArtSkills\Error\ConsoleErrorHandler(Configure::read('Error')))->register();
+} else {
+	(new \ArtSkills\Error\ErrorHandler(Configure::read('Error')))->register();
+}
+```
+
 ## Уровни 
 Для логирования предлагается использовать 3 уровня:
 * error - для логирования любых ошибок, автоматически отправляется в Sentry и посылает оповещения

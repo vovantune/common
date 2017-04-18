@@ -98,13 +98,13 @@ class HttpClientMocker
 	 * TODO: затестить
 	 *
 	 * @param string $url
-	 * @param array $postArgs
+	 * @param array|string $expectedPostArgs
 	 * @return HttpClientMockerEntity
 	 */
-	public static function mockPost($url, $postArgs = []) {
+	public static function mockPost($url, $expectedPostArgs = []) {
 		$mock = self::mock($url, Request::METHOD_POST);
-		if (count($postArgs)) {
-			$mock->expectBody($postArgs);
+		if (count($expectedPostArgs)) {
+			$mock->expectBody($expectedPostArgs);
 		}
 		return $mock;
 	}

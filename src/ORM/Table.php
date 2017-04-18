@@ -237,6 +237,26 @@ class Table extends \Cake\ORM\Table
 		return new Query($this->connection(), $this);
 	}
 
+	/** @inheritdoc */
+	public function belongsTo($associated, array $options = []) {
+		return parent::belongsTo($associated, $this->_assocOptions($associated, $options));
+	}
+
+	/** @inheritdoc */
+	public function hasOne($associated, array $options = []) {
+		return parent::hasOne($associated, $this->_assocOptions($associated, $options));
+	}
+
+	/** @inheritdoc */
+	public function hasMany($associated, array $options = []) {
+		return parent::hasMany($associated, $this->_assocOptions($associated, $options));
+	}
+
+	/** @inheritdoc */
+	public function belongsToMany($associated, array $options = []) {
+		return parent::belongsToMany($associated, $this->_assocOptions($associated, $options));
+	}
+
 	/**
 	 * Автозаполнение полей создания/правки
 	 */
@@ -312,26 +332,5 @@ class Table extends \Cake\ORM\Table
 			$options['propertyName'] = $assocName;
 		}
 		return $options;
-	}
-
-
-	/** @inheritdoc */
-	public function belongsTo($associated, array $options = []) {
-		return parent::belongsTo($associated, $this->_assocOptions($associated, $options));
-	}
-
-	/** @inheritdoc */
-	public function hasOne($associated, array $options = []) {
-		return parent::hasOne($associated, $this->_assocOptions($associated, $options));
-	}
-
-	/** @inheritdoc */
-	public function hasMany($associated, array $options = []) {
-		return parent::hasMany($associated, $this->_assocOptions($associated, $options));
-	}
-
-	/** @inheritdoc */
-	public function belongsToMany($associated, array $options = []) {
-		return parent::belongsToMany($associated, $this->_assocOptions($associated, $options));
 	}
 }

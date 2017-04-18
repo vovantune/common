@@ -20,3 +20,18 @@ function assoc(...$names) {
 function field($tableAlias, $fieldName, $operation = null) {
 	return $tableAlias . '.' . $fieldName . (empty($operation) ? '' : ' ' . $operation);
 }
+
+if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
+
+	/**
+	 * Переводим в верхний регистр первую букву
+	 *
+	 * @param string $string
+	 * @param string $enc
+	 * @return string
+	 */
+	function mb_ucfirst($string, $enc = 'utf-8') {
+		$string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_strtolower(mb_substr($string, 1, mb_strlen($string, $enc) - 1, $enc), $enc);
+		return $string;
+	}
+}
