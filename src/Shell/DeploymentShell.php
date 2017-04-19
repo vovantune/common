@@ -115,13 +115,13 @@ abstract class DeploymentShell extends Shell
 		}
 		$deployer = $this->_getDeployer($this->params['type']);
 		if (!empty($data['current'])) {
-			$success = $deployer->deployCurrentBranch($this->_getVersion());
+			$success = $deployer->deployCurrentBranch();
 		} else {
 			$data = Arrays::decode($this->params['data']);
 			if (empty($data) || empty($data['repo']) || empty($data['branch'])) {
 				$this->abort('Неправильно указан параметр data');
 			}
-			$success = $deployer->deploy($data['repo'], $data['branch'], empty($data['commit']) ? '' : $data['commit'], $this->_getVersion());
+			$success = $deployer->deploy($data['repo'], $data['branch']);
 		}
 
 		if ($success) {
@@ -136,16 +136,10 @@ abstract class DeploymentShell extends Shell
 	 *
 	 * @param string $type
 	 * @return \ArtSkills\Lib\Deployer
+	 * @throws \Exception
 	 */
-	abstract protected function _getDeployer($type);
-
-	/**
-	 * Текущая версия
-	 *
-	 * @return int|null
-	 */
-	protected function _getVersion() {
-		return CORE_VERSION;
+	protected function _getDeployer($type) {
+		return Deployer::createFromConfig($type);
 	}
 
 	/**

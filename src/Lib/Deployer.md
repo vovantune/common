@@ -30,9 +30,6 @@
 
 Можно добавить проверку, что сейчас ничего не деплоится/откатывается, чтобы нельзя было запустить одновременно
 ## <a name="usage"></a>Использование
-
-Сконфигурировать нужным образом и вызывать метод `deploy()` :
-
 ### Конфигурация
 При создании объекта в конструктор нужно передать массив с конфигурацией
 
@@ -42,56 +39,66 @@
 * `string cakeSubPath` - если кейк лежит не в корне проекта, то указать относительный путь до него (относительно корня проекта)
 * `string[] copyFileList` - список файлов, которые нужно переносить копированием (например, локальные конфиги, которых нет в репозитории). Путь относительно корня.
 * `string versionFile` - файл с номером версии, номер инкрементируется при деплое. Путь относительно корня
+* `int currentVersion` - сам номер версии. Если объявлена константа CORE_VERSION, то можно не указывать
 * `bool autoMigrate` - явно указать, разворачивать миграции или нет. (Например, при обновлении теста этого делать не нужно)
 * `string repoName` - название текущего репозитория, для дополнительных проверок (ниже есть более подробное объяснение)
 
 Режим деплоя в текущую папку:
-* `string singleRoot` - полный путь до корня проекта, и не задавать опции `projectSymlink` и `rotateDeployFolders`  
+* `string singleRoot` - полный путь до корня проекта. Тогда нужно не задавать опции `projectSymlink` и `rotateDeployFolders`  
 
 Дополнительные настройки
-* `bool isDeployEnv` - можно ли здесь запуститься с такой конфигурацией. По умолчанию туда записывается `Env::isProduction()`. Например, из продакшна можно деплоить себя и тест, а из теста - только себя, а продакшн нельзя
-* `string[] composerDependencies` - список зависимостей, которые нужно обновить автоматически
+* `bool isDeployEnv` - можно ли здесь запуститься с такой конфигурацией. По умолчанию туда записывается `Env::isProduction()`. Например, из продакшна можно деплоить себя и тест, а из теста - только себя, а продакшн нельзя (см. примеры ниже)
+* `string[] composerDependencies` - список зависимостей, которые нужно обновить автоматически. По умолчанию там `["artskills/common"]`
 * `bool composerRequireDev` - значение false означает опцию --no-dev
 * `string[] composerOptions` - список опций при запуске композера. По умолчанию - --optimize-autoloader, всегда добавляется --no-interaction, в зависимости от предыдущего свойства - --no-dev
-
-В деплойщике есть метод `makeProjectSymlink()` для быстрой и безболезненной подмены текущей папки проекта на симлинк (он переименовывает папку и делает симлинк со старого названия на новое).
 
 Замечание:
 
 для опций `cakeSubPath`, `versionFile` и `copyFileList` можно указать полный путь, который будет преобразован в относительный. Для этого путь должен начинаться с одной из папок `rotateDeployFolders`, `projectSymlink`, `singleRoot`.
-Для удобства, например, если уже есть константы с полными путями (снизу есть пример).
+Для удобства, например, если уже есть константы с полными путями (см. пример ниже).
+
+Конфигурацию можно определять через cake Configure. Метод `Deployer::createFromConfig(string $type)` создаст сконфигурированного деплойщика. Конфигурация дложна быть объявлена в cake конфиге по пути `Deploy.$type`
+
+### Создать симлинк
+Для перехода от обычной папки проекта к симлинку есть метод `Deployer::makeProjectSymlink(string $projectPath, string $newFolderName)`.
+
+Он переименует `$projectPath` в `$newFolderName` и создаст симлинк со старого названия на новое.
+`$newFolderName` - не полный путь, а только новое название папки.
 
 ### Запуск
-Метод `bool deploy()`, `@throws \Exception`. Аргументы:
-* `string $repo` Название деплоящегося репозитория. Для проверки того, что деплоится то, что нужно (Например, деплой делается по вебхуку из гитхаба, гитхаб в том числе присылает название репозитория. Делаем проверку, тот это репозиторий или нет)
-* `string $branch` Название деплоящейся ветки. Для такой же проверки. (Например, на тесте можно переключать ветки. Если изменилась текущая ветка, её нужно обновить, если другая - то ненужно)
-* `string $commit` Хеш коммита, для записи в лог, просто так
-* `int $currentVersion` Текущая версия, она инкрементируется и запишется в файл.
+Класс `Deployer`, метод `bool deploy($repo, $branch, $currentVersion)`, `@throws \Exception`. Аргументы:
+* `string $repo` Название деплоящегося репозитория. Если он не совпадает с тем, который в конфиге, то деплоя не будет. (Например, деплой делается по вебхуку из гитхаба, гитхаб в том числе присылает название репозитория. Делаем проверку, тот это репозиторий или нет)
+* `string $branch` Название деплоящейся ветки, для такой же проверки. Сравнивается с текущей веткой репозитория. (Например, на тесте можно переключать ветки. Если изменилась текущая ветка, её нужно обновить, если другая - то ненужно)
 
 Метод вернёт `false`, если не прошла проверка на то, что нужно деплоиться: не совпало название репозитория или ветки, или не то окружение.
 В случае ошибок (не удалось скопировать файлы / сделать pull / composer update / phinx migrate) он будет кидать исключения.
 
-Если проверки репозитория и ветки не нужны, то есть метод `bool deployCurrentBranch($currentVersion)`
+Если проверки репозитория и ветки не нужны, то есть метод `bool deployCurrentBranch()` без параметров
 
 Возможно деплой занимает много времени, и хотелось бы выполнять его в фоновом режиме. Например, если деплой делается по вебхуку из гитхаба, а обновить нужно и продакшн и тест, запрос может отвалиться по таймауту. Это не страшно, но неприятно.
 
-Для этого есть `DeploymentShell`. Для использования его тоже нужно расширить, определив метод
-* `\ArtSkills\Lib\Deployer _getDeployer(string $type)` - возвращает нужный объект деплойщика в зависимости от типа (про тип будет сказано ниже)
+Для этого есть `DeploymentShell`. В нём уже есть всё нужное, но так как он лежит здесь, то его не получится использовать в проекте (`bin/cake` смотрит только в папку Shell текущего проекта).
 
-Запуск: `DeploymentShell::deployInBg()`. Параметры:
-* `string $type` - тип, по которому определяется деплойщик. Определение происходит тем самым методом `_getDeployer()`
-* `string $repo`, `string $branch`, `string $commit` - аналогично простому запуску `deploy()`
+Чтобы было можно его использовать, придётся отнаследовать в папке `Shell` пустой класс. `class DeploymentShell extends \ArtSkills\Shell\DeploymentShell {}` Или использовать `class_alias()`
 
-В том же `DeploymentShell` есть и запуск упомянутого выше `makeProjectSymlink()`
+Запуск: `DeploymentShell::deployInBg($type, $repo, $branch)`. Параметры:
+* `string $type` - тип из конфига, по которому будет сделано `Deployer::createFromConfig($type)`
+* `string $repo`, `string $branch` - аналогично простому запуску `deploy()`
+
+Или `DeploymentShell::deployCurrentInBg($type)`
+
+В том же `DeploymentShell` есть и запуск упомянутого выше `makeProjectSymlink()`: `bin/cake deployment makeProjectSymlink --project-path='' --new-folder=''`
 
 ### <a name="examples"></a>Примеры
 Пусть наш продакшн может обновлять себя и тест. Себя он обновляет посредством переключения симлинка, а тест - прям в той же папке.
 ```php
 // пусть есть симлинк '/var/www/my_project', который сейчас залинкан на '/var/www/my_project_1'
 // а cake лежит в подпапке 'cake'
-// тогда стандартная константа ROOT = '/var/www/my_project_1/cake'; 
-// CONFIG = ROOT . DS . 'config' . DS
-// и где-то есть VERSION_FILE = CONFIG . 'version.txt';
+// тогда стандартная константа ROOT = '/var/www/my_project_1/cake'; CONFIG = ROOT . DS . 'config' . DS
+// и где-то есть PROJECT_ROOT = '/var/www/my_project_1'; и VERSION_FILE = CONFIG . 'version.txt';
+
+$cakeSubPath = Strings::replacePrefix(ROOT, PROFECT_ROOT);
+$versionFile = Strings::replacePrefix(VERSION_FILE, PROFECT_ROOT);
 
 $configProduction = [
   'repoName' => 'my-prj',
@@ -100,11 +107,11 @@ $configProduction = [
 	'/var/www/my_project_1',
 	'/var/www/my_project_2',
   ],
-  'cakeSubPath' => ROOT, // здесь мы можем просто взять и указать ROOT и от него отрежется '/var/www/my_project_1/', т.к. он есть в списке rotateDeployFolders 
+  'cakeSubPath' => $cakeSubPath, 
   'copyFileList' => [
 	CONFIG . 'app_local.php',
   ],
-  'versionFile' => VERSION_FILE,                             // аналогично cakeSubPath, путь отрежется
+  'versionFile' => $versionFile,
   'autoMigrate' => true,                                     // на продакшне миграции запускаем
   'isDeployEnv' => Env::isProduction(),                      // продакшн можно деплоить только из продакшна
 ];
@@ -112,11 +119,23 @@ $configProduction = [
 $configTest = [
   'repoName' => 'my-prj',
   'singleRoot' => '/var/www/my_project_test',               // обновление в эту папку, без симлинков и переключений
-  'cakeSubPath' => 'cake', // а здесь указать ROOT не получится, потому что из такой конфигурации непонятно, как получить относительный путь
-  'versionFile' => 'cake/version.txt',                      // аналогично, только относительный путь
+  'cakeSubPath' => $cakeSubPath,
+  'versionFile' => $versionFile,
   'autoMigrate' => false,                                   // при обновлении теста миграции запускать не стоит
   'isDeployEnv' => Env::isProduction() || Env::isTest(),    // тест можно обновить из продакшна или из теста
 ];
+
+/*
+В $configProduction можно было бы написать 
+[
+  'cakeSubPath' => ROOT, 
+  'versionFile' => VERSION_FILE, 
+]
+но вот в $configTest уже нельзя
+ROOT = '/var/www/my_project_1/cake', и от него нужно отрезать часть '/var/www/my_project_1'
+В конфигурации $configProduction '/var/www/my_project_1' есть в списке 'rotateDeployFolders', и мы можем догадаться, что нужно отрезать от ROOT
+Но в $configTest такого нет, и там вычислить не получится
+*/
 ```
 
 Тогда:
@@ -126,10 +145,24 @@ $configTest = [
 $version = 111;
 
 $productionDeployer = new Deployer($configProduction);
-$productionDeployer->deployCurrentBranch($version);
+$productionDeployer->deployCurrentBranch();
 
 $testDeployer = new Deployer($configTest);
-$testDeployer->deployCurrentBranch($version);
+$testDeployer->deployCurrentBranch();
+```
+
+либо
+```php
+// app.php:
+// ...
+'Deploy' => [
+  'production' => $configProduction,
+  'test' => $configTest,
+],
+// ...
+
+Deployer::createFromConfig('production')->deployCurrentBranch();
+Deployer::createFromConfig('test')->deployCurrentBranch();
 ```
 
 с проверками (допустим, хук на гитхаб)
@@ -137,32 +170,22 @@ $testDeployer->deployCurrentBranch($version);
 $payload = Git::parseGithubRequest($_POST);
 
 $productionDeployer = new Deployer($configProduction);
-$productionDeployer->deploy($payload['repo'], $payload['branch'], $payload['commit'], $version);
+$productionDeployer->deploy($payload['repo'], $payload['branch']);
 
 $testDeployer = new Deployer($configTest);
-$testDeployer->deploy($payload['repo'], $payload['branch'], $payload['commit'], $version);
+$testDeployer->deploy($payload['repo'], $payload['branch']);
 ```
 
 в фоновом режиме
 ```php
 // DeploymentShell.php
-class DeploymentShell extends \ArtSkills\Shell\DeploymentShell {
-  protected function _getDeployer($type) {
-    // получить $configProduction и $configTest
-    // ...
-    if ($type === self::TYPE_PRODUCTION) {
-		return new Deployer($configProduction);
-	} else {
-		return new Deployer($configTest);
-	}
-  }
-}
+class DeploymentShell extends \ArtSkills\Shell\DeploymentShell {}
 
 // other_file.php
 $payload = Git::parseGithubRequest($_POST);
 
-DeploymentShell::deployInBg(DeploymentShell::TYPE_PRODUCTION, $payload['repo'], $payload['branch'], $payload['commit']);
-DeploymentShell::deployInBg(DeploymentShell::TYPE_TEST, $payload['repo'], $payload['branch'], $payload['commit']);
+DeploymentShell::deployInBg(DeploymentShell::TYPE_PRODUCTION, $payload['repo'], $payload['branch']);
+DeploymentShell::deployInBg(DeploymentShell::TYPE_TEST, $payload['repo'], $payload['branch']);
 ```
 
 

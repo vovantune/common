@@ -16,6 +16,7 @@ class LocalDeployer extends Deployer
 	const VERSION_FILE = self::CAKE_SUB_PATH . DS . 'version.txt';
 	const VERSION_FILE_PATH = self::DIR_CURRENT . DS . self::VERSION_FILE;
 	const COPY_FILE = self::CAKE_SUB_PATH . DS . 'some_file.txt';
+	const VERSION = 5;
 
 	/** @inheritdoc */
 	protected $_repoName = self::REPO_NAME;
@@ -46,8 +47,12 @@ class LocalDeployer extends Deployer
 	];
 
 	/** @inheritdoc */
-	protected function _isDeployEnvironment() {
-		return Env::isUnitTest();
+	public function __construct(array $config = []) {
+		if (!array_key_exists('isDeployEnv', $config)) {
+			$config['isDeployEnv'] = true;
+		}
+		$config['currentVersion'] = self::VERSION;
+		parent::__construct($config);
 	}
 
 }

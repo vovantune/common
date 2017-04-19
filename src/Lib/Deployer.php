@@ -3,10 +3,13 @@
 namespace ArtSkills\Lib;
 
 use ArtSkills\Log\Engine\SentryLog;
+use Cake\Core\Configure;
 use Cake\Log\Log;
 
 /**
  * Деплойщик
+ * обновляет текущий или вообще любой проект
+ * [описание](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
  */
 class Deployer
 {
@@ -57,6 +60,16 @@ class Deployer
 	 * @var string
 	 */
 	protected $_versionFile = '';
+
+
+	/**
+	 * Версия, инкрементируется при деплое, и записывается в файл
+	 * Либо null и ничего не происходит
+	 * Если задана константа CORE_VERSION, то берётся из ней
+	 *
+	 * @var int|null
+	 */
+	protected $_currentVersion = null;
 
 	/**
 	 * Если вдруг кейковый проект не является корнем проекта
@@ -180,22 +193,37 @@ class Deployer
 	}
 
 	/**
+	 * Инстанцировать объект
+	 * С настройками, взятыми из cake Configure
+	 * по ключу Deploy.$type
+	 *
+	 * @param string $type ключ
+	 * @return static
+	 * @throws \Exception
+	 */
+	public static function createFromConfig($type) {
+		$configs = Configure::read('Deploy');
+		if (empty($configs[$type])) {
+			throw new \Exception("Не определён конфиг деплоя '$type'");
+		}
+		return new static($configs[$type]);
+	}
+
+	/**
 	 * Деплой с проверками того, что деплоится
 	 *
 	 * @param string $repo обновляемая репа
 	 * @param string $branch обновляемая ветка
-	 * @param string $commit к чему обновляемся. для замиси в лог
-	 * @param null|int $currentVersion счётчик версий
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function deploy($repo, $branch, $commit, $currentVersion = null) {
+	public function deploy($repo, $branch) {
 		$currentDir = getcwd();
 		$this->_chdir($this->_runFrom);
 
 		$success = false;
 		try {
-			$success = $this->_run($repo, $branch, $commit, $currentVersion);
+			$success = $this->_run($repo, $branch);
 		} catch (\Exception $e) {
 			SentryLog::logException($e, [
 				'scope' => [$this->_logScope],
@@ -210,12 +238,11 @@ class Deployer
 	/**
 	 * Деплой текущей ветки, без проверок
 	 *
-	 * @param null|int $currentVersion счётчик версий
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function deployCurrentBranch($currentVersion = null) {
-		return $this->deploy($this->_repoName, $this->_git->getCurrentBranchName(), '', $currentVersion);
+	public function deployCurrentBranch() {
+		return $this->deploy($this->_repoName, $this->_git->getCurrentBranchName());
 	}
 
 	/**
@@ -253,7 +280,10 @@ class Deployer
 	 * @param array $config
 	 */
 	protected function _applyConfig(array $config) {
-		$this->_isDeployEnv = $this->_isDeployEnvironment();
+		$this->_isDeployEnv = Env::isProduction();
+		if (defined('CORE_VERSION')) {
+			$this->_currentVersion = CORE_VERSION;
+		}
 		foreach ($config as $property => $value) {
 			$property = '_' . $property;
 			if (property_exists($this, $property)) {
@@ -392,12 +422,10 @@ class Deployer
 	 *
 	 * @param string $repo обновляемая репа
 	 * @param string $branch обновляемая ветка
-	 * @param string $commit к чему обновляемся. для замиси в лог
-	 * @param null|int $currentVersion счётчик версий
 	 * @return bool
 	 * @throws \Exception
 	 */
-	protected function _run($repo, $branch, $commit, $currentVersion = null) {
+	protected function _run($repo, $branch) {
 		if (!$this->_canDeploy($repo, $branch)) {
 			return false;
 		}
@@ -406,7 +434,7 @@ class Deployer
 		$timeStart = microtime(true);
 
 		// мелочёвку сделаем сначала, чтобы после миграции максимально быстро переключить симлинк
-		$this->_updateVersion($currentVersion);
+		$this->_updateVersion();
 		$this->_copyFiles();
 
 		// первым идёт обновление репозитория, ибо там могли обновиться composer.json и добавиться миграции
@@ -418,7 +446,7 @@ class Deployer
 		$this->_setProjectSymlink($nextRoot);
 
 		$timeEnd = microtime(true);
-		$this->_log($timeStart, $timeEnd, $commit);
+		$this->_log($timeStart, $timeEnd);
 
 		$this->_notifySuccess();
 		return true;
@@ -488,14 +516,6 @@ class Deployer
 			&& ($branch === $currentBranch)
 			&& $this->_isDeployEnv
 		);
-	}
-
-	/**
-	 * В каком окружении можно деплоить эту конфигурацию
-	 * Например, чтоб из тестового окружения случайно не задеплоить продакшн
-	 */
-	protected function _isDeployEnvironment() {
-		return Env::isProduction();
 	}
 
 	/**
@@ -607,13 +627,11 @@ class Deployer
 
 	/**
 	 * Обновить файл с версией
-	 *
-	 * @param int|null $currentVersion
 	 */
-	protected function _updateVersion($currentVersion) {
-		if (!empty($this->_versionFile) && ($currentVersion !== null)) {
+	protected function _updateVersion() {
+		if (!empty($this->_versionFile) && ($this->_currentVersion !== null)) {
 			$versionFilePath = $this->_getNextRoot() . DS . $this->_versionFile;
-			file_put_contents($versionFilePath, ++$currentVersion);
+			file_put_contents($versionFilePath, ++$this->_currentVersion);
 		}
 	}
 
@@ -622,11 +640,10 @@ class Deployer
 	 *
 	 * @param float $timeStart
 	 * @param float $timeEnd
-	 * @param float $commit
 	 */
-	protected function _log($timeStart, $timeEnd, $commit) {
+	protected function _log($timeStart, $timeEnd) {
 		$this->_output = array_merge([
-			date('Y-m-d H:i:s', $timeStart) . ': Deployment to ' . $commit,
+			date('Y-m-d H:i:s', $timeStart),
 			'Finished in ' . round($timeEnd - $timeStart, 3) . ' seconds',
 		], $this->_output, ["\n\n"]);
 

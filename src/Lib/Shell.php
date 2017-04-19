@@ -3,6 +3,10 @@ namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
 
+/**
+ * Запуск команд в командной строке
+ * Просто обёртка над exec() с небольшими удобствами
+ */
 class Shell
 {
 	use Library;

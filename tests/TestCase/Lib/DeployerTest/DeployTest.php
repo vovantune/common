@@ -64,13 +64,6 @@ class DeployTest extends AppTestCase
 	 */
 	private $_nextRootSub = '';
 
-	/**
-	 * Тестовое значение версии
-	 *
-	 * @var int
-	 */
-	private $_version = 3;
-
 
 	/** @inheritdoc */
 	public function setUp() {
@@ -82,7 +75,6 @@ class DeployTest extends AppTestCase
 		$this->_currentDir = getcwd();
 		$this->_repo = LocalDeployer::REPO_NAME;
 		$this->_branch = Git::getInstance()->getCurrentBranchName();
-		$this->_version += 2; // изменяю, чтоб в разных тестах были разные значения, на всякий случай
 		$this->_nextRoot = LocalDeployer::DIR_NEXT;
 		$this->_nextRootSub = $this->_nextRoot . DS . LocalDeployer::CAKE_SUB_PATH;
 	}
@@ -114,7 +106,7 @@ class DeployTest extends AppTestCase
 		$this->_mockOther();
 
 		$deployer = new LocalDeployer();
-		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
+		$res = $deployer->deployCurrentBranch();
 		self::assertTrue($res);
 
 		$expectedCommandList = [
@@ -129,7 +121,7 @@ class DeployTest extends AppTestCase
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
-		$this->assertFileEqualsString((string)($this->_version + 1), self::VERSION_FILE_PATH);
+		$this->assertFileEqualsString((string)(LocalDeployer::VERSION + 1), self::VERSION_FILE_PATH);
 		self::assertFileEquals(self::COPY_FILE_FROM, self::COPY_FILE_TO);
 	}
 
@@ -148,7 +140,7 @@ class DeployTest extends AppTestCase
 			'versionFile' => $singleRoot . DS . LocalDeployer::VERSION_FILE,
 			'cakeSubPath' => $rootSub,
 		]);
-		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
+		$res = $deployer->deploy($this->_repo, $this->_branch);
 		self::assertTrue($res);
 
 		$expectedCommandList = [
@@ -161,7 +153,7 @@ class DeployTest extends AppTestCase
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
-		$this->assertFileEqualsString((string)($this->_version + 1), self::VERSION_FILE_PATH_CURRENT);
+		$this->assertFileEqualsString((string)(LocalDeployer::VERSION + 1), self::VERSION_FILE_PATH_CURRENT);
 	}
 
 	/** Что если не удалось спуллиться */
@@ -171,7 +163,7 @@ class DeployTest extends AppTestCase
 		$this->_expectException('Не удалось спуллиться');
 
 		$deployer = new LocalDeployer();
-		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
+		$res = $deployer->deploy($this->_repo, $this->_branch);
 		self::assertFalse($res);
 
 		$expectedCommandList = [
@@ -191,7 +183,7 @@ class DeployTest extends AppTestCase
 		$this->_expectException('Не удалось обновить композер');
 
 		$deployer = new LocalDeployer();
-		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
+		$res = $deployer->deploy($this->_repo, $this->_branch);
 		self::assertFalse($res);
 
 		$expectedCommandList = [
@@ -213,7 +205,7 @@ class DeployTest extends AppTestCase
 		$this->_expectException('Миграции не развернулись');
 
 		$deployer = new LocalDeployer();
-		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
+		$res = $deployer->deploy($this->_repo, $this->_branch);
 		self::assertFalse($res);
 
 		$expectedCommandList = [
@@ -303,22 +295,19 @@ class DeployTest extends AppTestCase
 	}
 
 
-
-
-
-
-
 	/**
 	 * Проверяем, что ничего не произошло
 	 *
-	 * @param array ...$deployArgs аргументы для вызова
+	 * @param string $repo
+	 * @param string $branch
+	 * @param array $config
 	 */
-	private function _testNothingHappens(...$deployArgs) {
+	private function _testNothingHappens($repo, $branch, $config = []) {
 		$this->_mockExec(1);
 		$this->_mockOther(2, 0, 0, 0);
 
-		$deployer = new LocalDeployer();
-		$res = $deployer->deploy(...$deployArgs);
+		$deployer = new LocalDeployer($config);
+		$res = $deployer->deploy($repo, $branch);
 		self::assertFalse($res);
 
 		$expectedCommandList = [
@@ -331,18 +320,17 @@ class DeployTest extends AppTestCase
 
 	/** не та репа */
 	public function testWrongRepo() {
-		$this->_testNothingHappens('badRepoName', $this->_branch, '', $this->_version);
+		$this->_testNothingHappens('badRepoName', $this->_branch);
 	}
 
 	/** не та ветка */
 	public function testWrongBranch() {
-		$this->_testNothingHappens($this->_repo, 'branchNameThatWillNeverEverExist', '', $this->_version);
+		$this->_testNothingHappens($this->_repo, 'branchNameThatWillNeverEverExist');
 	}
 
 	/** не то окружение */
 	public function testWrongEnv() {
-		MethodMocker::mock(LocalDeployer::class, '_isDeployEnvironment')->willReturnValue(false);
-		$this->_testNothingHappens($this->_repo, $this->_branch, '', $this->_version);
+		$this->_testNothingHappens($this->_repo, $this->_branch, ['isDeployEnv' => false]);
 	}
 
 	/** не мигрируем по-умолчанию (например, в тестовом окружении) и не разворачиваем композер */
@@ -356,7 +344,7 @@ class DeployTest extends AppTestCase
 			'autoMigrate' => false,
 			'composerCommand' => false,
 		]);
-		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
+		$res = $deployer->deploy($this->_repo, $this->_branch);
 		self::assertTrue($res);
 
 		$expectedCommandList = [
@@ -381,7 +369,7 @@ class DeployTest extends AppTestCase
 			'composerDependencies' => false,
 			'copyFileList' => [],
 		]);
-		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
+		$res = $deployer->deploy($this->_repo, $this->_branch);
 		self::assertTrue($res);
 
 		$expectedCommandList = [
@@ -408,7 +396,7 @@ class DeployTest extends AppTestCase
 			'composerOptions' => [],
 			'composerRequireDev' => true,
 		]);
-		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
+		$res = $deployer->deploy($this->_repo, $this->_branch);
 		self::assertTrue($res);
 
 		$expectedCommandList = [
