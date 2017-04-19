@@ -26,7 +26,25 @@ abstract class DeploymentShell extends Shell
 	 * @param string $commit к чему обновляемся. для замиси в лог
 	 */
 	public static function deployInBg($type, $repo, $branch, $commit) {
-		$params = compact('repo', 'branch', 'commit');
+		self::_deployInBg($type, compact('repo', 'branch', 'commit'));
+	}
+
+	/**
+	 * Деплой без проверок в фоновом режиме
+	 *
+	 * @param string $type
+	 */
+	public static function deployCurrentInBg($type) {
+		self::_deployInBg($type, ['current' => true]);
+	}
+
+	/**
+	 * Деплой в фоновом режиме
+	 *
+	 * @param string $type
+	 * @param array $params
+	 */
+	private static function _deployInBg($type, array $params) {
 		$stringParams = escapeshellarg(json_encode($params));
 		$type = escapeshellarg($type);
 		$shellName = namespaceSplit(static::class)[1];
@@ -48,7 +66,7 @@ abstract class DeploymentShell extends Shell
 							'default' => false,
 						],
 						'data' => [
-							'help' => 'Информация об обновлении. JSON-строка, обязательно имеет ключи repo и branch',
+							'help' => 'Информация об обновлении. JSON-строка, обязательно имеет ключи repo и branch для деплоя с проверками. Либо current для деплоя без проверок',
 							'default' => false,
 						],
 					]
@@ -95,12 +113,17 @@ abstract class DeploymentShell extends Shell
 		if (empty($this->params['data'])) {
 			$this->abort('Не указан обязательный параметр data');
 		}
-		$data = Arrays::decode($this->params['data']);
-		if (empty($data) || empty($data['repo']) || empty($data['branch'])) {
-			$this->abort('Неправильно указан параметр data');
-		}
 		$deployer = $this->_getDeployer($this->params['type']);
-		$success = $deployer->deploy($data['repo'], $data['branch'], empty($data['commit']) ? '' : $data['commit'], $this->_getVersion());
+		if (!empty($data['current'])) {
+			$success = $deployer->deployCurrentBranch($this->_getVersion());
+		} else {
+			$data = Arrays::decode($this->params['data']);
+			if (empty($data) || empty($data['repo']) || empty($data['branch'])) {
+				$this->abort('Неправильно указан параметр data');
+			}
+			$success = $deployer->deploy($data['repo'], $data['branch'], empty($data['commit']) ? '' : $data['commit'], $this->_getVersion());
+		}
+
 		if ($success) {
 			$this->out('Деплой успешно завершён');
 		} else {
