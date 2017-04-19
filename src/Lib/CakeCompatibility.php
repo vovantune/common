@@ -12,7 +12,7 @@ use ArtSkills\Traits\Singleton;
 use Cake\Core\Configure;
 
 /**
- * Класс для проверки совместимости CakePHP на разнные плюшки
+ * Библиотека для проверки совместимости CakePHP на разнные плюшки
  */
 class CakeCompatibility
 {
