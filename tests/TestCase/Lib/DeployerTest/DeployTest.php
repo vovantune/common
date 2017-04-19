@@ -18,6 +18,7 @@ use Cake\Log\Log;
 class DeployTest extends AppTestCase
 {
 	const VERSION_FILE_PATH = LocalDeployer::DIR_NEXT . DS . LocalDeployer::VERSION_FILE;
+	const VERSION_FILE_PATH_CURRENT = LocalDeployer::DIR_CURRENT . DS . LocalDeployer::VERSION_FILE;
 	const COPY_FILE_FROM = LocalDeployer::DIR_CURRENT . DS . LocalDeployer::COPY_FILE;
 	const COPY_FILE_TO = LocalDeployer::DIR_NEXT . DS . LocalDeployer::COPY_FILE;
 
@@ -76,6 +77,7 @@ class DeployTest extends AppTestCase
 		parent::setUp();
 		$this->_executeHistory = [];
 		$this->_cleanFiles();
+		symlink(LocalDeployer::DIR_CURRENT, LocalDeployer::SYMLINK);
 
 		$this->_currentDir = getcwd();
 		$this->_repo = LocalDeployer::REPO_NAME;
@@ -93,7 +95,7 @@ class DeployTest extends AppTestCase
 
 	/** удалить ненужные файлы */
 	private function _cleanFiles() {
-		$toClean = [self::VERSION_FILE_PATH, self::COPY_FILE_TO];
+		$toClean = [self::VERSION_FILE_PATH, self::VERSION_FILE_PATH_CURRENT, self::COPY_FILE_TO, LocalDeployer::SYMLINK];
 		foreach ($toClean as $file) {
 			if (file_exists($file)) {
 				unlink($file);
@@ -106,7 +108,7 @@ class DeployTest extends AppTestCase
 	 * Смотрим выполняемые команды
 	 */
 	public function testDeploy() {
-		$mainRoot = LocalDeployer::DIR_MAIN;
+		$mainRoot = LocalDeployer::SYMLINK;
 
 		$this->_mockExec(6);
 		$this->_mockOther();
@@ -133,18 +135,18 @@ class DeployTest extends AppTestCase
 
 	/** Деплой в текущую папку */
 	public function testDeploySingleRoot() {
-		$singleRoot = __DIR__;
+		$singleRoot = LocalDeployer::DIR_CURRENT;
 		$rootSub = $singleRoot . DS . LocalDeployer::CAKE_SUB_PATH;
 
 		$this->_mockExec(4);
 		$this->_mockOther();
 
 		$deployer = new LocalDeployer([
-			'_singleRoot' => $singleRoot,
-			'_mainRoot' => '',
-			'_currentRoot' => '',
-			'_rotateDeployFolders' => [],
-			'_versionFile' => $singleRoot . DS . LocalDeployer::VERSION_FILE,
+			'singleRoot' => $singleRoot,
+			'projectSymlink' => '',
+			'rotateDeployFolders' => [],
+			'versionFile' => $singleRoot . DS . LocalDeployer::VERSION_FILE,
+			'cakeSubPath' => $rootSub,
 		]);
 		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
 		self::assertTrue($res);
@@ -159,7 +161,7 @@ class DeployTest extends AppTestCase
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
-		$this->assertFileEqualsString((string)($this->_version + 1), self::VERSION_FILE_PATH);
+		$this->assertFileEqualsString((string)($this->_version + 1), self::VERSION_FILE_PATH_CURRENT);
 	}
 
 	/** Что если не удалось спуллиться */
@@ -345,14 +347,14 @@ class DeployTest extends AppTestCase
 
 	/** не мигрируем по-умолчанию (например, в тестовом окружении) и не разворачиваем композер */
 	public function testNoAutoMigrateNoComposer() {
-		$mainRoot = LocalDeployer::DIR_MAIN;
+		$mainRoot = LocalDeployer::SYMLINK;
 
 		$this->_mockExec(4);
 		$this->_mockOther(2, 0, 1, 1);
 
 		$deployer = new LocalDeployer([
-			'_autoMigrate' => false,
-			'_composerCommand' => false,
+			'autoMigrate' => false,
+			'composerCommand' => false,
 		]);
 		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
 		self::assertTrue($res);
@@ -370,14 +372,14 @@ class DeployTest extends AppTestCase
 
 	/** не перечислены зависимости и не надо копировать файлы */
 	public function testNoDependenciesNoCopy() {
-		$mainRoot = LocalDeployer::DIR_MAIN;
+		$mainRoot = LocalDeployer::SYMLINK;
 
 		$this->_mockExec(4);
 		$this->_mockOther(2, 0, 1, 1);
 
 		$deployer = new LocalDeployer([
-			'_composerDependencies' => false,
-			'_copyFileList' => [],
+			'composerDependencies' => false,
+			'copyFileList' => [],
 		]);
 		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
 		self::assertTrue($res);
@@ -395,16 +397,16 @@ class DeployTest extends AppTestCase
 
 	/** не указан composer home, файл версии и опции композера */
 	public function testNoHomeNoVersionNoOptions() {
-		$mainRoot = LocalDeployer::DIR_MAIN;
+		$mainRoot = LocalDeployer::SYMLINK;
 
 		$this->_mockExec(6);
 		$this->_mockOther(2, 0, 1, 1);
 
 		$deployer = new LocalDeployer([
-			'_versionFile' => '',
-			'_composerHome' => '',
-			'_composerOptions' => [],
-			'_composerRequireDev' => true,
+			'versionFile' => '',
+			'composerHome' => '',
+			'composerOptions' => [],
+			'composerRequireDev' => true,
 		]);
 		$res = $deployer->deploy($this->_repo, $this->_branch, '', $this->_version);
 		self::assertTrue($res);
@@ -434,7 +436,7 @@ class DeployTest extends AppTestCase
 	 */
 	public function testConfigConflict() {
 		new LocalDeployer([
-			'_singleRoot' => ROOT,
+			'singleRoot' => ROOT,
 		]);
 	}
 
@@ -446,7 +448,7 @@ class DeployTest extends AppTestCase
 	 */
 	public function testUnsetAutoMigrate() {
 		new LocalDeployer([
-			'_autoMigrate' => null,
+			'autoMigrate' => null,
 		]);
 	}
 
@@ -458,21 +460,8 @@ class DeployTest extends AppTestCase
 	 */
 	public function testBadAutoMigrate() {
 		new LocalDeployer([
-			'_autoMigrate' => true,
-			'_phinxCommand' => '',
-		]);
-	}
-
-
-	/**
-	 * текущий корень отсутствует в списке
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Текущий корень проекта отсутствует в списке
-	 */
-	public function testBadCurrentRoot() {
-		new LocalDeployer([
-			'_currentRoot' => '/var/www/common-15',
+			'autoMigrate' => true,
+			'phinxCommand' => '',
 		]);
 	}
 
@@ -484,7 +473,7 @@ class DeployTest extends AppTestCase
 	 */
 	public function testNoMainRoot() {
 		new LocalDeployer([
-			'_mainRoot' => '',
+			'projectSymlink' => '',
 		]);
 	}
 
@@ -494,11 +483,25 @@ class DeployTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Главный симлинк задан в списке папок
 	 */
-	public function testMainRootInList() {
+	public function testSymlinkInList() {
 		new LocalDeployer([
-			'_mainRoot' => ROOT,
+			'rotateDeployFolders' => [LocalDeployer::SYMLINK, '/var/www/common-1'],
 		]);
 	}
+
+	/**
+	 * то же самое, но путь оканчивается на слеш
+	 *
+	 * @expectedException \Exception
+	 * @expectedExceptionMessage Главный симлинк задан в списке папок
+	 */
+	public function testSymlinkInListDs() {
+		new LocalDeployer([
+			'rotateDeployFolders' => [LocalDeployer::SYMLINK . DS, '/var/www/common-1'],
+		]);
+	}
+
+
 
 	/**
 	 * не проинициализировался гит
@@ -519,7 +522,7 @@ class DeployTest extends AppTestCase
 	 */
 	public function testNoRepo() {
 		new LocalDeployer([
-			'_repoName' => '',
+			'repoName' => '',
 		]);
 	}
 
@@ -531,7 +534,7 @@ class DeployTest extends AppTestCase
 	 */
 	public function testOneFolderInList() {
 		new LocalDeployer([
-			'_rotateDeployFolders' => [ROOT],
+			'rotateDeployFolders' => [ROOT],
 		]);
 	}
 
@@ -543,9 +546,22 @@ class DeployTest extends AppTestCase
 	 */
 	public function testFolderDuplicates() {
 		new LocalDeployer([
-			'_rotateDeployFolders' => [ROOT, ROOT],
+			'rotateDeployFolders' => [ROOT, ROOT],
 		]);
 	}
+
+	/**
+	 * плохой файл версий
+	 *
+	 * @expectedException \Exception
+	 * @expectedExceptionMessage Не могу получить относительный путь из
+	 */
+	public function testBadVersionFile() {
+		new LocalDeployer([
+			'versionFile' => '/var/www/common/asdfgh',
+		]);
+	}
+
 
 
 

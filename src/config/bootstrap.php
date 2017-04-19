@@ -13,6 +13,15 @@ if (!defined('AS_COMMON')) {
 	define('AS_COMMON', ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . DS);
 }
 
+if (!defined('CAKE_BIN')) {
+	/**
+	 * Путь до исполняемого файла кейка
+	 */
+	define('CAKE_BIN', ROOT . DS . 'bin' . DS . 'cake');
+}
+
+
+
 $tableAliasesDir = APP . 'Model' . DS . 'table_names.php';
 if (file_exists($tableAliasesDir)) {
 	require_once $tableAliasesDir;

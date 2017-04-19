@@ -8,7 +8,7 @@ use Cake\Log\Log;
 /**
  * Деплойщик
  */
-abstract class Deployer
+class Deployer
 {
 
 	/**
@@ -20,27 +20,18 @@ abstract class Deployer
 	protected $_singleRoot = '';
 
 	/**
-	 * Папка, на которую смотрит веб-сервер
-	 * Подразумевается, что это симлинк на одну из списка rotateDeployFolders
-	 *
-	 * @var string
-	 */
-	protected $_mainRoot = '';
-
-	/**
-	 * Текущий настоящий корень проекта
-	 *
-	 * @var string
-	 */
-	protected $_currentRoot = '';
-
-	/**
-	 * Переключаемые папки для деплоя
+	 * Список заранее созданных папок, между которыми переключается симлинк при деплое
 	 *
 	 * @var string[]
 	 */
 	protected $_rotateDeployFolders = [];
 
+	/**
+	 * Симлинк, который будет переключаться, и через который внешний мир обращается к проекту
+	 *
+	 * @var string
+	 */
+	protected $_projectSymlink = '';
 
 	/**
 	 * Название репозитория
@@ -81,6 +72,14 @@ abstract class Deployer
 	 * @var null|bool
 	 */
 	protected $_autoMigrate = null;
+
+	/**
+	 * Можно ли в текущем окружении деплоить текущую конфигурацию
+	 * (Например, тест не может деплоить продакшн, и для конфигурации продакшна в тестовом окружении тут должен быть false)
+	 *
+	 * @var bool|null
+	 */
+	protected $_isDeployEnv = null;
 
 
 	/**
@@ -152,41 +151,36 @@ abstract class Deployer
 	protected $_git = null;
 
 	/**
+	 * Каталог, на который сейчас засимлинкан $_projectSymlink. Вычислимое поле, не трогать
+	 *
+	 * @var string
+	 */
+	protected $_currentRoot = '';
+
+	/**
 	 * Из какой папки всё будет выполняться. Вычислимое поле, не трогать
 	 *
 	 * @var string
 	 */
 	protected $_runFrom = '';
 
+
+
 	/**
 	 * конструктор
+	 *
+	 * @param array $config Конфиг. ключ => начение, клиючи - названия свойств этого класса без подчёркивания
+	 * описание в [доках](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
 	 */
-	public function __construct() {
+	public function __construct(array $config = []) {
+		$this->_applyConfig($config);
 		$this->_normalizePaths();
 		$this->_checkProperties();
 		$this->_setValues();
 	}
 
 	/**
-	 * Запустить в бэкграунде
-	 * Нужно, например, если запрос на деплой приходит не из консоли, а от веб-сервера,
-	 *   и хочется, чтобы реквест не висел и не отваливался по таймауту
-	 *
-	 * @param string $type тип репозитория - продакшн, тест, ...
-	 * @param string $repo обновляемая репа
-	 * @param string $branch обновляемая ветка
-	 * @param string $commit к чему обновляемся. для замиси в лог
-	 */
-	public function deployInBg($type, $repo, $branch, $commit) {
-		$cakeBinPath = Misc::implodeDs($this->_runFrom, 'bin', 'cake');
-		$params = compact('repo', 'branch', 'commit');
-		$stringParams = escapeshellarg(json_encode($params));
-		$type = escapeshellarg($type);
-		Shell::execInBackground($cakeBinPath . " deployment deploy --type=$type --data=$stringParams");
-	}
-
-	/**
-	 * Деплой
+	 * Деплой с проверками того, что деплоится
 	 *
 	 * @param string $repo обновляемая репа
 	 * @param string $branch обновляемая ветка
@@ -211,6 +205,17 @@ abstract class Deployer
 			$this->_chdir($currentDir);
 		}
 		return $success;
+	}
+
+	/**
+	 * Деплой текущей ветки, без проверок
+	 *
+	 * @param null|int $currentVersion счётчик версий
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function deployCurrentBranch($currentVersion = null) {
+		return $this->deploy($this->_repoName, $this->_git->getCurrentBranchName(), '', $currentVersion);
 	}
 
 	/**
@@ -243,12 +248,27 @@ abstract class Deployer
 	}
 
 	/**
+	 * Заполнить свойства из конфига
+	 *
+	 * @param array $config
+	 */
+	protected function _applyConfig(array $config) {
+		$this->_isDeployEnv = $this->_isDeployEnvironment();
+		foreach ($config as $property => $value) {
+			$property = '_' . $property;
+			if (property_exists($this, $property)) {
+				$this->{$property} = $value;
+			}
+		}
+	}
+
+	/**
 	 * Делаем проверки заполненности свойств
 	 * @throws \Exception
 	 */
 	protected function _checkProperties() {
 		if (!empty($this->_singleRoot)) {
-			if (!empty($this->_currentRoot) || !empty($this->_rotateDeployFolders) || !empty($this->_mainRoot)) {
+			if (!empty($this->_rotateDeployFolders) || !empty($this->_projectSymlink)) {
 				throw new \Exception('Заполнены конфликтующие свойства');
 			}
 		} else {
@@ -258,14 +278,14 @@ abstract class Deployer
 			if (count($this->_rotateDeployFolders) !== count(array_unique($this->_rotateDeployFolders))) {
 				throw new \Exception('В списке папок есть дубли');
 			}
-			if (empty($this->_mainRoot)) {
+			if (empty($this->_projectSymlink)) {
 				throw new \Exception('Не указан главный симлинк');
 			}
-			if (in_array($this->_mainRoot, $this->_rotateDeployFolders)) {
-				throw new \Exception('Главный симлинк задан в списке папок');
+			if (!is_link($this->_projectSymlink)) {
+				throw new \Exception("{$this->_projectSymlink} не является симлинком");
 			}
-			if (!in_array($this->_currentRoot, $this->_rotateDeployFolders)) {
-				throw new \Exception('Текущий корень проекта отсутствует в списке');
+			if (in_array($this->_projectSymlink, $this->_rotateDeployFolders)) {
+				throw new \Exception('Главный симлинк задан в списке папок');
 			}
 		}
 
@@ -287,13 +307,18 @@ abstract class Deployer
 	 */
 	protected function _setValues() {
 		if (!empty($this->_singleRoot)) {
-			$this->_mainRoot = $this->_currentRoot = $this->_singleRoot;
+			$this->_currentRoot = $this->_singleRoot;
 			$this->_rotateDeployFolders = [$this->_singleRoot];
+		} else {
+			$this->_currentRoot = $this->_cutTrailingDs(readlink($this->_projectSymlink));
+			if (!in_array($this->_currentRoot, $this->_rotateDeployFolders)) {
+				throw new \Exception('Каталог, на который сейчас ссылается симлинк, отсутствует в списке!');
+			}
 		}
 
 		$this->_runFrom = $this->_getNextRoot();
 		if (!empty($this->_cakeSubPath)) {
-			$this->_runFrom = $this->_runFrom . DS . $this->_cakeSubPath;
+			$this->_runFrom = $this->_runFrom . DS . $this->_fullPathToRelative($this->_cakeSubPath);
 		}
 
 		$this->_git = new Git($this->_runFrom);
@@ -318,7 +343,7 @@ abstract class Deployer
 	protected function _normalizePaths() {
 		// слеши в конце пути
 		$folderProperties = [
-			'_singleRoot', '_mainRoot', '_currentRoot', '_cakeSubPath'
+			'_singleRoot', '_projectSymlink', '_cakeSubPath'
 		];
 		foreach ($folderProperties as $property) {
 			$this->$property = $this->_cutTrailingDs($this->$property);
@@ -336,10 +361,7 @@ abstract class Deployer
 	 * @return string
 	 */
 	protected function _cutTrailingDs($path) {
-		if (Strings::endsWith($path, DS)) {
-			return Strings::replacePostfix($path, DS);
-		}
-		return $path;
+		return Strings::replaceIfEndsWith($path, DS);
 	}
 
 	/**
@@ -347,13 +369,21 @@ abstract class Deployer
 	 * Для файлов, лежащих в текущем корне
 	 *
 	 * @param string $fullPath
+	 * @throws \Exception
 	 * @return string
 	 */
 	protected function _fullPathToRelative($fullPath) {
-		if (Strings::startsWith($fullPath, $this->_currentRoot)) {
-			return Strings::replacePrefix($fullPath, $this->_currentRoot . DS);
+		$toReplace = $this->_rotateDeployFolders;
+		$toReplace[] = $this->_projectSymlink;
+		foreach ($toReplace as &$path) {
+			$path .= DS;
 		}
-		return $fullPath;
+		unset($path);
+		$result = Strings::replaceIfStartsWith($fullPath, $toReplace);
+		if (!empty($result) && ($result[0] === DS)) {
+			throw new \Exception("Не могу получить относительный путь из {$fullPath}");
+		}
+		return $result;
 	}
 
 
@@ -385,7 +415,7 @@ abstract class Deployer
 		$this->_migrateDb();
 
 		AppCache::flush();
-		$this->_setMainRoot($nextRoot);
+		$this->_setProjectSymlink($nextRoot);
 
 		$timeEnd = microtime(true);
 		$this->_log($timeStart, $timeEnd, $commit);
@@ -415,13 +445,13 @@ abstract class Deployer
 	 *
 	 * @param string $newActualRoot
 	 */
-	protected function _setMainRoot($newActualRoot) {
+	protected function _setProjectSymlink($newActualRoot) {
 		if (!empty($this->_singleRoot)) {
 			// одна папка, деплой по живому
 			return;
 		}
 		$newActualRoot = escapeshellarg($newActualRoot);
-		$mainRoot = escapeshellarg($this->_mainRoot);
+		$mainRoot = escapeshellarg($this->_projectSymlink);
 		// ротация нескольких папок, переключаем симлинк
 		// s - символьная, nf - чтобы ссылка на папку перезаписалась
 		$this->_exec("ln -snf $newActualRoot $mainRoot", 'Не переключился симлинк');
@@ -456,7 +486,7 @@ abstract class Deployer
 			($repo === $this->_repoName)
 			&& !empty($currentBranch)
 			&& ($branch === $currentBranch)
-			&& $this->_isDeployEnvironment()
+			&& $this->_isDeployEnv
 		);
 	}
 

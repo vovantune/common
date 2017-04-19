@@ -9,22 +9,19 @@ class LocalDeployer extends Deployer
 
 	// константы для использования в тесте
 	const REPO_NAME = 'common';
-	const DIR_CURRENT = ROOT;
-	const DIR_NEXT = __DIR__;
-	const DIR_MAIN = '/var/www/common';
+	const DIR_CURRENT = __DIR__ . DS . 'project-1';
+	const DIR_NEXT =  __DIR__ . DS . 'project-2';
+	const SYMLINK = __DIR__ . DS . 'symlink';
 	const CAKE_SUB_PATH = 'subfolder';
 	const VERSION_FILE = self::CAKE_SUB_PATH . DS . 'version.txt';
 	const VERSION_FILE_PATH = self::DIR_CURRENT . DS . self::VERSION_FILE;
-	const COPY_FILE = 'composer.json';
+	const COPY_FILE = self::CAKE_SUB_PATH . DS . 'some_file.txt';
 
 	/** @inheritdoc */
 	protected $_repoName = self::REPO_NAME;
 
 	/** @inheritdoc */
-	protected $_mainRoot = self::DIR_MAIN;
-
-	/** @inheritdoc */
-	protected $_currentRoot = self::DIR_CURRENT;
+	protected $_projectSymlink = self::SYMLINK;
 
 	/** @inheritdoc */
 	protected $_rotateDeployFolders = [
@@ -47,17 +44,6 @@ class LocalDeployer extends Deployer
 	protected $_copyFileList = [
 		self::DIR_CURRENT . DS . self::COPY_FILE,
 	];
-
-	/**
-	 * Переопределение свойств для тестов
-	 * @param array $setProperties
-	 */
-	public function __construct(array $setProperties = []) {
-		foreach ($setProperties as $name => $value) {
-			$this->{$name} = $value;
-		}
-		parent::__construct();
-	}
 
 	/** @inheritdoc */
 	protected function _isDeployEnvironment() {

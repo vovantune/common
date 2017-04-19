@@ -3,13 +3,36 @@ namespace ArtSkills\Shell;
 
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\Deployer;
+use ArtSkills\Lib\Strings;
 use ArtSkills\Log\Engine\SentryLog;
 use Cake\Console\Shell;
+use Cake\Utility\Inflector;
 
 abstract class DeploymentShell extends Shell
 {
 	const TYPE_PRODUCTION = 'production';
 	const TYPE_TEST = 'test';
+
+	const CAKE_PATH = CAKE_BIN;
+
+	/**
+	 * Запустить деплойщика в фоновом режиме
+	 * Нужно, например, если запрос на деплой приходит не из консоли, а от веб-сервера,
+	 *   и хочется, чтобы реквест не висел и не отваливался по таймауту
+	 *
+	 * @param string $type тип репозитория - продакшн, тест, ...
+	 * @param string $repo обновляемая репа
+	 * @param string $branch обновляемая ветка
+	 * @param string $commit к чему обновляемся. для замиси в лог
+	 */
+	public static function deployInBg($type, $repo, $branch, $commit) {
+		$params = compact('repo', 'branch', 'commit');
+		$stringParams = escapeshellarg(json_encode($params));
+		$type = escapeshellarg($type);
+		$shellName = namespaceSplit(static::class)[1];
+		$shellName = Inflector::underscore(Strings::replacePostfix($shellName, 'Shell'));
+		\ArtSkills\Lib\Shell::execInBackground(static::CAKE_PATH . " $shellName deploy --type=$type --data=$stringParams");
+	}
 
 	/** @inheritdoc */
 	public function getOptionParser() {
@@ -95,9 +118,12 @@ abstract class DeploymentShell extends Shell
 
 	/**
 	 * Текущая версия
+	 *
 	 * @return int|null
 	 */
-	abstract protected function _getVersion();
+	protected function _getVersion() {
+		return CORE_VERSION;
+	}
 
 	/**
 	 * Откат
