@@ -78,7 +78,7 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 
 		$this->assertResponseOk();
 		if (CakeCompatibility::supportSetters()) {
-			$rawBody = $this->_response->getBody();
+			$rawBody = (string)$this->_response->getBody();
 		} else {
 			$rawBody = $this->_response->body();
 		}
