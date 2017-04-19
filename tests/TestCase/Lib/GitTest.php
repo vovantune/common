@@ -364,11 +364,11 @@ class GitTest extends AppTestCase
 		$git->updateRefs();
 		$git->pullCurrentBranch();
 
-		$commandStart = 'cd ' . escapeshellarg($gitFolder) . ' 2>&1 && ' . $this->_gitCommand . ' ';
+		$commandStart = 'cd ' . escapeshellarg($gitFolder) . ' 2>&1 && (' . $this->_gitCommand . ' ';
 		$expectedHistory = [
-			$commandStart . 'rev-parse --abbrev-ref HEAD 2>&1',
-			$commandStart . 'remote update --prune 2>&1',
-			$commandStart . 'pull 2>&1',
+			$commandStart . 'rev-parse --abbrev-ref HEAD 2>&1)',
+			$commandStart . 'remote update --prune 2>&1)',
+			$commandStart . 'pull 2>&1)',
 		];
 		self::assertEquals($expectedHistory, $this->_executeHistory);
 	}
@@ -385,7 +385,7 @@ class GitTest extends AppTestCase
 			->expectCall($expectTimes)
 			->willReturnAction(function ($args) {
 				$this->_executeHistory[] = $args[0];
-				if (preg_match('/^(cd [^&]+(&1)?\s+&&\s)?' . addcslashes($this->_gitCommand, '/.') . ' (branch( -[ar])?|for-each-ref.*|rev-parse .*)/', $args[0])) {
+				if (preg_match('/^(cd [^&]+(&1)?\s+&&\s\()?' . addcslashes($this->_gitCommand, '/.') . ' (branch( -[ar])?|for-each-ref.*|rev-parse .*)/', $args[0])) {
 					exec($args[0], $output, $returnCode);
 					return [$returnCode === 0, $output];
 				} else {

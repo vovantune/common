@@ -16,19 +16,7 @@ class Shell
 	 * @return array [успех, вывод, результирующая команда, код возврата]
 	 */
 	public static function exec($commands, $withErrors = true, $stopOnFail = true) {
-		$commands = (array)$commands;
-		if ($stopOnFail) {
-			$glue = ' && ';
-		} else {
-			$glue = ' ; ';
-		}
-		if ($withErrors) {
-			$errorRedirect = ' 2>&1';
-			$glue = $errorRedirect . $glue;
-			$resultCommand = implode($glue, $commands) . $errorRedirect;
-		} else {
-			$resultCommand = implode($glue, $commands);
-		}
+		$resultCommand = self::_processCommandList($commands, $withErrors, $stopOnFail);
 		return self::_exec($resultCommand);
 	}
 
@@ -53,12 +41,12 @@ class Shell
 	 * @return array [успех, вывод, результирующая команда, код возврата]
 	 */
 	public static function execFromDir($directory, $commands, $withErrors = true, $stopOnFail = true) {
-		$commands = (array)$commands;
+		$resultCommand = self::_processCommandList($commands, $withErrors, $stopOnFail);
 		if (!empty($directory) && (getcwd() !== $directory)) {
-			$cdCommand = 'cd ' . escapeshellarg($directory) . ($withErrors ? ' 2>&1' : '') . ' && ';
-			$commands[0] = $cdCommand . $commands[0];
+			$cdCommand = 'cd ' . escapeshellarg($directory) . ($withErrors ? ' 2>&1' : '');
+			$resultCommand = "$cdCommand && ($resultCommand)";
 		}
-		return self::exec($commands, $withErrors, $stopOnFail);
+		return self::_exec($resultCommand);
 	}
 
 	/**
@@ -70,6 +58,31 @@ class Shell
 	private static function _exec($command) {
 		exec($command, $output, $returnCode);
 		return [$returnCode === 0, $output, $command, $returnCode];
+	}
+
+	/**
+	 * Взять список команд и склеить их в одну строку в зависимости от параметров
+	 *
+	 * @param string|strings $commands
+	 * @param bool $withErrors
+	 * @param bool $stopOnFail
+	 * @return string
+	 */
+	private static function _processCommandList($commands, $withErrors = true, $stopOnFail = true) {
+		$commands = (array)$commands;
+		if ($stopOnFail) {
+			$glue = ' && ';
+		} else {
+			$glue = ' ; ';
+		}
+		if ($withErrors) {
+			$errorRedirect = ' 2>&1';
+			$glue = $errorRedirect . $glue;
+			$resultCommand = implode($glue, $commands) . $errorRedirect;
+		} else {
+			$resultCommand = implode($glue, $commands);
+		}
+		return $resultCommand;
 	}
 
 }

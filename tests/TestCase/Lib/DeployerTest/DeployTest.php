@@ -116,7 +116,7 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
@@ -150,7 +150,7 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '$rootSub' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '$rootSub' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd $rootSub",
 			'git pull 2>&1',
 			'putenv HOME=/var/www',
@@ -173,7 +173,7 @@ class DeployTest extends AppTestCase
 		self::assertFalse($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
@@ -193,7 +193,7 @@ class DeployTest extends AppTestCase
 		self::assertFalse($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
@@ -215,7 +215,7 @@ class DeployTest extends AppTestCase
 		self::assertFalse($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
@@ -242,7 +242,7 @@ class DeployTest extends AppTestCase
 					$command = $args[0];
 					$this->_executeHistory[] = $command;
 					if (
-						preg_match('/^(cd [^&]+(&1)?\s+&&\s)?git (branch( -[ar])?|for-each-ref.*|rev-parse.*)/', $command)
+						preg_match('/^(cd [^&]+(&1)?\s+&&\s\()?git (branch( -[ar])?|for-each-ref.*|rev-parse.*)/', $command)
 						|| Strings::startsWith($command, 'cp ')
 					) {
 						exec($args[0], $output, $returnCode);
@@ -320,7 +320,7 @@ class DeployTest extends AppTestCase
 		self::assertFalse($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			"cd {$this->_currentDir}",
 		];
@@ -358,7 +358,7 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
@@ -383,7 +383,7 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			'git pull 2>&1',
 			'vendor/bin/phinx migrate 2>&1',
@@ -410,7 +410,7 @@ class DeployTest extends AppTestCase
 		self::assertTrue($res);
 
 		$expectedCommandList = [
-			"cd '{$this->_nextRootSub}' 2>&1 && git rev-parse --abbrev-ref HEAD 2>&1",
+			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
