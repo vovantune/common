@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\Mailer;
 
+use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\Env;
 use ArtSkills\Log\Engine\SentryLog;
 
@@ -37,7 +38,8 @@ class Email extends \Cake\Mailer\Email
 			} else {
 				$confKey = $paramConfig;
 			}
-			$config = static::config($confKey);
+
+			$config = CakeCompatibility::supportSetters()? static::getConfig($confKey): static::config($confKey);
 		}
 		if (is_array($config)) {
 			$config['transport'] = 'test';

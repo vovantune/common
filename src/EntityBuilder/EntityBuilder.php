@@ -1,7 +1,9 @@
 <?php
+
 namespace ArtSkills\EntityBuilder;
 
 use ArtSkills\Lib\Arrays;
+use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\DB;
 use ArtSkills\Lib\Misc;
 use ArtSkills\Lib\Strings;
@@ -47,28 +49,33 @@ class EntityBuilder
 
 	/**
 	 * Конфиг
+	 *
 	 * @var EntityBuilderConfig
 	 */
 	protected static $_config = null;
 
 	/**
 	 * Список шаблонов магических методов для таблиц
+	 *
 	 * @var array
 	 */
 	protected static $_tableMethods = [];
 	/**
 	 * Список шаблонов файлов
+	 *
 	 * @var array
 	 */
 	protected static $_fileTemplates = [];
 	/**
 	 * Список базовых классов
+	 *
 	 * @var array
 	 */
 	protected static $_baseClasses = [];
 
 	/**
 	 * Задать конфиг
+	 *
 	 * @param EntityBuilderConfig $config
 	 * @param $config
 	 * @throws \Exception
@@ -264,7 +271,9 @@ class EntityBuilder
 	 * @return File
 	 */
 	private static function _getFile($entityName, $type) {
-		return new File(static::$_config->modelFolder . $type . '/' . self::_getShortClassName($entityName, $type) . '.php');
+		return new File(
+			static::$_config->modelFolder . $type . '/' . self::_getShortClassName($entityName, $type) . '.php'
+		);
 	}
 
 	/**
@@ -284,7 +293,9 @@ class EntityBuilder
 	 * @return string
 	 */
 	private static function _getClassTemplate($type) {
-		return '\\' . static::$_config->modelNamespace . '\\' . $type . '\\' . self::_getShortClassName(static::ENTITY_TEMPLATE_STRING, $type);
+		return '\\' . static::$_config->modelNamespace . '\\' . $type . '\\' . self::_getShortClassName(
+				static::ENTITY_TEMPLATE_STRING, $type
+			);
 	}
 
 	/**
@@ -300,9 +311,9 @@ class EntityBuilder
 	}
 
 
-
 	/**
 	 * Проверка, что задан конфиг
+	 *
 	 * @throws \Exception
 	 */
 	private static function _checkConfig() {
@@ -338,7 +349,7 @@ class EntityBuilder
 			$entityName,
 			static::$_config->modelNamespace,
 			$baseClassShort,
-			$useBaseClass
+			$useBaseClass,
 		];
 
 		return str_replace($search, $replace, static::$_fileTemplates[$type]);
@@ -352,7 +363,10 @@ class EntityBuilder
 	 */
 	private static function _checkTableExists($tableName) {
 		$connection = DB::getConnection(static::$_config->connectionName);
-		$existingTables = $connection->query("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $tableName . "';")->fetchAll();
+		$existingTables = $connection->query(
+			"SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config(
+			)['database'] . "' AND table_name='" . $tableName . "';"
+		)->fetchAll();
 		return $existingTables[0][0];
 	}
 
@@ -390,7 +404,9 @@ class EntityBuilder
 
 		$classComment = $refClass->getDocComment();
 		$entityName = substr($tblName, 0, -5);
-		$resultComment = self::_buildTableMethodRedefines($classComment, $entityName, self::_getClassPublicMethods($refClass));
+		$resultComment = self::_buildTableMethodRedefines(
+			$classComment, $entityName, self::_getClassPublicMethods($refClass)
+		);
 
 		$hasChanges = false;
 		if ($resultComment !== $classComment) {
@@ -436,7 +452,10 @@ class EntityBuilder
 					$hasMethod = true;
 				}
 
-				if (!$hasMethod && preg_match('/\s\*\s\@method\s.+' . $tplMethod . '\(.+/', $commLine)) { // есть описание такого метода, но не такое, как надо
+				if (!$hasMethod && preg_match(
+						'/\s\*\s\@method\s.+' . $tplMethod . '\(.+/', $commLine
+					)
+				) { // есть описание такого метода, но не такое, как надо
 					$commArr[$commIndex] = ' * ' . $template;
 					$hasMethod = true;
 				}
@@ -491,7 +510,9 @@ class EntityBuilder
 			array_splice($curContentArr, $refClass->getStartLine() - 1, 0, explode("\n", $newComment));
 			$newContent = implode("\n", $curContentArr);
 		} else {
-			$newContent = substr_replace($curContent, $newComment, strpos($curContent, $oldClassComment), strlen($oldClassComment));
+			$newContent = substr_replace(
+				$curContent, $newComment, strpos($curContent, $oldClassComment), strlen($oldClassComment)
+			);
 		}
 
 		$file->write($newContent);
@@ -531,7 +552,9 @@ class EntityBuilder
 		$aliasProperty = "\n";
 		foreach ($aliases as $alias => $field) {
 			$aliasProperty .= "		'$alias' => '$field',\n";
-			$curTblFields[$alias] = str_replace('$' . $field, '$' . $alias, $curTblFields[$field]) . " (алиас поля $field)";
+			$curTblFields[$alias] = str_replace(
+					'$' . $field, '$' . $alias, $curTblFields[$field]
+				) . " (алиас поля $field)";
 		}
 		$aliasProperty .= "\t";
 
@@ -553,7 +576,9 @@ class EntityBuilder
 
 			$file = new File($refClass->getFileName());
 			$contents = $file->read();
-			$contents = preg_replace('/protected \$_aliases = \[[^]]*\];/', 'protected $_aliases = [' . $aliasProperty . '];', $contents);
+			$contents = preg_replace(
+				'/protected \$_aliases = \[[^]]*\];/', 'protected $_aliases = [' . $aliasProperty . '];', $contents
+			);
 			$file->write($contents);
 			$file->close();
 
@@ -567,7 +592,10 @@ class EntityBuilder
 				$toAddComments = array_diff($curTblFields, $commentsArr);
 				$hasChanges = false;
 				foreach ($commentsArr as $key => $comm) { // удаляем ненужные свойства
-					if ((stristr($comm, '@property') || stristr($comm, '@tableComment')) && !in_array($comm, $curTblFields)) {
+					if ((stristr($comm, '@property') || stristr($comm, '@tableComment')) && !in_array(
+							$comm, $curTblFields
+						)
+					) {
 						unset($commentsArr[$key]);
 						$hasChanges = true;
 					}
@@ -604,7 +632,12 @@ class EntityBuilder
 	 */
 	private static function _getTableFieldsComments($entityName) {
 		$table = self::_getTable($entityName);
-		$tableSchema = $table->schema();
+		if (CakeCompatibility::supportSetters()) {
+			$tableSchema = $table->getSchema();
+		} else {
+			$tableSchema = $table->schema();
+		}
+
 
 		$columnList = $tableSchema->columns();
 		$defaultValues = ($tableSchema->defaultValues());
@@ -620,13 +653,27 @@ class EntityBuilder
 		$associations = $table->associations();
 		/** @type \Cake\ORM\Association $assoc */
 		foreach ($associations as $assoc) {
-			$className = $assoc->className() ? $assoc->className() : $assoc->name();
-			$result[$assoc->property()] = ' * @property ' . $className . (in_array($assoc->type(), [
+			$className = $assoc->className() ? $assoc->className()
+				: (CakeCompatibility::supportSetters() ? $assoc->getName() : $assoc->name());
+
+			if (CakeCompatibility::supportSetters()) {
+				$propertyName = $assoc->getProperty();
+				$foreignKeys = $assoc->getForeignKey();
+				$bindingKeys = $assoc->getBindingKey();
+			} else {
+				$propertyName = $assoc->property();
+				$foreignKeys = $assoc->foreignKey();
+				$bindingKeys = $assoc->bindingKey();
+			}
+
+			$result[$propertyName] = ' * @property ' . $className . (in_array(
+					$assoc->type(), [
 					'oneToMany',
 					'manyToMany',
-				]) ? '[]' : '') . ' $' . $assoc->property() . ' `' .
-				implode('`, `', (array)$assoc->foreignKey()) . '` => `' .
-				implode('`, `', (array)$assoc->bindingKey()) . '`';
+				]
+				) ? '[]' : '') . ' $' . $propertyName . ' `' .
+				implode('`, `', (array)$foreignKeys) . '` => `' .
+				implode('`, `', (array)$bindingKeys) . '`';
 		}
 
 		return $result;
@@ -642,7 +689,11 @@ class EntityBuilder
 		$table = self::_getTable($entityName);
 
 		$connection = DB::getConnection(static::$_config->connectionName);
-		$tableComment = $connection->query("SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $table->table() . "';")->fetchAll();
+		$tableName = CakeCompatibility::supportSetters()? $table->getTable(): $table->table();
+		$tableComment = $connection->query(
+			"SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config(
+			)['database'] . "' AND table_name='" . $tableName . "';"
+		)->fetchAll();
 		if (!empty($tableComment) && !empty($tableComment[0][0])) {
 			return ' * @tableComment ' . $tableComment[0][0];
 		} else {
@@ -661,7 +712,15 @@ class EntityBuilder
 		foreach ($tableList as $className) {
 			$entityName = substr($className, 0, -5);
 			$table = self::_getTable($entityName);
-			$constList[] = 'const ' . strtoupper($table->table()) . ' = "' . $table->alias() . '";';
+			if (CakeCompatibility::supportSetters()) {
+				$tableName = $table->getTable();
+				$tableAlias = $table->getAlias();
+			} else {
+				$tableName = $table->table();
+				$tableAlias = $table->alias();
+			}
+
+			$constList[] = 'const ' . strtoupper($tableName) . ' = "' . $tableAlias . '";';
 		}
 
 		$newContent = "<?php\n// This file is autogenerated\n" . implode("\n", $constList);

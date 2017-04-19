@@ -2,9 +2,17 @@
 
 namespace ArtSkills\Mailer\Transport;
 
+use ArtSkills\Lib\CakeCompatibility;
 use Cake\Mailer\AbstractTransport;
 use Cake\Mailer\Email;
 
+/**
+ * Почтовый транспорт, применяемый во время юнит тестирования. Фактическая отправка не происходит.
+ * Получить список писем можно следующим образом:
+ * ```php
+ * $sentMessages = TestEmailTransport::getMessages();
+ * ```
+ */
 class TestEmailTransport extends AbstractTransport
 {
 
@@ -44,14 +52,25 @@ class TestEmailTransport extends AbstractTransport
 	 * @return array
 	 */
 	public function send(Email $email) {
-		self::$_messages[] = [
-			'to' => $email->to(),
-			'subject' => $email->subject(),
-			'template' => $email->viewBuilder()->template(),
-			'layout' => $email->viewBuilder()->layout(),
-			'vars' => $email->viewVars(),
-			'message' => $email->message(),
-		];
+		if (CakeCompatibility::supportSetters()) {
+			self::$_messages[] = [
+				'to' => $email->getTo(),
+				'subject' => $email->getSubject(),
+				'template' => $email->viewBuilder()->getTemplate(),
+				'layout' => $email->viewBuilder()->getLayout(),
+				'vars' => $email->getViewVars(),
+				'message' => $email->message(),
+			];
+		} else {
+			self::$_messages[] = [
+				'to' => $email->to(),
+				'subject' => $email->subject(),
+				'template' => $email->viewBuilder()->template(),
+				'layout' => $email->viewBuilder()->layout(),
+				'vars' => $email->viewVars(),
+				'message' => $email->message(),
+			];
+		}
 		return ['headers' => 'test', 'message' => 'test'];
 	}
 }

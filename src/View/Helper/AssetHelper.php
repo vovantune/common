@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\View\Helper;
 
+use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Url;
 use ArtSkills\Filesystem\File;
@@ -154,7 +155,7 @@ class AssetHelper extends Helper
 	 * @param bool $merge добавить или перезаписать
 	 * @throws \Exception
 	 */
-	public function setConfig($controller, $action, array $config, $merge = true) {
+	private function _setCurrentConfig($controller, $action, array $config, $merge = true) {
 		if (!empty($config[self::KEY_DEPEND])) {
 			foreach ($config[self::KEY_DEPEND] as $dependency) {
 				if (!strpos($dependency, '.')) {
@@ -172,7 +173,12 @@ class AssetHelper extends Helper
 				}
 			}
 		}
-		$this->config("$controller.$action", $config, $merge);
+
+		if (CakeCompatibility::supportSetters()) {
+			parent::setConfig("$controller.$action", $config, $merge);
+		} else {
+			parent::config("$controller.$action", $config, $merge);
+		}
 	}
 
 	/**
@@ -183,7 +189,7 @@ class AssetHelper extends Helper
 	 * @param bool $merge добавить или перезаписать
 	 */
 	public function setCurrentConfig(array $config, $merge = true) {
-		$this->setConfig($this->_getParam(null, 'controller'), $this->_getParam(null, 'action'), $config, $merge);
+		$this->_setCurrentConfig($this->_getParam(null, 'controller'), $this->_getParam(null, 'action'), $config, $merge);
 	}
 
 	/**
@@ -226,10 +232,10 @@ class AssetHelper extends Helper
 		foreach ($configs as $controller => $controllerConf) {
 			if (strpos($controller, '.') !== false) {
 				list($controller, $action) = explode('.', $controller);
-				$this->setConfig($controller, $action, $controllerConf, $merge);
+				$this->_setCurrentConfig($controller, $action, $controllerConf, $merge);
 			} else {
 				foreach ($controllerConf as $action => $actionConf) {
-					$this->setConfig($controller, $action, $actionConf, $merge);
+					$this->_setCurrentConfig($controller, $action, $actionConf, $merge);
 				}
 			}
 		}
@@ -298,7 +304,11 @@ class AssetHelper extends Helper
 	 * @return mixed
 	 */
 	private function _getAssetParam($assetName, $paramName) {
-		return $this->config($assetName . '.' . $paramName);
+		if (CakeCompatibility::supportSetters()) {
+			return $this->getConfig($assetName . '.' . $paramName);
+		} else {
+			return $this->config($assetName . '.' . $paramName);
+		}
 	}
 
 	/**
@@ -310,7 +320,11 @@ class AssetHelper extends Helper
 	 */
 	private function _getParam($value, $name) {
 		if (empty($value)) {
-			$value = $this->request->param($name);
+			if (CakeCompatibility::supportSetters()) {
+				$value = $this->request->getParam($name);
+			} else {
+				$value = $this->request->param($name);
+			}
 		}
 		if (empty($value)) {
 			$value = self::DEFAULT_PARAMS[$name];
