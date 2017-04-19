@@ -23,10 +23,9 @@ abstract class DeploymentShell extends Shell
 	 * @param string $type тип репозитория - продакшн, тест, ...
 	 * @param string $repo обновляемая репа
 	 * @param string $branch обновляемая ветка
-	 * @param string $commit к чему обновляемся. для замиси в лог
 	 */
-	public static function deployInBg($type, $repo, $branch, $commit) {
-		self::_deployInBg($type, compact('repo', 'branch', 'commit'));
+	public static function deployInBg($type, $repo, $branch) {
+		self::_deployInBg($type, compact('repo', 'branch'));
 	}
 
 	/**
