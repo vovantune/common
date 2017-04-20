@@ -654,7 +654,6 @@ class Deployer
 
 		Log::info(implode("\n", $this->_output), [
 			'scope' => [$this->_logScope],
-			SentryLog::KEY_SENTRY_SEND => true,
 		]);
 
 		$this->_output = [];
