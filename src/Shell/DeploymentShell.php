@@ -37,20 +37,6 @@ abstract class DeploymentShell extends Shell
 		self::_deployInBg($type, ['current' => true]);
 	}
 
-	/**
-	 * Деплой в фоновом режиме
-	 *
-	 * @param string $type
-	 * @param array $params
-	 */
-	private static function _deployInBg($type, array $params) {
-		$stringParams = escapeshellarg(json_encode($params));
-		$type = escapeshellarg($type);
-		$shellName = namespaceSplit(static::class)[1];
-		$shellName = Inflector::underscore(Strings::replacePostfix($shellName, 'Shell'));
-		\ArtSkills\Lib\Shell::execInBackground(static::CAKE_PATH . " $shellName deploy --type=$type --data=$stringParams");
-	}
-
 	/** @inheritdoc */
 	public function getOptionParser() {
 		$parser = parent::getOptionParser();
@@ -131,17 +117,6 @@ abstract class DeploymentShell extends Shell
 	}
 
 	/**
-	 * В зависимости от типа создать объект деплойщика
-	 *
-	 * @param string $type
-	 * @return \ArtSkills\Lib\Deployer
-	 * @throws \Exception
-	 */
-	protected function _getDeployer($type) {
-		return Deployer::createFromConfig($type);
-	}
-
-	/**
 	 * Откат
 	 * todo: сделать
 	 */
@@ -168,6 +143,31 @@ abstract class DeploymentShell extends Shell
 		} catch (\Exception $e) {
 			SentryLog::logException($e);
 		}
+	}
+
+	/**
+	 * Деплой в фоновом режиме
+	 *
+	 * @param string $type
+	 * @param array $params
+	 */
+	private static function _deployInBg($type, array $params) {
+		$stringParams = escapeshellarg(json_encode($params));
+		$type = escapeshellarg($type);
+		$shellName = namespaceSplit(static::class)[1];
+		$shellName = Inflector::underscore(Strings::replacePostfix($shellName, 'Shell'));
+		\ArtSkills\Lib\Shell::execInBackground(static::CAKE_PATH . " $shellName deploy --type=$type --data=$stringParams");
+	}
+
+	/**
+	 * В зависимости от типа создать объект деплойщика
+	 *
+	 * @param string $type
+	 * @return \ArtSkills\Lib\Deployer
+	 * @throws \Exception
+	 */
+	protected function _getDeployer($type) {
+		return Deployer::createFromConfig($type);
 	}
 
 }

@@ -9,7 +9,7 @@ class Strings
 	use Library;
 
 	/**
-	 * Проверка, что строка начинается с префикса
+	 * Проверка, что строка начинается с любого префикса из списка
 	 *
 	 * @param string $string
 	 * @param string|string[] $prefixes
@@ -25,10 +25,10 @@ class Strings
 	}
 
 	/**
-	 * Проверка, что строка заканчивается постфиксом
+	 * Проверка, что строка заканчивается любым постфиксом из списка
 	 *
 	 * @param string $string
-	 * @param string $postfixes
+	 * @param string|string[] $postfixes
 	 * @return bool
 	 */
 	public static function endsWith($string, $postfixes) {
@@ -70,7 +70,7 @@ class Strings
 	}
 
 	/**
-	 * Заменить префикс, если строка начинается с него
+	 * Заменить префикс из списка, если строка начинается с него
 	 *
 	 * @param string $string
 	 * @param string[]|string $prefixes
@@ -91,7 +91,7 @@ class Strings
 	}
 
 	/**
-	 * Заменить постфикс, если строка заканчивается им
+	 * Заменить постфикс из списка, если строка заканчивается им
 	 *
 	 * @param string $string
 	 * @param string[]|string $postfixes

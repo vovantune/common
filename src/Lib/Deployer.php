@@ -4,6 +4,7 @@ namespace ArtSkills\Lib;
 
 use ArtSkills\Log\Engine\SentryLog;
 use Cake\Core\Configure;
+use Cake\I18n\Time;
 use Cake\Log\Log;
 
 /**
@@ -250,23 +251,23 @@ class Deployer
 	 * Может не сработать, если неправильные права
 	 * Обратите внимание, что у симлинка владельцем будет текущий пользователь
 	 *
-	 * @param string $projectPath полный путь до проекта
+	 * @param string $absProjectPath полный путь до проекта
 	 * @param string $newFolderName новое название папки, относительный путь в том же каталоге, что и проект
 	 * @throws \Exception
 	 */
-	public static function makeProjectSymlink($projectPath, $newFolderName) {
-		if (is_link($projectPath) || !is_dir($projectPath)) {
+	public static function makeProjectSymlink($absProjectPath, $newFolderName) {
+		if (is_link($absProjectPath) || !is_dir($absProjectPath)) {
 			throw new \Exception('Передан некорректный каталог проекта');
 		}
-		$newFolderFullName = dirname($projectPath) . DS . $newFolderName;
+		$newFolderFullName = dirname($absProjectPath) . DS . $newFolderName;
 		if (file_exists($newFolderFullName)) {
 			throw new \Exception('Такой каталог уже есть');
 		}
 		$newFolderFullName = escapeshellarg($newFolderFullName);
-		$projectPath = escapeshellarg($projectPath);
+		$absProjectPath = escapeshellarg($absProjectPath);
 		$commands = [
-			"mv $projectPath $newFolderFullName",
-			"ln -s $newFolderFullName $projectPath"
+			"mv $absProjectPath $newFolderFullName",
+			"ln -s $newFolderFullName $absProjectPath"
 		];
 		list($success, $output, $resultCommand) = Shell::exec($commands);
 		if (!$success) {
@@ -283,6 +284,9 @@ class Deployer
 		$this->_isDeployEnv = Env::isProduction();
 		if (defined('CORE_VERSION')) {
 			$this->_currentVersion = CORE_VERSION;
+		}
+		if (defined('VERSION_FILE')) {
+			$this->_versionFile = VERSION_FILE;
 		}
 		foreach ($config as $property => $value) {
 			$property = '_' . $property;
@@ -325,7 +329,6 @@ class Deployer
 		if ($this->_autoMigrate && empty($this->_phinxCommand)) {
 			throw new \Exception('Явно задан параметр миграции, но не задана команда');
 		}
-
 
 		if (empty($this->_repoName)) {
 			throw new \Exception('Не указан репозиторий');
@@ -427,6 +430,8 @@ class Deployer
 	 */
 	protected function _run($repo, $branch) {
 		if (!$this->_canDeploy($repo, $branch)) {
+			$message = Time::now()->format('Y-m-d H:i:s') . ': Обновление не было запущено.';
+			Log::info($message, ['scope' => [$this->_logScope]]);
 			return false;
 		}
 		$nextRoot = $this->_getNextRoot();

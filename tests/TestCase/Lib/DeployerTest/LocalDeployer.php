@@ -51,6 +51,9 @@ class LocalDeployer extends Deployer
 		if (!array_key_exists('isDeployEnv', $config)) {
 			$config['isDeployEnv'] = true;
 		}
+		if (!array_key_exists('versionFile', $config)) {
+			$config['versionFile'] = self::VERSION_FILE_PATH;
+		}
 		$config['currentVersion'] = self::VERSION;
 		parent::__construct($config);
 	}
