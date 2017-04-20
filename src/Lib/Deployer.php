@@ -16,7 +16,7 @@ class Deployer
 
 	/**
 	 * Если не используется ротация и деплой идёт по живому
-	 * Заполнить либо это свойство, либо mainRoot + rotateDeployFolders
+	 * Заполнить либо это свойство, либо projectSymlink + rotateDeployFolders
 	 *
 	 * @var string
 	 */
