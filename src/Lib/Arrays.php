@@ -42,11 +42,12 @@ class Arrays
 	 * @return array
 	 */
 	public static function filterKeys(array $array, array $keys) {
-		return array_intersect_key($array, array_fill_keys($keys, 1));
+		return array_intersect_key($array, array_flip($keys));
 	}
 
 	/**
 	 * Проставить массиву ключи на основе их значений
+	 * Возможно, вместо этой функции вам нужен array_flip()
 	 *
 	 * @param string[]|int[] $values
 	 * @return array

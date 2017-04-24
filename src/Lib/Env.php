@@ -151,7 +151,10 @@ class Env
 	 * @throws \PHPUnit_Framework_ExpectationFailedException
 	 */
 	public static function checkTestException(\Exception $exception) {
-		if ($exception instanceof \PHPUnit_Framework_ExpectationFailedException) {
+		if (
+			$exception instanceof \PHPUnit_Framework_ExpectationFailedException
+			|| $exception instanceof \PHPUnit_Framework_AssertionFailedError
+		) {
 			throw $exception;
 		}
 	}

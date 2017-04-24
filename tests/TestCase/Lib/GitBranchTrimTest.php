@@ -1,6 +1,7 @@
 <?php
 namespace App\Test\TestCase\Shell\TrimBranchesTest;
 
+use ArtSkills\Lib\Shell;
 use ArtSkills\Lib\Git;
 use ArtSkills\Lib\GitBranchTrim;
 use ArtSkills\TestSuite\AppTestCase;
@@ -31,10 +32,11 @@ class GitBranchTrimTest extends AppTestCase
 		$actualHistory = $history;
 		$expectedHistory = [];
 		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
-			$expectedHistory[] = 'git branch -a';
-			$expectedHistory[] = 'git checkout master';
+			$expectedHistory[] = 'git branch -a 2>&1';
+			$expectedHistory[] = 'git checkout master 2>&1';
 		}
-		$expectedHistory[] = 'git remote update --prune';
+		$expectedHistory[] = 'git remote update --prune 2>&1';
+		$expectedHistory[] = 'git pull 2>&1';
 		foreach ([Git::BRANCH_TYPE_REMOTE, Git::BRANCH_TYPE_LOCAL] as $type) {
 			$expectedHistory = array_merge($expectedHistory, $this->_getCommandListMerged($type));
 			$mergedBranches = $git->getMergedBranches($type);
@@ -45,8 +47,8 @@ class GitBranchTrimTest extends AppTestCase
 			}
 		}
 		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
-			$expectedHistory[] = 'git branch -a';
-			$expectedHistory[] = 'git checkout ' . $branchBefore;
+			$expectedHistory[] = 'git branch -a 2>&1';
+			$expectedHistory[] = 'git checkout ' . $branchBefore . ' 2>&1';
 		}
 
 		self::assertEquals($expectedHistory, $actualHistory, 'Неправильный набор комманд');
@@ -59,14 +61,14 @@ class GitBranchTrimTest extends AppTestCase
 	 * @throws \Exception
 	 */
 	private function _mockExecute(&$history) {
-		MethodMocker::mock(Git::class, '_execute')
+		MethodMocker::mock(Shell::class, '_exec')
 			->willReturnAction(function ($args) use (&$history) {
 				$history[] = $args[0];
-				if (preg_match('/^git (branch( -[ar])?|for-each-ref.*)$/', $args[0])) {
-					exec($args[0], $output);
-					return $output;
+				if (preg_match('/^git (branch( -[ar])?|for-each-ref.*)/', $args[0])) {
+					exec($args[0], $output, $returnCode);
+					return [$returnCode === 0, $output];
 				} else {
-					return [];
+					return [true, []];
 				}
 			});
 	}
@@ -78,11 +80,11 @@ class GitBranchTrimTest extends AppTestCase
 	 * @return array|bool
 	 */
 	private function _getCommandListMerged($type) {
-		$list = ['git pull'];
+		$list = [];
 		if ($type == Git::BRANCH_TYPE_REMOTE) {
-			$list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/remotes/origin --merged';
+			$list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/remotes/origin --merged 2>&1';
 		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
-			$list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/heads --merged';
+			$list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/heads --merged 2>&1';
 		} else {
 			return false;
 		}
@@ -101,11 +103,10 @@ class GitBranchTrimTest extends AppTestCase
 		if (empty($list)) {
 			return false;
 		}
-		$list[] = 'git pull';
 		if ($type == Git::BRANCH_TYPE_REMOTE) {
-			$list[] = 'git push origin --delete ' . $branchDelete;
+			$list[] = 'git push origin --delete ' . $branchDelete . ' 2>&1';
 		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
-			$list[] = 'git branch ' . $branchDelete . ' -d';
+			$list[] = 'git branch ' . $branchDelete . ' -d 2>&1';
 		} else {
 			return false;
 		}

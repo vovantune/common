@@ -227,7 +227,8 @@ trait TestCaseTrait
 	 * @param bool $ignoreCase
 	 */
 	public function assertArraySubsetEquals(
-		array $expected, array $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false
+		array $expected, array $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false,
+		$ignoreCase = false
 	) {
 		$actual = array_intersect_key($actual, $expected);
 		self::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
@@ -276,5 +277,29 @@ trait TestCaseTrait
 		array $expectedArray, Entity $actualEntity, $message = '', $delta = 0.0, $maxDepth = 10
 	) {
 		self::assertEquals($expectedArray, $actualEntity->toArray(), $message, $delta, $maxDepth);
+	}
+
+	/**
+	 * Содержимое файла соответствует ожидаемой строке
+	 *
+	 * @param string $actualFile
+	 * @param string $expectedString
+	 * @param string $message
+	 * @param bool $canonicalize
+	 * @param bool $ignoreCase
+	 */
+	public function assertFileEqualsString(
+		$expectedString, $actualFile, $message = '', $canonicalize = false, $ignoreCase = false
+	) {
+		self::assertFileExists($actualFile, $message);
+		self::assertEquals(
+			$expectedString,
+			file_get_contents($actualFile),
+			$message,
+			0,
+			10,
+			$canonicalize,
+			$ignoreCase
+		);
 	}
 }

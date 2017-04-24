@@ -5,7 +5,6 @@ use ArtSkills\Database\Type\JsonType;
 use ArtSkills\TestSuite\AppTestCase;
 use Cake\Database\Type;
 use Cake\ORM\Table;
-use Cake\ORM\TableRegistry;
 
 /**
  * @property Table $TestTableFive
