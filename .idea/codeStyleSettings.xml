@@ -64,6 +64,12 @@
             <option name="USE_TAB_CHARACTER" value="true" />
           </indentOptions>
         </codeStyleSettings>
+        <codeStyleSettings language="JSON">
+          <indentOptions>
+            <option name="INDENT_SIZE" value="4" />
+            <option name="USE_TAB_CHARACTER" value="true" />
+          </indentOptions>
+        </codeStyleSettings>
         <codeStyleSettings language="JavaScript">
           <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
           <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
@@ -85,9 +91,6 @@
           <option name="METHOD_BRACE_STYLE" value="1" />
           <option name="SPECIAL_ELSE_IF_TREATMENT" value="true" />
           <option name="ALIGN_MULTILINE_FOR" value="false" />
-          <option name="CALL_PARAMETERS_WRAP" value="1" />
-          <option name="CALL_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
-          <option name="CALL_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
           <option name="METHOD_PARAMETERS_WRAP" value="1" />
           <option name="METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
           <option name="METHOD_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />

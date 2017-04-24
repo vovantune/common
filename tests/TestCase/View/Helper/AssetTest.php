@@ -448,13 +448,13 @@ class AssetTest extends AppTestCase
 	public function testAssetManualNotExists() {
 		MethodMocker::callPrivate(
 			$this->_assetHelper, '_setCurrentConfig', [
-			'test',
-			'manualNotExists',
-			[
-				AssetHelper::KEY_SCRIPT => 'js/TestManual/notExists.js',
-				AssetHelper::KEY_STYLE => 'css/TestManual/notExists.css',
-			],
-		]
+				'test',
+				'manualNotExists',
+				[
+					AssetHelper::KEY_SCRIPT => 'js/TestManual/notExists.js',
+					AssetHelper::KEY_STYLE => 'css/TestManual/notExists.css',
+				],
+			]
 		);
 		$this->_assetHelper->load('test', 'manualNotExists');
 	}
@@ -640,14 +640,14 @@ class AssetTest extends AppTestCase
 	public function testLoadParams() {
 		MethodMocker::callPrivate(
 			$this->_assetHelper, '_setCurrentConfig', [
-			'test',
-			'fromParams',
-			[
-				AssetHelper::KEY_VARS => [
-					'testLoad' => AssetHelper::TYPE_STRING,
+				'test',
+				'fromParams',
+				[
+					AssetHelper::KEY_VARS => [
+						'testLoad' => AssetHelper::TYPE_STRING,
+					],
 				],
-			],
-		]
+			]
 		);
 
 		$this->_request->addParams(['controller' => 'test', 'action' => 'fromParams']);

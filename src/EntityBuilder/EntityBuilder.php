@@ -364,8 +364,7 @@ class EntityBuilder
 	private static function _checkTableExists($tableName) {
 		$connection = DB::getConnection(static::$_config->connectionName);
 		$existingTables = $connection->query(
-			"SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config(
-			)['database'] . "' AND table_name='" . $tableName . "';"
+			"SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $tableName . "';"
 		)->fetchAll();
 		return $existingTables[0][0];
 	}
@@ -668,9 +667,9 @@ class EntityBuilder
 
 			$result[$propertyName] = ' * @property ' . $className . (in_array(
 					$assoc->type(), [
-					'oneToMany',
-					'manyToMany',
-				]
+						'oneToMany',
+						'manyToMany',
+					]
 				) ? '[]' : '') . ' $' . $propertyName . ' `' .
 				implode('`, `', (array)$foreignKeys) . '` => `' .
 				implode('`, `', (array)$bindingKeys) . '`';
@@ -689,10 +688,9 @@ class EntityBuilder
 		$table = self::_getTable($entityName);
 
 		$connection = DB::getConnection(static::$_config->connectionName);
-		$tableName = CakeCompatibility::supportSetters()? $table->getTable(): $table->table();
+		$tableName = CakeCompatibility::supportSetters() ? $table->getTable() : $table->table();
 		$tableComment = $connection->query(
-			"SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config(
-			)['database'] . "' AND table_name='" . $tableName . "';"
+			"SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $tableName . "';"
 		)->fetchAll();
 		if (!empty($tableComment) && !empty($tableComment[0][0])) {
 			return ' * @tableComment ' . $tableComment[0][0];
