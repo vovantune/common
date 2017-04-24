@@ -87,4 +87,60 @@ class ArraysTest extends AppTestCase
 		self::assertEquals(null, Arrays::get(null, $hasNotKey));
 	}
 
+	/** инициализация значения */
+	public function testInitPath() {
+		$array = [];
+		$key = 'key1';
+		$value = 'test';
+		$newValue = 'asd';
+
+		// ключа нет - запишется
+		Arrays::initPath($array, $key, $value);
+		self::assertEquals($value, $array[$key]);
+
+		// ключ уже есть - не запишется
+		Arrays::initPath($array, $key, $newValue);
+		self::assertEquals($value, $array[$key]);
+
+		// вложенность
+		$keyNestedFirst = 'nest1';
+		$keyNestedSecond = 'nest2';
+		$keyNestedThird = 'nest3';
+		$value = 'test1';
+
+		// ключа нет - запишется
+		Arrays::initPath($array, [$keyNestedFirst, $keyNestedSecond, $keyNestedThird], $value);
+		self::assertEquals($value, $array[$keyNestedFirst][$keyNestedSecond][$keyNestedThird]);
+
+		// ключ уже есть - не запишется
+		Arrays::initPath($array, [$keyNestedFirst, $keyNestedSecond, $keyNestedThird], $newValue);
+		self::assertEquals($value, $array[$keyNestedFirst][$keyNestedSecond][$keyNestedThird]);
+
+		// часть пути уже есть
+		$keyNestedThird = 'nest3.1';
+		$value = 'test2';
+		Arrays::initPath($array, [$keyNestedFirst, $keyNestedSecond, $keyNestedThird], $value);
+		self::assertEquals($value, $array[$keyNestedFirst][$keyNestedSecond][$keyNestedThird]);
+	}
+
+	/**
+	 * на пути есть немассив
+	 *
+	 * @expectedException \Exception
+	 * @expectedExceptionMessage По ключу nest2 находится не массив
+	 */
+	public function testInitPathFail() {
+		$keyNestedFirst = 'nest1';
+		$keyNestedSecond = 'nest2';
+		$keyNestedThird = 'nest3';
+		$value = 'test';
+		$array = [
+			$keyNestedFirst => [
+				$keyNestedSecond => 'asd',
+			],
+		];
+
+		Arrays::initPath($array, [$keyNestedFirst, $keyNestedSecond, $keyNestedThird], $value);
+	}
+
 }
