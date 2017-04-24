@@ -304,7 +304,7 @@ class DeployTest extends AppTestCase
 	 */
 	private function _testNothingHappens($repo, $branch, $config = []) {
 		$this->_mockExec(1);
-		$this->_mockOther(2, 0, 0, 0);
+		$this->_mockOther(2, 0, 1, 0);
 
 		$deployer = new LocalDeployer($config);
 		$res = $deployer->deploy($repo, $branch);
