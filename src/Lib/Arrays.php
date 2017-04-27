@@ -42,11 +42,12 @@ class Arrays
 	 * @return array
 	 */
 	public static function filterKeys(array $array, array $keys) {
-		return array_intersect_key($array, array_fill_keys($keys, 1));
+		return array_intersect_key($array, array_flip($keys));
 	}
 
 	/**
 	 * Проставить массиву ключи на основе их значений
+	 * Возможно, вместо этой функции вам нужен array_flip()
 	 *
 	 * @param string[]|int[] $values
 	 * @return array
@@ -91,6 +92,34 @@ class Arrays
 			return $array[$key];
 		} else {
 			return $default;
+		}
+	}
+
+	/**
+	 * Инициализировать значение в массиве по ключу или пути из ключей
+	 * Для уменьшения количества однообразных ифчиков вида
+	 * if (empty($array[$key])) $array[$key] = [];
+	 * if (empty($array[$key][$key2])) $array[$key][$key2] = [];
+	 * if (empty($array[$key][$key2][$key3])) $array[$key][$key2][$key3] = 1;
+	 *
+	 * @param array $array
+	 * @param string|string[] $keyPath
+	 * @param mixed $defaultValue
+	 * @throws \Exception
+	 */
+	public static function initPath(array &$array, $keyPath, $defaultValue) {
+		$keyPath = (array)$keyPath;
+		$lastKey = array_pop($keyPath);
+		foreach ($keyPath as $key) {
+			if (!array_key_exists($key, $array)) {
+				$array[$key] = [];
+			} elseif (!is_array($array[$key])) {
+				throw new \Exception("По ключу $key находится не массив");
+			}
+			$array = &$array[$key];
+		}
+		if (!array_key_exists($lastKey, $array)) {
+			$array[$lastKey] = $defaultValue;
 		}
 	}
 

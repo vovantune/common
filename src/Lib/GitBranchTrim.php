@@ -1,5 +1,6 @@
 <?php
 namespace ArtSkills\Lib;
+
 use Cake\I18n\Time;
 
 /**
@@ -82,6 +83,7 @@ class GitBranchTrim
 
 	/**
 	 * Объект гита
+	 *
 	 * @return Git
 	 */
 	protected static function _git() {

@@ -9,15 +9,15 @@ class Strings
 	use Library;
 
 	/**
-	 * Проверка, что строка начинается с префикса
+	 * Проверка, что строка начинается с любого префикса из списка
 	 *
 	 * @param string $string
-	 * @param string|string[] $prefix
+	 * @param string|string[] $prefixes
 	 * @return bool
 	 */
-	public static function startsWith($string, $prefix) {
-		foreach ((array)$prefix as $prefixElement) {
-			if (stripos($string, $prefixElement) === 0) {
+	public static function startsWith($string, $prefixes) {
+		foreach ((array)$prefixes as $prefix) {
+			if (stripos($string, $prefix) === 0) {
 				return true;
 			}
 		}
@@ -25,18 +25,25 @@ class Strings
 	}
 
 	/**
-	 * Проверка, что строка заканчивается постфиксом
+	 * Проверка, что строка заканчивается любым постфиксом из списка
 	 *
 	 * @param string $string
-	 * @param string $postfix
+	 * @param string|string[] $postfixes
 	 * @return bool
 	 */
-	public static function endsWith($string, $postfix) {
-		return (strripos($string, $postfix) === (strlen($string) - strlen($postfix)));
+	public static function endsWith($string, $postfixes) {
+		$stringLength = strlen($string);
+		foreach ((array)$postfixes as $postfix) {
+			if (strripos($string, $postfix) === ($stringLength - strlen($postfix))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
 	 * Заменить или отрезать префикс у строки
+	 * Без проверок, когда точно знаете, что префикс есть
 	 * str_replace заменяет все вхождения, так что он не подходит
 	 *
 	 * @param string $string
@@ -49,7 +56,8 @@ class Strings
 	}
 
 	/**
-	 * Заменить или отрезать поствикс у строки
+	 * Заменить или отрезать постфикс у строки
+	 * Без проверок, когда точно знаете, что постфикс есть
 	 * str_replace заменяет все вхождения, так что он не подходит
 	 *
 	 * @param string $string
@@ -59,6 +67,48 @@ class Strings
 	 */
 	public static function replacePostfix($string, $postfix, $replacement = '') {
 		return (substr($string, 0, -strlen($postfix))) . $replacement;
+	}
+
+	/**
+	 * Заменить префикс из списка, если строка начинается с него
+	 *
+	 * @param string $string
+	 * @param string[]|string $prefixes
+	 * @param string $replacement
+	 * @param bool $concatOnFail добавить $replacement в случае отсутствия префикса или нет
+	 * @return string
+	 */
+	public static function replaceIfStartsWith($string, $prefixes, $replacement = '', $concatOnFail = false) {
+		foreach ((array)$prefixes as $prefix) {
+			if (self::startsWith($string, $prefix)) {
+				return self::replacePrefix($string, $prefix, $replacement);
+			}
+		}
+		if ($concatOnFail) {
+			$string = $replacement . $string;
+		}
+		return $string;
+	}
+
+	/**
+	 * Заменить постфикс из списка, если строка заканчивается им
+	 *
+	 * @param string $string
+	 * @param string[]|string $postfixes
+	 * @param string $replacement
+	 * @param bool $concatOnFail добавить $replacement в случае отсутствия префикса или нет
+	 * @return string
+	 */
+	public static function replaceIfEndsWith($string, $postfixes, $replacement = '', $concatOnFail = false) {
+		foreach ((array)$postfixes as $postfix) {
+			if (self::endsWith($string, $postfix)) {
+				return self::replacePostfix($string, $postfix, $replacement);
+			}
+		}
+		if ($concatOnFail) {
+			$string .= $replacement;
+		}
+		return $string;
 	}
 
 
