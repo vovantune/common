@@ -1,6 +1,9 @@
 <?php
+
 namespace ArtSkills\Controller;
 
+
+use ArtSkills\Lib\CakeCompatibility;
 
 class Controller extends \Cake\Controller\Controller
 {
@@ -47,9 +50,15 @@ class Controller extends \Cake\Controller\Controller
 		$jsonArray['_jsonOptions'] = JSON_UNESCAPED_UNICODE;
 
 		$this->set($jsonArray);
-		$this->viewBuilder()->className('Json');
+		if (CakeCompatibility::supportSetters()) {
+			$this->viewBuilder()->setClassName('Json');
+			$jsonPResponse = !empty($this->request->getQuery('callback'));
+		} else {
+			$this->viewBuilder()->className('Json');
+			$jsonPResponse = !empty($this->request->query('callback'));
+		}
 
-		if (isset($this->request->query['callback'])) {
+		if ($jsonPResponse) {
 			$this->response->type('application/x-javascript');
 			$this->set('_jsonp', true);
 		} else {
@@ -57,9 +66,4 @@ class Controller extends \Cake\Controller\Controller
 		}
 		return null;
 	}
-
-
-
-
-
 }

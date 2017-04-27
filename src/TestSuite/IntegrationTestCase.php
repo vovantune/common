@@ -3,6 +3,7 @@ namespace ArtSkills\TestSuite;
 
 use ArtSkills\Controller\Controller;
 use ArtSkills\Lib\Arrays;
+use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\Env;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\TestSuite\Mock\MethodMockerEntity;
@@ -76,8 +77,14 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 		}
 
 		$this->assertResponseOk();
-		self::assertJson($this->_response->body(), 'Получен ответ не в формате JSON');
-		return json_decode($this->_response->body(), true);
+		if (CakeCompatibility::supportSetters()) {
+			$rawBody = (string)$this->_response->getBody();
+		} else {
+			$rawBody = $this->_response->body();
+		}
+
+		self::assertJson($rawBody, 'Получен ответ не в формате JSON');
+		return json_decode($rawBody, true);
 	}
 
 	/**

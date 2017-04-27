@@ -1,6 +1,22 @@
 <?php
 namespace ArtSkills\Lib;
 
+/**
+ * Запись в CSV файл. Работает в двух решимах:
+ *  - Построчная запись (для больших объёмов данных)
+ * ```php
+ * $svFile = new CsvWriter('svFile.csv', 'cp1251', ',');
+ * while ($data = $query->fetchRow()) {
+ *     $svFile->writeRow($data);
+ * }
+ * $svFile->close(); // также возможно сделать unset($svFile) - сохраняет данные при вызове деструктора
+ * ```
+ *
+ * - Запись ассоциативного массива целиком
+ * ```php
+ * $result = CsvWriter::writeCsv('svFile.csv', $lines, 'cp1251', ',');
+ * ```
+ */
 class CsvWriter
 {
 	/**
