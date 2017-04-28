@@ -62,6 +62,13 @@ class Folder extends \Cake\Filesystem\Folder
 		return $res;
 	}
 
+	/** @inheritdoc */
+	public function move($options) {
+		$res = parent::move($options);
+		$this->cd($this->_virtualPath);
+		return $res;
+	}
+
 	/**
 	 * Чистилка временных папок. Выбирает РЕКУРСИВНО файлы в папке $dirPath
 	 * по шаблону $exp с временем жизни больше $lifetime и удаляет
