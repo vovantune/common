@@ -98,11 +98,11 @@ abstract class DeploymentShell extends Shell
 		if (empty($this->params['data'])) {
 			$this->abort('Не указан обязательный параметр data');
 		}
+		$data = Arrays::decode($this->params['data']);
 		$deployer = $this->_getDeployer($this->params['type']);
 		if (!empty($data['current'])) {
 			$success = $deployer->deployCurrentBranch();
 		} else {
-			$data = Arrays::decode($this->params['data']);
 			if (empty($data) || empty($data['repo']) || empty($data['branch'])) {
 				$this->abort('Неправильно указан параметр data');
 			}
