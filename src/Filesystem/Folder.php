@@ -65,7 +65,7 @@ class Folder extends \Cake\Filesystem\Folder
 	/** @inheritdoc */
 	public function move($options) {
 		$res = parent::move($options);
-		$this->cd($this->_virtualPath);
+		$this->path = $this->_virtualPath;
 		return $res;
 	}
 
