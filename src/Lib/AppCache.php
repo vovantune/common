@@ -39,6 +39,7 @@ class AppCache
 		$isDebug = Env::isNotProduction();
 		$redisServer = Env::getRedisServer();
 		$redisPassword = Env::getRedisPassword();
+		$version = defined('CORE_VERSION') ? '_' . CORE_VERSION : '';
 
 		foreach ($cacheConfig as $configName => &$configItem) {
 			if (empty($configItem['className'])) {
@@ -54,7 +55,7 @@ class AppCache
 				$configItem['duration'] = static::$_debugCacheDuration;
 			}
 
-			$configItem['prefix'] = $currentServer . '_' . $configName . (!empty($configItem['prefix']) ? '_' . $configItem['prefix'] : '');
+			$configItem['prefix'] = $currentServer . $version . '_' . $configName . (!empty($configItem['prefix']) ? '_' . $configItem['prefix'] : '');
 		}
 		return $cacheConfig;
 	}
