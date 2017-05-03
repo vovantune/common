@@ -8,14 +8,38 @@ class AppCache
 {
 	const REDIS_CLASS_NAME = 'Redis';
 
+	/**
+	 * Этот кеш не чистится по умолчанию при flushExcept и при деплое
+	 * И в дебаг-режиме у него нормальное время жизни
+	 *
+	 * @var string[]
+	 */
 	protected static $_excludeFlushCacheList = ['session'];
+
+	/**
+	 * Время жизни кеша в дебаг-режиме
+	 *
+	 * @var string
+	 */
 	protected static $_debugCacheDuration = '+30 seconds';
 
 	/**
-	 * Чистит кэш
+	 * Почистить весь кеш
+	 */
+	public static function flushAll() {
+		static::flushExcept(false);
+	}
+
+	/**
+	 * Чистит кэш за исключением переданных конфигов
+	 * По умолчанию исключает static::$_excludeFlushCacheList
+	 *
 	 * @param array $skipConfigs
 	 */
-	public static function flush($skipConfigs = []) {
+	public static function flushExcept($skipConfigs = null) {
+		if ($skipConfigs === null) {
+			$skipConfigs = static::$_excludeFlushCacheList;
+		}
 		$skipConfigs = Arrays::keysFromValues($skipConfigs);
 		$cacheConfigs = Cache::configured();
 		foreach ($cacheConfigs as $configName) {
@@ -23,6 +47,13 @@ class AppCache
 				Cache::clear(false, $configName);
 			}
 		}
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static function flush($skipConfigs = null) {
+		static::flushExcept($skipConfigs);
 	}
 
 	/**
@@ -51,11 +82,16 @@ class AppCache
 				$configItem['password'] = $redisPassword;
 			}
 
-			if ($isDebug && !in_array($configName, static::$_excludeFlushCacheList)) {
-				$configItem['duration'] = static::$_debugCacheDuration;
+			$configVersionPrefix = $version;
+			if (in_array($configName, static::$_excludeFlushCacheList)) {
+				$configVersionPrefix = '';
+			} else {
+				if ($isDebug) {
+					$configItem['duration'] = static::$_debugCacheDuration;
+				}
 			}
 
-			$configItem['prefix'] = $currentServer . $version . '_' . $configName . (!empty($configItem['prefix']) ? '_' . $configItem['prefix'] : '');
+			$configItem['prefix'] = $currentServer . $configVersionPrefix . '_' . $configName . (!empty($configItem['prefix']) ? '_' . $configItem['prefix'] : '');
 		}
 		return $cacheConfig;
 	}

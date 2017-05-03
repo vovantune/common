@@ -17,7 +17,7 @@ class AppCacheTest extends AppTestCase
 		self::assertEquals(123, Cache::read('qwe', 'short'));
 		self::assertEquals(12345, Cache::read('qwerty', '_cake_core_'));
 		self::assertEquals(123456789, Cache::read('qwertyuio', 'default'));
-		AppCache::flush(['short']);
+		AppCache::flushExcept(['short']);
 		self::assertEquals(123, Cache::read('qwe', 'short'));
 		self::assertFalse(Cache::read('qwerty', '_cake_core_'));
 		self::assertFalse(Cache::read('qwertyuio', 'default'));
