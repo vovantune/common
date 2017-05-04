@@ -91,7 +91,11 @@ class ValueObject implements \JsonSerializable, \ArrayAccess
 	 * @return string
 	 */
 	public function toJson() {
-		return Arrays::encode($this, JSON_UNESCAPED_UNICODE);
+		$options = JSON_UNESCAPED_UNICODE;
+		if (Env::isDevelopment()) {
+			$options |= JSON_PRETTY_PRINT;
+		}
+		return Arrays::encode($this, $options);
 	}
 
 	/**
