@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use Cake\Error\Debugger;
@@ -82,6 +83,15 @@ class ValueObject implements \JsonSerializable, \ArrayAccess
 	 */
 	public function toArray() {
 		return json_decode(json_encode($this), true);
+	}
+
+	/**
+	 * Преобразуем в json строку
+	 *
+	 * @return string
+	 */
+	public function toJson() {
+		return Arrays::encode($this, JSON_UNESCAPED_UNICODE);
 	}
 
 	/**

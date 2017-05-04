@@ -10,12 +10,12 @@ class Arrays
 	/**
 	 * json_encode с JSON_UNESCAPED_UNICODE по умолчанию
 	 *
-	 * @param array $array
+	 * @param array|ValueObject $array
 	 * @param int $options
 	 * @param int $depth
 	 * @return string
 	 */
-	public static function encode(array $array, $options = JSON_UNESCAPED_UNICODE, $depth = 512) {
+	public static function encode($array, $options = JSON_UNESCAPED_UNICODE, $depth = 512) {
 		return json_encode($array, $options, $depth);
 	}
 

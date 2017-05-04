@@ -35,6 +35,8 @@ class ValueObjectTest extends AppTestCase
 			'field1' => 'qqq',
 			'field3' => 'azazaz',
 		], $obj->toArray());
+
+		self::assertEquals('{"field1":"qqq","field3":"azazaz"}', $obj->toJson());
 	}
 
 	/**
