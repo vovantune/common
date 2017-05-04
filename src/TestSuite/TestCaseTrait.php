@@ -108,7 +108,7 @@ trait TestCaseTrait
 	 * Чистка кеша
 	 */
 	protected function _clearCache() {
-		AppCache::flush(['_cake_core_', '_cake_model_']);
+		AppCache::flushExcept(['_cake_core_', '_cake_model_']);
 	}
 
 	/**

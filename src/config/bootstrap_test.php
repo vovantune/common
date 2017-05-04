@@ -20,7 +20,7 @@ if (!empty($existingTables)) {
 }
 unset($testConnection);
 
-\ArtSkills\Lib\AppCache::flush();
+\ArtSkills\Lib\AppCache::flushAll();
 
 \ArtSkills\Lib\Env::setFixtureFolder(TEST_FIXTURE);
 \ArtSkills\Lib\Env::setMockFolder(TESTS . 'Suite' . DS . 'Mock' . DS);

@@ -447,7 +447,7 @@ class Deployer
 		$this->_updateComposer();
 		$this->_migrateDb();
 
-		AppCache::flush();
+		AppCache::flushExcept();
 		$this->_setProjectSymlink($nextRoot);
 
 		$timeEnd = microtime(true);
