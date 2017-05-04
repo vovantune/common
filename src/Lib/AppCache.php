@@ -40,7 +40,7 @@ class AppCache
 		if ($skipConfigs === null) {
 			$skipConfigs = static::$_excludeFlushCacheList;
 		}
-		$skipConfigs = Arrays::keysFromValues($skipConfigs);
+		$skipConfigs = Arrays::keysFromValues((array)$skipConfigs);
 		$cacheConfigs = Cache::configured();
 		foreach ($cacheConfigs as $configName) {
 			if (empty($skipConfigs[$configName])) {
