@@ -27,10 +27,10 @@ class Controller extends \Cake\Controller\Controller
 	 * Возвращает ответ с ошибкой, сообщением, и прерывает выполнение
 	 *
 	 * @param string $message
-	 * @param array|ValueObject $jsonData дополнительные параметры если нужны
+	 * @param array $jsonData дополнительные параметры если нужны
 	 * @return NULL
 	 */
-	protected function _sendJsonError($message, $jsonData = []) {
+	protected function _sendJsonError($message, array $jsonData = []) {
 		return $this->_sendJsonResponse(['status' => self::JSON_STATUS_ERROR, 'message' => $message] + $jsonData);
 	}
 
@@ -43,6 +43,10 @@ class Controller extends \Cake\Controller\Controller
 	 * @internal У нас стандартизированный JSON: _sendJsonOk и _sendJsonError
 	 */
 	protected function _sendJsonResponse($jsonArray, $sendNull = false) {
+		if ($jsonArray instanceof ValueObject) {
+			$jsonArray = $jsonArray->toArray();
+		}
+
 		if (empty($jsonArray) && !$sendNull) {
 			$jsonArray['status'] = self::JSON_STATUS_OK;
 		}
