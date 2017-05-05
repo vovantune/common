@@ -4,6 +4,7 @@ namespace ArtSkills\Controller;
 
 
 use ArtSkills\Lib\CakeCompatibility;
+use ArtSkills\Lib\ValueObject;
 
 class Controller extends \Cake\Controller\Controller
 {
@@ -26,17 +27,17 @@ class Controller extends \Cake\Controller\Controller
 	 * Возвращает ответ с ошибкой, сообщением, и прерывает выполнение
 	 *
 	 * @param string $message
-	 * @param array $jsonData дополнительные параметры если нужны
+	 * @param array|ValueObject $jsonData дополнительные параметры если нужны
 	 * @return NULL
 	 */
-	protected function _sendJsonError($message, array $jsonData = []) {
+	protected function _sendJsonError($message, $jsonData = []) {
 		return $this->_sendJsonResponse(['status' => self::JSON_STATUS_ERROR, 'message' => $message] + $jsonData);
 	}
 
 	/**
 	 * Отправляем JSON/JSONP ответ клиенту
 	 *
-	 * @param array $jsonArray
+	 * @param array|ValueObject $jsonArray
 	 * @param bool $sendNull
 	 * @return null
 	 * @internal У нас стандартизированный JSON: _sendJsonOk и _sendJsonError
