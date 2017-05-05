@@ -1,7 +1,7 @@
 <?php
-namespace ArtSkills\Test\TestCase\Lib\ValueObjectTest;
+namespace ArtSkills\Test\TestCase\ValueObject;
 
-use ArtSkills\Lib\ValueObject;
+use ArtSkills\ValueObject\ValueObject;
 
 /**
  * @method $this setField1(mixed $value)

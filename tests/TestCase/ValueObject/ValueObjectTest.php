@@ -1,5 +1,5 @@
 <?php
-namespace ArtSkills\Test\TestCase\Lib\ValueObjectTest;
+namespace ArtSkills\Test\TestCase\ValueObject;
 
 use ArtSkills\TestSuite\AppTestCase;
 
