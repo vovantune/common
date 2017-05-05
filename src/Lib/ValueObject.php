@@ -2,6 +2,7 @@
 
 namespace ArtSkills\Lib;
 
+use ArtSkills\ORM\Entity;
 use Cake\Error\Debugger;
 use Cake\Log\Log;
 
@@ -27,10 +28,10 @@ class ValueObject implements \JsonSerializable, \ArrayAccess
 	/**
 	 * constructor.
 	 *
-	 * @param array $fillValues Список заполняемых свойств
+	 * @param array|Entity $fillValues Список заполняемых свойств
 	 * @throws \Exception
 	 */
-	public function __construct(array $fillValues = []) {
+	public function __construct($fillValues = []) {
 		$this->_fillExportedFields();
 
 		foreach ($fillValues as $key => $value) {
