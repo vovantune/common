@@ -1,7 +1,9 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\ValueObject;
 
 use ArtSkills\TestSuite\AppTestCase;
+use ArtSkills\ValueObject\ValueObjectDocumentation;
 
 class ValueObjectTest extends AppTestCase
 {
@@ -22,6 +24,7 @@ class ValueObjectTest extends AppTestCase
 			'field1' => 'zxc',
 			// field2 выключен
 			'field3' => 'vbn',
+			'field4' => null,
 		];
 		self::assertEquals($expectedArray, $obj->toArray());
 		self::assertEquals(json_encode($expectedArray), json_encode($obj));
@@ -34,26 +37,30 @@ class ValueObjectTest extends AppTestCase
 		self::assertEquals([
 			'field1' => 'qqq',
 			'field3' => 'azazaz',
+			'field4' => null,
 		], $obj->toArray());
 
 		self::assertEquals('{
     "field1": "qqq",
-    "field3": "azazaz"
+    "field3": "azazaz",
+    "field4": null
 }', $obj->toJson());
 	}
 
 	/**
 	 * плохой вызов магического метода
+	 *
 	 * @expectedException \Exception
-	 * @expectedExceptionMessage Undefined property field4
+	 * @expectedExceptionMessage Undefined property field5
 	 */
 	public function testBadProperty() {
 		$obj = new ValueObjectFixture();
-		$obj->setField4();
+		$obj->setField5();
 	}
 
 	/**
 	 * плохой вызов магического метода
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Invalid argument count when calling setField3
 	 */

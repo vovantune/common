@@ -10,7 +10,7 @@ class Arrays
 	/**
 	 * json_encode с JSON_UNESCAPED_UNICODE по умолчанию
 	 *
-	 * @param array|ValueObject $array
+	 * @param array|\ArtSkills\ValueObject\ValueObject $array
 	 * @param int $options
 	 * @param int $depth
 	 * @return string
