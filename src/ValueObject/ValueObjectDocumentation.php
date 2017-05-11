@@ -24,16 +24,19 @@ class ValueObjectDocumentation
 	 * Формируем JSDoc документацию по ValueObject файлу
 	 *
 	 * @param string $absFilePath
+	 * @param string $dstFolder где хранить JSDoc описание
 	 */
-	public static function build($absFilePath) {
-		Assert::fileExists($absFilePath);
+	public static function build($absFilePath, $dstFolder) {
+		Assert::file($absFilePath);
+		Assert::fileExists($dstFolder);
 
 		$fullNameSpace = static::_getFullNamespace($absFilePath);
 
 		$fullClassName = $fullNameSpace . '\\' . static::_getClassName($absFilePath);
 		$propertyList = self::_getPropertyList((new \ReflectionClass($fullClassName)), self::_getUsesList($absFilePath));
 
-		$jsDocFile = new File(Strings::replaceIfEndsWith($absFilePath, '.php', '.js'));
+		$jsDocFilePath = $dstFolder . DS . static::_convertPsr4ToPsr0($fullClassName) . '.js';
+		$jsDocFile = new File($jsDocFilePath);
 		if ($jsDocFile->exists()) {
 			$jsDocFile->delete();
 		}
@@ -163,7 +166,11 @@ class ValueObjectDocumentation
 	 * @param array $propertyList
 	 */
 	private static function _createJsDocFile(File $jsDocFile, $fullClassName, array $propertyList) {
-		$jsDocArr = ['/**', ' * @typedef {Object} ' . self::_convertPsr4ToPsr0($fullClassName)];
+		$jsDocArr = [
+			'// Auto generated file, to change structure edit ' . $fullClassName . ' php class',
+			'/**',
+			' * @typedef {Object} ' . self::_convertPsr4ToPsr0($fullClassName),
+		];
 		foreach ($propertyList as $propertyName => $propertyType) {
 			if ($propertyType !== self::DEFAULT_TYPE) {
 				$jsDocArr[] = ' * @property {' . self::_convertPsr4ToPsr0($propertyType) . '} ' . $propertyName;

@@ -10,9 +10,11 @@ class ValueObjectDocumentationTest extends AppTestCase
 {
 	/** Генерилка доки */
 	public function testMain() {
-		ValueObjectDocumentation::build(__DIR__ . '/ValueObjectFixture.php');
-		$jsDocFile = __DIR__ . '/ValueObjectFixture.js';
-		self::assertEquals("/**
+		ValueObjectDocumentation::build(__DIR__ . '/ValueObjectFixture.php', __DIR__);
+		$jsDocFile = __DIR__ . '/ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture.js';
+		self::assertFileExists($jsDocFile);
+		self::assertEquals("// Auto generated file, to change structure edit ArtSkills\Test\TestCase\ValueObject\ValueObjectFixture php class
+/**
  * @typedef {Object} ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture
  * @property {string} field1
  * @property field2
