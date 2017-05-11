@@ -12,7 +12,7 @@ use phpDocumentor\Reflection\Types\Context;
 use Webmozart\Assert\Assert;
 
 /**
- * Билдилка документации по ValueObject
+ * Построитель документации по [ValueObject](https://github.com/ArtSkills/common/src/ValueObject/README.md)
  */
 class ValueObjectDocumentation
 {

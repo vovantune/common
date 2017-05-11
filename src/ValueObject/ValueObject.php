@@ -10,9 +10,11 @@ use Cake\Error\Debugger;
 use Cake\Log\Log;
 
 /**
- * TODO: изучть https://symfony.com/doc/current/components/serializer.html для вомзможного применения
+ * Основной класс [объекта-значения](https://github.com/ArtSkills/common/src/ValueObject/README.md).
+ *
+ * TODO: изучить https://symfony.com/doc/current/components/serializer.html для вомзможного применения
  */
-class ValueObject implements \JsonSerializable, \ArrayAccess
+abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 {
 	/** Методы, которые не экспортируются через json_encode */
 	const EXCLUDE_EXPORT_PROPS = [];
