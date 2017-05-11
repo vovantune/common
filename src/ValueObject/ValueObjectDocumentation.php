@@ -20,6 +20,16 @@ class ValueObjectDocumentation
 
 	const DEFAULT_TYPE = 'mixed';
 
+	/** Псевдонимы типов данных в JS  */
+	const JS_TYPE_ALIAS = [
+		'bool' => 'boolean',
+		'bool[]' => 'boolean[]',
+		'mixed' => '*',
+		'integer' => 'int',
+		'integer[]' => 'int[]',
+		'array' => 'Object',
+	];
+
 	/**
 	 * Формируем JSDoc документацию по ValueObject файлу
 	 *
@@ -89,11 +99,10 @@ class ValueObjectDocumentation
 		$result = [];
 		if (preg_match_all('/^use (.*);$/m', $flContent, $usesList)) {
 			foreach ($usesList[1] as $use) {
-				if (preg_match('/^([^\s]+)\sas\s(.+)$/i', $use, $aliasMath)) { // use \ArtSkills\Strings as MyString
+				if (preg_match('/^([\S]+)\sas\s(.+)$/i', $use, $aliasMath)) { // use \ArtSkills\Strings as MyString
 					$result[$aliasMath[2]] = $aliasMath[1];
 				} else {
-					$useArr = explode("\\", $use);
-					$result[$useArr[count($useArr) - 1]] = $use;
+					$result[Strings::lastPart("\\", $use)] = $use;
 				}
 			}
 		}
@@ -173,12 +182,31 @@ class ValueObjectDocumentation
 		];
 		foreach ($propertyList as $propertyName => $propertyType) {
 			if ($propertyType !== self::DEFAULT_TYPE) {
-				$jsDocArr[] = ' * @property {' . self::_convertPsr4ToPsr0($propertyType) . '} ' . $propertyName;
+				$jsDocArr[] = ' * @property {' . static::_getJsVariableName($propertyType) . '} ' . $propertyName;
 			} else {
 				$jsDocArr[] = ' * @property ' . $propertyName;
 			}
 		}
 		$jsDocArr[] = ' */';
 		$jsDocFile->write(implode("\n", $jsDocArr) . "\n");
+	}
+
+	/**
+	 * Определяем JS тип исходня из PHP типа
+	 *
+	 * @param string $propertyType
+	 * @return string
+	 */
+	private static function _getJsVariableName($propertyType) {
+		if (empty($propertyType)) {
+			return '*';
+		}
+
+		$propertyType = self::_convertPsr4ToPsr0($propertyType);
+		if (array_key_exists($propertyType, static::JS_TYPE_ALIAS)) {
+			return static::JS_TYPE_ALIAS[$propertyType];
+		} else {
+			return $propertyType;
+		}
 	}
 }
