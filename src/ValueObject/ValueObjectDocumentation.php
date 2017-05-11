@@ -9,7 +9,7 @@ use ArtSkills\Traits\Library;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\Context;
-use Webmozart\Assert\Assert;
+use ArtSkills\Error\Assert;
 
 /**
  * Построитель документации по [ValueObject](https://github.com/ArtSkills/common/src/ValueObject/README.md)
