@@ -13,13 +13,13 @@ class ValueObjectDocumentationTest extends AppTestCase
 {
 	/** Генерилка доки */
 	public function testMain() {
-		ValueObjectDocumentation::build(__DIR__ . '/ValueObjectFixture.php', __DIR__);
-		$jsDocFile = __DIR__ . '/ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture.js';
+		ValueObjectDocumentation::buildJsDoc(__DIR__ . '/ValueObjectFixture.php', TMP);
+		$jsDocFile = TMP . 'ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture.js';
 		self::assertFileExists($jsDocFile);
 		self::assertEquals("// Auto generated file, to change structure edit ArtSkills\Test\TestCase\ValueObject\ValueObjectFixture php class
 /**
  * @typedef {Object} ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture
- * @property {string} field1
+ * @property {string} field1 блаблабла трололо
  * @property field2
  * @property {ArtSkills_Lib_Strings} field3
  * @property {Cake_Utility_String} field4
@@ -28,14 +28,118 @@ class ValueObjectDocumentationTest extends AppTestCase
 		unlink($jsDocFile);
 	}
 
-	/** namespace в файле */
-	public function testGetFullNamespace() {
-		self::assertEquals(namespaceSplit(ValueObjectFixture::class)[0], MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getFullNamespace', [__FILE__]));
-	}
-
-	/** Имя класса из файла */
-	public function testGetClassName() {
-		self::assertEquals(namespaceSplit(ValueObjectFixture::class)[1], MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getClassName', [__DIR__ . '/ValueObjectFixture.php']));
+	/** Дока с наследованием */
+	public function testMainInheritance() {
+		ValueObjectDocumentation::buildJsonSchema(__DIR__ . '/ValueObjectFixtureSecond.php', TMP, 'https://www.artskills.ru/jsonSchema/');
+		$jsDocFile = TMP . 'ArtSkills_Test_TestCase_ValueObject_ValueObjectFixtureSecond.json';
+		self::assertFileExists($jsDocFile);
+		self::assertEquals([
+			'$schema' => 'http://json-schema.org/draft-04/schema#',
+			'title' => 'ArtSkills_Test_TestCase_ValueObject_ValueObjectFixtureSecond',
+			'description' => 'ArtSkills\Test\TestCase\ValueObject\ValueObjectFixtureSecond php class',
+			'type' => 'object',
+			'properties' => [
+				'thisProperty' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_ValueObjectFixtureSecond.json',
+						],
+					],
+				],
+				'multiplyProperty' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'type' => 'integer',
+						],
+						2 => [
+							'type' => 'string',
+						],
+					],
+				],
+				'intArray' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'type' => 'array',
+							'items' => [
+								'type' => 'integer',
+							],
+							'minItems' => 0,
+						],
+					],
+				],
+				'arrayArray' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'type' => 'object',
+						],
+					],
+				],
+				'mixedProperty' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'description' => '',
+						],
+					],
+				],
+				'field1' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'type' => 'string',
+							'description' => 'блаблабла трололо',
+						],
+					],
+				],
+				'field2' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'description' => "\nТип данных у свойства \"ArtSkills\Test\TestCase\ValueObject\ValueObjectFixtureSecond::field2\" не описан.",
+						],
+					],
+				],
+				'field3' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_Strings.json',
+						],
+					],
+				],
+				'field4' => [
+					'oneOf' => [
+						0 => [
+							'type' => 'null',
+						],
+						1 => [
+							'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_CakeString.json',
+						],
+					],
+				],
+			],
+		], json_decode(file_get_contents($jsDocFile), true));
+		unlink($jsDocFile);
 	}
 
 	/** Список использованных объектов */
@@ -45,21 +149,5 @@ class ValueObjectDocumentationTest extends AppTestCase
 			'ValueObject' => ValueObject::class,
 			'CakeString' => String::class,
 		], MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getUsesList', [__DIR__ . '/ValueObjectFixture.php']));
-	}
-
-	/** Преобразовываем имя из namespace в PSR0 */
-	public function testConvertPsr4ToPsr0() {
-		self::assertEquals('Test_Object', MethodMocker::callPrivate(ValueObjectDocumentation::class, '_convertPsr4ToPsr0', ['\Test\Object']));
-		self::assertEquals('Test_ObjectSecond', MethodMocker::callPrivate(ValueObjectDocumentation::class, '_convertPsr4ToPsr0', ['App\Test\ObjectSecond']));
-		self::assertEquals('Test_ObjectThird', MethodMocker::callPrivate(ValueObjectDocumentation::class, '_convertPsr4ToPsr0', ['Test\ObjectThird']));
-	}
-
-	/** Определяем JS тип исходня из PHP типа */
-	public function testGetJsVariableName() {
-		self::assertEquals('Test_Object[]', MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getJsVariableName', ['\Test\Object[]']));
-		self::assertEquals('*', MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getJsVariableName', [null]));
-		self::assertEquals('boolean', MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getJsVariableName', ['bool']));
-		self::assertEquals('int[]', MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getJsVariableName', ['integer[]']));
-		self::assertEquals('float', MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getJsVariableName', ['float']));
 	}
 }
