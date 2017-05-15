@@ -10,12 +10,5 @@ use Cake\Log\Log;
  */
 class Assert extends \Webmozart\Assert\Assert
 {
-	protected static function reportInvalidArgument($message) {
-		if (Env::isDevelopment()) {
-			parent::reportInvalidArgument($message);
-		} else {
-			Log::error($message);
-		}
-	}
-
+	
 }

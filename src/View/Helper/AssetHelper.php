@@ -273,7 +273,7 @@ class AssetHelper extends Helper
 	 * или при попытке переопределить переменную, когда это не разрешено
 	 */
 	public function setVars(array $variables, $overwrite = false) {
-		Assert::isArray($variables);
+		Assert::isArray($variables, 'Переменные должны быть массивом [название => значение]');
 
 		foreach ($variables as $varName => $varValue) {
 			$varName = $this->_validVarName($varName);
@@ -502,7 +502,7 @@ class AssetHelper extends Helper
 	 * @param string $assetName
 	 * @param string $type скрипт или стиль
 	 * @param bool $realPath возвращать uri или путь к файлу
-	 * @return string[]|string
+	 * @return string[]|string|null
 	 * @throws \Exception если файл явно указан, а его нет
 	 */
 	private function _getPath($assetName, $type, $realPath = false) {
