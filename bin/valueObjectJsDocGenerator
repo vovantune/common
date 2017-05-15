@@ -5,7 +5,7 @@
  */
 
 namespace ArtSkillsCommon {
-	require_once __DIR__ .'../src/config/bootstrap.bin.php';
+	require_once __DIR__ .'/../src/config/bootstrap.bin.php';
 
 	use ArtSkills\Filesystem\Folder;
 	use ArtSkills\ValueObject\ValueObjectDocumentation;
