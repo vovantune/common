@@ -32,7 +32,7 @@ ValueObjectDocumentation::buildJsonSchema(string $absFilePath, string $dstSchema
 ```
 Логика аналогична ```ValueObjectDocumentation::buildJsDoc```.
 
-### Скрипт формирования документации
+### Скрипт формирования документации JSDoc
 ```php 
 vendor/artskills/common/bin/valueObjectJsDocGenerator src_file|src_dir dst_dir
 ```
@@ -41,3 +41,9 @@ vendor/artskills/common/bin/valueObjectJsDocGenerator src_file|src_dir dst_dir
 * Scope: в какой папке проекта лежат данные объекты, например, ```file[site]:src/Response//*```
 * Program: путь для PHP, например, ```/usr/local/bin/php```
 * Arguments: ```$ProjectFileDir$/vendor/artskills/common/bin/valueObjectJsDocGenerator $FilePath$ $ProjectFileDir$/webroot/js/TypeDef/ValueObject```
+
+### Скрипт формирования JSON schema
+```php 
+vendor/artskills/common/bin/valueObjectJsonSchemaGenerator src_file|src_dir dst_dir dst_url
+```
+Настраивается аналогично ```valueObjectJsDocGenerator```.

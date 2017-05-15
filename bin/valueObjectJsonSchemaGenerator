@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /**
- * Генератор JSDoc описания для ValueObject в той же папке, где и сам файл
+ * Генератор Json схемы для ValueObject в той же папке, где и сам файл
  */
 
 namespace ArtSkillsCommon {
@@ -11,7 +11,7 @@ namespace ArtSkillsCommon {
 	use ArtSkills\ValueObject\ValueObjectDocumentation;
 
 	if ($_SERVER['argc'] !== 3) {
-		echo 'Usage: valueObjectJsDocGenerator src_file|src_dir dst_dir' . PHP_EOL;
+		echo 'Usage: valueObjectJsDocGenerator src_file|src_dir dst_dir dst_url' . PHP_EOL;
 		exit(0);
 	}
 
@@ -19,9 +19,9 @@ namespace ArtSkillsCommon {
 		$dir = new Folder($_SERVER['argv'][1]);
 		$fileList = $dir->findRecursive('.*\.php');
 		foreach ($fileList as $filePath) {
-			ValueObjectDocumentation::buildJsDoc($filePath, $_SERVER['argv'][2]);
+			ValueObjectDocumentation::buildJsonSchema($filePath, $_SERVER['argv'][2], $_SERVER['argv'][3]);
 		}
 	} else {
-		ValueObjectDocumentation::buildJsDoc($_SERVER['argv'][1], $_SERVER['argv'][2]);
+		ValueObjectDocumentation::buildJsonSchema($_SERVER['argv'][1], $_SERVER['argv'][2], $_SERVER['argv'][3]);
 	}
 }

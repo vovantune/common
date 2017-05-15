@@ -93,6 +93,7 @@ class ValueObjectDocumentation
 	public static function buildJsonSchema($absFilePath, $dstSchemaFolder, $schemaLocationUrl) {
 		Assert::file($absFilePath);
 		Assert::fileExists($dstSchemaFolder);
+		Assert::notEmpty($schemaLocationUrl);
 
 		$fullClassName = static::_getFullNamespace($absFilePath) . '\\' . static::_getClassName($absFilePath);
 		$propertyList = static::_getPropertyList((new \ReflectionClass($fullClassName)), static::_getUsesList($absFilePath));
