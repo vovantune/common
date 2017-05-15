@@ -115,7 +115,7 @@ class DeployTest extends AppTestCase
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction 2>&1",
+			"php composer.phar install --optimize-autoloader --no-dev --no-interaction 2>&1",
 			'vendor/bin/phinx migrate 2>&1',
 			"ln -snf '{$this->_nextRoot}' '$mainRoot' 2>&1",
 			"cd {$this->_currentDir}",
@@ -148,7 +148,7 @@ class DeployTest extends AppTestCase
 			"cd $rootSub",
 			'git pull 2>&1',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction 2>&1",
+			"php composer.phar install --optimize-autoloader --no-dev --no-interaction 2>&1",
 			'vendor/bin/phinx migrate 2>&1',
 			"cd {$this->_currentDir}",
 		];
@@ -178,7 +178,7 @@ class DeployTest extends AppTestCase
 
 	/** Что если не обновился композер */
 	public function testComposerFail() {
-		$this->_mockExec(4, '/^php composer.phar update/');
+		$this->_mockExec(4, '/^php composer.phar install/');
 		$this->_mockOther(2, 1, 0, 1);
 		$this->_expectException('Не удалось обновить композер');
 
@@ -192,7 +192,7 @@ class DeployTest extends AppTestCase
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction 2>&1",
+			"php composer.phar install --optimize-autoloader --no-dev --no-interaction 2>&1",
 			"cd {$this->_currentDir}",
 		];
 		self::assertEquals($expectedCommandList, $this->_executeHistory);
@@ -214,7 +214,7 @@ class DeployTest extends AppTestCase
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
 			'putenv HOME=/var/www',
-			"php composer.phar update 'artskills/common' --optimize-autoloader --no-dev --no-interaction 2>&1",
+			"php composer.phar install --optimize-autoloader --no-dev --no-interaction 2>&1",
 			'vendor/bin/phinx migrate 2>&1',
 			"cd {$this->_currentDir}",
 		];
@@ -359,14 +359,13 @@ class DeployTest extends AppTestCase
 	}
 
 	/** не перечислены зависимости и не надо копировать файлы */
-	public function testNoDependenciesNoCopy() {
+	public function testNoCopy() {
 		$mainRoot = LocalDeployer::SYMLINK;
 
-		$this->_mockExec(4);
-		$this->_mockOther(2, 0, 1, 1);
+		$this->_mockExec(5);
+		$this->_mockOther();
 
 		$deployer = new LocalDeployer([
-			'composerDependencies' => false,
 			'copyFileList' => [],
 		]);
 		$res = $deployer->deploy($this->_repo, $this->_branch);
@@ -376,6 +375,8 @@ class DeployTest extends AppTestCase
 			"cd '{$this->_nextRootSub}' 2>&1 && (git rev-parse --abbrev-ref HEAD 2>&1)",
 			"cd {$this->_nextRootSub}",
 			'git pull 2>&1',
+			'putenv HOME=/var/www',
+			'php composer.phar install --optimize-autoloader --no-dev --no-interaction 2>&1',
 			'vendor/bin/phinx migrate 2>&1',
 			"ln -snf '{$this->_nextRoot}' '$mainRoot' 2>&1",
 			"cd {$this->_currentDir}",
@@ -404,7 +405,7 @@ class DeployTest extends AppTestCase
 			"cd {$this->_nextRootSub}",
 			"cp '" . self::COPY_FILE_FROM . "' '" . self::COPY_FILE_TO . "' 2>&1",
 			'git pull 2>&1',
-			"php composer.phar update 'artskills/common' --no-interaction 2>&1",
+			"php composer.phar install --no-interaction 2>&1",
 			'vendor/bin/phinx migrate 2>&1',
 			"ln -snf '{$this->_nextRoot}' '$mainRoot' 2>&1",
 			"cd {$this->_currentDir}",
