@@ -43,13 +43,20 @@ class ValueObjectDocumentation
 	const JSON_SCHEMA_TYPE_ALIAS = [
 		'bool' => 'boolean',
 		'bool[]' => 'boolean[]',
-		'mixed' => '*',
 		'int' => 'integer',
 		'int[]' => 'integer[]',
+		'float' => 'number',
+		'float[]' => 'number[]',
+		'double' => 'number',
+		'double[]' => 'number[]',
+		'decimal' => 'number',
+		'decimal[]' => 'number[]',
+		'mixed' => '*',
 		'array' => 'object',
 	];
 
-	const JSON_SCHEMA_DATA_TYPES = [
+	/** Стандартные типы данных JSON schema  */
+	const JSON_SCHEMA_INTERNAL_DATA_TYPES = [
 		'string',
 		'integer',
 		'number',
@@ -247,6 +254,14 @@ class ValueObjectDocumentation
 		$jsDocFile->close();
 	}
 
+	/**
+	 * Создаём файл с JSON схемой
+	 *
+	 * @param File $schemaFile
+	 * @param string $fullClassName
+	 * @param array $propertyList
+	 * @param string $schemaLocationUrl
+	 */
 	private static function _createJsonSchemaFile(
 		File $schemaFile, $fullClassName, array $propertyList, $schemaLocationUrl
 	) {
@@ -304,7 +319,7 @@ class ValueObjectDocumentation
 			return [
 				'description' => $propertyDescription, // оно обязательно
 			];
-		} elseif (in_array($typeName, static::JSON_SCHEMA_DATA_TYPES)) {
+		} elseif (in_array($typeName, static::JSON_SCHEMA_INTERNAL_DATA_TYPES)) {
 			$result = [
 				'type' => $typeName,
 			];

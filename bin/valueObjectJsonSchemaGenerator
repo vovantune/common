@@ -10,7 +10,7 @@ namespace ArtSkillsCommon {
 	use ArtSkills\Filesystem\Folder;
 	use ArtSkills\ValueObject\ValueObjectDocumentation;
 
-	if ($_SERVER['argc'] !== 3) {
+	if ($_SERVER['argc'] !== 4) {
 		echo 'Usage: valueObjectJsDocGenerator src_file|src_dir dst_dir dst_url' . PHP_EOL;
 		exit(0);
 	}
