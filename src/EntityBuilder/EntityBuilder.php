@@ -2,6 +2,7 @@
 
 namespace ArtSkills\EntityBuilder;
 
+use ArtSkills\Error\Assert;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\DB;
@@ -76,17 +77,16 @@ class EntityBuilder
 	/**
 	 * Задать конфиг
 	 *
-	 * @param EntityBuilderConfig $config
-	 * @param $config
+	 * @param EntityBuilderConfig|null $config
 	 * @throws \Exception
 	 */
 	public static function setConfig($config) {
 		static::$_config = $config;
 		if (empty($config)) {
 			return;
-		} elseif (!($config instanceof EntityBuilderConfig)) {
-			throw new \Exception('Bad config');
 		}
+		Assert::isInstanceOf($config, EntityBuilderConfig::class, 'Bad config');
+
 		$entityClassName = self::_getClassTemplate(self::FILE_TYPE_ENTITY);
 		$queryClassName = self::_getClassTemplate(self::FILE_TYPE_QUERY);
 		static::$_tableMethods = [

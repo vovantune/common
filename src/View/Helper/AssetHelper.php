@@ -7,10 +7,10 @@ use ArtSkills\Lib\Url;
 use ArtSkills\Filesystem\File;
 use Cake\Utility\Inflector;
 use Cake\View\Helper;
+use ArtSkills\Error\Assert;
 
 class AssetHelper extends Helper
 {
-
 	const KEY_SCRIPT = 'script';
 	const KEY_STYLE = 'style';
 	const KEY_DEPEND = 'depend';
@@ -272,10 +272,9 @@ class AssetHelper extends Helper
 	 * @throws \Exception если переданы неправильные параметры
 	 * или при попытке переопределить переменную, когда это не разрешено
 	 */
-	public function setVars($variables, $overwrite = false) {
-		if (!is_array($variables)) {
-			throw new \Exception('Переменные должны быть массивом [название => значение]');
-		}
+	public function setVars(array $variables, $overwrite = false) {
+		Assert::isArray($variables, 'Переменные должны быть массивом [название => значение]');
+
 		foreach ($variables as $varName => $varValue) {
 			$varName = $this->_validVarName($varName);
 			$existingVarType = $this->_existingVarType($varName, true);
@@ -503,7 +502,7 @@ class AssetHelper extends Helper
 	 * @param string $assetName
 	 * @param string $type скрипт или стиль
 	 * @param bool $realPath возвращать uri или путь к файлу
-	 * @return string
+	 * @return string[]|string|null
 	 * @throws \Exception если файл явно указан, а его нет
 	 */
 	private function _getPath($assetName, $type, $realPath = false) {
@@ -529,7 +528,7 @@ class AssetHelper extends Helper
 		if (file_exists(WWW_ROOT . $fileName)) {
 			return $realPath ? realpath(WWW_ROOT . $fileName) : ('/' . $fileName . $this->_assetPostfix);
 		}
-		return '';
+		return null;
 	}
 
 	/**

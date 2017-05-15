@@ -109,16 +109,6 @@ class AssetTest extends AppTestCase
 	}
 
 	/**
-	 * не массив
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Переменные должны быть массивом [название => значение]
-	 */
-	public function testBadVarsNotArray() {
-		$this->_assetHelper->setVars('asd');
-	}
-
-	/**
 	 * плохой ключ
 	 *
 	 * @expectedException \Exception
