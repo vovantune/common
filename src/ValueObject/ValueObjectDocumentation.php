@@ -6,14 +6,14 @@ namespace ArtSkills\ValueObject;
 use ArtSkills\Filesystem\File;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\Strings;
-use ArtSkills\Lib\Url;
 use ArtSkills\Traits\Library;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\DocBlockFactory;
-use phpDocumentor\Reflection\Type;
+use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Context;
 use ArtSkills\Error\Assert;
+use phpDocumentor\Reflection\Types\Mixed;
 use phpDocumentor\Reflection\Types\Self_;
 use phpDocumentor\Reflection\Types\Static_;
 use phpDocumentor\Reflection\Types\This;
@@ -178,32 +178,40 @@ class ValueObjectDocumentation
 	 *
 	 * @param \ReflectionClass $reflectionClass
 	 * @param array $usesList
-	 * @return array ['имя метода' => ['type' => null|Var_, 'description' => null|string], ...]
+	 * @return array ['имя метода' => ['type' => null|Var_, 'description' => null|string, 'default' => 'дефотовое значение'], ...]
+	 * @throws \Exception
 	 */
 	private static function _getPropertyList(\ReflectionClass $reflectionClass, array $usesList) {
 		$propertyList = [];
 
+		$defaultValues = $reflectionClass->getDefaultProperties();
 		if ($reflectionClass->isSubclassOf(ValueObject::class)) {
 			foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+				$propertyName = $property->getName();
 				$propertyInfo = [
 					'type' => null,
+					'default' => $defaultValues[$propertyName],
 					'description' => null,
 				];
 
 				$rawDocBlock = $property->getDocComment();
-				if (!empty($rawDocBlock)) {
-					$docBlock = DocBlockFactory::createInstance()
-						->create($rawDocBlock, (new Context($property->getDeclaringClass()
-							->getNamespaceName(), $usesList)));
-					/** @var Var_[] $vars */
-					$vars = $docBlock->getTagsByName('var');
-					if (count($vars)) {
-						$propertyInfo['type'] = $vars[0];
-					}
-
-					$propertyInfo['description'] = $docBlock->getSummary();
+				if (empty($rawDocBlock)) {
+					throw new \Exception($reflectionClass->getName() . '::' . $propertyName . ': Нет описания типа данных');
 				}
-				$propertyList[$property->getName()] = $propertyInfo;
+
+				$docBlock = DocBlockFactory::createInstance()
+					->create($rawDocBlock, (new Context($property->getDeclaringClass()
+						->getNamespaceName(), $usesList)));
+				/** @var Var_[] $vars */
+				$vars = $docBlock->getTagsByName('var');
+				if (empty($vars)) {
+					throw new \Exception($reflectionClass->getName() . '::' . $propertyName . ': Нет описания типа данных');
+				}
+				$propertyInfo['type'] = $vars[0];
+
+				$propertyInfo['description'] = $docBlock->getSummary();
+
+				$propertyList[$propertyName] = $propertyInfo;
 			}
 		}
 		return $propertyList;
@@ -242,11 +250,11 @@ class ValueObjectDocumentation
 			}
 
 			if (!empty($propertyInfo['type'])) {
-				$jsName = static::_getJsVariableName($propertyInfo['type'], $fullClassName, static::JS_TYPE_ALIAS);
+				$jsName = static::_getJsVariableName($fullClassName, $propertyName, $propertyInfo['type'], static::JS_TYPE_ALIAS);
 				$jsDocArr[] = ' * @property {' . (is_array($jsName) ? implode('|', $jsName)
-						: $jsName) . '} ' . $propertyName . $propertyDescription;
+						: $jsName) . '} ' . $propertyName . ' = ' . var_export($propertyInfo['default'], true) . $propertyDescription;
 			} else {
-				$jsDocArr[] = ' * @property ' . $propertyName . $propertyDescription;
+				$jsDocArr[] = ' * @property ' . $propertyName . ' = ' . var_export($propertyInfo['default'], true) . $propertyDescription;
 			}
 		}
 		$jsDocArr[] = ' */';
@@ -278,29 +286,21 @@ class ValueObjectDocumentation
 		/** @var Var_ $propertyInfo */
 		foreach ($propertyList as $propertyName => $propertyInfo) {
 			$propertyDescription = static::_getPropertyDescription($propertyInfo['description']);
-			$propertyTypes = [['type' => 'null']];
-
-			if (!empty($propertyInfo['type']) || $propertyInfo['type'] === static::JS_NOT_VARIANT_PROPERTY) {
-				$jsNames = (array)static::_getJsVariableName($propertyInfo['type'], $fullClassName, static::JSON_SCHEMA_TYPE_ALIAS);
-				foreach ($jsNames as $jsName) {
-					if (Strings::endsWith($jsName, '[]')) {
-						$ins = [
-							'type' => 'array',
-							'items' => static::_getJsonSchemaTypeStructure(Strings::replacePostfix($jsName, '[]'), '', $schemaLocationUrl),
-							'minItems' => 0,
-						];
-						if (!empty($propertyDescription)) {
-							$ins['description'] = $propertyDescription;
-						}
-						$propertyTypes[] = $ins;
-					} else {
-						$propertyTypes[] = static::_getJsonSchemaTypeStructure($jsName, $propertyDescription, $schemaLocationUrl);
-					}
+			$jsName = static::_getJsVariableName($fullClassName, $propertyName, $propertyInfo['type'], static::JSON_SCHEMA_TYPE_ALIAS);
+			if (Strings::endsWith($jsName, '[]')) {
+				$propertyType = [
+					'type' => 'array',
+					'items' => static::_getJsonSchemaTypeStructure(Strings::replacePostfix($jsName, '[]'), '', $schemaLocationUrl),
+					'minItems' => 0,
+				];
+				if (!empty($propertyDescription)) {
+					$propertyType['description'] = $propertyDescription;
 				}
 			} else {
-				$propertyTypes[] = static::_getJsonSchemaTypeStructure(null, $propertyDescription . "\nТип данных у свойства \"" . $fullClassName . '::' . $propertyName . '" не описан.', $schemaLocationUrl);
+				$propertyType = static::_getJsonSchemaTypeStructure($jsName, $propertyDescription, $schemaLocationUrl);
 			}
-			$schemaObject['properties'][$propertyName] = ['oneOf' => $propertyTypes];
+
+			$schemaObject['properties'][$propertyName] = $propertyType;
 		}
 		$schemaFile->write(Arrays::encode($schemaObject, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 		$schemaFile->close();
@@ -309,17 +309,13 @@ class ValueObjectDocumentation
 	/**
 	 * Формируем массив описания типа для JSON схемы
 	 *
-	 * @param string|null $typeName
+	 * @param string $typeName
 	 * @param string $propertyDescription
 	 * @param string $schemaLocationUrl URL адрес папки, в которой будут находится JSON схемы
 	 * @return array
 	 */
 	private static function _getJsonSchemaTypeStructure($typeName, $propertyDescription, $schemaLocationUrl) {
-		if (empty($typeName) || $typeName === static::JS_NOT_VARIANT_PROPERTY) {
-			return [
-				'description' => $propertyDescription, // оно обязательно
-			];
-		} elseif (in_array($typeName, static::JSON_SCHEMA_INTERNAL_DATA_TYPES)) {
+		if (in_array($typeName, static::JSON_SCHEMA_INTERNAL_DATA_TYPES)) {
 			$result = [
 				'type' => $typeName,
 			];
@@ -351,43 +347,31 @@ class ValueObjectDocumentation
 	/**
 	 * Определяем JS тип исходня из PHP типа
 	 *
-	 * @param Var_ $propertyVar
 	 * @param string $fullClassName
+	 * @param string $propertyName
+	 * @param Var_ $propertyVar
 	 * @param array $typeAliases
-	 * @return string|string[]
+	 * @return string
+	 * @throws \Exception
 	 */
-	private static function _getJsVariableName(Var_ $propertyVar, $fullClassName, array $typeAliases) {
+	private static function _getJsVariableName($fullClassName, $propertyName, Var_ $propertyVar, array $typeAliases) {
 		$propertyType = $propertyVar->getType();
-		if (empty($propertyType) && $propertyVar->getVariableName() === 'this') {
-			$propertyType = new This();
+		if ((empty($propertyType) && $propertyVar->getVariableName() === 'this') || $propertyType instanceof Self_ || $propertyType instanceof Static_ || $propertyType instanceof This) {
+			throw new \Exception($fullClassName . '::' . $propertyName . ': ValueObject не может ссылаться сам на себя!');
 		}
 
 		if ($propertyType instanceof Compound) {
-			$result = [];
-			$index = 0;
-			while ($propertyType->has($index)) {
-				$result[] = static::_convertPhpTypeToJs($propertyType->get($index), $fullClassName, $typeAliases);
-				$index++;
-			}
-			return $result;
-		} else {
-			return static::_convertPhpTypeToJs($propertyType, $fullClassName, $typeAliases);
+			throw new \Exception($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть только одного типа!');
 		}
-	}
 
-	/**
-	 * Определяем тип переменной в формате JS
-	 *
-	 * @param Type $propertyType
-	 * @param string $fullClassName
-	 * @param array $typeAliases
-	 * @return string
-	 */
-	private static function _convertPhpTypeToJs(Type $propertyType, $fullClassName, array $typeAliases) {
-		if ($propertyType instanceof Self_) {
-			return static::JS_NOT_VARIANT_PROPERTY;
-		} else if ($propertyType instanceof Static_ || $propertyType instanceof This) {
-			return static::_convertPsr4ToPsr0($fullClassName);
+		if ($propertyType instanceof Mixed) {
+			throw new \Exception($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть только одного типа!');
+		}
+
+		if ($propertyType instanceof Array_) {
+			if ($propertyType->getValueType() instanceof Mixed) {
+				throw new \Exception($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть простым типом, либо объектом!');
+			}
 		}
 
 		$propertyTypeString = static::_convertPsr4ToPsr0((string)$propertyType);

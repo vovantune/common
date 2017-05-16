@@ -11,27 +11,12 @@ namespace ArtSkills\Test\TestCase\ValueObject;
 class ValueObjectFixtureSecond extends ValueObjectFixture
 {
 	/**
-	 * @var $this
+	 * @var bool
 	 */
-	public $thisProperty = null;
-
-	/**
-	 * @var int|string
-	 */
-	public $multiplyProperty;
+	public $boolProperty;
 
 	/**
 	 * @var int[]
 	 */
 	public $intArray;
-
-	/**
-	 * @var array
-	 */
-	public $arrayArray;
-
-	/**
-	 * @var mixed
-	 */
-	public $mixedProperty;
 }

@@ -19,6 +19,9 @@ $object->setProperty1('new value')->setProperty2('property 2 value'); // где 
 * Преобразование объекта в массив: ```$arr = $object->toArray();```
 * Преобразование в JSON строку: ```$string = $object->toJson();``` либо ```$string = json_encode($object);```.
 
+# Ограничения
+TODO: написать
+
 ## Автоматическое формирование JSDoc структуры из ValueObject
 ```php
 ValueObjectDocumentation::buildJsDoc(string $absFilePath, string $dstFolder);

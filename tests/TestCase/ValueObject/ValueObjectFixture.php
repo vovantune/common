@@ -22,6 +22,8 @@ class ValueObjectFixture extends ValueObject
 	 * @var string
 	 */
 	public $field1 = 'asd';
+
+	/** @var string */
 	public $field2 = 'qwe';
 	/** @var Strings */
 	public $field3;

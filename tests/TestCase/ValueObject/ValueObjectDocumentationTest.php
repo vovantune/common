@@ -19,10 +19,10 @@ class ValueObjectDocumentationTest extends AppTestCase
 		self::assertEquals("// Auto generated file, to change structure edit ArtSkills\Test\TestCase\ValueObject\ValueObjectFixture php class
 /**
  * @typedef {Object} ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture
- * @property {string} field1 блаблабла трололо
- * @property field2
- * @property {ArtSkills_Lib_Strings} field3
- * @property {Cake_Utility_String} field4
+ * @property {string} field1 = 'asd' блаблабла трололо
+ * @property {string} field2 = 'qwe'
+ * @property {ArtSkills_Lib_Strings} field3 = NULL
+ * @property {Cake_Utility_String} field4 = NULL
  */
 ", file_get_contents($jsDocFile));
 		unlink($jsDocFile);
@@ -39,103 +39,31 @@ class ValueObjectDocumentationTest extends AppTestCase
 			'description' => 'ArtSkills\Test\TestCase\ValueObject\ValueObjectFixtureSecond php class',
 			'type' => 'object',
 			'properties' => [
-				'thisProperty' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_ValueObjectFixtureSecond.json',
-						],
-					],
-				],
-				'multiplyProperty' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'type' => 'integer',
-						],
-						2 => [
-							'type' => 'string',
-						],
-					],
+				'boolProperty' => [
+					'type' => 'boolean',
 				],
 				'intArray' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'type' => 'array',
-							'items' => [
-								'type' => 'integer',
-							],
-							'minItems' => 0,
-						],
+
+					'type' => 'array',
+					'items' => [
+						'type' => 'integer',
 					],
-				],
-				'arrayArray' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'type' => 'object',
-						],
-					],
-				],
-				'mixedProperty' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'description' => '',
-						],
-					],
+					'minItems' => 0,
+
 				],
 				'field1' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'type' => 'string',
-							'description' => 'блаблабла трололо',
-						],
-					],
+					'type' => 'string',
+					'description' => 'блаблабла трололо',
 				],
 				'field2' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'description' => "\nТип данных у свойства \"ArtSkills\Test\TestCase\ValueObject\ValueObjectFixtureSecond::field2\" не описан.",
-						],
-					],
+					'type' => 'string',
 				],
+
 				'field3' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_Strings.json',
-						],
-					],
+					'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_Strings.json',
 				],
 				'field4' => [
-					'oneOf' => [
-						0 => [
-							'type' => 'null',
-						],
-						1 => [
-							'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_CakeString.json',
-						],
-					],
+					'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_CakeString.json',
 				],
 			],
 		], json_decode(file_get_contents($jsDocFile), true));
