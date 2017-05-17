@@ -27,6 +27,9 @@ class ValueObjectDocumentation
 
 	const DEFAULT_TYPE = null;
 
+	const EXTENSION_JSDOC = '.js';
+	const EXTENSION_JSON = '.json';
+
 	/** Псевдонимы типов данных в JS  */
 	const JS_TYPE_ALIAS = [
 		'bool' => 'boolean',
@@ -79,7 +82,7 @@ class ValueObjectDocumentation
 		$fullClassName = static::_getFullNamespace($absFilePath) . '\\' . static::_getClassName($absFilePath);
 		$propertyList = static::_getPropertyList((new \ReflectionClass($fullClassName)), static::_getUsesList($absFilePath));
 
-		$jsDocFilePath = $dstJsDocFolder . DS . static::_convertPsr4ToPsr0($fullClassName) . '.js';
+		$jsDocFilePath = $dstJsDocFolder . DS . static::_convertPsr4ToPsr0($fullClassName) . static::EXTENSION_JSDOC;
 		$jsDocFile = new File($jsDocFilePath);
 		if ($jsDocFile->exists()) {
 			$jsDocFile->delete();
@@ -95,24 +98,24 @@ class ValueObjectDocumentation
 	 *
 	 * @param string $absFilePath Абсолютный путь до класса
 	 * @param string $dstSchemaFolder Папка, где хранть схемы
-	 * @param string $schemaLocationUrl URL адрес до папки со схемами
+	 * @param string $schemaLocationUri часть ссылки до папки со схемами
 	 */
-	public static function buildJsonSchema($absFilePath, $dstSchemaFolder, $schemaLocationUrl) {
+	public static function buildJsonSchema($absFilePath, $dstSchemaFolder, $schemaLocationUri) {
 		Assert::file($absFilePath);
 		Assert::fileExists($dstSchemaFolder);
-		Assert::notEmpty($schemaLocationUrl);
+		Assert::notEmpty($schemaLocationUri);
 
 		$fullClassName = static::_getFullNamespace($absFilePath) . '\\' . static::_getClassName($absFilePath);
 		$propertyList = static::_getPropertyList((new \ReflectionClass($fullClassName)), static::_getUsesList($absFilePath));
 
-		$schemaFilePath = $dstSchemaFolder . DS . static::_convertPsr4ToPsr0($fullClassName) . '.json';
+		$schemaFilePath = $dstSchemaFolder . DS . static::_convertPsr4ToPsr0($fullClassName) . static::EXTENSION_JSON;
 		$schemaFile = new File($schemaFilePath);
 		if ($schemaFile->exists()) {
 			$schemaFile->delete();
 		}
 
 		if (!empty($propertyList)) {
-			static::_createJsonSchemaFile($schemaFile, $fullClassName, $propertyList, $schemaLocationUrl);
+			static::_createJsonSchemaFile($schemaFile, $fullClassName, $propertyList, $schemaLocationUri);
 		}
 	}
 
@@ -268,10 +271,10 @@ class ValueObjectDocumentation
 	 * @param File $schemaFile
 	 * @param string $fullClassName
 	 * @param array $propertyList
-	 * @param string $schemaLocationUrl
+	 * @param string $schemaLocationUri
 	 */
 	private static function _createJsonSchemaFile(
-		File $schemaFile, $fullClassName, array $propertyList, $schemaLocationUrl
+		File $schemaFile, $fullClassName, array $propertyList, $schemaLocationUri
 	) {
 		$schemaObject = [
 			'$schema' => 'http://json-schema.org/draft-04/schema#',
@@ -290,14 +293,14 @@ class ValueObjectDocumentation
 			if (Strings::endsWith($jsName, '[]')) {
 				$propertyType = [
 					'type' => 'array',
-					'items' => static::_getJsonSchemaTypeStructure(Strings::replacePostfix($jsName, '[]'), '', $schemaLocationUrl),
+					'items' => static::_getJsonSchemaTypeStructure(Strings::replacePostfix($jsName, '[]'), '', $schemaLocationUri),
 					'minItems' => 0,
 				];
 				if (!empty($propertyDescription)) {
 					$propertyType['description'] = $propertyDescription;
 				}
 			} else {
-				$propertyType = static::_getJsonSchemaTypeStructure($jsName, $propertyDescription, $schemaLocationUrl);
+				$propertyType = static::_getJsonSchemaTypeStructure($jsName, $propertyDescription, $schemaLocationUri);
 			}
 
 			$schemaObject['properties'][$propertyName] = $propertyType;
@@ -325,7 +328,7 @@ class ValueObjectDocumentation
 			return $result;
 		} else {
 			return [
-				'$ref' => Strings::replaceIfEndsWith($schemaLocationUrl, '/') . '/' . $typeName . '.json',
+				'$ref' => Strings::replaceIfEndsWith($schemaLocationUrl, '/') . '/' . $typeName . static::EXTENSION_JSON,
 			];
 		}
 	}
