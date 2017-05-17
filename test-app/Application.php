@@ -14,8 +14,7 @@
  */
 namespace TestApp;
 
-use Cake\Core\Configure;
-use Cake\Error\Middleware\ErrorHandlerMiddleware;
+use ArtSkills\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Http\BaseApplication;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
