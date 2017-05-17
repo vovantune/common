@@ -40,4 +40,24 @@ class TestController extends Controller
 		return $this->_sendJsonResponse([]);
 	}
 
+	/**
+	 * Ошибка из ексепшна
+	 *
+	 * @return null
+	 */
+	public function getJsonException() {
+		return $this->_sendJsonException(new \Exception('test exception'), ['someData' => 'test']);
+	}
+
+	/**
+	 * Ошибки phpunit прокидываются дальше
+	 *
+	 * @return null
+	 */
+	public function getJsonExceptionUnit() {
+		return $this->_sendJsonException(new \PHPUnit_Framework_AssertionFailedError('test unit exception'), ['someData' => 'test']);
+	}
+
+
+
 }

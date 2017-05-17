@@ -4,6 +4,7 @@ namespace ArtSkills\Controller;
 
 
 use ArtSkills\Lib\CakeCompatibility;
+use ArtSkills\Lib\Env;
 use ArtSkills\Lib\ValueObject;
 
 class Controller extends \Cake\Controller\Controller
@@ -36,6 +37,19 @@ class Controller extends \Cake\Controller\Controller
 	 */
 	protected function _sendJsonError($message, array $jsonData = []) {
 		return $this->_sendJsonResponse(['status' => self::JSON_STATUS_ERROR, 'message' => $message] + $jsonData);
+	}
+
+	/**
+	 * Вернуть json-ответ с ошибкой, сообщение берётся из $exception->getMessage().
+	 * Исключения PHPUnit прокидываются дальше
+	 *
+	 * @param \Exception $exception
+	 * @param array $jsonData
+	 * @return NULL
+	 */
+	protected function _sendJsonException(\Exception $exception, array $jsonData = []) {
+		Env::checkTestException($exception);
+		return $this->_sendJsonError($exception->getMessage(), $jsonData);
 	}
 
 	/**
