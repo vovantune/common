@@ -1,24 +1,11 @@
 #!/usr/bin/env php
 <?php
 /**
- * Генератор JSDoc опсиания для ValueObject в той же папке, где и сам файл
+ * Генератор JSDoc описания для ValueObject в той же папке, где и сам файл
  */
 
-namespace ValueObjectJsDocGenerator {
-	function includeIfExists($file) {
-		if (file_exists($file)) {
-			return include_once $file;
-		}
-		return null;
-	}
-
-	if ((!$loader = includeIfExists(__DIR__ . '/../vendor/autoload.php')) && (!$loader = includeIfExists(__DIR__ . '/../../../autoload.php'))) {
-		$msg = 'You must set up the project dependencies, run the following commands:' . PHP_EOL .
-			'curl -sS https://getcomposer.org/installer | php' . PHP_EOL .
-			'php composer.phar install' . PHP_EOL;
-		fwrite(STDERR, $msg);
-		exit(1);
-	}
+namespace ArtSkillsCommon {
+	require_once __DIR__ .'/../src/config/bootstrap.bin.php';
 
 	use ArtSkills\Filesystem\Folder;
 	use ArtSkills\ValueObject\ValueObjectDocumentation;
@@ -32,11 +19,9 @@ namespace ValueObjectJsDocGenerator {
 		$dir = new Folder($_SERVER['argv'][1]);
 		$fileList = $dir->findRecursive('.*\.php');
 		foreach ($fileList as $filePath) {
-			ValueObjectDocumentation::build($filePath, $_SERVER['argv'][2]);
+			ValueObjectDocumentation::buildJsDoc($filePath, $_SERVER['argv'][2]);
 		}
 	} else {
-		ValueObjectDocumentation::build($_SERVER['argv'][1], $_SERVER['argv'][2]);
+		ValueObjectDocumentation::buildJsDoc($_SERVER['argv'][1], $_SERVER['argv'][2]);
 	}
-
-
 }

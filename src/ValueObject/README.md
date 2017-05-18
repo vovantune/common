@@ -19,14 +19,25 @@ $object->setProperty1('new value')->setProperty2('property 2 value'); // где 
 * Преобразование объекта в массив: ```$arr = $object->toArray();```
 * Преобразование в JSON строку: ```$string = $object->toJson();``` либо ```$string = json_encode($object);```.
 
+# Ограничения
+* У каждого свойства должен быть описан тип, причём `mixed` и `array` запрещены, только простые типы, объекты и их массивы.
+* Дефолтные значения для свойств должны быть такого же типа данных.
+* Каждое свойство может иметь только один тип данных.
+
 ## Автоматическое формирование JSDoc структуры из ValueObject
 ```php
-ValueObjectDocumentation::build(string $absFilePath, string $dstFolder);
+ValueObjectDocumentation::buildJsDoc(string $absFilePath, string $dstFolder);
 ```
 Имя структуры и имя файла строится на основе преобразования PSR4 полного имени класса в имя формата PSR0, например: ```ArtSkills\Test\TestCase\ValueObject\ValueObjectFixture```
 будет именоваться ```ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture```. Типы свойств берутся на основе PHPDoc директивы ```@var``` для каждого из них.
 
-### Скрипт формирования документации
+## Автоматические формирование JSON schema из ValueObject
+```php
+ValueObjectDocumentation::buildJsonSchema(string $absFilePath, string $dstSchemaFolder, string $schemaLocationUrl)
+```
+Логика аналогична ```ValueObjectDocumentation::buildJsDoc```.
+
+### Скрипт формирования документации JSDoc
 ```php 
 vendor/artskills/common/bin/valueObjectJsDocGenerator src_file|src_dir dst_dir
 ```
