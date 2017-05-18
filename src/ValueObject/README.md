@@ -20,7 +20,9 @@ $object->setProperty1('new value')->setProperty2('property 2 value'); // где 
 * Преобразование в JSON строку: ```$string = $object->toJson();``` либо ```$string = json_encode($object);```.
 
 # Ограничения
-TODO: написать
+* У каждого свойства должен быть описан тип, причём `mixed` и `array` запрещены, только простые типы, объекты и их массивы.
+* Дефолтные значения для свойств должны быть такого же типа данных.
+* Каждое свойство может иметь только один тип данных.
 
 ## Автоматическое формирование JSDoc структуры из ValueObject
 ```php
@@ -44,9 +46,3 @@ vendor/artskills/common/bin/valueObjectJsDocGenerator src_file|src_dir dst_dir
 * Scope: в какой папке проекта лежат данные объекты, например, ```file[site]:src/Response//*```
 * Program: путь для PHP, например, ```/usr/local/bin/php```
 * Arguments: ```$ProjectFileDir$/vendor/artskills/common/bin/valueObjectJsDocGenerator $FilePath$ $ProjectFileDir$/webroot/js/TypeDef/ValueObject```
-
-### Скрипт формирования JSON schema
-```php 
-vendor/artskills/common/bin/valueObjectJsonSchemaGenerator src_file|src_dir dst_dir dst_url
-```
-Настраивается аналогично ```valueObjectJsDocGenerator```.
