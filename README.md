@@ -5,6 +5,7 @@ require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . D
 ```
 * Наследуем `AppController` от [ArtSkills\Controller\Controller](src/Controller/Controller.php)
 * Наследуем `AppTable` от [ArtSkills\ORM\Table](src/ORM/Table.php)
+* В `Application.php` заменяем `Cake\Error\Middleware\ErrorHandlerMiddleware` на [ArtSkills\Error\Middleware\ErrorHandlerMiddleware](src/Error/Middleware/ErrorHandlerMiddleware.php)
 
 # Что тут сделано
 

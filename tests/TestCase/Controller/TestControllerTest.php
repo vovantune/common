@@ -32,4 +32,20 @@ class TestControllerTest extends AppControllerTestCase
 			'testProperty' => 'testData',
 		]);
 	}
+
+	/** ответ с ошибкой из исключения */
+	public function testErrorFromException() {
+		$this->get('/test/getJsonException');
+		$this->assertJsonErrorEquals('test exception', 'Некорректное сообщение об ошибке', ['someData' => 'test']);
+	}
+
+	/**
+	 * Если было исключение phpunit
+	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedExceptionMessage test unit exception
+	 */
+	public function testUnitException() {
+		$this->get('/test/getJsonExceptionUnit');
+	}
+
 }

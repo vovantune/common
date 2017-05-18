@@ -37,6 +37,7 @@ if ($isCli) {
 	(new \ArtSkills\Error\ErrorHandler(Configure::read('Error')))->register();
 }
 ```
+* В `Application.php` заменяем `Cake\Error\Middleware\ErrorHandlerMiddleware` на [ArtSkills\Error\Middleware\ErrorHandlerMiddleware](../../Error/Middleware/ErrorHandlerMiddleware.php)
 
 ## Уровни 
 Для логирования предлагается использовать 3 уровня:
