@@ -125,7 +125,7 @@ class ValueObjectDocumentation
 	 * @param string $absFilePath
 	 * @return string
 	 */
-	private static function _getFullNamespace($absFilePath) {
+	protected static function _getFullNamespace($absFilePath) {
 		$lines = file($absFilePath);
 		$result = preg_grep('/^namespace /', $lines);
 		$namespaceLine = array_shift($result);
@@ -142,7 +142,7 @@ class ValueObjectDocumentation
 	 * @param string $absFilePath
 	 * @return string
 	 */
-	private static function _getClassName($absFilePath) {
+	protected static function _getClassName($absFilePath) {
 		$directoriesAndFilename = explode('/', $absFilePath);
 		$absFilePath = array_pop($directoriesAndFilename);
 		$nameAndExtension = explode('.', $absFilePath);
@@ -159,7 +159,7 @@ class ValueObjectDocumentation
 	 * @param string $absFilePath
 	 * @return array
 	 */
-	private static function _getUsesList($absFilePath) {
+	protected static function _getUsesList($absFilePath) {
 		$flContent = file_get_contents($absFilePath);
 		$result = [];
 		if (preg_match_all('/^use (.*);$/m', $flContent, $usesList)) {
@@ -184,13 +184,20 @@ class ValueObjectDocumentation
 	 * @return array ['имя метода' => ['type' => null|Var_, 'description' => null|string, 'default' => 'дефотовое значение'], ...]
 	 * @throws \Exception
 	 */
-	private static function _getPropertyList(\ReflectionClass $reflectionClass, array $usesList) {
+	protected static function _getPropertyList(\ReflectionClass $reflectionClass, array $usesList) {
 		$propertyList = [];
+
+		$excludeProperties = $reflectionClass->getConstant('EXCLUDE_EXPORT_PROPS');
+		Assert::isArray($excludeProperties, 'Список не экспортируемых свойств должен быть массивом');
 
 		$defaultValues = $reflectionClass->getDefaultProperties();
 		if ($reflectionClass->isSubclassOf(ValueObject::class)) {
 			foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
 				$propertyName = $property->getName();
+				if (in_array($propertyName, $excludeProperties)) {
+					continue;
+				}
+
 				$propertyInfo = [
 					'type' => null,
 					'default' => $defaultValues[$propertyName],
@@ -226,7 +233,7 @@ class ValueObjectDocumentation
 	 * @param string $fullName
 	 * @return string
 	 */
-	private static function _convertPsr4ToPsr0($fullName) {
+	protected static function _convertPsr4ToPsr0($fullName) {
 		$fullName = Strings::replaceIfStartsWith($fullName, "\\", '');
 		$fullName = Strings::replaceIfStartsWith($fullName, "App\\", '');
 		return str_replace("\\", '_', $fullName);
@@ -239,7 +246,7 @@ class ValueObjectDocumentation
 	 * @param string $fullClassName
 	 * @param array $propertyList
 	 */
-	private static function _createJsDocFile(File $jsDocFile, $fullClassName, array $propertyList) {
+	protected static function _createJsDocFile(File $jsDocFile, $fullClassName, array $propertyList) {
 		$jsDocArr = [
 			'// Auto generated file, to change structure edit ' . $fullClassName . ' php class',
 			'/**',
@@ -273,7 +280,7 @@ class ValueObjectDocumentation
 	 * @param array $propertyList
 	 * @param string $schemaLocationUri
 	 */
-	private static function _createJsonSchemaFile(
+	protected static function _createJsonSchemaFile(
 		File $schemaFile, $fullClassName, array $propertyList, $schemaLocationUri
 	) {
 		$schemaObject = [
@@ -317,7 +324,7 @@ class ValueObjectDocumentation
 	 * @param string $schemaLocationUrl URL адрес папки, в которой будут находится JSON схемы
 	 * @return array
 	 */
-	private static function _getJsonSchemaTypeStructure($typeName, $propertyDescription, $schemaLocationUrl) {
+	protected static function _getJsonSchemaTypeStructure($typeName, $propertyDescription, $schemaLocationUrl) {
 		if (in_array($typeName, static::JSON_SCHEMA_INTERNAL_DATA_TYPES)) {
 			$result = [
 				'type' => $typeName,
@@ -339,7 +346,7 @@ class ValueObjectDocumentation
 	 * @param string $description
 	 * @return string
 	 */
-	private static function _getPropertyDescription($description) {
+	protected static function _getPropertyDescription($description) {
 		if (!empty($description)) {
 			return trim(str_replace(["\r", "\n"], ' ', $description));
 		} else {
@@ -357,7 +364,7 @@ class ValueObjectDocumentation
 	 * @return string
 	 * @throws \Exception
 	 */
-	private static function _getJsVariableName($fullClassName, $propertyName, Var_ $propertyVar, array $typeAliases) {
+	protected static function _getJsVariableName($fullClassName, $propertyName, Var_ $propertyVar, array $typeAliases) {
 		$propertyType = $propertyVar->getType();
 		if ((empty($propertyType) && $propertyVar->getVariableName() === 'this') || $propertyType instanceof Self_ || $propertyType instanceof Static_ || $propertyType instanceof This) {
 			throw new \Exception($fullClassName . '::' . $propertyName . ': ValueObject не может ссылаться сам на себя!');

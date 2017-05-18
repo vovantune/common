@@ -20,7 +20,6 @@ class ValueObjectDocumentationTest extends AppTestCase
 /**
  * @typedef {Object} ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture
  * @property {string} field1 = 'asd' блаблабла трололо
- * @property {string} field2 = 'qwe'
  * @property {ArtSkills_Lib_Strings} field3 = NULL
  * @property {Cake_Utility_String} field4 = NULL
  */
@@ -55,10 +54,6 @@ class ValueObjectDocumentationTest extends AppTestCase
 					'type' => 'string',
 					'description' => 'блаблабла трололо',
 				],
-				'field2' => [
-					'type' => 'string',
-				],
-
 				'field3' => [
 					'$ref' => 'https://www.artskills.ru/jsonSchema/ArtSkills_Test_TestCase_ValueObject_Strings.json',
 				],
