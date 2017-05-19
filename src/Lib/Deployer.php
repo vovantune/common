@@ -97,15 +97,6 @@ class Deployer
 
 
 	/**
-	 * Список зависимостей композера
-	 *
-	 * @var string[]
-	 */
-	protected $_composerDependencies = [
-		'artskills/common',
-	];
-
-	/**
 	 * Ставить ли dev зависимости
 	 *
 	 * @var bool
@@ -442,7 +433,7 @@ class Deployer
 		$this->_updateVersion();
 		$this->_copyFiles();
 
-		// первым идёт обновление репозитория, ибо там могли обновиться composer.json и добавиться миграции
+		// первым идёт обновление репозитория, ибо там могли обновиться composer.lock и добавиться миграции
 		$this->_updateRepo();
 		$this->_updateComposer();
 		$this->_migrateDb();
@@ -538,7 +529,7 @@ class Deployer
 	 */
 	protected function _updateComposer() {
 		$this->_addToOutput(["\n\nComposer\n"]);
-		if (empty($this->_composerDependencies) || empty($this->_composerCommand)) {
+		if (empty($this->_composerCommand)) {
 			$this->_addToOutput(['not updating dependencies']);
 			return;
 		}
@@ -546,9 +537,8 @@ class Deployer
 			$envData = 'HOME=' . $this->_composerHome;
 			$this->_putEnv($envData);
 		}
-		$safeDependencies = array_map('escapeshellarg', $this->_composerDependencies);
 		$this->_exec(
-			$this->_composerCommand . ' update ' . implode(' ', $safeDependencies) . ' ' . implode(' ', $this->_composerOptions),
+			$this->_composerCommand . ' install ' . implode(' ', $this->_composerOptions),
 			'Не удалось обновить композер'
 		);
 	}
