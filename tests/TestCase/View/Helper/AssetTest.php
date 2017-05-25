@@ -1,12 +1,12 @@
 <?php
 
-namespace ArtSkills\Test\TestCase\View\Helper\AssetTest;
+namespace ArtSkills\Test\TestCase\View\Helper;
 
 use ArtSkills\Filesystem\Folder;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\View\Helper\AssetHelper;
 use ArtSkills\TestSuite\AppTestCase;
-use Cake\Network\Request;
+use Cake\Http\ServerRequest;
 use Cake\View\View;
 
 class AssetTest extends AppTestCase
@@ -17,7 +17,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * request
 	 *
-	 * @var Request
+	 * @var ServerRequest
 	 */
 	private $_request = null;
 
@@ -62,7 +62,7 @@ class AssetTest extends AppTestCase
 	 * @inheritdoc
 	 */
 	public function setUp() {
-		$this->_request = new Request();
+		$this->_request = new ServerRequest();
 		$this->_assetHelper = new AssetHelper(new View($this->_request));
 		$this->_assetHelper->setAssetVersion(self::SCRIPT_VERSION);
 		parent::setUp();
@@ -477,7 +477,7 @@ class AssetTest extends AppTestCase
 	/** Добавляется префикс */
 	public function testUrlPrefix() {
 		$urlPrefix = '/prefix';
-		$this->_request = new Request(['webroot' => $urlPrefix]);
+		$this->_request = new ServerRequest(['webroot' => $urlPrefix]);
 		$this->_assetHelper = new AssetHelper(new View($this->_request));
 
 		$this->_assetHelper->load('testManual', 'fileAuto');
