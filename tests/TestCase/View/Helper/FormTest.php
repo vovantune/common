@@ -31,7 +31,8 @@ class FormTest extends AppTestCase
 		parent::setUp();
 	}
 
-	public function test() {
+	/** Дописывание текста сразу после инпута */
+	public function testAppend() {
 		// по-умолчанию
 		$result = $this->_helper->control('test');
 		$expectedResult = '<div class="input text"><label for="test">Test</label><input type="text" name="test" id="test"/></div>';
@@ -66,8 +67,10 @@ class FormTest extends AppTestCase
 		]);
 		$expectedResult = '<div class="input text error"><label for="errorfield">Error Field</label><input type="text" name="errorField" id="errorfield" class="form-error"/>append text when error<div class="error-message">some error</div></div>';
 		self::assertEquals($expectedResult, $result);
-		$this->_helper->create(null);
+	}
 
+	/** Изменение шаблона контейнера и добавление ему атрибутов */
+	public function testContainer() {
 		// класс контейнера
 		$result = $this->_helper->control('test', [
 			'containerClass' => 'test-cont-class',
@@ -93,6 +96,14 @@ class FormTest extends AppTestCase
 		self::assertEquals($expectedResult, $result);
 
 		// другой контейнер с ошибкой
+		$errorConfig = [
+			'schema' => [
+				'errorField' => ['type' => 'string'],
+			],
+			'errors' => [
+				'errorField' => 'some error',
+			],
+		];
 		$this->_helper->create($errorConfig);
 		$result = $this->_helper->control('errorField', [
 			'append' => 'append text when error',
@@ -100,8 +111,10 @@ class FormTest extends AppTestCase
 		]);
 		$expectedResult = '<label for="errorfield">Error Field</label><input type="text" name="errorField" id="errorfield" class="form-error"/>append text when error<div class="error-message">some error</div>';
 		self::assertEquals($expectedResult, $result);
-		$this->_helper->create(null);
+	}
 
+	/** изменение шаблона инпута */
+	public function testInputChange() {
 		// другой инпут
 		$result = $this->_helper->control('test', [
 			'inputTemplate' => 'inputDiv',
