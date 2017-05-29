@@ -2,7 +2,6 @@
 
 namespace ArtSkills\Mailer\Transport;
 
-use ArtSkills\Lib\CakeCompatibility;
 use Cake\Mailer\AbstractTransport;
 use Cake\Mailer\Email;
 
@@ -15,7 +14,6 @@ use Cake\Mailer\Email;
  */
 class TestEmailTransport extends AbstractTransport
 {
-
 	/**
 	 * Посланные сообщения
 	 *
@@ -52,25 +50,15 @@ class TestEmailTransport extends AbstractTransport
 	 * @return array
 	 */
 	public function send(Email $email) {
-		if (CakeCompatibility::supportSetters()) {
-			self::$_messages[] = [
-				'to' => $email->getTo(),
-				'subject' => $email->getSubject(),
-				'template' => $email->viewBuilder()->getTemplate(),
-				'layout' => $email->viewBuilder()->getLayout(),
-				'vars' => $email->getViewVars(),
-				'message' => $email->message(),
-			];
-		} else {
-			self::$_messages[] = [
-				'to' => $email->to(),
-				'subject' => $email->subject(),
-				'template' => $email->viewBuilder()->template(),
-				'layout' => $email->viewBuilder()->layout(),
-				'vars' => $email->viewVars(),
-				'message' => $email->message(),
-			];
-		}
+		self::$_messages[] = [
+			'to' => $email->getTo(),
+			'subject' => $email->getSubject(),
+			'template' => $email->viewBuilder()->getTemplate(),
+			'layout' => $email->viewBuilder()->getLayout(),
+			'vars' => $email->getViewVars(),
+			'message' => $email->message(),
+		];
+
 		return ['headers' => 'test', 'message' => 'test'];
 	}
 }

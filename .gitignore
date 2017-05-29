@@ -1,5 +1,4 @@
 /vendor/
 /.idea/
-/composer.lock
 /composer.phar
 /test-app-conf/app_local.php

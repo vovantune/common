@@ -1,7 +1,7 @@
 <?php
+
 namespace ArtSkills\View\Helper;
 
-use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Url;
 use ArtSkills\Filesystem\File;
@@ -85,7 +85,6 @@ class AssetHelper extends Helper
 	 * @var array
 	 */
 	private $_startedAssets = [];
-
 
 
 	/**
@@ -174,11 +173,7 @@ class AssetHelper extends Helper
 			}
 		}
 
-		if (CakeCompatibility::supportSetters()) {
-			parent::setConfig("$controller.$action", $config, $merge);
-		} else {
-			parent::config("$controller.$action", $config, $merge);
-		}
+		parent::setConfig("$controller.$action", $config, $merge);
 	}
 
 	/**
@@ -303,11 +298,7 @@ class AssetHelper extends Helper
 	 * @return mixed
 	 */
 	private function _getAssetParam($assetName, $paramName) {
-		if (CakeCompatibility::supportSetters()) {
-			return $this->getConfig($assetName . '.' . $paramName);
-		} else {
-			return $this->config($assetName . '.' . $paramName);
-		}
+		return $this->getConfig($assetName . '.' . $paramName);
 	}
 
 	/**
@@ -319,11 +310,7 @@ class AssetHelper extends Helper
 	 */
 	private function _getParam($value, $name) {
 		if (empty($value)) {
-			if (CakeCompatibility::supportSetters()) {
-				$value = $this->request->getParam($name);
-			} else {
-				$value = $this->request->param($name);
-			}
+			$value = $this->request->getParam($name);
 		}
 		if (empty($value)) {
 			$value = self::DEFAULT_PARAMS[$name];
@@ -399,7 +386,8 @@ class AssetHelper extends Helper
 			return $this->_loadedVariables[$varName];
 		}
 		if ($actual) {
-			return (empty($this->_definedVariables[$varName]) ? null : $this->_getVarType($this->_definedVariables[$varName]));
+			return (empty($this->_definedVariables[$varName]) ? null
+				: $this->_getVarType($this->_definedVariables[$varName]));
 		} else {
 			return (empty($this->_newVariables[$varName]) ? null : $this->_newVariables[$varName]);
 		}

@@ -4,7 +4,6 @@ namespace ArtSkills\EntityBuilder;
 
 use ArtSkills\Error\Assert;
 use ArtSkills\Lib\Arrays;
-use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\DB;
 use ArtSkills\Lib\Misc;
 use ArtSkills\Lib\Strings;
@@ -631,12 +630,7 @@ class EntityBuilder
 	 */
 	private static function _getTableFieldsComments($entityName) {
 		$table = self::_getTable($entityName);
-		if (CakeCompatibility::supportSetters()) {
-			$tableSchema = $table->getSchema();
-		} else {
-			$tableSchema = $table->schema();
-		}
-
+		$tableSchema = $table->getSchema();
 
 		$columnList = $tableSchema->columns();
 		$defaultValues = ($tableSchema->defaultValues());
@@ -652,18 +646,10 @@ class EntityBuilder
 		$associations = $table->associations();
 		/** @type \Cake\ORM\Association $assoc */
 		foreach ($associations as $assoc) {
-			$className = $assoc->className() ? $assoc->className()
-				: (CakeCompatibility::supportSetters() ? $assoc->getName() : $assoc->name());
-
-			if (CakeCompatibility::supportSetters()) {
-				$propertyName = $assoc->getProperty();
-				$foreignKeys = $assoc->getForeignKey();
-				$bindingKeys = $assoc->getBindingKey();
-			} else {
-				$propertyName = $assoc->property();
-				$foreignKeys = $assoc->foreignKey();
-				$bindingKeys = $assoc->bindingKey();
-			}
+			$className = $assoc->className() ? $assoc->className() : $assoc->getName();
+			$propertyName = $assoc->getProperty();
+			$foreignKeys = $assoc->getForeignKey();
+			$bindingKeys = $assoc->getBindingKey();
 
 			$result[$propertyName] = ' * @property ' . $className . (in_array(
 					$assoc->type(), [
@@ -688,7 +674,7 @@ class EntityBuilder
 		$table = self::_getTable($entityName);
 
 		$connection = DB::getConnection(static::$_config->connectionName);
-		$tableName = CakeCompatibility::supportSetters() ? $table->getTable() : $table->table();
+		$tableName = $table->getTable();
 		$tableComment = $connection->query(
 			"SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $tableName . "';"
 		)->fetchAll();
@@ -710,13 +696,8 @@ class EntityBuilder
 		foreach ($tableList as $className) {
 			$entityName = substr($className, 0, -5);
 			$table = self::_getTable($entityName);
-			if (CakeCompatibility::supportSetters()) {
-				$tableName = $table->getTable();
-				$tableAlias = $table->getAlias();
-			} else {
-				$tableName = $table->table();
-				$tableAlias = $table->alias();
-			}
+			$tableName = $table->getTable();
+			$tableAlias = $table->getAlias();
 
 			$constList[] = 'const ' . strtoupper($tableName) . ' = "' . $tableAlias . '";';
 		}

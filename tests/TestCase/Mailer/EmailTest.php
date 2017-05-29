@@ -14,8 +14,8 @@ class EmailTest extends AppTestCase
 	public function testChangeRecipient() {
 		$text = 'test email text';
 		$email = new Email();
-		$email->from('test@artskills.ru')
-			->to('test@artskills.ru', 'test-name')
+		$email->setFrom('test@artskills.ru')
+			->setTo('test@artskills.ru', 'test-name')
 			->addTo('test@yandex.ru', 'yandex-test')
 			->addTo('other@artskills.ru', 'artskills')
 			->send($text);
