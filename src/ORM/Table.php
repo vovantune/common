@@ -137,14 +137,16 @@ class Table extends \Cake\ORM\Table
 		if (is_array($queryData)) {
 			$queryData = $this->find()->where($queryData);
 		}
-		$result = $queryData->epilog('FOR UPDATE')
-			->first();
-		if (empty($result)) {
-			return $result;
-		} else {
-			$this->patchEntity($result, $updateData);
-			return $this->save($result);
-		}
+		return $this->getConnection()->transactional(function() use($queryData, $updateData) {
+			$result = $queryData->epilog('FOR UPDATE')
+				->first();
+			if (empty($result)) {
+				return $result;
+			} else {
+				$this->patchEntity($result, $updateData);
+				return $this->save($result);
+			}
+		});
 	}
 
 	/**
