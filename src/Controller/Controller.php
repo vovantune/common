@@ -2,8 +2,6 @@
 
 namespace ArtSkills\Controller;
 
-
-use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\ValueObject;
 
@@ -68,14 +66,8 @@ class Controller extends \Cake\Controller\Controller
 		$jsonArray['_jsonOptions'] = JSON_UNESCAPED_UNICODE;
 
 		$this->set($jsonArray);
-		if (CakeCompatibility::supportSetters()) {
-			$this->viewBuilder()->setClassName('Json');
-			$jsonPResponse = !empty($this->request->getQuery('callback'));
-		} else {
-			$this->viewBuilder()->className('Json');
-			$jsonPResponse = !empty($this->request->query('callback'));
-		}
-
+		$this->viewBuilder()->setClassName('Json');
+		$jsonPResponse = !empty($this->request->getQuery('callback'));
 		if ($jsonPResponse) {
 			$this->response->type('application/x-javascript');
 			$this->set('_jsonp', true);

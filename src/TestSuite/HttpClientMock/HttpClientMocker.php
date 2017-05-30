@@ -1,7 +1,7 @@
 <?php
+
 namespace ArtSkills\TestSuite\HttpClientMock;
 
-use ArtSkills\Lib\CakeCompatibility;
 use Cake\Http\Client\Request;
 use Cake\Http\Client\Response;
 
@@ -118,13 +118,8 @@ class HttpClientMocker
 	 */
 	public static function getMockedData(Request $request) {
 		foreach (self::$_mockCallList as $mock) {
-			if (CakeCompatibility::supportSetters()) {
-				$url = (string)$request->getUri();
-				$method = $request->getMethod();
-			} else {
-				$url = $request->url();
-				$method = $request->method();
-			}
+			$url = (string)$request->getUri();
+			$method = $request->getMethod();
 
 			if ($mock->check($url, $method)) {
 				return $mock->doAction($request);

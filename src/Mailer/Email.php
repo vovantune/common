@@ -1,10 +1,17 @@
 <?php
+
 namespace ArtSkills\Mailer;
 
-use ArtSkills\Lib\CakeCompatibility;
 use ArtSkills\Lib\Env;
 use ArtSkills\Log\Engine\SentryLog;
 
+/**
+ * Надстройка над классом \Cake\Mailer\Email. Основные отличия:
+ * * Проставляется заголовок отправки роботом.
+ * * Во время теста подменяется транспорт, что позволяет получить все передаваемые письма.
+ * * При включенном debug все письма отправляется на debugEmail параметр конфигурации.
+ * * Если письмо не отправилось, то Exception не прокидывается.
+ */
 class Email extends \Cake\Mailer\Email
 {
 
@@ -39,7 +46,7 @@ class Email extends \Cake\Mailer\Email
 				$confKey = $paramConfig;
 			}
 
-			$config = CakeCompatibility::supportSetters()? static::getConfig($confKey): static::config($confKey);
+			$config = static::getConfig($confKey);
 		}
 		if (is_array($config)) {
 			$config['transport'] = 'test';
@@ -81,38 +88,42 @@ class Email extends \Cake\Mailer\Email
 	}
 
 	/**
-	 * переопределяем email сотрудников
+	 * переопределяем email для тестового режима
 	 *
-	 * @param string|null $email
-	 * @param string|null $name
-	 * @return array|Email
+	 * @inheritdoc
 	 */
-	public function to($email = null, $name = null) {
-		if ($email === null) {
-			return $this->_to;
+	protected function _setEmail($varName, $email, $name) {
+		return parent::_setEmail($varName, $this->_getEmailList($email), $name);
+	}
+
+	/**
+	 * переопределяем email для тестового режима
+	 *
+	 * @inheritdoc
+	 */
+	protected function _addEmail($varName, $email, $name) {
+		return parent::_addEmail($varName, $this->_getEmailList($email), $name);
+	}
+
+	/**
+	 * Преобразуем массив email адресов
+	 *
+	 * @param array|string $email
+	 * @return array|string
+	 */
+	private function _getEmailList($email) {
+		if (!is_array($email)) {
+			return $this->_getEmail($email);
 		}
-		return $this->_setEmail('_to', self::_getEmail($email), $name);
-	}
-
-	/**
-	 * переопределение email сотрудников в дополнительном письме
-	 *
-	 * @param string $email
-	 * @param null $name
-	 * @return $this
-	 */
-	public function addTo($email, $name = null) {
-		return $this->_addEmail('_to', self::_getEmail($email), $name);
-	}
-
-	/**
-	 * Заменить старый artskills.ru на новый artskills-studio.ru
-	 *
-	 * @param string $email
-	 * @return string
-	 */
-	public static function newAsDomain($email) {
-		return str_replace('@artskills.ru', '@artskills-studio.ru', $email);
+		$list = [];
+		foreach ($email as $key => $value) {
+			if (is_int($key)) {
+				$key = $value;
+			}
+			$key = $this->_getEmail($key);
+			$list[$key] = $value;
+		}
+		return $list;
 	}
 
 	/**
@@ -124,13 +135,13 @@ class Email extends \Cake\Mailer\Email
 	 * @return string
 	 * @throws \Exception
 	 */
-	private static function _getEmail($email) {
+	private function _getEmail($email) {
 		if (!Env::isProduction() && !Env::isUnitTest()) {
 			$email = Env::getDebugEmail();
 			if (empty($email)) {
 				throw new \Exception('Не прописан debugEmail в конфиге!');
 			}
 		}
-		return self::newAsDomain($email);
+		return str_replace('@artskills.ru', '@artskills-studio.ru', $email);
 	}
 }
