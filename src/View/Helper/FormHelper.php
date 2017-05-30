@@ -6,7 +6,7 @@ use Cake\View\View;
 
 /**
  * Расширенный FormHelper с более настраиваемыми шаблонами.
- * Подключается как и любоё хелпер: в классе View написать:
+ * Подключается как и любой хелпер: в классе View написать:
  * $this->loadHelper('ArtSkills.Form');
  */
 class FormHelper extends \Cake\View\Helper\FormHelper
