@@ -21,6 +21,37 @@ function field($tableAlias, $fieldName, $operation = null) {
 	return $tableAlias . '.' . $fieldName . (empty($operation) ? '' : ' ' . $operation);
 }
 
+/**
+ * В массиве для условий where() всем полям проставить таблицу.
+ *
+ * @param string $tableAlias
+ * @param array $conditions
+ * @return array
+ */
+function fieldsWhere($tableAlias, array $conditions) {
+	$newConditions = [];
+	foreach ($conditions as $field => $value) {
+		$fieldFull = $tableAlias . '.' . $field;
+		$newConditions[$fieldFull] = $value;
+	}
+	return $newConditions;
+}
+
+/**
+ * В массиве для выборки select() всем полям проставить таблицу.
+ *
+ * @param string $tableAlias
+ * @param string|string[] $fields
+ * @return string[]
+ */
+function fieldsSelect($tableAlias, $fields) {
+	$fields = (array)$fields;
+	foreach ($fields as &$field) {
+		$field = $tableAlias . '.' . $field;
+	}
+	return $fields;
+}
+
 if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
 
 	/**
