@@ -254,6 +254,7 @@ class SentryLog extends BaseLog
 			if (self::$_isShutdown || !($exception instanceof FatalErrorException)) {
 				self::_addCallArgs($exception->getTrace(), 0);
 				$client->captureException($exception, $data);
+				self::_addBreadCrumb($exception->getMessage(), $level, $exception->getTrace());
 			}
 		} else {
 			if (!self::$_isShutdown) {
@@ -262,8 +263,32 @@ class SentryLog extends BaseLog
 					$trace = self::_sliceTrace($trace);
 				}
 				$client->captureMessage($message, [], $data, $trace);
+				self::_addBreadCrumb($message, $level, $trace);
 			}
 		}
+	}
+
+	/**
+	 * Добавить текущую ошибку как хлебную крошку для последующих
+	 *
+	 * @param string $message
+	 * @param string $level
+	 * @param array $traceFull
+	 */
+	protected static function _addBreadCrumb($message, $level, $traceFull) {
+		$where = [];
+		if (!empty($traceFull)) {
+			$where = array_shift($traceFull);
+		}
+		$client = self::getSentry();
+		$client->breadcrumbs->record([
+			'message' => $message,
+			'level' => $level,
+			'data' => [
+				'from' => $where,
+				'error_extra' => Arrays::get($client->context->extra, '_extra_as_string', '')
+			],
+		]);
 	}
 
 	/**
