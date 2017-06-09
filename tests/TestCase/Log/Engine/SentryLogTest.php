@@ -47,6 +47,11 @@ class SentryLogTest extends AppTestCase
 	public function setUp() {
 		$this->_disablePermanentMock(MockFileLog::class);
 		parent::setUp();
+		$breadcrumbs = SentryLog::getSentry()->breadcrumbs;
+		PropertyAccess::set($breadcrumbs, 'count', 0);
+		PropertyAccess::set($breadcrumbs, 'pos', 0);
+		PropertyAccess::set($breadcrumbs, 'buffer', []);
+		PropertyAccess::setStatic(SentryLog::class, '_addInfo', []);
 
 		$this->_fileLogMock = MethodMocker::mock(FileLog::class, 'log');
 		$this->_sentryLogMock = MethodMocker::mock(\Raven_Client::class, 'capture')
@@ -406,4 +411,53 @@ class SentryLogTest extends AppTestCase
 		getimagesize('govno');
 	}
 
+	/** Добавление хлебных крошек после ошибок */
+	public function testBreadCrumbs() {
+		$this->_sentryLogMock->willReturnValue(null);
+
+		$breadCrumbsObj = SentryLog::getSentry()->breadcrumbs;
+		self::assertEquals([], $breadCrumbsObj->fetch());
+
+		// запись в лог
+		$message = 'test message 15';
+		$extra = ['test add info' => 'some value'];
+		Log::warning($message, [
+			SentryLog::KEY_ADD_INFO => $extra,
+		]);
+		$line = __LINE__ - 1;
+
+		$breadCrumbs = $breadCrumbsObj->fetch();
+		self::assertCount(1, $breadCrumbs);
+		$crumb = $breadCrumbs[0];
+		$this->assertArraySubsetEquals([
+			'message' => $message,
+			'level' => \Raven_Client::WARN,
+		], $crumb);
+		self::assertEquals(Debugger::exportVar($extra), $crumb['data']['error_extra']);
+		$this->assertArraySubsetEquals([
+			'file' => __FILE__,
+			'line' => $line,
+		], $crumb['data']['from']);
+
+
+		// ексепшн
+		$message = 'test message 16';
+		$extraNew = ['test info exception' => 'asdfgh'];
+		SentryLog::logException(new \Exception($message), [
+			SentryLog::KEY_ADD_INFO => $extraNew,
+		]);
+
+		$breadCrumbs = $breadCrumbsObj->fetch();
+		self::assertCount(2, $breadCrumbs);
+		$crumb = $breadCrumbs[1];
+		$this->assertArraySubsetEquals([
+			'message' => $message,
+			'level' => \Raven_Client::ERROR,
+		], $crumb);
+		self::assertEquals(Debugger::exportVar($extra + $extraNew), $crumb['data']['error_extra']);
+		$this->assertArraySubsetEquals([
+			'class' => __CLASS__,
+			'function' => __FUNCTION__,
+		], $crumb['data']['from']);
+	}
 }

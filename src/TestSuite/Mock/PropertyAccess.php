@@ -31,7 +31,7 @@ class PropertyAccess
 	 * @param mixed $value
 	 */
 	public static function set($object, $propertyName, $value) {
-		$property = new \ReflectionProperty(get_class($object), $propertyName);
+		$property = new \ReflectionProperty($object, $propertyName);
 		$property->setAccessible(true);
 		$property->setValue($object, $value);
 	}
