@@ -23,33 +23,114 @@ function field($tableAlias, $fieldName, $operation = null) {
 
 /**
  * В массиве для условий where() всем полям проставить таблицу.
+ * Проставляет таблицу в ключи массива.
+ * Поэтому не будет работать для условий типа ['field IS NULL'].
+ * Но будет работать для ['field IS' => null]
+ * ```php
+ * // можно делать
+ * $query->where(fieldsWhere([
+ *		'TableName1' => [
+ * 			'field1' => 'val1',
+ * 			'field2' => 'val2',
+ * 		],
+ * 		'TableName2' => [
+ * 			'field1' => 'val3',
+ * 			'field2' => 'val4',
+ * 		],
+ * 		'' => [
+ * 			'field3' => 'val',
+ * 		]
+ * 	]));
+ * // вместо
+ * $query->where([
+ * 		'TableName1.field1' => 'val1',
+ * 		'TableName1.field2' => 'val2',
+ * 		'TableName2.field1' => 'val3',
+ * 		'TableName2.field2' => 'val4',
+ * 		'field3' => 'val',
+ * 	]);
+ * ```
  *
- * @param string $tableAlias
- * @param array $conditions
+ * @param array $conditionsByTable
+ * @throws Exception при дублировании ключей
  * @return array
  */
-function fieldsWhere($tableAlias, array $conditions) {
-	$newConditions = [];
-	foreach ($conditions as $field => $value) {
-		$fieldFull = $tableAlias . '.' . $field;
-		$newConditions[$fieldFull] = $value;
+function fieldsWhere(array $conditionsByTable) {
+	$noTableKey = '';
+	if (array_key_exists($noTableKey, $conditionsByTable)) {
+		$newConditions = $conditionsByTable[$noTableKey];
+		unset($conditionsByTable[$noTableKey]);
+	} else {
+		$newConditions = [];
+	}
+	foreach ($conditionsByTable as $tableAlias => $conditions) {
+		foreach ($conditions as $field => $value) {
+			$fieldFull = $tableAlias . '.' . $field;
+			if (array_key_exists($fieldFull, $newConditions)) {
+				throw new Exception("Дублируется ключ $fieldFull");
+			}
+			$newConditions[$fieldFull] = $value;
+		}
 	}
 	return $newConditions;
 }
 
 /**
  * В массиве для выборки select() всем полям проставить таблицу.
+ * Проставляет таблицу в значения массива.
+ * ```php
+ * // можно делать
+ * $query->select(fieldsSelect([
+ *		'Table1' => [
+ *			'field1',
+ *			'field2',
+ *		],
+ *		'Table2' => [
+ *			'field1',
+ *			'alias' => 'field2',
+ *		],
+ *		'' => [
+ *			'field4',
+ *			'other_alias' => 'field5',
+ *		],
+ * 	]));
+ * // вместо
+ * $query->select([
+ *		'Table1.field1',
+ *		'Table1.field2',
+ *		'Table2.field1',
+ *		'alias' => 'Table2.field2',
+ * 		'field4',
+ *		'other_alias' => 'field5',
+ * 	]);
+ * ```
  *
- * @param string $tableAlias
- * @param string|string[] $fields
+ * @param array $fieldsByTable
+ * @throws Exception при дублировании ключей
  * @return string[]
  */
-function fieldsSelect($tableAlias, $fields) {
-	$fields = (array)$fields;
-	foreach ($fields as &$field) {
-		$field = $tableAlias . '.' . $field;
+function fieldsSelect($fieldsByTable) {
+	$noTableKey = '';
+	if (array_key_exists($noTableKey, $fieldsByTable)) {
+		$newFields = $fieldsByTable[$noTableKey];
+		unset($fieldsByTable[$noTableKey]);
+	} else {
+		$newFields = [];
 	}
-	return $fields;
+	$counterKey = count($newFields);
+	foreach ($fieldsByTable as $tableAlias => $fields) {
+		foreach ((array)$fields as $key => $field) {
+			if (!is_string($key)) {
+				$key = $counterKey;
+				$counterKey++;
+			} elseif (array_key_exists($key, $newFields)) {
+				throw new Exception("Дублируется ключ $key");
+			}
+			$newFields[$key] = $tableAlias . '.' . $field;
+		}
+	}
+
+	return $newFields;
 }
 
 if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
