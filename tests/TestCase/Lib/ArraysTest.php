@@ -151,14 +151,24 @@ class ArraysTest extends AppTestCase
 		$keyNumString = '_numString';
 		$number = 123;
 		$value = '_val';
+		$badValue = 'asdfg';
 		$arr = [
 			$keyEquals => $value,
-			$keyNotEquals => 'asdfg',
+			$keyNotEquals => $badValue,
 			$keyNumString => (string)$number,
 		];
 		self::assertTrue(Arrays::equals($arr, $keyEquals, $value));
+		self::assertTrue(Arrays::equalsAny($arr, $keyEquals, [$value]));
+		self::assertTrue(Arrays::equalsAny($arr, $keyEquals, [$value, $badValue]));
+		self::assertTrue(Arrays::equalsAny($arr, $keyEquals, [$badValue, $value]));
+		self::assertFalse(Arrays::equalsAny($arr, $keyEquals, [$badValue]));
+
 		self::assertFalse(Arrays::equals($arr, $keyNotEquals, $value));
+		self::assertFalse(Arrays::equalsAny($arr, $keyNotEquals, [$value]));
+
 		self::assertFalse(Arrays::equals($arr, $keyNotExists, $value));
+		self::assertFalse(Arrays::equalsAny($arr, $keyNotExists, [$value]));
+
 
 		self::assertFalse(Arrays::equals($arr, $keyNumString, $number));
 		self::assertTrue(Arrays::equals($arr, $keyNumString, $number, false));
