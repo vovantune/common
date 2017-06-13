@@ -96,6 +96,24 @@ class Arrays
 	}
 
 	/**
+	 * Проверить, что значение по ключу равно ожидаемому.
+	 * С проверкой на существование
+	 *
+	 * @param array $array
+	 * @param string $key
+	 * @param mixed $value
+	 * @param bool $strict
+	 * @return bool
+	 */
+	public static function equals(array $array, $key, $value, $strict = true) {
+		if ($strict) {
+			return array_key_exists($key, $array) && ($array[$key] === $value);
+		} else {
+			return array_key_exists($key, $array) && ($array[$key] == $value);
+		}
+	}
+
+	/**
 	 * Инициализировать значение в массиве по ключу или пути из ключей
 	 * Для уменьшения количества однообразных ифчиков вида
 	 * if (empty($array[$key])) $array[$key] = [];
