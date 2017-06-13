@@ -100,7 +100,7 @@ class Arrays
 	 * С проверкой на существование
 	 *
 	 * @param array $array
-	 * @param string $key
+	 * @param string|int $key
 	 * @param mixed $value
 	 * @param bool $strict
 	 * @return bool
@@ -112,6 +112,19 @@ class Arrays
 			return array_key_exists($key, $array) && ($array[$key] == $value);
 		}
 	}
+
+	/**
+	 * Проверить, что значение по ключу равно одному из ожидаемых
+	 *
+	 * @param array $array
+	 * @param string|int $key
+	 * @param array $values
+	 * @return bool
+	 */
+	public static function equalsAny(array $array, $key, array $values) {
+		return array_key_exists($key, $array) && in_array($array[$key], $values);
+	}
+	
 
 	/**
 	 * Инициализировать значение в массиве по ключу или пути из ключей
