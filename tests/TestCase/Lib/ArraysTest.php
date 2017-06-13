@@ -143,4 +143,25 @@ class ArraysTest extends AppTestCase
 		Arrays::initPath($array, [$keyNestedFirst, $keyNestedSecond, $keyNestedThird], $value);
 	}
 
+	/** Сравнение */
+	public function testEquals() {
+		$keyEquals = '_key';
+		$keyNotEquals = '_notEq';
+		$keyNotExists = '_notExists';
+		$keyNumString = '_numString';
+		$number = 123;
+		$value = '_val';
+		$arr = [
+			$keyEquals => $value,
+			$keyNotEquals => 'asdfg',
+			$keyNumString => (string)$number,
+		];
+		self::assertTrue(Arrays::equals($arr, $keyEquals, $value));
+		self::assertFalse(Arrays::equals($arr, $keyNotEquals, $value));
+		self::assertFalse(Arrays::equals($arr, $keyNotExists, $value));
+
+		self::assertFalse(Arrays::equals($arr, $keyNumString, $number));
+		self::assertTrue(Arrays::equals($arr, $keyNumString, $number, false));
+	}
+
 }
