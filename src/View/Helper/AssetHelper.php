@@ -8,6 +8,7 @@ use ArtSkills\Filesystem\File;
 use Cake\Utility\Inflector;
 use Cake\View\Helper;
 use ArtSkills\Error\Assert;
+use Cake\View\View;
 
 class AssetHelper extends Helper
 {
@@ -29,6 +30,11 @@ class AssetHelper extends Helper
 	const BLOCK_SCRIPT_BOTTOM = 'scriptBottom';
 	const BLOCK_SCRIPT = 'script';
 	const BLOCK_STYLE = 'css';
+	const BLOCKS = [
+		self::BLOCK_SCRIPT,
+		self::BLOCK_SCRIPT_BOTTOM,
+		self::BLOCK_STYLE,
+	];
 
 	const DEFAULT_PARAMS = [
 		'controller' => 'pages',
@@ -122,11 +128,23 @@ class AssetHelper extends Helper
 	 *
 	 * @var array
 	 */
-	private $_result = [
-		self::BLOCK_SCRIPT => [],
-		self::BLOCK_SCRIPT_BOTTOM => [],
-		self::BLOCK_STYLE => [],
-	];
+	private $_result = [];
+
+	/**
+	 * Массив флагов того, был ли уже выведен этот блок
+	 *
+	 * @var array
+	 */
+	private $_blockFetched = [];
+
+	/** @inheritdoc */
+	public function __construct(View $View, array $config = []) {
+		foreach (static::BLOCKS as $block) {
+			$this->_result[$block] = [];
+			$this->_blockFetched[$block] = false;
+		}
+		parent::__construct($View, $config);
+	}
 
 	/**
 	 * Задать счётчик версий ассетов
@@ -154,7 +172,11 @@ class AssetHelper extends Helper
 	 * @param bool $merge добавить или перезаписать
 	 * @throws \Exception
 	 */
-	private function _setCurrentConfig($controller, $action, array $config, $merge = true) {
+	public function setActionConfig($controller, $action, array $config, $merge = true) {
+		$assetName = "$controller.$action";
+		if ($this->_isLoaded($assetName)) {
+			throw new \Exception("Попытка сконфигурировать ассет $assetName, который уже загружен");
+		}
 		if (!empty($config[self::KEY_DEPEND])) {
 			foreach ($config[self::KEY_DEPEND] as $dependency) {
 				if (!strpos($dependency, '.')) {
@@ -173,7 +195,7 @@ class AssetHelper extends Helper
 			}
 		}
 
-		parent::setConfig("$controller.$action", $config, $merge);
+		parent::setConfig($assetName, $config, $merge);
 	}
 
 	/**
@@ -184,7 +206,7 @@ class AssetHelper extends Helper
 	 * @param bool $merge добавить или перезаписать
 	 */
 	public function setCurrentConfig(array $config, $merge = true) {
-		$this->_setCurrentConfig($this->_getParam(null, 'controller'), $this->_getParam(null, 'action'), $config, $merge);
+		$this->setActionConfig($this->_getParam(null, 'controller'), $this->_getParam(null, 'action'), $config, $merge);
 	}
 
 	/**
@@ -227,10 +249,10 @@ class AssetHelper extends Helper
 		foreach ($configs as $controller => $controllerConf) {
 			if (strpos($controller, '.') !== false) {
 				list($controller, $action) = explode('.', $controller);
-				$this->_setCurrentConfig($controller, $action, $controllerConf, $merge);
+				$this->setActionConfig($controller, $action, $controllerConf, $merge);
 			} else {
 				foreach ($controllerConf as $action => $actionConf) {
-					$this->_setCurrentConfig($controller, $action, $actionConf, $merge);
+					$this->setActionConfig($controller, $action, $actionConf, $merge);
 				}
 			}
 		}
@@ -268,10 +290,39 @@ class AssetHelper extends Helper
 	 * или при попытке переопределить переменную, когда это не разрешено
 	 */
 	public function setVars(array $variables, $overwrite = false) {
-		Assert::isArray($variables, 'Переменные должны быть массивом [название => значение]');
+		$this->_setVars($variables, $overwrite, true);
+	}
+
+	/**
+	 * Задание значений констант
+	 *
+	 * @param array $constants [название => значение]
+	 * проставление кавычек строкам и json_encode() массивов сделаются автоматически, передавать сюда такое не нужно!!!
+	 * и по названиям переменных пройдутся preg_match и инфлектор, чтоб туда не попадало говно
+	 * @param bool|array $overwrite можно ли перезаписать константы, если они уже определены.
+	 * bool сразу для всех, массив - для каждого по отдельности
+	 * @throws \Exception если переданы неправильные параметры
+	 * или при попытке переопределить константу, когда это не разрешено
+	 */
+	public function setConsts(array $constants, $overwrite = false) {
+		$this->_setVars($constants, $overwrite, false);
+	}
+
+	/**
+	 * Задание значений переменных или констант.
+	 * Разница в проверке именований: переменные в camelCase, константы в UPPER_CASE.
+	 *
+	 * @param array $variables
+	 * @param bool $overwrite
+	 * @param bool $isVariable переменная или константа.
+	 * @throws \Exception
+	 */
+	private function _setVars(array $variables, $overwrite = false, $isVariable = true) {
+		$this->_checkCanRenderVars();
+		Assert::isArray($variables, ($isVariable ? 'Переменные' : 'Константы') . ' должны быть массивом [название => значение]');
 
 		foreach ($variables as $varName => $varValue) {
-			$varName = $this->_validVarName($varName);
+			$varName = $this->_validVarName($varName, $isVariable);
 			$existingVarType = $this->_existingVarType($varName, true);
 			if (empty($existingVarType)) {
 				$this->_definedVariables[$varName] = $varValue;
@@ -289,6 +340,53 @@ class AssetHelper extends Helper
 			}
 		}
 	}
+
+	/**
+	 * Вывести блок в шаблон/layout
+	 *
+	 * @param string $blockName
+	 * @return string
+	 * @throws \Exception
+	 */
+	public function fetchBlock($blockName) {
+		if (!array_key_exists($blockName, $this->_blockFetched)) {
+			throw new \Exception("Неизвестный блок $blockName");
+		}
+		if ($this->_blockFetched[$blockName]) {
+			throw new \Exception("Блок $blockName уже был выведен");
+		}
+		$this->_blockFetched[$blockName] = true;
+		return $this->_View->fetch($blockName);
+	}
+
+	/**
+	 * Вывести скрипты в шаблон
+	 *
+	 * @return string
+	 */
+	public function fetchScripts() {
+		return $this->fetchBlock(self::BLOCK_SCRIPT);
+	}
+
+	/**
+	 * Вывести стили в шаблон
+	 *
+	 * @return string
+	 */
+	public function fetchStyles() {
+		return $this->fetchBlock(self::BLOCK_STYLE);
+	}
+
+	/**
+	 * Вывести скрипты в шаблон в нижний блок
+	 *
+	 * @return string
+	 */
+	public function fetchScriptsBottom() {
+		return $this->fetchBlock(self::BLOCK_SCRIPT_BOTTOM);
+	}
+
+
 
 	/**
 	 * Вытащить из конфига параметр ассета
@@ -319,13 +417,23 @@ class AssetHelper extends Helper
 	}
 
 	/**
+	 * Был ли ассет уже загружен
+	 *
+	 * @param string $assetName
+	 * @return bool
+	 */
+	private function _isLoaded($assetName) {
+		return in_array($assetName, $this->_loadedAssets) || in_array($assetName, $this->_newAssets);
+	}
+
+	/**
 	 * Загрузка ассета со всеми зависимостями, переменными и проверками
 	 *
 	 * @param string $assetName
 	 * @throws \Exception
 	 */
 	private function _loadAsset($assetName) {
-		if (in_array($assetName, $this->_loadedAssets) || in_array($assetName, $this->_newAssets)) {
+		if ($this->_isLoaded($assetName)) {
 			return;
 		}
 		if (!empty($this->_startedAssets[$assetName])) {
@@ -414,6 +522,7 @@ class AssetHelper extends Helper
 		if (empty($this->_definedVariables)) {
 			return;
 		}
+		$this->_checkCanRenderVars();
 		$statements = [];
 		foreach ($this->_definedVariables as $varName => $varValue) {
 			$expectedType = (empty($this->_newVariables[$varName]) ? null : $this->_newVariables[$varName]);
@@ -425,7 +534,32 @@ class AssetHelper extends Helper
 			$statements[] = "$varName = $value;";
 		}
 		$html = "<script>\n " . implode("\n ", $statements) . "\n</script>";
-		$this->_result[self::BLOCK_SCRIPT][] = $html;
+		$this->_result[$this->_getRenderVarsBlock()][] = $html;
+	}
+
+	/**
+	 * Получить блок, в который будут выводиться переменные
+	 *
+	 * @return string
+	 */
+	private function _getRenderVarsBlock() {
+		foreach ([self::BLOCK_SCRIPT, self::BLOCK_SCRIPT_BOTTOM] as $block) {
+			if (!$this->_blockFetched[$block]) {
+				return $block;
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Проверить, можно ли добавить ещё переменных
+	 *
+	 * @throws \Exception
+	 */
+	private function _checkCanRenderVars() {
+		if (empty($this->_getRenderVarsBlock())) {
+			throw new \Exception('Все блоки для переменных уже были выведены');
+		}
 	}
 
 	/**
@@ -461,26 +595,44 @@ class AssetHelper extends Helper
 	private function _renderAssets() {
 		foreach ($this->_newAssets as $assetName) {
 			$isBottom = $this->_getAssetParam($assetName, self::KEY_IS_BOTTOM);
-			$block = (empty($isBottom) ? self::BLOCK_SCRIPT : self::BLOCK_SCRIPT_BOTTOM);
+			$scriptBlock = (empty($isBottom) ? self::BLOCK_SCRIPT : self::BLOCK_SCRIPT_BOTTOM);
 
 			$templatePath = $this->_getPath($assetName, self::KEY_TEMPLATE, true);
 			if (!empty($templatePath)) {
+				$this->_checkCanRenderBlock($scriptBlock, $assetName);
 				$file = new File($templatePath);
-				$this->_result[$block][] = $file->read();
+				$this->_result[$scriptBlock][] = $file->read();
 				$file->close();
 			}
 
 			$scriptPath = $this->_getPath($assetName, self::KEY_SCRIPT);
 			if (!empty($scriptPath)) {
+				$this->_checkCanRenderBlock($scriptBlock, $assetName);
 				$html = $this->_View->Html->script($scriptPath);
-				$this->_result[$block][] = $html;
+				$this->_result[$scriptBlock][] = $html;
 			}
 
 			$stylePath = $this->_getPath($assetName, self::KEY_STYLE);
 			if (!empty($stylePath)) {
+				$styleBlock = self::BLOCK_STYLE;
+				$this->_checkCanRenderBlock($styleBlock, $assetName);
 				$html = $this->_View->Html->css($stylePath);
-				$this->_result[self::BLOCK_STYLE][] = $html;
+				$this->_result[$styleBlock][] = $html;
 			}
+		}
+	}
+
+	/**
+	 * Проверить, можно ли добавить что-то в этот блок.
+	 * Т.е. то, что он ещё не был выведен.
+	 *
+	 * @param string $blockName
+	 * @param string $assetName для сообщения об ошибке
+	 * @throws \Exception
+	 */
+	private function _checkCanRenderBlock($blockName, $assetName) {
+		if ($this->_blockFetched[$blockName]) {
+			throw new \Exception("Не могу загрузить ассет $assetName: блок $blockName уже выведен");
 		}
 	}
 
@@ -501,7 +653,7 @@ class AssetHelper extends Helper
 				if (Url::isHttpUrl($path)) {
 					$finalPaths[] = $path;
 				} else {
-					if (!file_exists(WWW_ROOT . $path)) {
+					if (!is_file(WWW_ROOT . $path)) {
 						throw new \Exception("Прописанного файла $path не существует");
 					}
 					$finalPaths[] = '/' . $path . $this->_assetPostfix;
@@ -513,7 +665,7 @@ class AssetHelper extends Helper
 		$pathParts = self::DEFAULT_PATH_PARTS[$type];
 		list($controller, $action) = explode('.', $assetName);
 		$fileName = $pathParts['folder'] . '/' . Inflector::camelize($controller) . '/' . Inflector::delimit($action) . '.' . $pathParts['extension'];
-		if (file_exists(WWW_ROOT . $fileName)) {
+		if (is_file(WWW_ROOT . $fileName)) {
 			return $realPath ? realpath(WWW_ROOT . $fileName) : ('/' . $fileName . $this->_assetPostfix);
 		}
 		return null;
@@ -523,20 +675,30 @@ class AssetHelper extends Helper
 	 * Проверка, что такое имя можно задать, и приведение его к camelCase
 	 *
 	 * @param string $varName
+	 * @param bool $isVariable
 	 * @return string
 	 * @throws \Exception если имя - не строка или там полнейшее говно
 	 */
-	private function _validVarName($varName) {
+	private function _validVarName($varName, $isVariable = true) {
+		$subjectName = $isVariable ? 'переменной' : 'константы';
 		if (!is_string($varName)) {
-			throw new \Exception('Название переменной должно быть строкой');
+			throw new \Exception("Название $subjectName должно быть строкой");
 		}
 		if (preg_match('/([^\w\d_]|[а-яё]|^[\d_])/ui', $varName)) {
-			throw new \Exception("Невалидное название переменной '$varName'");
+			throw new \Exception("Невалидное название $subjectName '$varName'");
 		}
-		$validName = Inflector::variable($varName);
-		if ($validName !== $varName) {
-			throw new \Exception("Переименуйте '$varName' в '$validName'");
+		if ($isVariable) {
+			$validName = Inflector::variable($varName);
+			if ($validName !== $varName) {
+				throw new \Exception("Переменная '$varName' не camelCase");
+			}
+		} else {
+			$validName = strtoupper($varName);
+			if ($validName !== $varName) {
+				throw new \Exception("Константа '$varName' не UPPER_CASE");
+			}
 		}
+
 		return $validName;
 	}
 
@@ -566,7 +728,7 @@ class AssetHelper extends Helper
 	 * @param null|string $block
 	 * @return array
 	 */
-	public function fetchResult($block = null) {
+	public function getResult($block = null) {
 		if (!empty($block)) {
 			if (!empty($this->_result[$block])) {
 				$result = $this->_result[$block];
@@ -593,7 +755,7 @@ class AssetHelper extends Helper
 	private function _finish($appendResult) {
 		if ($appendResult) {
 			if (!Env::isUnitTest()) {
-				$result = $this->fetchResult();
+				$result = $this->getResult();
 				foreach ($result as $block => $tags) {
 					foreach ($tags as $tag) {
 						$this->_View->append($block, $tag);
@@ -607,7 +769,7 @@ class AssetHelper extends Helper
 			$this->_loadedVariables = array_merge($this->_loadedVariables, $this->_newVariables);
 			$this->_loadedAssets = array_merge($this->_loadedAssets, $this->_newAssets);
 		} else {
-			$this->fetchResult();
+			$this->getResult();
 		}
 		$this->_newAssets = [];
 		$this->_newVariables = [];
