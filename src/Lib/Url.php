@@ -180,13 +180,13 @@ class Url
 	}
 
 	/**
-	 * Проверить, что строка начинается с http://
+	 * Проверить, что строка начинается с http:// или https://
 	 *
 	 * @param string $url
 	 * @return bool
 	 */
 	public static function isHttpUrl($url) {
-		return Strings::startsWith(trim($url), self::HTTP);
+		return Strings::startsWith(trim($url), [self::HTTP, 'https://']);
 	}
 
 
