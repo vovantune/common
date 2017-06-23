@@ -26,12 +26,12 @@ class GitBranchTrimTest extends AppTestCase
 
 		self::assertEquals($branchBefore, $git->getCurrentBranchName(), 'Ветка не вернулась обратно');
 
-		$deleteDateFrom = Time::now(PropertyAccess::getStatic(GitBranchTrim::class, '_branchDeleteInterval'))->format('Y-m-d');
+		$deleteDateFrom = Time::parse(PropertyAccess::getStatic(GitBranchTrim::class, '_branchDeleteInterval'))->format('Y-m-d');
 		$skipBranches = [Git::BRANCH_NAME_MASTER, Git::BRANCH_NAME_HEAD, $branchBefore];
 
 		$actualHistory = $history;
 		$expectedHistory = [];
-		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
+		if ($branchBefore !== Git::BRANCH_NAME_MASTER) {
 			$expectedHistory[] = 'git branch -a 2>&1';
 			$expectedHistory[] = 'git checkout master 2>&1';
 		}
@@ -46,7 +46,7 @@ class GitBranchTrimTest extends AppTestCase
 				}
 			}
 		}
-		if ($branchBefore != Git::BRANCH_NAME_MASTER) {
+		if ($branchBefore !== Git::BRANCH_NAME_MASTER) {
 			$expectedHistory[] = 'git branch -a 2>&1';
 			$expectedHistory[] = 'git checkout ' . $branchBefore . ' 2>&1';
 		}

@@ -113,7 +113,7 @@ class GitBranchTrim
 		$git = static::_git();
 		$skipBranches = array_merge($skipBranches, [Git::BRANCH_NAME_MASTER, Git::BRANCH_NAME_HEAD]);
 		$mergedBranches = $git->getMergedBranches($type);
-		$deleteDateFrom = Time::now(static::$_branchDeleteInterval)->format('Y-m-d');
+		$deleteDateFrom = Time::parse(static::$_branchDeleteInterval)->format('Y-m-d');
 		$log = [];
 		foreach ($mergedBranches as $branchName => $lastCommitDate) {
 			if ($lastCommitDate > $deleteDateFrom) {

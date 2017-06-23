@@ -279,8 +279,8 @@ class GitTest extends AppTestCase
 					continue;
 				}
 				$this->_executeHistory = [];
-				$canDelete = ($state == 'merged');
-				$labelState = (($state == 'unmerged') ? 'не' : '') . 'померженной';
+				$canDelete = ($state === 'merged');
+				$labelState = (($state === 'unmerged') ? 'не' : '') . 'померженной';
 				$branch = array_pop($list);
 				self::assertEquals(
 					$canDelete,
@@ -288,7 +288,7 @@ class GitTest extends AppTestCase
 					'Удаление ' . $labelState . ' ' . $labelType . ' ветки вернуло не то, что нужно'
 				);
 				self::assertEquals(
-					$this->_expectedCommandListDelete($branch, $canDelete, $this->_branchBeforeTest, $type),
+					$this->_expectedCommandListDelete($branch, $canDelete, $this->_branchBeforeTest, $type, $pull),
 					$this->_executeHistory,
 					'Удаление ' . $labelState . ' ' . $labelType . ' ветки вызывало неправильные команды'
 				);
