@@ -83,7 +83,7 @@ class TestController extends Controller
 	 * @throws UserException
 	 */
 	public function getStandardErrorJsonConfigured() {
-		throw $this->_getUserError('log message')
+		throw UserException::instance('log message')
 			->setUserMessage('user message')
 			->setLogScope('some scope')
 			->setLogAddInfo('some info')

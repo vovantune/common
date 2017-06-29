@@ -139,7 +139,7 @@ class ControllerTest extends AppControllerTestCase
 				'url' => '/test/getInternalErrorJson',
 				'code' => 500,
 				'file' => (new \ReflectionClass(Controller::class))->getFileName(),
-				'line' => 119,
+				'line' => 99,
 			],
 			500
 		);
