@@ -2,14 +2,120 @@
 
 namespace ArtSkills\Controller;
 
+use ArtSkills\Error\InternalException;
+use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\ValueObject;
+use Cake\Http\Response;
+use Cake\Routing\Router;
 
 class Controller extends \Cake\Controller\Controller
 {
 
 	const JSON_STATUS_OK = 'ok';
 	const JSON_STATUS_ERROR = 'error';
+
+	const EXTENSION_HTML = 'html';
+	const EXTENSION_JSON = 'json';
+	const EXTENSION_DEFAULT = self::EXTENSION_HTML;
+
+	/**
+	 * Задать редирект в случае ошибки
+	 *
+	 * @var null|string|array|Response
+	 */
+	private $_errorRedirect = null;
+
+	/**
+	 * Список экшнов, которые всегда должны возвращать джсон.
+	 * Автоматически вызывает для них _setIsJsonAction() в инициализации.
+	 * Т.к. вызывается в инициализации и ставит _ext=json,
+	 * то ошибки 4хх и 5хх будут отображаться в виде json не зависимо от изначального _ext
+	 *
+	 * @var string[]
+	 */
+	protected $_jsonActions = [];
+
+	/** @inheritdoc */
+	public function invokeAction() {
+		try {
+			return parent::invokeAction();
+		} catch (UserException $exception) {
+			$exception->log();
+			if ($this->_isJsonAction()) {
+				return $this->_sendJsonException($exception);
+			}
+			$this->Flash->error($exception->getUserMessage());
+			$redirect = $this->_errorRedirect;
+			if (is_string($redirect) || is_array($redirect)) {
+				$redirect = $this->redirect($redirect);
+			}
+			return $redirect;
+		}
+	}
+
+	/** @inheritdoc */
+	public function initialize() {
+		parent::initialize();
+		$currentAction = $this->request->getParam('action');
+		foreach ($this->_jsonActions as $action) {
+			if ($action === $currentAction) {
+				$this->_setIsJsonAction();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Задать редирект при обработке ошибок
+	 *
+	 * @param null|string|array|Response $redirect
+	 */
+	protected function _setErrorRedirect($redirect) {
+		$this->_errorRedirect = $redirect;
+	}
+
+	/**
+	 * Бросить обычную пользовательскую ошибку
+	 *
+	 * @param string $message
+	 * @param bool|null|string|array|Response $redirect
+	 * @throws UserException
+	 */
+	protected function _throwUserError($message, $redirect = false) {
+		if ($redirect !== false) {
+			$this->_errorRedirect = $redirect;
+		}
+		throw new UserException($message);
+	}
+
+	/**
+	 * Бросить обычную внутреннюю ошибку
+	 *
+	 * @param string $message
+	 * @throws InternalException
+	 */
+	protected function _throwInternalError($message) {
+		throw new InternalException($message);
+	}
+
+
+	/**
+	 * Задать, что текущий экшн должен возвращать json
+	 */
+	protected function _setIsJsonAction() {
+		$this->request = $this->request->withParam('_ext', self::EXTENSION_JSON);
+		Router::pushRequest($this->request);
+	}
+
+	/**
+	 * Узнать, должен ли текущий экшн должен возвращать json
+	 *
+	 * @return bool
+	 */
+	protected function _isJsonAction() {
+		return ($this->request->getParam('_ext') === self::EXTENSION_JSON);
+	}
 
 	/**
 	 * Возвращает ответ без ошибки и прерывает выполнение
@@ -47,7 +153,12 @@ class Controller extends \Cake\Controller\Controller
 	 */
 	protected function _sendJsonException(\Exception $exception, array $jsonData = []) {
 		Env::checkTestException($exception);
-		return $this->_sendJsonError($exception->getMessage(), $jsonData);
+		if ($exception instanceof UserException) {
+			$message = $exception->getUserMessage();
+		} else {
+			$message = $exception->getMessage();
+		}
+		return $this->_sendJsonError($message, $jsonData);
 	}
 
 	/**

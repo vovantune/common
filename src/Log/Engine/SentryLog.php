@@ -162,6 +162,10 @@ class SentryLog extends BaseLog
 	 */
 	public static function logException(\Exception $exception, array $context = [], $alert = null) {
 		Env::checkTestException($exception);
+		if (($exception instanceof \ArtSkills\Error\Exception) && (!$exception->isLogged())) {
+			$exception->log();
+			return;
+		}
 		$level = self::_getExceptionLevel($exception, $alert);
 		if (empty($context[self::KEY_NO_FILE_LOG])) {
 			Log::write($level, $exception->getMessage(), [self::KEY_IS_HANDLED => true] + $context);

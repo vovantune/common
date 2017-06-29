@@ -12,6 +12,8 @@ use Cake\Controller\Component\FlashComponent;
 abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 {
 
+	use TestCaseTrait;
+
 	/**
 	 * Снифф флеша
 	 *
@@ -68,14 +70,20 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * Проверка, что ответ - JSON и его decode
 	 *
 	 * @param string $url
+	 * @param null|int $responseCode
 	 * @return array
 	 */
-	public function getJsonResponse($url = '') {
+	public function getJsonResponse($url = '', $responseCode = null) {
 		if (!empty($url)) {
 			$this->get($url);
 		}
 
-		$this->assertResponseOk();
+		if ($responseCode === null) {
+			$this->assertResponseOk();
+		} else {
+			$this->assertResponseCode($responseCode);
+		}
+
 		$rawBody = (string)$this->_response->getBody();
 
 		self::assertJson($rawBody, 'Получен ответ не в формате JSON');
@@ -99,11 +107,12 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 *
 	 * @param array $expected
 	 * @param string $message
+	 * @param null|int $responseCode
 	 * @param float $delta
 	 * @param int $maxDepth
 	 */
-	public function assertJsonResponseEquals($expected, $message = '', $delta = 0.0, $maxDepth = 10) {
-		self::assertEquals($expected, $this->getJsonResponse(), $message, $delta, $maxDepth);
+	public function assertJsonResponseEquals($expected, $message = '', $responseCode = null, $delta = 0.0, $maxDepth = 10) {
+		self::assertEquals($expected, $this->getJsonResponse('', $responseCode), $message, $delta, $maxDepth);
 	}
 
 	/**
@@ -123,14 +132,15 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $expectedMessage
 	 * @param string $message
 	 * @param array $expectedData
+	 * @param null|int $responseCode
 	 * @param float $delta
 	 * @param int $maxDepth
 	 */
 	public function assertJsonErrorEquals(
-		$expectedMessage, $message = '', $expectedData = [], $delta = 0.0, $maxDepth = 10
+		$expectedMessage, $message = '', $expectedData = [], $responseCode = null, $delta = 0.0, $maxDepth = 10
 	) {
 		$expectedResponse = ['status' => Controller::JSON_STATUS_ERROR, 'message' => $expectedMessage] + $expectedData;
-		$this->assertJsonResponseEquals($expectedResponse, $message, $delta, $maxDepth);
+		$this->assertJsonResponseEquals($expectedResponse, $message, $responseCode, $delta, $maxDepth);
 	}
 
 	/**
@@ -138,12 +148,13 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 *
 	 * @param array $expectedData
 	 * @param string $message
+	 * @param null|int $responseCode
 	 * @param float $delta
 	 * @param int $maxDepth
 	 */
-	public function assertJsonOKEquals($expectedData = [], $message = '', $delta = 0.0, $maxDepth = 10) {
+	public function assertJsonOKEquals($expectedData = [], $message = '', $responseCode = null, $delta = 0.0, $maxDepth = 10) {
 		$expectedResponse = ['status' => Controller::JSON_STATUS_OK] + $expectedData;
-		$this->assertJsonResponseEquals($expectedResponse, $message, $delta, $maxDepth);
+		$this->assertJsonResponseEquals($expectedResponse, $message, $responseCode, $delta, $maxDepth);
 	}
 
 	/** @inheritdoc */
