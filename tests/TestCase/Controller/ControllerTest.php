@@ -1,6 +1,6 @@
 <?php
 
-namespace ArtSkills\Test\Controller\TestControllerTest;
+namespace ArtSkills\Test\Controller;
 
 use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;

@@ -68,7 +68,7 @@ class Exception extends \Exception
 	/**
 	 * Задать scope для логирования ошибок
 	 *
-	 * @param string|string[] $scope
+	 * @param string|string[]|null $scope
 	 * @return $this
 	 */
 	public function setLogScope($scope) {
