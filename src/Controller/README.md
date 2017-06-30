@@ -52,20 +52,26 @@ try {
 Ошибка может быть выведена как в виде html, так и в json (подробнее в след. разделе).
 В случае html ошибка выведется при помощи `Flash->error()`. 
 При этом если был задан редирект на случай ошибки при помощи метода `Controller->_setErrorRedirect(null|string|array|Response): void`, то произойдёт соответствующий редирект, иначе отрендерится текущий экшн.
-Для удобного кидания есть метод контроллера `_throwUserError($message, bool|null|string|array|Response $redirect = false): void`.
+Для удобного кидания есть метод контроллера `_throwUserError(string $message, bool|null|string|array|Response $redirect = false): void`.
 Параметр `$redirect`: если это строка или массив, то их закинут в `$this->redirect()`; объект `Response` останется в неизменном виде; `null` означает не делать редирект; а `false` - использовать заданное ранее поведение.
+Для ещё более удобного использования есть метод контроллера `_throwUserErrorIf(bool $condition, string $message, bool|null|string|array|Response $redirect = false): void`.
   
 ```php
 function someAction() {
 	$this->_setErrorRedirect('/controller/otherAction');
 	// ... 
-	if ($emptyParams) {
-		$this->_throwUserError('empty params');
-		// редирект был задан _setErrorRedirect()
-	}
-	if ($badParam1) {
-		$this->_throwUserError('bad param 1');
-		// редирект был задан _setErrorRedirect()
+	$this->_throwUserErrorIf($isEmptyParams, 'empty params'); // редирект был задан _setErrorRedirect()
+	$this->_throwUserErrorIf($isBadParam1, 'bad param 1'); // редирект был задан _setErrorRedirect()
+	$this->_throwUserErrorIf($someError, 'error', '/otherController/action'); // редирект на 3й параметр
+	// ...
+	if (
+		$condition1
+		|| $condition2
+		|| $condition3
+		|| $condition4
+		|| $condition5
+	) {
+		$this->_throwUserError('error');
 	}
 	// ...
 	if ($somethingUnexpected) {
@@ -73,10 +79,8 @@ function someAction() {
 		// редирект не произойдёт, будет ошибка 500
 	}
 	// ...
-	if ($someError) {
-		$this->_throwUserError('error', '/otherController/action');
-		// редирект на 2й параметр
-	}
+	methodThatThrowsException();
+	// ...
 	// ...
 	if ($someOtherError) {
 		throw UserError::instance('log message')

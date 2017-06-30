@@ -29,8 +29,6 @@ class Controller extends \Cake\Controller\Controller
 	/**
 	 * Список экшнов, которые всегда должны возвращать джсон.
 	 * Автоматически вызывает для них _setIsJsonAction() в инициализации.
-	 * Т.к. вызывается в инициализации и ставит _ext=json,
-	 * то ошибки 4хх и 5хх будут отображаться в виде json не зависимо от изначального _ext
 	 *
 	 * @var string[]
 	 */
@@ -87,6 +85,19 @@ class Controller extends \Cake\Controller\Controller
 			$this->_errorRedirect = $redirect;
 		}
 		throw new UserException($message);
+	}
+
+	/**
+	 * Бросить обычную пользовательскую ошибку при условии
+	 *
+	 * @param bool $condition
+	 * @param string $message
+	 * @param bool|null|string|array|Response $redirect
+	 */
+	protected function _throwUserErrorIf($condition, $message, $redirect = false) {
+		if ($condition) {
+			$this->_throwUserError($message, $redirect);
+		}
 	}
 
 	/**
