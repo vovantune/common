@@ -127,4 +127,14 @@ class TestController extends Controller
 		$this->_throwInternalError('test json message');
 	}
 
+	/**
+	 * Внутренняя ошибка, json, проверяем трейс
+	 *
+	 * @throws InternalException
+	 */
+	public function getInternalErrorJsonTrace() {
+		$this->_setIsJsonAction();
+		throw new InternalException('test trace');
+	}
+
 }

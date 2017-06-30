@@ -1,6 +1,8 @@
 <?php
 namespace ArtSkills\Error;
 
+use ArtSkills\Controller\Controller;
+use ArtSkills\Lib\Arrays;
 use ArtSkills\Log\Engine\SentryLog;
 
 /**
@@ -70,6 +72,10 @@ class Exception extends \Exception
 	 * @return $this
 	 */
 	public function setLogScope($scope) {
+		if ($scope === null) {
+			unset($this->_logContext['scope']);
+			return $this;
+		}
 		$this->_logContext['scope'] = (array)$scope;
 		return $this->setWriteToLog(true);
 	}
@@ -81,6 +87,10 @@ class Exception extends \Exception
 	 * @return $this
 	 */
 	public function setLogAddInfo($info) {
+		if ($info === null) {
+			unset($this->_logContext[SentryLog::KEY_ADD_INFO]);
+			return $this;
+		}
 		$this->_logContext[SentryLog::KEY_ADD_INFO] = $info;
 		return $this->setWriteToLog(true);
 	}
@@ -139,6 +149,29 @@ class Exception extends \Exception
 	 */
 	public function isLogged() {
 		return $this->_isLogged;
+	}
+
+	/**
+	 * Получить место, откуда было брошено исключение,
+	 *
+	 * @return null|array ['file' => , 'line' => ]
+	 */
+	public function getActualThrowSpot() {
+		$trace = $this->getTrace();
+		array_unshift($trace, ['file' => $this->getFile(), 'line' => $this->getLine()]);
+		$excludeFiles = [
+			__FILE__,
+			(new \ReflectionClass(Controller::class))->getFileName(),
+		];
+		$actualCall = null;
+		foreach ($trace as $call) {
+			$callFile = Arrays::get($call, 'file');
+			if (!empty($callFile) && !in_array($callFile, $excludeFiles, true)) {
+				$actualCall = $call;
+				break;
+			}
+		}
+		return $actualCall;
 	}
 
 }

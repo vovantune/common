@@ -2,12 +2,12 @@
 
 namespace ArtSkills\Test\Controller\TestControllerTest;
 
-use ArtSkills\Controller\Controller;
 use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;
 use ArtSkills\Log\Engine\SentryLog;
 use ArtSkills\TestSuite\AppControllerTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
+use TestApp\Controller\TestController;
 
 class ControllerTest extends AppControllerTestCase
 {
@@ -138,8 +138,29 @@ class ControllerTest extends AppControllerTestCase
 			[
 				'url' => '/test/getInternalErrorJson',
 				'code' => 500,
-				'file' => (new \ReflectionClass(Controller::class))->getFileName(),
-				'line' => 99,
+				// в TestController вызван Controller->_throwInternalError
+				// в котором вызван InternalError::instance
+				// при этом file и line - из TestController
+				'file' => (new \ReflectionClass(TestController::class))->getFileName(),
+				'line' => 127,
+			],
+			500
+		);
+	}
+
+	/** проверить, что у внутренних ошибок правильный трейс */
+	public function testInternalErrorTrace() {
+		MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
+		$this->get('/test/getInternalErrorJsonTrace');
+		$this->assertJsonErrorEquals(
+			'test trace',
+			'Неожиданный результат внутренней ошибки в формате json в режиме дебага',
+			[
+				'url' => '/test/getInternalErrorJsonTrace',
+				'code' => 500,
+				// а здесь был сделан непосредственно throw new InternalError
+				'file' => (new \ReflectionClass(TestController::class))->getFileName(),
+				'line' => 137,
 			],
 			500
 		);

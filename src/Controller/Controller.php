@@ -104,10 +104,12 @@ class Controller extends \Cake\Controller\Controller
 	 * Бросить обычную внутреннюю ошибку
 	 *
 	 * @param string $message
+	 * @param mixed $addInfo
+	 * @param string|string[]|null $scope
 	 * @throws InternalException
 	 */
-	protected function _throwInternalError($message) {
-		throw new InternalException($message);
+	protected function _throwInternalError($message, $addInfo = null, $scope = null) {
+		throw InternalException::instance($message)->setLogAddInfo($addInfo)->setLogScope($scope);
 	}
 
 

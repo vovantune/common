@@ -46,7 +46,7 @@ try {
 То есть, его обработка вообще ничем не отличается от любого другого исключения.
 Ошибка может быть выведена как в виде html, так и в json (подробнее в след. разделе).
 Для этого был сделан местный [ErrorController](ErrorController.php), от которого нужно отнаследовать ErrorController в проекте.
-А в обычном контроллере есть метод `_throwInternalError(string $message): void` для удобного кидания этих исключений.
+А в обычном контроллере есть метод `_throwInternalError(string $message, mixed $addInfo, null|string|string[] $scope): void` для удобного кидания этих исключений.
 
 Если был брошен `UserException`, то пользователю вернётся ответ с кодом 200 и сообщением об ошибке.
 Ошибка может быть выведена как в виде html, так и в json (подробнее в след. разделе).
@@ -75,7 +75,7 @@ function someAction() {
 	}
 	// ...
 	if ($somethingUnexpected) {
-		$this->_throwInternalError('something unexpected happened');
+		$this->_throwInternalError('something unexpected happened', $infoAboutError, $logScope);
 		// редирект не произойдёт, будет ошибка 500
 	}
 	// ...
