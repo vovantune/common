@@ -119,11 +119,15 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * Проверка вхождения в JSON ответ
 	 *
 	 * @param array $subset
-	 * @param bool $strict
 	 * @param string $message
+	 * @param null|int $responseCode
+	 * @param float $delta
+	 * @param int $maxDepth
 	 */
-	public function assertJsonResponseSubset($subset, $strict = false, $message = '') {
-		self::assertArraySubset($subset, $this->getJsonResponse(), $strict, $message);
+	public function assertJsonResponseSubset(
+		$subset, $message = '', $responseCode = null, $delta = 0.0, $maxDepth = 10
+	) {
+		$this->assertArraySubsetEquals($subset, $this->getJsonResponse('', $responseCode), $message, $delta, $maxDepth);
 	}
 
 	/**
@@ -141,6 +145,22 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	) {
 		$expectedResponse = ['status' => Controller::JSON_STATUS_ERROR, 'message' => $expectedMessage] + $expectedData;
 		$this->assertJsonResponseEquals($expectedResponse, $message, $responseCode, $delta, $maxDepth);
+	}
+
+	/**
+	 * Проверка JSON ответа с ошибкой
+	 *
+	 * @param string $expectedMessage
+	 * @param string $message
+	 * @param array $expectedData
+	 * @param float $delta
+	 * @param int $maxDepth
+	 */
+	public function assertJsonInternalErrorEquals(
+		$expectedMessage, $message = '', $expectedData = [], $delta = 0.0, $maxDepth = 10
+	) {
+		$expectedResponse = ['status' => Controller::JSON_STATUS_ERROR, 'message' => $expectedMessage] + $expectedData;
+		$this->assertJsonResponseSubset($expectedResponse, $message, 500, $delta, $maxDepth);
 	}
 
 	/**

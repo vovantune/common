@@ -146,6 +146,7 @@ class ControllerTest extends AppControllerTestCase
 			],
 			500
 		);
+		$this->assertJsonInternalErrorEquals('test json message');
 	}
 
 	/** проверить, что у внутренних ошибок правильный трейс */
@@ -176,6 +177,23 @@ class ControllerTest extends AppControllerTestCase
 			'Неожиданный результат внутренней ошибки в формате json в режиме продакшна',
 			[
 				'url' => '/test/getInternalErrorJson',
+				'code' => 500,
+			],
+			500
+		);
+		$this->assertJsonInternalErrorEquals('An Internal Error Has Occurred.');
+	}
+
+	/** Ещё раз убеждаемся, что трейса на продакшне нет */
+	public function testInternalErrorJsonProductionTrace() {
+		Env::setDebug(false);
+		MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
+		$this->get('/test/getInternalErrorJsonTrace');
+		$this->assertJsonErrorEquals(
+			'An Internal Error Has Occurred.',
+			'Неожиданный результат внутренней ошибки в формате json в режиме продакшна',
+			[
+				'url' => '/test/getInternalErrorJsonTrace',
 				'code' => 500,
 			],
 			500
