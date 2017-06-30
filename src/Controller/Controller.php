@@ -117,8 +117,10 @@ class Controller extends \Cake\Controller\Controller
 	 * Задать, что текущий экшн должен возвращать json
 	 */
 	protected function _setIsJsonAction() {
-		$this->request = $this->request->withParam('_ext', self::EXTENSION_JSON);
-		Router::pushRequest($this->request);
+		if (!$this->_isJsonAction()) {
+			$this->request = $this->request->withParam('_ext', self::EXTENSION_JSON);
+			Router::pushRequest($this->request);
+		}
 	}
 
 	/**
