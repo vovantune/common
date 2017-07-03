@@ -16,7 +16,7 @@ class Exception extends \Exception
 	 *
 	 * @var bool
 	 */
-	protected $_log = true;
+	protected $_writeToLog = true;
 
 	/**
 	 * Инфа для логов
@@ -61,7 +61,7 @@ class Exception extends \Exception
 	 * @return $this
 	 */
 	public function setWriteToLog($writeToLog) {
-		$this->_log = (bool)$writeToLog;
+		$this->_writeToLog = (bool)$writeToLog;
 		return $this;
 	}
 
@@ -129,7 +129,7 @@ class Exception extends \Exception
 	 * @param null|bool $alert
 	 */
 	public function log($context = [], $alert = null) {
-		if ($this->_log && !$this->_isLogged) {
+		if ($this->_writeToLog && !$this->_isLogged) {
 			$contextResult = (array)$context + $this->_logContext;
 			if (!empty($this->_logAddInfo)) {
 				$contextResult[SentryLog::KEY_ADD_INFO] = $this->_logAddInfo;

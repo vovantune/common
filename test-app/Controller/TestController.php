@@ -10,7 +10,7 @@ class TestController extends Controller
 {
 
 	/** @inheritdoc */
-	protected $_jsonActions = ['getStandardErrorJsonConfigured'];
+	protected $_jsonResponseActions = ['getStandardErrorJsonConfigured'];
 
 	/** @inheritdoc */
 	public $components = ['Flash', 'RequestHandler'];
@@ -105,7 +105,7 @@ class TestController extends Controller
 	 * @throws UserException
 	 */
 	public function getStandardErrorRedirect() {
-		$this->_throwUserError('test other flash message', '/test/getJsonOk');
+		$this->_throwUserErrorRedirect('test other flash message', '/test/getJsonOk');
 	}
 
 	/**

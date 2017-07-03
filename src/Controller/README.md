@@ -51,18 +51,25 @@ try {
 Если был брошен `UserException`, то пользователю вернётся ответ с кодом 200 и сообщением об ошибке.
 Ошибка может быть выведена как в виде html, так и в json (подробнее в след. разделе).
 В случае html ошибка выведется при помощи `Flash->error()`. 
-При этом если был задан редирект на случай ошибки при помощи метода `Controller->_setErrorRedirect(null|string|array|Response): void`, то произойдёт соответствующий редирект, иначе отрендерится текущий экшн.
-Для удобного кидания есть метод контроллера `_throwUserError(string $message, bool|null|string|array|Response $redirect = false): void`.
-Параметр `$redirect`: если это строка или массив, то их закинут в `$this->redirect()`; объект `Response` останется в неизменном виде; `null` означает не делать редирект; а `false` - использовать заданное ранее поведение.
-Для ещё более удобного использования есть метод контроллера `_throwUserErrorIf(bool $condition, string $message, bool|null|string|array|Response $redirect = false): void`.
+Для html версии есть возможность настроить редиректы при ошибке. 
+В json версии одновременно вывести ошибку и сделать редирект невозможно, поэтому использование редиректов выключено.
+Настройка редиректов:
+* `_setErrorRedirect(string|array|Response $redirect): void` - после вызова этого метода при поимке `UserException` будет сделан соответствующий редирект; 
+* `_setErrorNoRedirect(void): void` - после вызова этого метода при поимке `UserException` редиректов не будет, продолжится рендеринг текущего экшна;
+Методы для удобного бросания исключений
+* `_throwUserError(string $message, bool $condition = true)` - при выполнении условия бросить ошибку, редирект задаётся методами, описанными выше;
+* `_throwUserErrorRedirect(string $message, string|array|Response $redirect, bool $condition = true)` - при выполнении условия бросить ошибку и сделать редирект на переданный 2й параметр, не зависимо от методов выше;
+* `_throwUserErrorNoRedirect(string $message, bool $condition = true)` - при выполнении условия бросить ошибку и не делать редирект, не зависимо от методов выше;
+
   
 ```php
 function someAction() {
 	$this->_setErrorRedirect('/controller/otherAction');
 	// ... 
-	$this->_throwUserErrorIf($isEmptyParams, 'empty params'); // редирект был задан _setErrorRedirect()
-	$this->_throwUserErrorIf($isBadParam1, 'bad param 1'); // редирект был задан _setErrorRedirect()
-	$this->_throwUserErrorIf($someError, 'error', '/otherController/action'); // редирект на 3й параметр
+	$this->_throwUserError('empty params', $isEmptyParams); // редирект был задан _setErrorRedirect()
+	$this->_throwUserError('bad param 1', $isBadParam1); // редирект был задан _setErrorRedirect()
+	$this->_throwUserErrorRedirect('error', '/otherController/action', $someError); // редирект на 2й параметр
+	$this->_throwUserErrorNoRedirect('error', $otherError); // без редиректа
 	// ...
 	if (
 		$condition1
@@ -71,12 +78,13 @@ function someAction() {
 		|| $condition4
 		|| $condition5
 	) {
+		// условие в if, а не как параметр 
 		$this->_throwUserError('error');
 	}
 	// ...
 	if ($somethingUnexpected) {
 		$this->_throwInternalError('something unexpected happened', $infoAboutError, $logScope);
-		// редирект не произойдёт, будет ошибка 500
+		// внутренняя ошибка, редирект не произойдёт, будет ошибка 500 и неинформативное сообщение
 	}
 	// ...
 	methodThatThrowsException();
@@ -87,8 +95,8 @@ function someAction() {
 				->setUserMessage('user message')
 				->setLogScope('some_scope');
 	}
-	// кстати, такой экшн будет правильно работать и для запросов '.json', и для '.html'
-	// хотя для '.json' вызов _setErrorRedirect() не имеет смысла, так же как и 2й параметр _throwUserError()
+	// из-за наличия редиректов такой экшн не будет работать как .json
+	// но если их убрать, то будет работать и как .json, и как .html
 }
 ```
 
@@ -104,7 +112,7 @@ function someAction() {
 При этом есть возможность всегда отдавать JSON ответ, не зависимо от расширения.
 Для этого у контроллера есть метод `_setIsJsonAction(void): void` и свойство `string[] $_jsonActions`.
 `_setIsJsonAction()` - обрабатывать текущий экшн как `'.json'`; 
-`$_jsonActions` - обрабатывать каждый экшн из списка как `'.json'`, обрабатывается в `initialize()`.
+`$_jsonResponseActions` - обрабатывать каждый экшн из списка как `'.json'`, обрабатывается в `initialize()`.
 
 Стоит помнить, что если исключение было брошено до вызова `_setIsJsonAction()`, то оно будет обрабатываться в соответствии с расширением из запроса.
 

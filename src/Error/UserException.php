@@ -17,7 +17,7 @@ class UserException extends Exception
 	 * @inheritdoc
 	 * по умолчанию выключено
 	 */
-	protected $_log = false;
+	protected $_writeToLog = false;
 
 
 	/** @inheritdoc */

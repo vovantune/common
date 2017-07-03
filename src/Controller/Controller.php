@@ -7,6 +7,7 @@ use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\ValueObject;
 use Cake\Http\Response;
+use Cake\Log\Log;
 use Cake\Routing\Router;
 
 class Controller extends \Cake\Controller\Controller
@@ -32,7 +33,7 @@ class Controller extends \Cake\Controller\Controller
 	 *
 	 * @var string[]
 	 */
-	protected $_jsonActions = [];
+	protected $_jsonResponseActions = [];
 
 	/** @inheritdoc */
 	public function invokeAction() {
@@ -41,6 +42,9 @@ class Controller extends \Cake\Controller\Controller
 		} catch (UserException $exception) {
 			$exception->log();
 			if ($this->_isJsonAction()) {
+				if (!empty($this->_errorRedirect)) {
+					Log::error('Используется редирект в JSON ответе');
+				}
 				return $this->_sendJsonException($exception);
 			}
 			$this->Flash->error($exception->getUserMessage());
@@ -56,7 +60,7 @@ class Controller extends \Cake\Controller\Controller
 	public function initialize() {
 		parent::initialize();
 		$currentAction = $this->request->getParam('action');
-		foreach ($this->_jsonActions as $action) {
+		foreach ($this->_jsonResponseActions as $action) {
 			if ($action === $currentAction) {
 				$this->_setIsJsonAction();
 				break;
@@ -67,10 +71,20 @@ class Controller extends \Cake\Controller\Controller
 	/**
 	 * Задать редирект при обработке ошибок
 	 *
-	 * @param null|string|array|Response $redirect
+	 * @param string|array|Response $redirect
 	 */
 	protected function _setErrorRedirect($redirect) {
+		if (empty($redirect)) {
+			$this->_throwInternalError('Пустой параметр $redirect');
+		}
 		$this->_errorRedirect = $redirect;
+	}
+
+	/**
+	 * Задать, что при обработке ошибок редиректа нет
+	 */
+	protected function _setErrorNoRedirect() {
+		$this->_errorRedirect = null;
 	}
 
 	/**
@@ -78,34 +92,61 @@ class Controller extends \Cake\Controller\Controller
 	 *
 	 * @param string $message
 	 * @param bool|null|string|array|Response $redirect
+	 * @param bool $condition
 	 * @throws UserException
 	 */
-	protected function _throwUserError($message, $redirect = false) {
-		if ($redirect !== false) {
-			$this->_errorRedirect = $redirect;
+	private function _throwUserErrorAnyResponse($message, $redirect, $condition) {
+		if ($condition) {
+			if ($redirect !== false) {
+				$this->_errorRedirect = $redirect;
+			}
+			throw new UserException($message);
 		}
-		throw new UserException($message);
 	}
 
 	/**
-	 * Бросить обычную пользовательскую ошибку при условии
+	 * При выполнении условия бросить обычную пользовательскую ошибку, используя дефолтное поведение
 	 *
-	 * @param bool $condition
 	 * @param string $message
-	 * @param bool|null|string|array|Response $redirect
+	 * @param bool $condition
+	 * @throws UserException
 	 */
-	protected function _throwUserErrorIf($condition, $message, $redirect = false) {
-		if ($condition) {
-			$this->_throwUserError($message, $redirect);
+	protected function _throwUserError($message, $condition = true) {
+		$this->_throwUserErrorAnyResponse($message, false, $condition);
+	}
+
+	/**
+	 * При выполнении условия бросить обычную пользовательскую ошибку и сделать редирект
+	 *
+	 * @param string $message
+	 * @param string|array|Response $redirect
+	 * @param bool $condition
+	 * @throws UserException
+	 */
+	protected function _throwUserErrorRedirect($message, $redirect, $condition = true) {
+		if (empty($redirect)) {
+			$this->_throwInternalError('Пустой параметр $redirect');
 		}
+		$this->_throwUserErrorAnyResponse($message, $redirect, $condition);
+	}
+
+	/**
+	 * При выполнении условия бросить обычную пользовательскую ошибку и не делать редирект
+	 *
+	 * @param string $message
+	 * @param bool $condition
+	 * @throws UserException
+	 */
+	protected function _throwUserErrorNoRedirect($message, $condition) {
+		$this->_throwUserErrorAnyResponse($message, null, $condition);
 	}
 
 	/**
 	 * Бросить обычную внутреннюю ошибку
 	 *
 	 * @param string $message
-	 * @param mixed $addInfo
-	 * @param string|string[]|null $scope
+	 * @param mixed $addInfo доп информация об ошибке для sentry (SentryLog::KEY_ADD_INFO)
+	 * @param string|string[]|null $scope scope для логирования ошибки
 	 * @throws InternalException
 	 */
 	protected function _throwInternalError($message, $addInfo = null, $scope = null) {
@@ -153,6 +194,7 @@ class Controller extends \Cake\Controller\Controller
 	 * @param string $message
 	 * @param array $jsonData дополнительные параметры если нужны
 	 * @return NULL
+	 * @internal
 	 */
 	protected function _sendJsonError($message, array $jsonData = []) {
 		return $this->_sendJsonResponse(['status' => self::JSON_STATUS_ERROR, 'message' => $message] + $jsonData);
@@ -165,6 +207,7 @@ class Controller extends \Cake\Controller\Controller
 	 * @param \Exception $exception
 	 * @param array $jsonData
 	 * @return NULL
+	 * @internal
 	 */
 	protected function _sendJsonException(\Exception $exception, array $jsonData = []) {
 		Env::checkTestException($exception);
