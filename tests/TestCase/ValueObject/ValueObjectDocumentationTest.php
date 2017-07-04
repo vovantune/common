@@ -7,7 +7,7 @@ use ArtSkills\ValueObject\ValueObject;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\ValueObject\ValueObjectDocumentation;
-use Cake\Utility\String;
+use Cake\Utility\String as CakeString;
 
 class ValueObjectDocumentationTest extends AppTestCase
 {
@@ -70,7 +70,7 @@ class ValueObjectDocumentationTest extends AppTestCase
 		self::assertEquals([
 			'Strings' => Strings::class,
 			'ValueObject' => ValueObject::class,
-			'CakeString' => String::class,
+			'CakeString' => CakeString::class,
 		], MethodMocker::callPrivate(ValueObjectDocumentation::class, '_getUsesList', [__DIR__ . '/ValueObjectFixture.php']));
 	}
 }
