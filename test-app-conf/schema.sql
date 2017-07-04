@@ -30,6 +30,15 @@ CREATE TABLE `test_table_five` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `test_table_five`
+--
+
+LOCK TABLES `test_table_five` WRITE;
+/*!40000 ALTER TABLE `test_table_five` DISABLE KEYS */;
+/*!40000 ALTER TABLE `test_table_five` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `test_table_four`
 --
 
@@ -44,6 +53,15 @@ CREATE TABLE `test_table_four` (
   CONSTRAINT `fk_four_one` FOREIGN KEY (`table_one_fk`) REFERENCES `test_table_one` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='description qqq';
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `test_table_four`
+--
+
+LOCK TABLES `test_table_four` WRITE;
+/*!40000 ALTER TABLE `test_table_four` DISABLE KEYS */;
+/*!40000 ALTER TABLE `test_table_four` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `test_table_one`
@@ -62,6 +80,15 @@ CREATE TABLE `test_table_one` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `test_table_one`
+--
+
+LOCK TABLES `test_table_one` WRITE;
+/*!40000 ALTER TABLE `test_table_one` DISABLE KEYS */;
+/*!40000 ALTER TABLE `test_table_one` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `test_table_three`
 --
 
@@ -73,6 +100,15 @@ CREATE TABLE `test_table_three` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `test_table_three`
+--
+
+LOCK TABLES `test_table_three` WRITE;
+/*!40000 ALTER TABLE `test_table_three` DISABLE KEYS */;
+/*!40000 ALTER TABLE `test_table_three` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `test_table_two`
@@ -90,6 +126,15 @@ CREATE TABLE `test_table_two` (
   CONSTRAINT `fk_two_one` FOREIGN KEY (`table_one_fk`) REFERENCES `test_table_one` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='description qweqwe';
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `test_table_two`
+--
+
+LOCK TABLES `test_table_two` WRITE;
+/*!40000 ALTER TABLE `test_table_two` DISABLE KEYS */;
+/*!40000 ALTER TABLE `test_table_two` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -100,4 +145,4 @@ CREATE TABLE `test_table_two` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-04-18 10:45:09
+-- Dump completed on 2017-07-04 12:55:50
