@@ -39,14 +39,27 @@ class GitTest extends AppTestCase
 	private $_executeHistory = [];
 
 	/**
-	 * @inheritdoc
+	 * Текущая папка
+	 *
+	 * @var string
 	 */
+	private $_currentDir = '';
+
+	/** @inheritdoc */
 	public function setUp() {
 		parent::setUp();
 		$this->_git = new Git();
 		$this->_gitCommand = PropertyAccess::get($this->_git, '_gitCommand');
 		$this->_branchBeforeTest = $this->_git->getCurrentBranchName();
+		$this->_currentDir = getcwd();
 	}
+
+	/** @inheritdoc */
+	public function tearDown() {
+		chdir($this->_currentDir);
+		parent::tearDown();
+	}
+
 
 	/**
 	 * Тест функции названия текущей ветки
@@ -326,7 +339,7 @@ class GitTest extends AppTestCase
 			'Удаление текущей нелокальной ветки (' . $label . ') вернуло не то, что нужно'
 		);
 		self::assertEquals(
-			$this->_expectedCommandListDelete($this->_branchBeforeTest, $hasMergedRemote, $this->_branchBeforeTest, Git::BRANCH_TYPE_REMOTE),
+			$this->_expectedCommandListDelete($this->_branchBeforeTest, $hasMergedRemote, $this->_branchBeforeTest, Git::BRANCH_TYPE_REMOTE, false),
 			$this->_executeHistory,
 			'Удаление текущей нелокальной ветки (' . $label . ') вызывало неправильные команды'
 		);
@@ -358,6 +371,7 @@ class GitTest extends AppTestCase
 	 */
 	public function testOtherFolder() {
 		$gitFolder = ROOT;
+		chdir(APP);
 		$this->_mockExecute();
 
 		$git = new Git($gitFolder);
