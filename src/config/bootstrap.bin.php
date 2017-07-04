@@ -18,5 +18,4 @@ namespace ArtSkillsCommon {
 		fwrite(STDERR, $msg);
 		exit(1);
 	}
-
 }
