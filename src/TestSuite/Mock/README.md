@@ -16,19 +16,21 @@ MethodMockerEntity MethodMocker::mock(string $className, string $methodName, str
 `$newAction` необходим в случае полной подменой метода без каких-либо проверок. Полезно в случае переопределения каких-то методов вывода, например `_sendJsonResponse` в CakePHP2.
 
 ## Доступные методы `MethodMockerEntity`:
-* Ожидаемое кол-во вызовов
-    * `singleCall()` - ровно один раз
-    * `anyCall()` - как минимум 1 раз (по-умолчанию)
-    * `expectCall(int <кол-во>)` - конкретное кол-во. Если мы специально хотим указать, что вызовов быть не должно, то `$mock->expectCall(0);`
-* Проверка входных параметров 
-    * `expectArgs(mixed <аргумент1>, mixed <аргумент2>, ..)` Для указания того, что метод должен быть вызван без аргументов, нужно передать одно значение false
-    * `expectArgsList(array <список списков аргументов>)`  Аналогично `expectArgs()`, но на несколько вызовов
-* Возвращаемое значение
-    * `willReturnValue(mixed <значние>)`
-    * `willReturnAction(function($args, $additionalData) { /* код проверки */;  return 'mock result';})` будет вызвана функция, результат которой вернется в качестве ответа мока
-    * `null` по-умолчанию
-    * `willThrowException(string $message, string $class = null)`
-    * `willReturnValueList(array $valueList)` - для случаев, когда один вызов тестируемого метода делает более одного вызова замоканного метода
+* Ожидаемое кол-во вызовов:
+    * `singleCall()` - ровно один раз;
+    * `anyCall()` - как минимум 1 раз (по-умолчанию);
+    * `expectCall(int <кол-во>)` - конкретное кол-во. Если мы специально хотим указать, что вызовов быть не должно, то `$mock->expectCall(0);`;
+* Проверка входных параметров:
+    * `expectArgs(mixed <аргумент1>, mixed <аргумент2>, ..)` проверить все параметры;
+    * `expectNoArgs(void)` ожидается вызов без параметров;
+    * `expectSomeArgs(array $argsSubset)` проверить часть параметров;
+    * `expectArgsList(array <список списков аргументов>)`  Аналогично `expectArgs()`, но на несколько вызовов. Если ожидается вызов без аргументов, то вместо массива аргументов должен быть false;
+* Возвращаемое значение:
+    * `willReturnValue(mixed <значние>)`;
+    * `willReturnAction(function($args, $additionalData) { /* код проверки */;  return 'mock result';})` будет вызвана функция, результат которой вернется в качестве ответа мока;
+    * `null` по-умолчанию;
+    * `willThrowException(string $message, string $class = null)`;
+    * `willReturnValueList(array $valueList)` - для случаев, когда один вызов тестируемого метода делает более одного вызова замоканного метода;
 * `setAdditionalVar(mixed $var)` - Передача дополнительных данных в `willReturnAction`. Имеет смысл, когда мокнутый метод вызывается несколько раз, и нужно выполнить немного разные действия.  
 * Кол-во вызовов подменённого метода - `getCallCount()`
 

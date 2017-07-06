@@ -75,6 +75,13 @@ class MethodMockerEntity
 	private $_expectedArgs = null;
 
 	/**
+	 * Часть предполагаемых аргументов
+	 *
+	 * @var null|array
+	 */
+	private $_expectedArgsSubset = null;
+
+	/**
 	 * Предполагаемые аргументы на несколько вызовов
 	 *
 	 * @var null|array
@@ -278,34 +285,61 @@ class MethodMockerEntity
 	/**
 	 * Устанавливаем ожидаемые аргументы, необходимо указать как минимум 1. Если данный метод не вызывать, то проверка
 	 * на аргументы не проводится.
-	 * Если нужно явно задать отсутствие аргументов, то задается один параметр false: ->expected(false)
+	 * Если нужно явно задать отсутствие аргументов, то нужно вызывать expectNoArgs()
 	 *
-	 * @param array ...$params
+	 * @param array ...$args
 	 * @return $this
 	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
 	 */
-	public function expectArgs(...$params) {
+	public function expectArgs(...$args) {
 		$this->_checkNotRestored();
 
-		if (empty($params)) {
+		if (empty($args)) {
 			$this->_fail('method expectArgs() requires at least one arg!');
 		}
 
 		$this->_unsetExpectArgs();
-		if (count($params) === 1 && $params[0] === false) {
-			$this->_expectedArgs = false;
-		} else {
-			$this->_expectedArgs = $params;
-		}
-
+		$this->_expectedArgs = $args;
 
 		return $this;
 	}
 
 	/**
-	 * Ожидаемые аргументы на несколько вызовов
+	 * Ожидается вызов метода без аргументов
 	 *
-	 * @param array $argsList
+	 * @return $this
+	 */
+	public function expectNoArgs() {
+		$this->_checkNotRestored();
+		$this->_unsetExpectArgs();
+		$this->_expectedArgs = false;
+		return $this;
+	}
+
+	/**
+	 * Проверить только часть аргументов.
+	 *
+	 * @param array $argsSubset - массив с числовым индексом - номером аргумента.
+	 * @return $this
+	 */
+	public function expectSomeArgs(array $argsSubset) {
+		$this->_checkNotRestored();
+
+		if (empty($argsSubset)) {
+			$this->_fail('empty arguments list for expectSomeArgs()');
+		}
+
+		$this->_unsetExpectArgs();
+		$this->_expectedArgsSubset = $argsSubset;
+
+		return $this;
+	}
+
+	/**
+	 * Ожидаемые аргументы на несколько вызовов.
+	 *
+	 * @param array $argsList - Массив списков(массивов) аргументов на каждый вызов.
+	 * Если ожидается вызов без аргументов, то вместо массива аргументов - false.
 	 * @return $this
 	 */
 	public function expectArgsList(array $argsList) {
@@ -341,6 +375,7 @@ class MethodMockerEntity
 	private function _unsetExpectArgs() {
 		$this->_expectedArgs = null;
 		$this->_expectedArgsList = null;
+		$this->_expectedArgsSubset = null;
 	}
 
 	/**
@@ -398,7 +433,7 @@ class MethodMockerEntity
 		$this->_unsetReturn();
 		$this->_exceptionConf = [
 			'message' => $message,
-			'class' => (is_null($class) ? \Exception::class : $class),
+			'class' => (($class === null) ? \Exception::class : $class),
 		];
 		return $this;
 	}
@@ -449,12 +484,13 @@ class MethodMockerEntity
 	 * @param array $args
 	 */
 	private function _checkArgs($args) {
-		$expectedArgs = $this->_expectedArgs;
-		if (is_null($expectedArgs) && !is_null($this->_expectedArgsList)) {
+		if ($this->_expectedArgsList !== null) {
 			if (empty($this->_expectedArgsList)) {
 				$this->_fail('expect args list ended');
 			}
 			$expectedArgs = array_shift($this->_expectedArgsList);
+		} else {
+			$expectedArgs = $this->_expectedArgs;
 		}
 
 		if ($expectedArgs !== null) {
@@ -466,6 +502,10 @@ class MethodMockerEntity
 			}
 
 			$this->_assertEquals($expectedArgs, $args, $message);
+		} elseif ($this->_expectedArgsSubset !== null) {
+			$args = array_intersect_key($args, $this->_expectedArgsSubset);
+			$this->_assertEquals($this->_expectedArgsSubset, $args, 'unexpected args subset');
+
 		}
 	}
 
@@ -630,7 +670,7 @@ class MethodMockerEntity
 		}
 
 		$reflectionMethod = new ReflectionMethod($this->_class, $this->_method);
-		if ($reflectionMethod->getDeclaringClass()->getName() != $this->_class) {
+		if ($reflectionMethod->getDeclaringClass()->getName() !== $this->_class) {
 			// если замокать отнаследованный непереопределённый метод, то можно попортить класс
 			$this->_fail(
 				'method ' . $this->_method . ' is declared in parent class '
@@ -647,7 +687,7 @@ class MethodMockerEntity
 			}
 		}
 
-		if (!is_string($this->_action) && !is_null($this->_action) && !($this->_action instanceof \Closure)) {
+		if (!is_string($this->_action) && ($this->_action !== null) && !($this->_action instanceof \Closure)) {
 			$this->_fail('action must be a string, a Closure or a null');
 		}
 	}
