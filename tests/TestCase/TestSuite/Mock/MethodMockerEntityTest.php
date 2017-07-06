@@ -72,14 +72,14 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 			$instance = new MockTestFixture();
 		}
 		$originalResult = $this->_callFixtureMethod($instance, $isPrivate, $isProtected);
-		$mockResult = "mock " . $methodName;
+		$mockResult = 'mock ' . $methodName;
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, $methodName, false, function () use ($mockResult) {
 			return $mockResult;
 		});
-		$this->assertEquals($mockResult, $this->_callFixtureMethod($instance, $isPrivate, $isProtected));
+		self::assertEquals($mockResult, $this->_callFixtureMethod($instance, $isPrivate, $isProtected));
 		unset($mock);
 
-		$this->assertEquals($originalResult, $this->_callFixtureMethod($instance, $isPrivate, $isProtected));
+		self::assertEquals($originalResult, $this->_callFixtureMethod($instance, $isPrivate, $isProtected));
 	}
 
 	/**
@@ -139,8 +139,8 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 	 * @expectedException \PHPUnit_Framework_AssertionFailedError
 	 * @expectedExceptionMessage   mock entity is restored!
 	 */
-	public function testRestoredExpected() {
-		$this->_getRestoredMock()->expectArgs(false);
+	public function testRestoredExpectArgs() {
+		$this->_getRestoredMock()->expectArgs('asd');
 	}
 
 	/**
@@ -149,7 +149,27 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 	 * @expectedException \PHPUnit_Framework_AssertionFailedError
 	 * @expectedExceptionMessage   mock entity is restored!
 	 */
-	public function testRestoredExpectedList() {
+	public function testRestoredExpectNoArgs() {
+		$this->_getRestoredMock()->expectNoArgs();
+	}
+
+	/**
+	 * Мок вернули, а его конфигурируют
+	 *
+	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedExceptionMessage   mock entity is restored!
+	 */
+	public function testRestoredExpectSomeArgs() {
+		$this->_getRestoredMock()->expectSomeArgs(['asd']);
+	}
+
+	/**
+	 * Мок вернули, а его конфигурируют
+	 *
+	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedExceptionMessage   mock entity is restored!
+	 */
+	public function testRestoredExpectArgsList() {
 		$this->_getRestoredMock()->expectArgsList([false]);
 	}
 
@@ -236,24 +256,35 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Метод без аргументов
+	 * Пустой список ожидаемых аргументов
 	 *
 	 * @expectedException \PHPUnit_Framework_AssertionFailedError
 	 * @expectedExceptionMessage  method expectArgs() requires at least one arg!
 	 */
-	public function testExpectedArgs() {
+	public function testExpectArgsEmpty() {
 		$mock = $this->_getMock()->expectCall(0);
 		$mock->expectArgs();
 	}
 
 	/**
-	 * Метод с аргументом null
+	 * Список ожидаемых аргументов - null
 	 */
-	public function testExpectedArgsNull() {
+	public function testExpectArgsNull() {
 		$mock = $this->_getMock()->expectCall(0);
 		$mock->expectArgs(null);
 		// При значении null не вылетел ексепшн с проверки на пустоту
 		self::assertTrue(true);
+	}
+
+	/**
+	 * Пустой список ожидаемых аргументов
+	 *
+	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedExceptionMessage empty arguments list for expectSomeArgs()
+	 */
+	public function testExpectSomeArgsEmpty() {
+		$mock = $this->_getMock()->expectCall(0);
+		$mock->expectSomeArgs([]);
 	}
 
 
@@ -364,10 +395,10 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 	 * @param bool $changedResult результат - замокан? (или вернётся исходный)
 	 */
 	public function testInheritedMocks($callType, $isRedefined, $mockChild, $callChild, $changedResult) {
-		if (!$callChild && ($callType == 'parent')) {
+		if (!$callChild && ($callType === 'parent')) {
 			self::fail('бред');
 		}
-		$isStatic = ($callType != 'this');
+		$isStatic = ($callType !== 'this');
 		$methodName = MockTestChildFixture::getInheritTestFuncName($isStatic, $isRedefined);
 		if ($mockChild) {
 			$mockClass = MockTestChildFixture::class;
@@ -378,7 +409,7 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 		$testObject = new MockTestChildFixture();
 		$originalResult = $testObject->call($callChild, $isStatic, $isRedefined, $callType);
 
-		$mockResult = "mock " . $methodName . ' ' . $callType . ' ' . (int)$mockChild . ' ' . (int)$callChild;
+		$mockResult = 'mock ' . $methodName . ' ' . $callType . ' ' . (int)$mockChild . ' ' . (int)$callChild;
 		$mock = new MethodMockerEntity('mockid', $mockClass, $methodName, false, "return '$mockResult';");
 
 		if ($changedResult) {
@@ -388,10 +419,10 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 		}
 		$actualResult = $testObject->call($callChild, $isStatic, $isRedefined, $callType);
 
-		$this->assertEquals($expectedResult, $actualResult);
+		self::assertEquals($expectedResult, $actualResult);
 		unset($mock);
 
-		$this->assertEquals($originalResult, $testObject->call($callChild, $isStatic, $isRedefined, $callType));
+		self::assertEquals($originalResult, $testObject->call($callChild, $isStatic, $isRedefined, $callType));
 	}
 
 
@@ -402,10 +433,10 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 		$originalResult = MockTestChildFixture::callChildOnlyProtected();
 		$mockResult = 'mock child only protected';
 		$mock = new MethodMockerEntity('mockid', MockTestChildFixture::class, '_childOnlyFunc', false, "return '$mockResult';");
-		$this->assertEquals($mockResult, MockTestChildFixture::callChildOnlyProtected());
+		self::assertEquals($mockResult, MockTestChildFixture::callChildOnlyProtected());
 		unset($mock);
 
-		$this->assertEquals($originalResult, MockTestChildFixture::callChildOnlyProtected());
+		self::assertEquals($originalResult, MockTestChildFixture::callChildOnlyProtected());
 	}
 
 	/**
@@ -438,7 +469,7 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 	 * @expectedExceptionMessage method staticFunc is declared in parent class
 	 */
 	public function testMockInheritedNotRedeclared() {
-		new MethodMockerEntity('mockid', MockTestChildFixture::class, 'staticFunc', false, "return 123;");
+		new MethodMockerEntity('mockid', MockTestChildFixture::class, 'staticFunc', false, 'return 123;');
 	}
 
 	/**
@@ -448,7 +479,7 @@ class MethodMockerEntityTest extends \PHPUnit_Framework_TestCase
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
 	public function testStrictParams() {
-		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'complexParams', false, "return 123;");
+		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'complexParams', false, 'return 123;');
 		MockTestChildFixture::staticFunc();
 		self::assertTrue(true); // всё хорошо, скрипт не упал
 	}
