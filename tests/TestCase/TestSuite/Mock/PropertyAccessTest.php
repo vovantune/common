@@ -56,6 +56,32 @@ class PropertyAccessTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * Восстановление свойства, которое не было изменено
+	 *
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
+	 * @expectedExceptionMessage MockTestFixture::_privateProperty was not modified
+	 */
+	public function testRestoreNotModified() {
+		PropertyAccess::restoreStatic(MockTestFixture::class, '_privateProperty');
+	}
+
+	/**
+	 * Восстановление свойства 2 раза
+	 *
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
+	 * @expectedExceptionMessage MockTestFixture::_privateProperty was not modified
+	 */
+	public function testRestoreTwice() {
+		$className = MockTestFixture::class;
+		$propertyName = '_privateProperty';
+
+		PropertyAccess::setStaticAndRestore($className, $propertyName, 'aedrjhnbaeoridhno');
+		PropertyAccess::restoreStatic($className, $propertyName);
+		PropertyAccess::restoreStatic($className, $propertyName);
+	}
+
+
+	/**
 	 * Восстановление всех статических свойств
 	 */
 	public function testStaticRestoreAll() {
@@ -75,6 +101,24 @@ class PropertyAccessTest extends \PHPUnit_Framework_TestCase
 		PropertyAccess::restoreStaticAll();
 		self::assertSame($originalValue, PropertyAccess::getStatic($className, '_privateProperty'));
 		self::assertSame($originalValue, PropertyAccess::getStatic($className, '_otherProperty'));
+
+		// restoreStaticAll() можно вызывать несколько раз без ошибок
+		PropertyAccess::restoreStaticAll();
+	}
+
+	/**
+	 * Восстановление свойства после восстановления всего
+	 *
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
+	 * @expectedExceptionMessage MockTestFixture::_privateProperty was not modified
+	 */
+	public function testRestoreAfterRestoreAll() {
+		$className = MockTestFixture::class;
+		$propertyName = '_privateProperty';
+
+		PropertyAccess::setStaticAndRestore($className, $propertyName, 'aedrjhnbaeoridhno');
+		PropertyAccess::restoreStaticAll();
+		PropertyAccess::restoreStatic($className, $propertyName);
 	}
 
 }

@@ -2,6 +2,7 @@
 namespace ArtSkills\TestSuite\Mock;
 
 use ArtSkills\Traits\Library;
+use PHPUnit\Framework\AssertionFailedError;
 
 /**
  * Обращения к private и protected свойствам
@@ -79,7 +80,7 @@ class PropertyAccess
 	public static function restoreStatic($className, $propertyName) {
 		$storeKey = self::_makeStoreKey($className, $propertyName);
 		if (!array_key_exists($storeKey, self::$_toRestore)) {
-			throw new \Exception("$storeKey was not modified");
+			throw new AssertionFailedError("$storeKey was not modified");
 		}
 		self::setStatic($className, $propertyName, self::$_toRestore[$storeKey]);
 		unset(self::$_toRestore[$storeKey]);
