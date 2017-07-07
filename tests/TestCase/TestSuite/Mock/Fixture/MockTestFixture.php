@@ -25,6 +25,13 @@ class MockTestFixture
 	private static $_privateProperty = 'testPrivateStatic';
 
 	/**
+	 * для тестов
+	 *
+	 * @var string
+	 */
+	private static $_otherProperty = 'testPrivateStatic';
+
+	/**
 	 * Тестовый метод
 	 *
 	 * @return string
