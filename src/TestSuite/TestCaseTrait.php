@@ -205,13 +205,21 @@ trait TestCaseTrait
 	 * Задать тестовое время
 	 * Чтоб можно было передавать строку
 	 *
-	 * @param Time|string $time
+	 * @param Time|string|null $time
+	 * @param bool $clearMicroseconds убрать из времени микросекунды (PHP7).
+	 * Полезно тем, что в базу микросекунды всё равно не сохранятся
+	 * @return Time
 	 */
-	protected function _setTestNow($time) {
+	protected function _setTestNow($time = null, $clearMicroseconds = true) {
 		if (!($time instanceof Time)) {
 			$time = new Time($time);
 		}
+		if ($clearMicroseconds && (PHP_MAJOR_VERSION >= 7)) {
+			// todo: выпилить условие по версии после полного перехода на пхп7
+			$time->setTime($time->hour, $time->minute, $time->second, 0);
+		}
 		Time::setTestNow($time);
+		return $time;
 	}
 
 	/**
