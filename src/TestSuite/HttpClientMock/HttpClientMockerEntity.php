@@ -3,7 +3,6 @@
 namespace ArtSkills\TestSuite\HttpClientMock;
 
 use Cake\Http\Client\Request;
-use \PHPUnit_Framework_ExpectationFailedException;
 
 
 class HttpClientMockerEntity
@@ -237,7 +236,7 @@ class HttpClientMockerEntity
 	 */
 	public function doAction($request) {
 		if (($this->_expectedCallCount > self::EXPECT_CALL_ONCE) && ($this->_callCounter >= $this->_expectedCallCount)) {
-			throw new PHPUnit_Framework_ExpectationFailedException($this->_getErrorMessage('expected ' . $this->_expectedCallCount . ' calls, but more appeared'));
+			throw new \PHPUnit_Framework_ExpectationFailedException($this->_getErrorMessage('expected ' . $this->_expectedCallCount . ' calls, but more appeared'));
 		}
 
 		if (!empty($this->_body)) {
@@ -248,7 +247,7 @@ class HttpClientMockerEntity
 				parse_str($request->body(), $result);
 				$expectedBody = $result;
 			}
-			\PHPUnit_Framework_Assert::assertEquals($this->_body, $expectedBody, 'Expected POST body data is not equals real data');
+			\PHPUnit\Framework\Assert::assertEquals($this->_body, $expectedBody, 'Expected POST body data is not equals real data');
 		}
 
 		$this->_callCounter++;
@@ -275,6 +274,7 @@ class HttpClientMockerEntity
 
 	/**
 	 * Финальная проверка на вызовы
+	 * @throws \PHPUnit_Framework_ExpectationFailedException
 	 */
 	public function callCheck() {
 		if ($this->_mockChecked) {
@@ -288,7 +288,8 @@ class HttpClientMockerEntity
 		$this->_mockChecked = true;
 
 		if (!$goodCallCount) {
-			throw new PHPUnit_Framework_ExpectationFailedException($this->_getErrorMessage(
+			// todo: При переходе на php7 и phpunit6 заменить на правильный класс. Сейчас почему-то алиас не работает
+			throw new \PHPUnit_Framework_ExpectationFailedException($this->_getErrorMessage(
 				$this->_isCalled ? 'is called ' . $this->getCallCount() . ' times, expected ' . $this->_expectedCallCount : 'is not called!'
 			));
 		}

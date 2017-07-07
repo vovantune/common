@@ -148,11 +148,13 @@ class Env
 	 * Прокидывает PHPUnit exception'ы дальше, чтоб в тесты правильно валились
 	 *
 	 * @param \Exception $exception
-	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 * @throws \PHPUnit\Framework\AssertionFailedError
 	 */
 	public static function checkTestException(\Exception $exception) {
 		if (
-			$exception instanceof \PHPUnit_Framework_ExpectationFailedException
+			// ExpectationFailedException наследуется от AssertionFailedError, достаточно одного instanceof
+			$exception instanceof \PHPUnit\Framework\AssertionFailedError
+			// todo: после перехода на php7 и phpunit6 выпилить старый класс
 			|| $exception instanceof \PHPUnit_Framework_AssertionFailedError
 		) {
 			throw $exception;

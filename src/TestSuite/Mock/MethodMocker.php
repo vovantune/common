@@ -27,7 +27,7 @@ class MethodMocker
 	 * @param string $methodName
 	 * @param string|null $newAction новое событие метода
 	 * @return MethodMockerEntity
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public static function mock($className, $methodName, $newAction = null) {
 		self::_newMockCheck($className, $methodName);
@@ -44,7 +44,7 @@ class MethodMocker
 	 * @param null|callable $sniffAction функция, вызываемая при вызове подслушиваемого метода: function($args,
 	 *     $originalResult) {}, $originalResult - результат выполнения подслушиваемого метода
 	 * @return MethodMockerEntity
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public static function sniff($className, $methodName, $sniffAction = null) {
 		self::_newMockCheck($className, $methodName);
@@ -61,7 +61,7 @@ class MethodMocker
 	 *
 	 * @param string $className
 	 * @param string $methodName
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	private static function _newMockCheck($className, $methodName) {
 		$key = self::_buildKey($className, $methodName);
@@ -88,7 +88,7 @@ class MethodMocker
 	 * @param array $args
 	 * @param mixed $origMethodResult результат выполнения оригинального метода в режиме снифа
 	 * @return mixed
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public static function doAction($mockKey, $args, $origMethodResult = null) {
 		if (!isset(self::$_mockList[$mockKey])) {
@@ -103,7 +103,7 @@ class MethodMocker
 	 * Возвращаем все подмененные методы
 	 *
 	 * @param bool $hasFailed был ли тест завален
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public static function restore($hasFailed = false) {
 		$firstError = null;
@@ -130,7 +130,7 @@ class MethodMocker
 	 * @param string $methodName
 	 * @param array|null $args аргументы вызова
 	 * @return mixed
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public static function callPrivate($object, $methodName, $args = null) {
 		if (is_string($object)) {
@@ -168,12 +168,12 @@ class MethodMocker
 	 * Зависимость от PHPUnit
 	 * Определено в одном месте на все классы
 	 *
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 * @param string $message
 	 */
 	public static function fail($message) {
-		if (class_exists('\PHPUnit_Framework_Assert') && method_exists('\PHPUnit_Framework_Assert', 'fail')) {
-			\PHPUnit_Framework_Assert::fail($message);
+		if (class_exists(\PHPUnit\Framework\Assert::class) && method_exists(\PHPUnit\Framework\Assert::class, 'fail')) {
+			\PHPUnit\Framework\Assert::fail($message);
 		} else {
 			throw new \Exception($message); // @codeCoverageIgnore
 		}
@@ -184,14 +184,14 @@ class MethodMocker
 	 * Зависимость от PHPUnit
 	 * Определено в одном месте на все классы
 	 *
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 * @param mixed $expected
 	 * @param mixed $actual
 	 * @param string $message
 	 */
 	public static function assertEquals($expected, $actual, $message = '') {
-		if (class_exists('\PHPUnit_Framework_Assert') && method_exists('\PHPUnit_Framework_Assert', 'assertEquals')) {
-			\PHPUnit_Framework_Assert::assertEquals($expected, $actual, $message);
+		if (class_exists(\PHPUnit\Framework\Assert::class) && method_exists(\PHPUnit\Framework\Assert::class, 'assertEquals')) {
+			\PHPUnit\Framework\Assert::assertEquals($expected, $actual, $message);
 		} elseif ($expected != $actual) {
 			throw new \Exception($message, ' expected: ' . print_r($expected, true) . ', actual: ' . print_r($actual, true)); // @codeCoverageIgnore
 		}
