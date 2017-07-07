@@ -112,11 +112,17 @@ $result = MethodMocker::callPrivate(MockTestFixture::class, '_privateStaticFunc'
 	PropertyAccess::set($object, $propertyName, $value)
 	PropertyAccess::getStatic($className, $propertyName)
 	PropertyAccess::get($object, $propertyName)
+	PropertyAccess::setStaticAndRestore($className, $propertyName, $value)
+	PropertyAccess::restoreStatic($className, $propertyName)
+	PropertyAccess::restoreStaticAll()
 ```
 * `setStatic` - запись в статическое свойство
 * `set` - запись в обычное свойство
 * `getStatic` - чтение статического свойства
 * `get` - чтение обычного свойство
+* `setStaticAndRestore` - записать в статическое свойство с возможностью восстановления исходного значения. Автоматически восстанавливаются в юнит-тестах `tearDown()`
+* `restoreStatic` - восстановить конкретное свойство, изменённое через `setStaticAndRestore()`
+* `restoreStaticAll` - восстановить все свойства, изменённые через `setStaticAndRestore()`
 
 #### Параметры
 * `$className` - для статических свойств, строка, название класса

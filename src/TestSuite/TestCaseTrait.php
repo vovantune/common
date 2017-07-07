@@ -75,6 +75,7 @@ trait TestCaseTrait
 		/** @var TestCase $this */
 		MethodMocker::restore($this->hasFailed());
 		ConstantMocker::restore();
+		PropertyAccess::restoreStaticAll();
 		HttpClientMocker::clean($this->hasFailed());
 
 		Time::setTestNow(null); // сбрасываем тестовое время
