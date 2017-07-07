@@ -3,11 +3,12 @@ namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 
 use ArtSkills\TestSuite\Mock\PropertyAccess;
 use ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \ArtSkills\TestSuite\Mock\PropertyAccess
  */
-class PropertyAccessTest extends \PHPUnit_Framework_TestCase
+class PropertyAccessTest extends TestCase
 {
 
 	/** тест чтения и записи */

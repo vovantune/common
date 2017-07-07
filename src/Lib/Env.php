@@ -148,12 +148,12 @@ class Env
 	 * Прокидывает PHPUnit exception'ы дальше, чтоб в тесты правильно валились
 	 *
 	 * @param \Exception $exception
-	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 * @throws \PHPUnit\Framework\ExpectationFailedException
 	 */
 	public static function checkTestException(\Exception $exception) {
 		if (
-			$exception instanceof \PHPUnit_Framework_ExpectationFailedException
-			|| $exception instanceof \PHPUnit_Framework_AssertionFailedError
+			$exception instanceof \PHPUnit\Framework\ExpectationFailedException
+			|| $exception instanceof \PHPUnit\Framework\AssertionFailedError
 		) {
 			throw $exception;
 		}

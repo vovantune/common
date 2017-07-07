@@ -3,12 +3,13 @@ namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \ArtSkills\TestSuite\Mock\MethodMocker
  * @covers \ArtSkills\TestSuite\Mock\MethodMockerEntity
  */
-class MethodMockerTest extends \PHPUnit_Framework_TestCase
+class MethodMockerTest extends TestCase
 {
 
 	/**
@@ -80,7 +81,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Дважды замокали один метов
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage methodNoArgs already mocked!
 	 */
 	public function testDuplicateMock() {
@@ -91,7 +92,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Вызвали несуществующий запмоканый метод
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage notExists mock object doesn't exist!
 	 */
 	public function testNotExistsMockCall() {
@@ -119,7 +120,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Несуществующий класс
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage class "BadClass" does not exist!
 	 */
 	public function testCallPrivateBadClass() {
@@ -129,7 +130,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Несуществующий метод
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage method "BlaBla" in class "ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture" does not exist!
 	 */
 	public function testCallPrivateBadMethod() {
@@ -139,7 +140,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * вызов публичного
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage is not private and is not protected!
 	 */
 	public function testCallPrivatePublic() {
@@ -153,7 +154,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * ожидалось без аргументов, а они есть
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage expected no args, but they appeared
 	 */
 	public function testUnexpectedArgs() {
@@ -163,7 +164,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * меньше аргументов, чем ожидалось
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testLessArgs() {
@@ -173,7 +174,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * больше аргументов, чем ожидалось
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testMoreArgs() {
@@ -183,7 +184,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * не то значение аргумента
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testBadArgs() {
@@ -193,7 +194,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * аргументы не в том порядке
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testOrderArgs() {
@@ -203,7 +204,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * неправильная часть аргументов
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage unexpected args subset
 	 */
 	public function testBadArgsSubset() {
@@ -257,7 +258,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Спасок ожидаемых аргументов закончился
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage expect args list ended
 	 */
 	public function testArgsListShort() {
@@ -273,7 +274,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Ожидаемые аргументы не совпали
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage expected no args, but they appeared
 	 */
 	public function testArgsListFail() {
@@ -293,7 +294,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * не вызван
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage is not called!
 	 */
 	public function testNotCalled() {
@@ -303,7 +304,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * вызван меньше, чем ожидалось
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage unexpected call count
 	 */
 	public function testCalledLess() {
@@ -314,7 +315,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * вызван больше, чем ожидалось
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage expected 1 calls, but more appeared
 	 */
 	public function testCalledMore() {
@@ -442,7 +443,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Вызовов больше, чем значений в списке
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage return value list ended
 	 */
 	public function testReturnListMore() {
@@ -523,7 +524,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * переопределение expectArgs, срабатывание проверки
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testRedefineFail() {
@@ -541,7 +542,7 @@ class MethodMockerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * переопределение expectArgsList, срабатывание проверки
 	 *
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testRedefineListFail() {

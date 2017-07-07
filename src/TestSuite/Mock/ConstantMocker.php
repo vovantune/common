@@ -23,7 +23,7 @@ class ConstantMocker
 	 * @param string|null $className
 	 * @param string $constantName
 	 * @param mixed $newValue
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public static function mock($className, $constantName, $newValue) {
 		if (strlen($className)) {

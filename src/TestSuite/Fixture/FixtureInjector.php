@@ -1,20 +1,21 @@
 <?php
 namespace ArtSkills\TestSuite\Fixture;
 
+use PHPUnit\Framework\TestSuite;
 
 class FixtureInjector extends \Cake\TestSuite\Fixture\FixtureInjector
 {
 	/**
 	 * @inheritdoc
 	 */
-	public function startTestSuite(\PHPUnit_Framework_TestSuite $suite) {
+	public function startTestSuite(TestSuite $suite) {
 		// сделано специально
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function endTestSuite(\PHPUnit_Framework_TestSuite $suite) {
+	public function endTestSuite(TestSuite $suite) {
 		$this->_fixtureManager->shutDown();
 	}
 }

@@ -170,7 +170,7 @@ class MethodMockerEntity
 	 * Неполная подмена делается только через MethodMocker
 	 * доступен весь функционал, $this и self берутся из вызываемого контекста
 	 *
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 * @param string $mockId
 	 * @param string $className
 	 * @param string $methodName
@@ -220,7 +220,7 @@ class MethodMockerEntity
 	/**
 	 * Список параметров, чтоб переопределение работало правильно
 	 * @return string
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	private function _getMethodParameters() {
 		$reflectionMethod = new ReflectionMethod($this->_class, $this->_method);
@@ -253,7 +253,7 @@ class MethodMockerEntity
 	 * Омечаем, что функция должна вызываться разово
 	 *
 	 * @return $this
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public function singleCall() {
 		return $this->expectCall(1);
@@ -263,7 +263,7 @@ class MethodMockerEntity
 	 * Омечаем, что функция должна вызываться как минимум 1 раз
 	 *
 	 * @return $this
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public function anyCall() {
 		return $this->expectCall(self::EXPECT_CALL_ONCE);
@@ -274,7 +274,7 @@ class MethodMockerEntity
 	 *
 	 * @param int $times
 	 * @return $this
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public function expectCall($times = 1) {
 		$this->_checkNotRestored();
@@ -289,7 +289,7 @@ class MethodMockerEntity
 	 *
 	 * @param array ...$args
 	 * @return $this
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public function expectArgs(...$args) {
 		$this->_checkNotRestored();
@@ -393,7 +393,7 @@ class MethodMockerEntity
 	 *
 	 * @param mixed $value
 	 * @return $this
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public function willReturnValue($value) {
 		$this->_checkNotRestored();
@@ -412,7 +412,7 @@ class MethodMockerEntity
 	 *
 	 * @param callable $action
 	 * @return $this
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public function willReturnAction($action) {
 		$this->_checkNotRestored();
@@ -458,7 +458,7 @@ class MethodMockerEntity
 	 * @param array $args массив переданных аргументов к оригинальной функции
 	 * @param mixed $origMethodResult
 	 * @return mixed
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public function doAction($args, $origMethodResult = null) {
 		$this->_checkNotRestored();
@@ -568,7 +568,7 @@ class MethodMockerEntity
 	 * Проверка на вызов, возвращаем оригинальный метод
 	 *
 	 * @param bool $hasFailed Был ли тест завален
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	public function restore($hasFailed = false) {
 		if ($this->_mockRestored) {
@@ -601,7 +601,7 @@ class MethodMockerEntity
 	/**
 	 * Мокаем оригинальный метод
 	 *
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	private function _mockOriginalMethod() {
 		$flags = $this->_getRunkitFlags();
@@ -648,7 +648,7 @@ class MethodMockerEntity
 
 	/**
 	 * Если мок восстановлен, то кидает ексепшн
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	private function _checkNotRestored() {
 		if ($this->_mockRestored) {
@@ -658,7 +658,7 @@ class MethodMockerEntity
 
 	/**
 	 * Проверка, что такой метод можно мокнуть
-	 * @throws \PHPUnit_Framework_AssertionFailedError|\Exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
 	private function _checkCanMock() {
 		if (!class_exists($this->_class)) {

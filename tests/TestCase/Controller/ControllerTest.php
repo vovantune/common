@@ -53,7 +53,7 @@ class ControllerTest extends AppControllerTestCase
 
 	/**
 	 * Если было исключение phpunit
-	 * @expectedException \PHPUnit_Framework_AssertionFailedError
+	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage test unit exception
 	 */
 	public function testUnitException() {
