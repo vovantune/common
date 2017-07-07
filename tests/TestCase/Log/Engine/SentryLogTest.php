@@ -421,9 +421,7 @@ class SentryLogTest extends AppTestCase
 		// запись в лог
 		$message = 'test message 15';
 		$extra = ['test add info' => 'some value'];
-		Log::warning($message, [
-			SentryLog::KEY_ADD_INFO => $extra,
-		]);
+		Log::warning($message, [SentryLog::KEY_ADD_INFO => $extra]);
 		$line = __LINE__ - 1;
 
 		$breadCrumbs = $breadCrumbsObj->fetch();
