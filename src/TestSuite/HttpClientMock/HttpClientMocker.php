@@ -50,12 +50,15 @@ class HttpClientMocker
 	public static function clean($hasFailed = false) {
 		self::$_sniffList = [];
 
-		if (!$hasFailed) {
-			foreach (self::$_mockCallList as $mock) {
-				$mock->callCheck();
+		try {
+			if (!$hasFailed) {
+				foreach (self::$_mockCallList as $mock) {
+					$mock->callCheck();
+				}
 			}
+		} finally {
+			self::$_mockCallList = [];
 		}
-		self::$_mockCallList = [];
 	}
 
 	/**

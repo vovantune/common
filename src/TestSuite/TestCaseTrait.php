@@ -73,16 +73,20 @@ trait TestCaseTrait
 	 */
 	protected function _tearDown() {
 		/** @var TestCase $this */
-		MethodMocker::restore($this->hasFailed());
 		ConstantMocker::restore();
 		PropertyAccess::restoreStaticAll();
-		HttpClientMocker::clean($this->hasFailed());
-
 		Time::setTestNow(null); // сбрасываем тестовое время
 		TestEmailTransport::clearMessages();
-		$this->_destroyPermanentMocks();
-		$this->_disabledMocks = [];
 		$this->_tearDownLocal();
+
+		try {
+			MethodMocker::restore($this->hasFailed());
+		} finally {
+			$this->_destroyPermanentMocks();
+			$this->_disabledMocks = [];
+
+			HttpClientMocker::clean($this->hasFailed());
+		}
 	}
 
 	/** для локальных действий на setUp */
