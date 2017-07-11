@@ -27,8 +27,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 			->expectBody($testData)
 			->willReturnString($returnVal);
 
-		$request = new Request($testMethod);
-		$request->url($testUrl);
+		$request = new Request($testUrl, $testMethod);
 		$request->body($correctTestData);
 
 		self::assertTrue($mock->check($testUrl, $testMethod));
@@ -50,8 +49,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 				return $returnVal;
 			});
 
-		$request = new Request($testMethod);
-		$request->url($testUrl);
+		$request = new Request($testUrl, $testMethod);
 
 		self::assertTrue($mock->check($testUrl, $testMethod));
 		self::assertEquals($returnVal, $mock->doAction($request));
@@ -73,8 +71,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 		$mock->singleCall()
 			->willReturnString($returnVal);
 
-		$request = new Request($testMethod);
-		$request->url($testUrl);
+		$request = new Request($testUrl, $testMethod);
 
 		$mock->doAction($request);
 		$mock->doAction($request);
@@ -104,8 +101,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 		$testUrl = 'http://www.artskills.ru';
 		$testMethod = Request::METHOD_GET;
 
-		$request = new Request($testMethod);
-		$request->url($testUrl);
+		$request = new Request($testUrl, $testMethod);
 
 		$mock = new HttpClientMockerEntity('id', $testUrl, $testMethod);
 		$mock->willReturnString('123');
@@ -125,8 +121,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 		$testData = ['foo' => 'barr', 'bar' => 'babar'];
 		$testMethod = Request::METHOD_POST;
 
-		$request = new Request($testMethod);
-		$request->url($testUrl);
+		$request = new Request($testUrl, $testMethod);
 		$request->body($testData);
 
 		$mock = new HttpClientMockerEntity('id', $testUrl, $testMethod);
@@ -144,8 +139,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 		$testMethod = Request::METHOD_GET;
 		$testData = ['foo' => 'barr', 'bar' => 'babar'];
 
-		$request = new Request($testMethod);
-		$request->url($testUrl);
+		$request = new Request($testUrl, $testMethod);
 		$request->body($testData);
 
 		$mock = new HttpClientMockerEntity('id', $testUrl, $testMethod);
@@ -162,8 +156,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 		$testData = ['foo' => 'barr', 'bar' => 'babar'];
 		$testMethod = Request::METHOD_POST;
 
-		$request = new Request($testMethod);
-		$request->url($testUrl);
+		$request = new Request($testUrl, $testMethod);
 		$request->body($testData);
 
 		$mock = new HttpClientMockerEntity('id', $testUrl, $testMethod);

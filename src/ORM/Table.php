@@ -26,7 +26,7 @@ class Table extends \Cake\ORM\Table
 			// для построителя сущностей
 			// когда он запускается, то сущности может не быть
 			// он ведь и нужен, чтоб её создать
-			$this->entityClass(self::_getAlias());
+			$this->setEntityClass(self::_getAlias());
 		}
 		parent::initialize($config);
 	}
@@ -121,7 +121,7 @@ class Table extends \Cake\ORM\Table
 				->contain($contain)
 				->where($conditions)
 				->limit(1)
-				->hydrate(false)
+				->enableHydration(false)
 				->toArray()
 		);
 	}
@@ -177,7 +177,7 @@ class Table extends \Cake\ORM\Table
 	 * @return bool
 	 */
 	public function truncate() {
-		return ((int)$this->connection()->execute('TRUNCATE ' . $this->table())->errorCode() === 0);
+		return ((int)$this->getConnection()->execute('TRUNCATE ' . $this->getTable())->errorCode() === 0);
 	}
 
 	/**
@@ -218,7 +218,7 @@ class Table extends \Cake\ORM\Table
 					$path = explode('.', $field);
 					$fieldName = array_pop($path);
 					if (empty($path)) {
-						$alias = $this->alias();
+						$alias = $this->getAlias();
 					} else {
 						$alias = array_pop($path);
 					}
@@ -236,7 +236,7 @@ class Table extends \Cake\ORM\Table
 
 	/** @inheritdoc */
 	public function query() {
-		return new Query($this->connection(), $this);
+		return new Query($this->getConnection(), $this);
 	}
 
 	/** @inheritdoc */
@@ -264,15 +264,15 @@ class Table extends \Cake\ORM\Table
 	 */
 	private function _initTimeStampBehavior() {
 		$timeStampFields = [];
-		$columnList = $this->schema()->columns();
+		$columnList = $this->getSchema()->columns();
 
-		if (in_array('created', $columnList)) {
+		if (in_array('created', $columnList, true)) {
 			$timeStampFields['created'] = 'new';
 		}
-		if (in_array('updated', $columnList)) {
+		if (in_array('updated', $columnList, true)) {
 			$timeStampFields['updated'] = 'always';
 		}
-		if (in_array('modified', $columnList)) {
+		if (in_array('modified', $columnList, true)) {
 			$timeStampFields['modified'] = 'always';
 		}
 
@@ -300,14 +300,14 @@ class Table extends \Cake\ORM\Table
 			if (is_array($entity->{$propertyName})) {
 				/** @var Entity $subEntity */
 				foreach ($entity->{$propertyName} as $subEntity) {
-					if ($subEntity->dirty()) {
-						$entity->dirty($propertyName, true);
+					if ($subEntity->isDirty()) {
+						$entity->setDirty($propertyName, true);
 						break;
 					}
 				}
 			} else {
-				if ($entity->{$propertyName}->dirty()) {
-					$entity->dirty($propertyName, true);
+				if ($entity->{$propertyName}->isDirty()) {
+					$entity->setDirty($propertyName, true);
 				}
 			}
 		}
