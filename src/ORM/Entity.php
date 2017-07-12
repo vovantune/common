@@ -58,7 +58,11 @@ class Entity extends \Cake\ORM\Entity
 	 * @return string[]
 	 */
 	public function getAllErrors() {
-		return array_merge(...$this->getErrors());
+		$errors = $this->getErrors();
+		if (empty($errors)) {
+			return [];
+		}
+		return array_merge(...array_values($errors));
 	}
 
 	/**
