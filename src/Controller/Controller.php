@@ -137,7 +137,7 @@ class Controller extends \Cake\Controller\Controller
 	 * @param bool $condition
 	 * @throws UserException
 	 */
-	protected function _throwUserErrorNoRedirect($message, $condition) {
+	protected function _throwUserErrorNoRedirect($message, $condition = true) {
 		$this->_throwUserErrorAnyResponse($message, null, $condition);
 	}
 
