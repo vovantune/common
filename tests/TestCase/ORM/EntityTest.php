@@ -76,7 +76,7 @@ class EntityTest extends AppTestCase
 	public function testChanged() {
 		$entity = $this->TestTableTwo->get(88);
 		$entity->table_one_fk = $entity->table_one_fk;
-		self::assertTrue($entity->dirty('table_one_fk'));
+		self::assertTrue($entity->isDirty('table_one_fk'));
 		self::assertFalse($entity->changed('table_one_fk'));
 	}
 

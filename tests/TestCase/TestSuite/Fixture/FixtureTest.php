@@ -80,16 +80,16 @@ class FixtureTest extends AppTestCase
 	 * Тест корректной работы загрузки фикстур
 	 */
 	public function testFixtureLoad() {
-		$res = $this->TestTableOne->find()->hydrate(false)->toArray();
+		$res = $this->TestTableOne->find()->enableHydration(false)->toArray();
 		self::assertEquals(
 			[['id' => '158', 'col_enum' => 'val2', 'col_text' => 'qweqweqweqwe', 'col_time' => new Time('2017-03-14 11:22:33')]],
 			$res, 'Неправильно загрузилась локальная фикстура'
 		);
 
-		$res = $this->TestTableThree->find()->hydrate(false)->toArray();
+		$res = $this->TestTableThree->find()->enableHydration(false)->toArray();
 		self::assertEquals([['id' => '88']], $res, 'Неправильно загрузилась глобальная фикстура');
 
-		$res = $this->TestTableTwo->find()->hydrate(false)->toArray();
+		$res = $this->TestTableTwo->find()->enableHydration(false)->toArray();
 		self::assertEquals([['id' => '11', 'table_one_fk' => '1000', 'col_text' => null]], $res, 'Неправильно загрузилась фикстура наследника');
 	}
 

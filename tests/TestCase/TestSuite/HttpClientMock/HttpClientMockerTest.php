@@ -6,6 +6,7 @@ use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientAdapter;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientMocker;
 use Cake\Http\Client\Request;
+use Cake\Http\Client\Response;
 
 class HttpClientMockerTest extends AppTestCase
 {
@@ -49,11 +50,11 @@ class HttpClientMockerTest extends AppTestCase
 		HttpClientMocker::addSniff($testArray);
 
 		$resultCollection = HttpClientMocker::getSniffList();
-		self::assertEquals(1, count($resultCollection));
+		self::assertCount(1, $resultCollection);
 		self::assertEquals($testArray, $resultCollection[0]);
 
 		HttpClientMocker::clean();
-		self::assertEquals(0, count(HttpClientMocker::getSniffList()));
+		self::assertCount(0, HttpClientMocker::getSniffList());
 	}
 
 	/**
@@ -65,7 +66,7 @@ class HttpClientMockerTest extends AppTestCase
 		$clientResponse = $client->get($url);
 
 		$sniffCollection = HttpClientMocker::getSniffList();
-		self::assertEquals(1, count($sniffCollection));
+		self::assertCount(1, $sniffCollection);
 		/**
 		 * @var Request $sniffRequest
 		 */
@@ -74,7 +75,7 @@ class HttpClientMockerTest extends AppTestCase
 		 * @var Response $sniffResponse
 		 */
 		$sniffResponse = $sniffCollection[0]['response'];
-		self::assertEquals($url, $sniffRequest->url());
+		self::assertEquals($url, $sniffRequest->getUri());
 		self::assertEquals($clientResponse->body, $sniffResponse->body);
 	}
 }

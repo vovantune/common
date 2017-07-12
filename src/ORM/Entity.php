@@ -58,12 +58,7 @@ class Entity extends \Cake\ORM\Entity
 	 * @return string[]
 	 */
 	public function getAllErrors() {
-		$errorsByField = $this->errors();
-		$errors = [];
-		foreach ($errorsByField as $fieldErrors) {
-			$errors = array_merge($errors, $fieldErrors);
-		}
-		return $errors;
+		return array_merge(...$this->getErrors());
 	}
 
 	/**
@@ -88,7 +83,7 @@ class Entity extends \Cake\ORM\Entity
 		if (!array_key_exists($childEntity, $this->_properties)) {
 			throw new \Exception("Unknown property $childEntity");
 		} elseif (is_array($this->{$childEntity})) {
-			if (is_null($index)) {
+			if ($index === null) {
 				$this->set($childEntity, []);
 			} else {
 				unset($this->{$childEntity}[$index]);
@@ -96,6 +91,6 @@ class Entity extends \Cake\ORM\Entity
 		} else {
 			$this->set($childEntity, null);
 		}
-		$this->dirty($childEntity, true);
+		$this->setDirty($childEntity, true);
 	}
 }
