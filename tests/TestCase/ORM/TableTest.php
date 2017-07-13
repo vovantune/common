@@ -33,7 +33,7 @@ class TableTest extends AppTestCase
 	 */
 	public function testGetEntity() {
 		self::assertEquals('TestTableOne', MethodMocker::callPrivate(TestTableOneTable::class, '_getAlias'), 'Не сработало получение алиаса');
-		$this->assertInstanceOf(TestTableOneTable::class, TestTableOneTable::instance(), 'Не сработало получение инстанса');
+		self::assertInstanceOf(TestTableOneTable::class, TestTableOneTable::instance(), 'Не сработало получение инстанса');
 
 		self::assertFalse($this->TestTableOne->getEntity(-1)); // не выкинулся ексепшн
 
@@ -42,7 +42,7 @@ class TableTest extends AppTestCase
 		self::assertInstanceOf(TestTableOne::class, $testEntity, 'Не вернулась сущность');
 		self::assertEquals($testId, $testEntity->id, 'Вернулась не та сущность');
 		self::assertNotEmpty($testEntity->TestTableTwo, 'Не применились опции');
-		self::assertTrue($testEntity === $this->TestTableOne->getEntity($testEntity), 'Не вернулась сущность');
+		self::assertSame($testEntity, $this->TestTableOne->getEntity($testEntity), 'Не вернулась сущность');
 	}
 
 	/**
@@ -273,6 +273,15 @@ class TableTest extends AppTestCase
 			90 => 'olololo',
 		];
 		self::assertEquals($expectedList, $shortList);
+	}
+
+	/**
+	 * Запрос с применением кеша
+	 */
+	public function testFindCachedCache() {
+		$query = $this->TestTableTwo->find('cached');
+		$expectedSql = 'SELECT SQL_CACHE `TestTableTwo`.`id` AS `TestTableTwo__id`, `TestTableTwo`.`table_one_fk` AS `TestTableTwo__table_one_fk`, `TestTableTwo`.`col_text` AS `TestTableTwo__col_text` FROM `test_table_two` `TestTableTwo`';
+		self::assertEquals($expectedSql, $query->sql());
 	}
 
 }

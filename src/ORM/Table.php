@@ -234,6 +234,17 @@ class Table extends \Cake\ORM\Table
 		return parent::findList($query, $options);
 	}
 
+	/**
+	 * Файндер, включающий кеширование запросов MySql
+	 *
+	 * @param Query $query
+	 * @param array $options
+	 * @return Query
+	 */
+	public function findCached(Query $query, array $options) {
+		return $query->modifier(['SQL_CACHE']);
+	}
+
 	/** @inheritdoc */
 	public function query() {
 		return new Query($this->getConnection(), $this);
