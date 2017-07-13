@@ -237,11 +237,11 @@ class Table extends \Cake\ORM\Table
 	/**
 	 * Файндер, включающий кеширование запросов MySql
 	 *
-	 * @param Query $query
+	 * @param \Cake\ORM\Query $query
 	 * @param array $options
-	 * @return Query
+	 * @return \Cake\ORM\Query
 	 */
-	public function findCached(Query $query, array $options) {
+	public function findCached(\Cake\ORM\Query $query, array $options) {
 		return $query->modifier(['SQL_CACHE']);
 	}
 
