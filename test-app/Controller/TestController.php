@@ -137,4 +137,8 @@ class TestController extends Controller
 		throw new InternalException('test trace');
 	}
 
+	/** Тестируем обращение к экшну с разными регистрами букв */
+	public function testName() {
+	}
+
 }
