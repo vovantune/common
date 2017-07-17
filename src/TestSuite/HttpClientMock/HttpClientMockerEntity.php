@@ -2,6 +2,7 @@
 
 namespace ArtSkills\TestSuite\HttpClientMock;
 
+use ArtSkills\Lib\Arrays;
 use Cake\Http\Client\Request;
 
 
@@ -12,13 +13,6 @@ class HttpClientMockerEntity
 	 * запрос должен быть вызван хотя бы раз
 	 */
 	const EXPECT_CALL_ONCE = -1;
-
-	/**
-	 * ID текущего мока в стеке HttpClientMocker
-	 *
-	 * @var string
-	 */
-	private $_id = '';
 
 	/**
 	 * Файл, в котором мокнули
@@ -53,7 +47,7 @@ class HttpClientMockerEntity
 	 *
 	 * @var array
 	 */
-	private $_body = [];
+	private $_body = null;
 
 	/**
 	 * Возвращаемый результат
@@ -68,6 +62,13 @@ class HttpClientMockerEntity
 	 * @var null|callable
 	 */
 	private $_returnAction = null;
+
+	/**
+	 * Статус возвращаемого ответа
+	 *
+	 * @var int
+	 */
+	private $_returnStatusCode = 200;
 
 	/**
 	 * Сколько раз ожидается вызов функции
@@ -100,18 +101,31 @@ class HttpClientMockerEntity
 	/**
 	 * HttpClientMockerEntity constructor.
 	 *
-	 * @param string $mockId
 	 * @param string $url
 	 * @param string $method
 	 */
-	public function __construct($mockId, $url, $method = Request::METHOD_GET) {
-		$calledFrom = debug_backtrace();
-		$this->_callerFile = isset($calledFrom[1]['file']) ? $calledFrom[1]['file'] : $calledFrom[0]['file'];
-		$this->_callerLine = isset($calledFrom[1]['line']) ? $calledFrom[1]['line'] : $calledFrom[0]['line'];
-
-		$this->_id = $mockId;
+	public function __construct($url, $method = Request::METHOD_GET) {
 		$this->_url = $url;
 		$this->_method = $method;
+
+		$dropTraceFiles = [
+			__FILE__,
+			(new \ReflectionClass(HttpClientMocker::class))->getFileName(),
+		];
+		$mockedIn = null;
+		$trace = debug_backtrace();
+		foreach ($trace as $callData) {
+			if (
+				!empty($callData['file'])
+				&& !empty($callData['line'])
+				&& !in_array($callData['file'], $dropTraceFiles)
+			) {
+				$mockedIn = $callData;
+				break;
+			}
+		}
+		$this->_callerFile = $mockedIn['file'];
+		$this->_callerLine = $mockedIn['line'];
 	}
 
 	/**
@@ -151,6 +165,15 @@ class HttpClientMockerEntity
 	}
 
 	/**
+	 * Ожидаем, что таких вызовов не будет
+	 *
+	 * @return $this
+	 */
+	public function noCalls() {
+		return $this->expectCall(0);
+	}
+
+	/**
 	 * Ограничение на количество вызовов данного мока
 	 *
 	 * @param int $times
@@ -166,11 +189,11 @@ class HttpClientMockerEntity
 	 *
 	 * @param array|string $body
 	 * @return $this
-	 * @throws \Exception
+	 * @throws \PHPUnit_Framework_ExpectationFailedException
 	 */
 	public function expectBody($body) {
-		if ($this->_method == Request::METHOD_GET) {
-			throw new \Exception($this->_getErrorMessage('Body for GET method is not required!'));
+		if ($this->_method === Request::METHOD_GET) {
+			$this->_fail('Body for GET method is not required!');
 		}
 
 		$this->_body = $body;
@@ -178,14 +201,23 @@ class HttpClientMockerEntity
 	}
 
 	/**
+	 * Ожидается пустое тело запроса
+	 *
+	 * @return HttpClientMockerEntity
+	 */
+	public function expectEmptyBody() {
+		return $this->expectBody('');
+	}
+
+	/**
 	 * Что вернет запрос
 	 *
-	 * @param mixed $value
+	 * @param string $value
 	 * @return $this
 	 */
 	public function willReturnString($value) {
 		$this->_returnAction = null;
-		$this->_returnValue = $value;
+		$this->_returnValue = $this->_processResponse($value);
 		return $this;
 	}
 
@@ -201,12 +233,14 @@ class HttpClientMockerEntity
 
 	/**
 	 * Возвращаем содержимое файла
-	 * TODO: затестить отдельно
 	 *
 	 * @param string $filePath
 	 * @return HttpClientMockerEntity
 	 */
 	public function willReturnFile($filePath) {
+		if (!is_file($filePath)) {
+			$this->_fail($filePath . ' is not a file');
+		}
 		return $this->willReturnString(file_get_contents($filePath));
 	}
 
@@ -227,40 +261,80 @@ class HttpClientMockerEntity
 	}
 
 	/**
+	 * Задать статус возвращаемого ответа
+	 *
+	 * @param int $statusCode
+	 * @return $this
+	 */
+	public function willReturnStatus($statusCode) {
+		if (!is_int($statusCode) || ($statusCode < 100) || ($statusCode > 599)) {
+			$this->_fail('Status code should be integer between 100 and 599');
+		}
+		$this->_returnStatusCode = $statusCode;
+		return $this;
+	}
+
+	/**
 	 * Мок событие
 	 *
 	 * @param Request $request
 	 * @return string
-	 * @throws \Exception
 	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 * @throws \PHPUnit\Framework\AssertionFailedError
 	 */
 	public function doAction($request) {
 		if (($this->_expectedCallCount > self::EXPECT_CALL_ONCE) && ($this->_callCounter >= $this->_expectedCallCount)) {
-			throw new \PHPUnit_Framework_ExpectationFailedException($this->_getErrorMessage('expected ' . $this->_expectedCallCount . ' calls, but more appeared'));
-		}
-
-		if (!empty($this->_body)) {
-			if ($request->getHeader('Content-Type')[0] !== 'application/x-www-form-urlencoded') {
-				$expectedBody = $request->body();
-			} else {
-				$result = [];
-				parse_str($request->body(), $result);
-				$expectedBody = $result;
-			}
-			\PHPUnit\Framework\Assert::assertEquals($this->_body, $expectedBody, 'Expected POST body data is not equals real data');
+			$this->_fail('expected ' . $this->_expectedCallCount . ' calls, but more appeared');
 		}
 
 		$this->_callCounter++;
 		$this->_isCalled = true;
 
+		$actualBody = (string)$request->getBody();
+		if ($this->_body === null) {
+			if (($request->getMethod() === Request::METHOD_POST) && empty($actualBody)) {
+				// Post с пустым body - скорее всего ошибка
+				// Если это не ошибка, то надо явно вызвать ->expectEmptyBody()
+				$this->_fail('Post request with empty body');
+			}
+		} else {
+			if (is_array($this->_body)) {
+				$contentTypes = $request->getHeader('Content-Type');
+				$contentType = Arrays::get($contentTypes, 0);
+				switch ($contentType) {
+					case 'application/x-www-form-urlencoded':
+						$parsedBody = [];
+						parse_str($actualBody, $parsedBody);
+						$actualBody = $parsedBody;
+						break;
+					case 'application/json':
+						$actualBody = json_decode($actualBody, true);
+						break;
+				}
+			}
+			\PHPUnit\Framework\Assert::assertEquals($this->_body, $actualBody, 'Expected POST body data is not equal to real data');
+		}
+
 		if ($this->_returnValue !== null) {
-			return $this->_returnValue;
+			$response = $this->_returnValue;
 		} elseif ($this->_returnAction !== null) {
 			$action = $this->_returnAction;
-			return $action($request);
+			// передаю $this, чтобы внутри можно было задать код статуса
+			$response = $action($request, $this);
 		} else {
-			throw new \Exception($this->_getErrorMessage('Return mock action is not defined'));
+			$this->_fail('Return mock action is not defined');
 		}
+
+		return $this->_processResponse($response);
+	}
+
+	/**
+	 * Получить код статуса ответа
+	 *
+	 * @return int
+	 */
+	public function getReturnStatusCode() {
+		return $this->_returnStatusCode;
 	}
 
 	/**
@@ -288,10 +362,9 @@ class HttpClientMockerEntity
 		$this->_mockChecked = true;
 
 		if (!$goodCallCount) {
-			// todo: При переходе на php7 и phpunit6 заменить на правильный класс. Сейчас почему-то алиас не работает
-			throw new \PHPUnit_Framework_ExpectationFailedException($this->_getErrorMessage(
+			$this->_fail(
 				$this->_isCalled ? 'is called ' . $this->getCallCount() . ' times, expected ' . $this->_expectedCallCount : 'is not called!'
-			));
+			);
 		}
 	}
 
@@ -303,5 +376,34 @@ class HttpClientMockerEntity
 	 */
 	private function _getErrorMessage($msg) {
 		return $this->_url . '(mocked in ' . $this->_callerFile . ' line ' . $this->_callerLine . ') - ' . $msg;
+	}
+
+	/**
+	 * Не прошла проверка, заваливаем тест
+	 *
+	 * @param string $message
+	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 */
+	private function _fail($message) {
+		// todo: При переходе на php7 и phpunit6 заменить на правильный класс. Сейчас почему-то алиас не работает
+		throw new \PHPUnit_Framework_ExpectationFailedException($this->_getErrorMessage($message));
+	}
+
+	/**
+	 * Обработать возвращаемое значение.
+	 * null превращается в пустую строку,
+	 * при любых других нестроковых значениях кидается ошибка
+	 *
+	 * @param mixed $response
+	 * @return string
+	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 */
+	private function _processResponse($response) {
+		if ($response === null) {
+			$response = '';
+		} elseif (!is_string($response)) {
+			$this->_fail('Invalid response: ' . print_r($response, true));
+		}
+		return $response;
 	}
 }
