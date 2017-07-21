@@ -20,6 +20,11 @@ class HttpClientAdapter extends Stream
 	 */
 	private $_currentRequestData = null;
 
+	/**
+	 * Выводить ли информацию о незамоканных запросах
+	 *
+	 * @var bool
+	 */
 	private static $_debugRequests = true;
 
 	/**
@@ -34,21 +39,18 @@ class HttpClientAdapter extends Stream
 			'response' => '',
 		];
 
-		$mockedData = HttpClientMocker::getMockedData($request);
-		if ($mockedData !== null) {
-			return $this->createResponses(['HTTP/1.1 200 OK', 'Server: nginx/1.2.1'], $mockedData);
+		$mockData = HttpClientMocker::getMockedData($request);
+		if ($mockData !== null) {
+			return $this->createResponses(['HTTP/1.1 ' . $mockData['status'], 'Server: nginx/1.2.1'], $mockData['response']);
 		} else {
-			/**
-			 * @var Response[] $result
-			 */
+			/** @var Response[] $result */
 			$result = parent::_send($request);
 
 			if (self::$_debugRequests) {
 				print "==============================================================\n";
-				print "Do " . $request->getMethod() . ' request to ' . $request->getUri() . ', Body: ' . $request->getBody() . "\n";
+				print 'Do ' . $request->getMethod() . ' request to ' . $request->getUri() . ', Body: ' . $request->getBody() . "\n";
 				print "Response: \n" . $result[0]->body() . "\n";
 				print "==============================================================\n";
-
 			}
 
 			return $result;
@@ -60,11 +62,8 @@ class HttpClientAdapter extends Stream
 	 */
 	public function createResponses($headers, $content) {
 		$result = parent::createResponses($headers, $content);
-		/**
-		 * @var Response $lastResponse
-		 */
-		$lastResponse = $result[count($result) - 1];
-		$this->_currentRequestData['response'] = $lastResponse;
+
+		$this->_currentRequestData['response'] = end($result);
 
 		HttpClientMocker::addSniff($this->_currentRequestData);
 		$this->_currentRequestData = null;

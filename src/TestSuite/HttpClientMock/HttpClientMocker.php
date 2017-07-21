@@ -67,29 +67,28 @@ class HttpClientMocker
 	 * @param string|array $url Полная строка, либо массив вида ['урл', ['arg1' => 1, ...]]
 	 * @param string $method
 	 * @return HttpClientMockerEntity
-	 * @throws \Exception
+	 * @throws \PHPUnit_Framework_ExpectationFailedException
 	 */
 	public static function mock($url, $method) {
 		$mockId = self::_buildKey($url, $method);
 		if (isset(self::$_mockCallList[$mockId])) {
-			throw new \Exception($url . ' is already mocked with such args');
+			throw new \PHPUnit_Framework_ExpectationFailedException($method . ' ' . $url . ' is already mocked');
 		}
 
-		self::$_mockCallList[$mockId] = new HttpClientMockerEntity($mockId, $url, $method);
+		self::$_mockCallList[$mockId] = new HttpClientMockerEntity($url, $method);
 		return self::$_mockCallList[$mockId];
 	}
 
 	/**
 	 * Мок гет запроса
-	 * TODO: затестить
 	 *
 	 * @param string $url
 	 * @param array $uriArgs
 	 * @return HttpClientMockerEntity
 	 */
-	public static function mockGet($url, $uriArgs = []) {
+	public static function mockGet($url, array $uriArgs = []) {
 		if (count($uriArgs)) {
-			$mockedUrl = $url . (strstr($url, '?') ? '&' : '?') . http_build_query($uriArgs);
+			$mockedUrl = $url . ((strpos($url, '?') === false) ? '?' : '&') . http_build_query($uriArgs);
 		} else {
 			$mockedUrl = $url;
 		}
@@ -99,13 +98,12 @@ class HttpClientMocker
 
 	/**
 	 * Мок пост запроса
-	 * TODO: затестить
 	 *
 	 * @param string $url
 	 * @param array|string $expectedPostArgs
 	 * @return HttpClientMockerEntity
 	 */
-	public static function mockPost($url, $expectedPostArgs = []) {
+	public static function mockPost($url, array $expectedPostArgs = []) {
 		$mock = self::mock($url, Request::METHOD_POST);
 		if (count($expectedPostArgs)) {
 			$mock->expectBody($expectedPostArgs);
@@ -117,7 +115,7 @@ class HttpClientMocker
 	 * Проверяем на мок и возвращаем результат
 	 *
 	 * @param Request $request
-	 * @return null|string
+	 * @return null|array ['response' => , 'status' => ]
 	 */
 	public static function getMockedData(Request $request) {
 		foreach (self::$_mockCallList as $mock) {
@@ -125,7 +123,10 @@ class HttpClientMocker
 			$method = $request->getMethod();
 
 			if ($mock->check($url, $method)) {
-				return $mock->doAction($request);
+				$response = $mock->doAction($request);
+				// doAction вызывается до getReturnStatusCode, потому что в нём статус может измениться
+				$statusCode = $mock->getReturnStatusCode();
+				return ['response' => $response, 'status' => $statusCode];
 			}
 		}
 

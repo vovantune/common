@@ -15,7 +15,7 @@ HttpClientMockerEntity HttpClientMocker::mock(string $url, string $method)
 HttpClientMockerEntity HttpClientMocker::mockGet(string $url, array $uriArgs = [])
 HttpClientMockerEntity HttpClientMocker::mockPost(string $url, array|string $expectedPostArgs = [])
 ```
-## Аараметр `$method`:
+## Параметр `$method`:
 * `Cake\Http\Client\Request::METHOD_GET`
 * `Cake\Http\Client\Request::METHOD_POST`
 * `Cake\Http\Client\Request::METHOD_PUT`
@@ -27,15 +27,24 @@ HttpClientMockerEntity HttpClientMocker::mockPost(string $url, array|string $exp
 
 ## Доступные методы `HttpClientMockerEntity`:
 * Манипуляция с кол-вом вызовов:
-    * `singleCall()` - один раз
-    * `anyCall()` - как минимум 1 раз (по-умолчанию)
-    * `expectCall(int <кол-во>)` - если мы специально хотим указать, что вызовов быть не должно, то `$mock->expectCall(0);`
-* Проверка тела запроса (POST данных) - `expectBody(array|string $body)`. Порядок следования аргументов не учитывается. Если нужно отловить запрос с JSON POST, то просто передаём строку, закодированную в json_encode.
-* Возвращаемое значение (понятное дело, что в конченом счете все конвертируется в строку):
+    * `singleCall()` - один раз;
+    * `anyCall()` - как минимум 1 раз (по-умолчанию);
+    * `noCalls()` - ожидается, что вызовов не будет;
+    * `expectCall(int <кол-во>)` - проверка, что вызван ровно столько раз;
+* Проверка тела запроса (POST данных): 
+	* `expectBody(array|string $body)`. 
+	Лучше передавать массив, обычные POST запросы (form-urlencoded) и JSON запросы будут раскодированы и сравниваться как массивы. 
+	Но можно передать строку, и сравниваться будут строки;
+	* `expectEmptyBody()`. 
+	Если не был вызван expectBody(), то проверок параметров POST запроса происходить не будет.
+	Но при этом, если будет замечен запрос без параметров, то будет брошено исключение, т.к. POST запрос без параметров скорее всего является ошибкой.
+	Если действительно нужно сделать такой запрос, то нужно явно указать, что ожидается пустой POST при помощи этого метода;
+* Задать код статуса ответа - `willReturnStatus(int $statusCode)`. По-умолчанию - 200;
+* Тело ответа (понятное дело, что в конченом счете все конвертируется в строку):
     * `willReturnString(string <Строка>)`
-    * `willReturnJson(array <JSON массив>)`
+    * `willReturnJson(array <массив, который будет сконвертмрован в JSON>)`
     * `willReturnFile(string <Путь к файлу>)`
-    * `willReturnAction(callable <функция>)` На вход функция получает объект `Cake\Network\Http\Request`, на выходе должная быть возвращена строка
+    * `willReturnAction(callable <функция>)` На вход функция получает 2 параметра: объект `Cake\Network\Http\Request` и объект текущего мока. Мок передаётся на случай, если нужно изменить код статуса. На выходе должна быть возвращена строка.
     * Если ничего не указать, ты получим `\Exception`
 * Кол-во вызовов подменённого запроса - `getCallCount()`
 
