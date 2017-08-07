@@ -57,6 +57,20 @@ class Controller extends \Cake\Controller\Controller
 	}
 
 	/** @inheritdoc */
+	public function isAction($action) {
+		$isAction = parent::isAction($action);
+		if ($isAction) {
+			$methodName = (new \ReflectionMethod($this, $action))->getName();
+			if ($methodName !== $action) {
+				// разный регистр букв
+				$this->request = $this->request->withParam('action', $methodName);
+				Router::pushRequest(Router::popRequest()->withParam('action', $methodName));
+			}
+		}
+		return $isAction;
+	}
+
+	/** @inheritdoc */
 	public function initialize() {
 		parent::initialize();
 		$currentAction = $this->request->getParam('action');

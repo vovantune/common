@@ -7,6 +7,7 @@ use ArtSkills\Lib\Env;
 use ArtSkills\Log\Engine\SentryLog;
 use ArtSkills\TestSuite\AppControllerTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
+use Cake\Log\Log;
 use TestApp\Controller\TestController;
 
 class ControllerTest extends AppControllerTestCase
@@ -198,6 +199,45 @@ class ControllerTest extends AppControllerTestCase
 			],
 			500
 		);
+	}
+
+	/** смотрим, как выбираются экшны и шаблоны */
+	public function testActionAndTemplateResolve() {
+		MethodMocker::mock(Log::class, 'write')->expectCall(4);
+
+		$this->get('/cake/testName');
+		$this->assertResponseOk();
+
+		$this->get('/cake/nonExistentAction');
+		$this->assertResponseError(); // 4xx
+		$this->assertResponseContains('Missing Method');
+
+		// у кейкового контроллера здесь ошибка "не найден шаблон"
+		// т.е. он нашёл экшн testName, но искал шаблон testname вместо test_name
+		// должна быть либо ошибка "не найден экшн", либо должен искать шаблон test_name
+		$this->get('/cake/testname');
+		$this->assertResponseFailure(); // 5xx
+		$this->assertResponseContains('Missing Template');
+
+
+
+		$this->get('/test/testName');
+		$this->assertResponseOk();
+
+		$this->get('/test/nonExistentAction');
+		$this->assertResponseError(); // 4xx
+		$this->assertResponseContains('Missing Method');
+
+		// а у нас я исправил
+		// сделал, чтобы страница открывалась
+		// чтобы не было ошибок у пользователей
+		$this->get('/test/testname');
+		$this->assertResponseOk();
+
+		// проверим, что ничего не испортил
+		$this->get('/test/isAction');
+		$this->assertResponseError(); // 4xx
+		$this->assertResponseContains('Missing Method');
 	}
 
 }
