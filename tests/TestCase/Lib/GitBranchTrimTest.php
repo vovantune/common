@@ -1,5 +1,5 @@
 <?php
-namespace App\Test\TestCase\Shell\TrimBranchesTest;
+namespace App\Test\TestCase\Lib;
 
 use ArtSkills\Lib\Shell;
 use ArtSkills\Lib\Git;
