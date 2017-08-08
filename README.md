@@ -14,7 +14,7 @@ require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . D
 * Куча [дополнительных инструментов тестирования](src/TestSuite).
 * Построитель классов Table и Entity на основе структуры базы (перенести сюда доки).
 * Логирование ошибок в [Sentry](src/Log/Engine).
-* Полезные фичи ORM (классы Table, Entity, Query) (написать доки).
+* Полезные фичи [ORM](src/ORM) (классы Table, Entity, Query).
 * [Helper для работы со скриптами и стилями](src/View/Helper)).
 * [Деплойщик](src/Lib/Deployer.md) проектов
 
