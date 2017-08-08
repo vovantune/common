@@ -275,13 +275,4 @@ class TableTest extends AppTestCase
 		self::assertEquals($expectedList, $shortList);
 	}
 
-	/**
-	 * Запрос с применением кеша
-	 */
-	public function testFindCachedCache() {
-		$query = $this->TestTableTwo->find('cached');
-		$expectedSql = 'SELECT SQL_CACHE `TestTableTwo`.`id` AS `TestTableTwo__id`, `TestTableTwo`.`table_one_fk` AS `TestTableTwo__table_one_fk`, `TestTableTwo`.`col_text` AS `TestTableTwo__col_text` FROM `test_table_two` `TestTableTwo`';
-		self::assertEquals($expectedSql, $query->sql());
-	}
-
 }
