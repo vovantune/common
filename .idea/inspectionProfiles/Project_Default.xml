@@ -58,7 +58,7 @@
         <list>
           <RulesetDescriptor>
             <option name="name" value="Artskills PHPMD rule set" />
-            <option name="path" value="$PROJECT_DIR$/../codeStyle/src/rules.xml" />
+            <option name="path" value="$PROJECT_DIR$/vendor/artskills/codestyle/src/rules.xml" />
           </RulesetDescriptor>
         </list>
       </option>
