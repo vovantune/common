@@ -33,7 +33,7 @@ class MockTestChildFixture extends MockTestFixture
 	 */
 	public function call($callChild, $isStatic, $isRedefined, $callType) {
 		if ($callChild) {
-			return self::callChild($isStatic, $isRedefined, $callType);
+			return $this->callChild($isStatic, $isRedefined, $callType);
 		} else {
 			return parent::callParent($isStatic, $isRedefined, $callType);
 		}
@@ -87,14 +87,16 @@ class MockTestChildFixture extends MockTestFixture
 	 * Функция с типизированными и обязательными параметрами и передачей по ссылке
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 *
-	 * @param MockTestFixture $typedParam
 	 * @param mixed $byRefParam
+	 * @param MockTestFixture $objParam
 	 * @param array $arrayParam
+	 * @param float $typedParam
+	 * @param string|null $nullableParam
 	 * @param mixed $requiredParam
 	 * @param array $mayBeNotArray
 	 */
 	public static function complexParams(
-		MockTestFixture $typedParam, &$byRefParam, array $arrayParam, $requiredParam, $mayBeNotArray = []
+		&$byRefParam, MockTestFixture $objParam, array $arrayParam, float $typedParam, ?string $nullableParam, $requiredParam, $mayBeNotArray = []
 	) {
 		// noop
 	}

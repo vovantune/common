@@ -4,6 +4,9 @@ namespace ArtSkills\TestSuite\HttpClientMock;
 
 use ArtSkills\Lib\Arrays;
 use Cake\Http\Client\Request;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\ExpectationFailedException;
 
 
 class HttpClientMockerEntity
@@ -118,7 +121,7 @@ class HttpClientMockerEntity
 			if (
 				!empty($callData['file'])
 				&& !empty($callData['line'])
-				&& !in_array($callData['file'], $dropTraceFiles)
+				&& !in_array($callData['file'], $dropTraceFiles, true)
 			) {
 				$mockedIn = $callData;
 				break;
@@ -189,7 +192,7 @@ class HttpClientMockerEntity
 	 *
 	 * @param array|string $body
 	 * @return $this
-	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 * @throws ExpectationFailedException
 	 */
 	public function expectBody($body) {
 		if ($this->_method === Request::METHOD_GET) {
@@ -279,8 +282,8 @@ class HttpClientMockerEntity
 	 *
 	 * @param Request $request
 	 * @return string
-	 * @throws \PHPUnit_Framework_ExpectationFailedException
-	 * @throws \PHPUnit\Framework\AssertionFailedError
+	 * @throws AssertionFailedError
+	 * @throws ExpectationFailedException
 	 */
 	public function doAction($request) {
 		if (($this->_expectedCallCount > self::EXPECT_CALL_ONCE) && ($this->_callCounter >= $this->_expectedCallCount)) {
@@ -312,7 +315,7 @@ class HttpClientMockerEntity
 						break;
 				}
 			}
-			\PHPUnit\Framework\Assert::assertEquals($this->_body, $actualBody, 'Expected POST body data is not equal to real data');
+			Assert::assertEquals($this->_body, $actualBody, 'Expected POST body data is not equal to real data');
 		}
 
 		if ($this->_returnValue !== null) {
@@ -348,7 +351,7 @@ class HttpClientMockerEntity
 
 	/**
 	 * Финальная проверка на вызовы
-	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 * @throws \PHPUnit\Framework\ExpectationFailedException
 	 */
 	public function callCheck() {
 		if ($this->_mockChecked) {
@@ -382,11 +385,10 @@ class HttpClientMockerEntity
 	 * Не прошла проверка, заваливаем тест
 	 *
 	 * @param string $message
-	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 * @throws ExpectationFailedException
 	 */
 	private function _fail($message) {
-		// todo: При переходе на php7 и phpunit6 заменить на правильный класс. Сейчас почему-то алиас не работает
-		throw new \PHPUnit_Framework_ExpectationFailedException($this->_getErrorMessage($message));
+		throw new ExpectationFailedException($this->_getErrorMessage($message));
 	}
 
 	/**
@@ -396,7 +398,7 @@ class HttpClientMockerEntity
 	 *
 	 * @param mixed $response
 	 * @return string
-	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 * @throws ExpectationFailedException
 	 */
 	private function _processResponse($response) {
 		if ($response === null) {

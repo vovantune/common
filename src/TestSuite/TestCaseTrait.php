@@ -219,8 +219,7 @@ trait TestCaseTrait
 		if (!($time instanceof Time)) {
 			$time = new Time($time);
 		}
-		if ($clearMicroseconds && (PHP_MAJOR_VERSION >= 7)) {
-			// todo: выпилить условие по версии после полного перехода на пхп7
+		if ($clearMicroseconds) {
 			$time->setTime($time->hour, $time->minute, $time->second, 0);
 		}
 		Time::setTestNow($time);

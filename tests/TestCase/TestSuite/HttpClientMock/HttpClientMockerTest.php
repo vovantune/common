@@ -72,7 +72,7 @@ class HttpClientMockerTest extends AppTestCase
 	/**
 	 * Нельзя замокать одно и то же 2 раза
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage GET http://www.artskills.ru is already mocked
 	 */
 	public function testMockTwice() {
@@ -167,7 +167,7 @@ class HttpClientMockerTest extends AppTestCase
 	/**
 	 * тест метода mockPost, запрос с неожиданным body
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Expected POST body data is not equal to real data
 	 */
 	public function testMockPostUnexpectedBody() {

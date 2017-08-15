@@ -4,6 +4,7 @@ namespace ArtSkills\TestSuite\HttpClientMock;
 
 use Cake\Http\Client\Request;
 use Cake\Http\Client\Response;
+use PHPUnit\Framework\ExpectationFailedException;
 
 class HttpClientMocker
 {
@@ -67,12 +68,12 @@ class HttpClientMocker
 	 * @param string|array $url Полная строка, либо массив вида ['урл', ['arg1' => 1, ...]]
 	 * @param string $method
 	 * @return HttpClientMockerEntity
-	 * @throws \PHPUnit_Framework_ExpectationFailedException
+	 * @throws \PHPUnit\Framework\ExpectationFailedException
 	 */
 	public static function mock($url, $method) {
 		$mockId = self::_buildKey($url, $method);
 		if (isset(self::$_mockCallList[$mockId])) {
-			throw new \PHPUnit_Framework_ExpectationFailedException($method . ' ' . $url . ' is already mocked');
+			throw new ExpectationFailedException($method . ' ' . $url . ' is already mocked');
 		}
 
 		self::$_mockCallList[$mockId] = new HttpClientMockerEntity($url, $method);
