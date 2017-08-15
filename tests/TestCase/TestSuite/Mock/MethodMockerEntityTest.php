@@ -515,37 +515,33 @@ class MethodMockerEntityTest extends TestCase
 				'errorMsg' => 'must be an instance of ' . MockTestFixture::class,
 			]],
 			2 => [[
-				'params' => [false, $objParam, $arrParam, $floatParam, $stringParam, $requiredParam],
-				'errorClass' => \Error::class,
-				'errorMsg' => 'Cannot pass parameter 1 by reference',
-			]],
-			3 => [[
 				'params' => [true, $objParam, 1, $floatParam, $stringParam, $requiredParam],
 				'errorClass' => \TypeError::class,
 				'errorMsg' => 'must be of the type array',
 			]],
-			4 => [[
+			3 => [[
 				'params' => [true, $objParam, $arrParam, [], $stringParam, $requiredParam],
 				'errorClass' => \TypeError::class,
 				'errorMsg' => 'must be of the type float',
 			]],
-			5 => [[
+			4 => [[
 				'params' => [true, $objParam, $arrParam, $floatParam, [], $requiredParam],
 				'errorClass' => \TypeError::class,
 				'errorMsg' => 'must be of the type string',
 			]],
-			6 => [[
+			5 => [[
 				// тут всё ок
 				'params' => [true, $objParam, $arrParam, $floatParam, $stringParam, $requiredParam],
 				'errorClass' => '',
 				'errorMsg' => '',
 			]],
-			7 => [[
+			6 => [[
 				// тут всё ок
 				'params' => [true, $objParam, $arrParam, $floatParam, null, $requiredParam],
 				'errorClass' => '',
 				'errorMsg' => '',
 			]],
+			// отсутствует тест того, что передача параметра по ссылке сохраняется
 		];
 	}
 
@@ -561,11 +557,7 @@ class MethodMockerEntityTest extends TestCase
 		$refParam = 1;
 		$useRefParam = array_shift($params);
 		try {
-			if ($useRefParam) {
-				MockTestFixture::complexParams($refParam, ...$params);
-			} else {
-				MockTestFixture::complexParams(1, ...$params);
-			}
+			MockTestFixture::complexParams($refParam, ...$params);
 			$error = null;
 		} catch (\Throwable $e) {
 			$error = $e;

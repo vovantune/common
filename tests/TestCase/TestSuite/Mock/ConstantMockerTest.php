@@ -29,24 +29,12 @@ class ConstantMockerTest extends TestCase
 
 	/**
 	 * Мок константы в классе.
-	 * И вызов в том же файле через self.
-	 * Мок не срабатывает :(
+	 * И вызов в том же файле через self
 	 */
 	public function testClassMockSameFile() {
 		$mockValue = 'qqq';
 		ConstantMocker::mock(MockTestFixture::class, self::CLASS_CONST_NAME, $mockValue);
-		self::assertNotEquals($mockValue, MockTestFixture::getConst());
-		ConstantMocker::restore();
-	}
-
-	/**
-	 * Мок константы в классе и вызов в том же файле, но через static.
-	 * Мок работает!!!!
-	 */
-	public function testClassMockSameFileStatic() {
-		$mockValue = 'qqq';
-		ConstantMocker::mock(MockTestFixture::class, self::CLASS_CONST_NAME, $mockValue);
-		self::assertEquals($mockValue, MockTestFixture::getConstStatic());
+		self::assertEquals($mockValue, MockTestFixture::getConst());
 		ConstantMocker::restore();
 	}
 
