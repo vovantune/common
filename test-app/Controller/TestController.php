@@ -64,7 +64,7 @@ class TestController extends Controller
 	 * @return null
 	 */
 	public function getJsonExceptionUnit() {
-		return $this->_sendJsonException(new \PHPUnit_Framework_AssertionFailedError('test unit exception'), ['someData' => 'test']);
+		return $this->_sendJsonException(new \PHPUnit\Framework\AssertionFailedError('test unit exception'), ['someData' => 'test']);
 	}
 
 	/**
