@@ -535,7 +535,7 @@ class MethodMockerEntity
 			}
 			return array_shift($this->_returnValueList);
 		} else {
-			return null;
+			return;
 		}
 	}
 

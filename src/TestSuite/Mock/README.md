@@ -86,6 +86,7 @@ MethodMocker::sniff(City::class, '_getFromCache', function($args, $origResult) u
 ```php
 ConstantMocker::mock(string $className, string $constantName, string $newValue)
 ```
+В PHP7 если обращаться к константам класса не через `static`, то мок валится с ошибкой. 
 
 # Вызов private или protected метода
 ```php

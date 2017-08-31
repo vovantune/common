@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 
 use ArtSkills\TestSuite\Mock\MethodMocker;
@@ -106,7 +108,7 @@ class MethodMockerTest extends TestCase
 	 * Делаем приватную статичную функцию доступной
 	 */
 	public function testCallPrivate() {
-		$this->assertEquals('original private static', MethodMocker::callPrivate(MockTestFixture::class, '_privateStaticFunc'));
+		self::assertEquals('original private static', MethodMocker::callPrivate(MockTestFixture::class, '_privateStaticFunc'));
 	}
 
 	/**
@@ -114,7 +116,7 @@ class MethodMockerTest extends TestCase
 	 */
 	public function testCallProtected() {
 		$testObject = new MockTestFixture();
-		$this->assertEquals('protected args test arg', MethodMocker::callPrivate($testObject, '_protectedArgs', ['test arg']));
+		self::assertEquals('protected args test arg', MethodMocker::callPrivate($testObject, '_protectedArgs', ['test arg']));
 	}
 
 	/**
@@ -146,11 +148,6 @@ class MethodMockerTest extends TestCase
 	public function testCallPrivatePublic() {
 		MethodMocker::callPrivate(MockTestFixture::class, 'staticFunc');
 	}
-
-
-
-
-
 
 	/**
 	 * ожидалось без аргументов, а они есть
@@ -288,10 +285,6 @@ class MethodMockerTest extends TestCase
 		$testObject->methodNoArgs(123);
 	}
 
-
-
-
-
 	/**
 	 * не вызван
 	 * @expectedException \PHPUnit\Framework\AssertionFailedError
@@ -323,7 +316,6 @@ class MethodMockerTest extends TestCase
 		MockTestFixture::staticMethodArgs(1, 2);
 		MockTestFixture::staticMethodArgs(1, 2);
 	}
-
 
 	/**
 	 * вызов правильное количество раз
@@ -452,7 +444,6 @@ class MethodMockerTest extends TestCase
 		MockTestFixture::staticFunc();
 	}
 
-
 	/**
 	 * переопределение expectArgs и willReturn
 	 */
@@ -557,9 +548,6 @@ class MethodMockerTest extends TestCase
 		MockTestFixture::staticFunc();
 		MockTestFixture::staticFunc();
 	}
-
-
-
 }
 
 

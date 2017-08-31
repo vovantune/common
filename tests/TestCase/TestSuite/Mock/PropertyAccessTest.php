@@ -1,4 +1,6 @@
 <?php
+
+
 namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 
 use ArtSkills\TestSuite\Mock\PropertyAccess;
@@ -10,7 +12,6 @@ use PHPUnit\Framework\TestCase;
  */
 class PropertyAccessTest extends TestCase
 {
-
 	/** тест чтения и записи */
 	public function test() {
 		$testObject = new MockTestFixture();
@@ -81,7 +82,6 @@ class PropertyAccessTest extends TestCase
 		PropertyAccess::restoreStatic($className, $propertyName);
 	}
 
-
 	/**
 	 * Восстановление всех статических свойств
 	 */
@@ -121,7 +121,4 @@ class PropertyAccessTest extends TestCase
 		PropertyAccess::restoreStaticAll();
 		PropertyAccess::restoreStatic($className, $propertyName);
 	}
-
 }
-
-
