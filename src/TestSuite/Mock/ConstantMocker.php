@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ArtSkills\TestSuite\Mock;
 
 use ArtSkills\Traits\Library;
@@ -8,7 +10,7 @@ use ArtSkills\Traits\Library;
  */
 class ConstantMocker
 {
-    use Library;
+	use Library;
 
 	/**
 	 * Список мокнутых констант
@@ -25,8 +27,9 @@ class ConstantMocker
 	 * @param mixed $newValue
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public static function mock($className, $constantName, $newValue) {
-		if (strlen($className)) {
+	public static function mock(?string $className, string $constantName, $newValue): void
+	{
+		if ($className !== null) {
 			$fullName = $className . '::' . $constantName;
 		} else {
 			$fullName = $constantName;
@@ -41,14 +44,15 @@ class ConstantMocker
 
 		self::$_constantList[$fullName] = $origValue;
 		if (!runkit_constant_redefine($fullName, $newValue)) {
-			MethodMocker::fail("Can't redefine constant $fullName!");	// @codeCoverageIgnore
+			MethodMocker::fail("Can't redefine constant $fullName!");    // @codeCoverageIgnore
 		}
 	}
 
 	/**
 	 * Возвращаем все обратно
 	 */
-	public static function restore() {
+	public static function restore(): void
+	{
 		foreach (self::$_constantList as $name => $origValue) {
 			runkit_constant_redefine($name, $origValue);
 		}

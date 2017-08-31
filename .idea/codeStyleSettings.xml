@@ -23,7 +23,7 @@
           <option name="KEEP_SINGLE_LINE_BLOCKS" value="true" />
         </CssCodeStyleSettings>
         <JSCodeStyleSettings>
-          <option name="ALIGN_MULTILINE_VAR_DECLARATION" value="true" />
+          <option name="ALIGN_VAR_STATEMENTS" value="1" />
         </JSCodeStyleSettings>
         <MarkdownNavigatorCodeStyleSettings>
           <option name="RIGHT_MARGIN" value="72" />
@@ -88,7 +88,6 @@
         </codeStyleSettings>
         <codeStyleSettings language="PHP">
           <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
-          <option name="METHOD_BRACE_STYLE" value="1" />
           <option name="SPECIAL_ELSE_IF_TREATMENT" value="true" />
           <option name="ALIGN_MULTILINE_FOR" value="false" />
           <option name="METHOD_PARAMETERS_WRAP" value="1" />

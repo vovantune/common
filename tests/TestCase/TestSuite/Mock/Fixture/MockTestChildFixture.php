@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ArtSkills\Test\TestCase\TestSuite\Mock\Fixture;
 
 class MockTestChildFixture extends MockTestFixture
@@ -9,7 +11,8 @@ class MockTestChildFixture extends MockTestFixture
 	 *
 	 * @return string
 	 */
-	protected static function _redefinedStaticFunc() {
+	protected static function _redefinedStaticFunc(): string
+	{
 		return 'redefined protected static';
 	}
 
@@ -18,7 +21,8 @@ class MockTestChildFixture extends MockTestFixture
 	 *
 	 * @return string
 	 */
-	protected function _redefinedFunc() {
+	protected function _redefinedFunc(): string
+	{
 		return 'redefined protected';
 	}
 
@@ -31,7 +35,8 @@ class MockTestChildFixture extends MockTestFixture
 	 * @param string $callType
 	 * @return string
 	 */
-	public function call($callChild, $isStatic, $isRedefined, $callType) {
+	public function call(bool $callChild, bool $isStatic, bool $isRedefined, string $callType): string
+	{
 		if ($callChild) {
 			return $this->callChild($isStatic, $isRedefined, $callType);
 		} else {
@@ -48,7 +53,8 @@ class MockTestChildFixture extends MockTestFixture
 	 * @return string
 	 * @throws \Exception
 	 */
-	public function callChild($isStatic, $isRedefined, $callType) {
+	public function callChild(bool $isStatic, bool $isRedefined, string $callType): string
+	{
 		$methodName = self::getInheritTestFuncName($isStatic, $isRedefined);
 		if ($isStatic) {
 			if ($callType == 'self') {
@@ -70,7 +76,8 @@ class MockTestChildFixture extends MockTestFixture
 	 *
 	 * @return string
 	 */
-	protected static function _childOnlyFunc() {
+	protected static function _childOnlyFunc(): string
+	{
 		return 'original child only';
 	}
 
@@ -79,7 +86,8 @@ class MockTestChildFixture extends MockTestFixture
 	 *
 	 * @return string
 	 */
-	public static function callChildOnlyProtected() {
+	public static function callChildOnlyProtected(): string
+	{
 		return self::_childOnlyFunc();
 	}
 
@@ -96,7 +104,8 @@ class MockTestChildFixture extends MockTestFixture
 	 * @param array $mayBeNotArray
 	 */
 	public static function complexParams(
-		&$byRefParam, MockTestFixture $objParam, array $arrayParam, float $typedParam, ?string $nullableParam, $requiredParam, $mayBeNotArray = []
+		&$byRefParam, MockTestFixture $objParam, array $arrayParam, float $typedParam, ?string $nullableParam,
+		$requiredParam, $mayBeNotArray = []
 	) {
 		// noop
 	}

@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
+
 namespace ArtSkills\TestSuite\Mock;
 
 use ArtSkills\Traits\Library;
 use \ReflectionMethod;
+use \PHPUnit\Framework\AssertionFailedError;
 
 
 /**
@@ -11,7 +14,7 @@ use \ReflectionMethod;
  */
 class MethodMocker
 {
-    use Library;
+	use Library;
 
 	/**
 	 * Стэк моков в рамках одного теста
@@ -27,9 +30,10 @@ class MethodMocker
 	 * @param string $methodName
 	 * @param string|null $newAction новое событие метода
 	 * @return MethodMockerEntity
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|\Exception
 	 */
-	public static function mock($className, $methodName, $newAction = null) {
+	public static function mock(string $className, string $methodName, ?string $newAction = null): MethodMockerEntity
+	{
 		self::_newMockCheck($className, $methodName);
 		$key = self::_buildKey($className, $methodName);
 		self::$_mockList[$key] = new MethodMockerEntity($key, $className, $methodName, false, $newAction);
@@ -44,9 +48,10 @@ class MethodMocker
 	 * @param null|callable $sniffAction функция, вызываемая при вызове подслушиваемого метода: function($args,
 	 *     $originalResult) {}, $originalResult - результат выполнения подслушиваемого метода
 	 * @return MethodMockerEntity
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|\Exception
 	 */
-	public static function sniff($className, $methodName, $sniffAction = null) {
+	public static function sniff(string $className, string $methodName, ?callable $sniffAction = null
+	): MethodMockerEntity {
 		self::_newMockCheck($className, $methodName);
 		$key = self::_buildKey($className, $methodName);
 		self::$_mockList[$key] = new MethodMockerEntity($key, $className, $methodName, true);
@@ -61,9 +66,10 @@ class MethodMocker
 	 *
 	 * @param string $className
 	 * @param string $methodName
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|\Exception
 	 */
-	private static function _newMockCheck($className, $methodName) {
+	private static function _newMockCheck(string $className, string $methodName): void
+	{
 		$key = self::_buildKey($className, $methodName);
 		if (isset(self::$_mockList[$key])) {
 			self::fail($key . ' already mocked!');
@@ -77,7 +83,8 @@ class MethodMocker
 	 * @param string $methodName
 	 * @return string
 	 */
-	private static function _buildKey($className, $methodName) {
+	private static function _buildKey(string $className, string $methodName): string
+	{
 		return $className . '::' . $methodName;
 	}
 
@@ -88,9 +95,10 @@ class MethodMocker
 	 * @param array $args
 	 * @param mixed $origMethodResult результат выполнения оригинального метода в режиме снифа
 	 * @return mixed
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|\Exception
 	 */
-	public static function doAction($mockKey, $args, $origMethodResult = null) {
+	public static function doAction(string $mockKey, array $args, $origMethodResult = null)
+	{
 		if (!isset(self::$_mockList[$mockKey])) {
 			self::fail($mockKey . " mock object doesn't exist!");
 		}
@@ -103,9 +111,10 @@ class MethodMocker
 	 * Возвращаем все подмененные методы
 	 *
 	 * @param bool $hasFailed был ли тест завален
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|\Exception
 	 */
-	public static function restore($hasFailed = false) {
+	public static function restore(bool $hasFailed = false): void
+	{
 		$firstError = null;
 		foreach (self::$_mockList as $mock) {
 			try {
@@ -126,13 +135,14 @@ class MethodMocker
 	/**
 	 * Делает protected и private методы публичными
 	 *
-	 * @param object|string $object. строка с названием класса для статических, непосредственно инстанс для обычных методов
+	 * @param object|string $object . строка с названием класса для статических, непосредственно инстанс для обычных методов
 	 * @param string $methodName
 	 * @param array|null $args аргументы вызова
 	 * @return mixed
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|\Exception
 	 */
-	public static function callPrivate($object, $methodName, $args = null) {
+	public static function callPrivate($object, string $methodName, $args = null)
+	{
 		if (is_string($object)) {
 			$className = $object;
 			$object = null;
@@ -168,10 +178,11 @@ class MethodMocker
 	 * Зависимость от PHPUnit
 	 * Определено в одном месте на все классы
 	 *
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|\Exception
 	 * @param string $message
 	 */
-	public static function fail($message) {
+	public static function fail(string $message): void
+	{
 		if (class_exists(\PHPUnit\Framework\Assert::class) && method_exists(\PHPUnit\Framework\Assert::class, 'fail')) {
 			\PHPUnit\Framework\Assert::fail($message);
 		} else {
@@ -184,12 +195,13 @@ class MethodMocker
 	 * Зависимость от PHPUnit
 	 * Определено в одном месте на все классы
 	 *
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|\Exception
 	 * @param mixed $expected
 	 * @param mixed $actual
 	 * @param string $message
 	 */
-	public static function assertEquals($expected, $actual, $message = '') {
+	public static function assertEquals($expected, $actual, string $message = ''): void
+	{
 		if (class_exists(\PHPUnit\Framework\Assert::class) && method_exists(\PHPUnit\Framework\Assert::class, 'assertEquals')) {
 			\PHPUnit\Framework\Assert::assertEquals($expected, $actual, $message);
 		} elseif ($expected != $actual) {
