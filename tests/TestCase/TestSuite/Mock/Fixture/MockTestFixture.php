@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ArtSkills\Test\TestCase\TestSuite\Mock\Fixture;
 
 const SINGLE_TEST_CONST = '666';
@@ -36,7 +38,8 @@ class MockTestFixture
 	 *
 	 * @return int
 	 */
-	public static function getConst() {
+	public static function getConst(): int
+	{
 		return self::TEST_CONSTANT;
 	}
 
@@ -45,7 +48,8 @@ class MockTestFixture
 	 *
 	 * @return int
 	 */
-	public static function getConstStatic() {
+	public static function getConstStatic(): int
+	{
 		return static::TEST_CONSTANT;
 	}
 
@@ -55,8 +59,19 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	public static function staticFunc() {
+	public static function staticFunc(): string
+	{
 		return 'original public static';
+	}
+
+	/**
+	 * Много вариантов возвращаемых значений
+	 *
+	 * @return mixed
+	 */
+	public static function staticFuncMixedResult()
+	{
+		return '';
 	}
 
 	/**
@@ -64,7 +79,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	public function publicFunc() {
+	public function publicFunc(): string
+	{
 		return 'original public';
 	}
 
@@ -73,7 +89,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	private function _privateFunc() {
+	private function _privateFunc(): string
+	{
 		return 'original private';
 	}
 
@@ -82,7 +99,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	private static function _privateStaticFunc() {
+	private static function _privateStaticFunc(): string
+	{
 		return 'original private static';
 	}
 
@@ -91,7 +109,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	protected function _protectedFunc() {
+	protected function _protectedFunc(): string
+	{
 		return 'original protected';
 	}
 
@@ -100,7 +119,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	protected static function _protectedStaticFunc() {
+	protected static function _protectedStaticFunc(): string
+	{
 		return 'original protected static';
 	}
 
@@ -109,7 +129,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	public function callProtected() {
+	public function callProtected(): string
+	{
 		return $this->_protectedFunc();
 	}
 
@@ -118,7 +139,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	public function callPrivate() {
+	public function callPrivate(): string
+	{
 		return $this->_privateFunc();
 	}
 
@@ -127,7 +149,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	public static function callPrivateStatic() {
+	public static function callPrivateStatic(): string
+	{
 		return self::_privateStaticFunc();
 	}
 
@@ -136,7 +159,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	public static function callProtectedStatic() {
+	public static function callProtectedStatic(): string
+	{
 		return self::_protectedStaticFunc();
 	}
 
@@ -145,7 +169,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	public function methodNoArgs() {
+	public function methodNoArgs(): string
+	{
 		return 'original no args';
 	}
 
@@ -156,7 +181,8 @@ class MockTestFixture
 	 * @param mixed $second
 	 * @return string
 	 */
-	public function methodArgs($first, $second) {
+	public function methodArgs($first, $second): string
+	{
 		return $first . ' ' . $second;
 	}
 
@@ -167,7 +193,8 @@ class MockTestFixture
 	 * @param mixed $second
 	 * @return string
 	 */
-	public static function staticMethodArgs($first, $second) {
+	public static function staticMethodArgs($first, $second): string
+	{
 		return 'static ' . $first . ' ' . $second;
 	}
 
@@ -177,7 +204,8 @@ class MockTestFixture
 	 * @param string $arg
 	 * @return string
 	 */
-	protected function _protectedArgs($arg) {
+	protected function _protectedArgs(string $arg): string
+	{
 		return 'protected args ' . $arg;
 	}
 
@@ -187,7 +215,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	protected static function _redefinedStaticFunc() {
+	protected static function _redefinedStaticFunc(): string
+	{
 		return 'parent protected static';
 	}
 
@@ -196,7 +225,8 @@ class MockTestFixture
 	 *
 	 * @return string
 	 */
-	protected function _redefinedFunc() {
+	protected function _redefinedFunc(): string
+	{
 		return 'parent protected';
 	}
 
@@ -209,7 +239,8 @@ class MockTestFixture
 	 * @return string
 	 * @throws \Exception
 	 */
-	public function callParent($isStatic, $isRedefined, $callType) {
+	public function callParent(bool $isStatic, bool $isRedefined, string $callType): string
+	{
 		$methodName = self::getInheritTestFuncName($isStatic, $isRedefined);
 		if ($isStatic) {
 			if ($callType == 'self') {
@@ -231,7 +262,8 @@ class MockTestFixture
 	 * @param bool $isRedefined
 	 * @return string
 	 */
-	public static function getInheritTestFuncName($isStatic, $isRedefined) {
+	public static function getInheritTestFuncName(bool $isStatic, bool $isRedefined): string
+	{
 		if ($isRedefined) {
 			$methodName = '_redefined';
 		} else {
@@ -257,7 +289,8 @@ class MockTestFixture
 	 * @param array $mayBeNotArray
 	 */
 	public static function complexParams(
-		&$byRefParam, MockTestFixture $objParam, array $arrayParam, float $typedParam, ?string $nullableParam, $requiredParam, $mayBeNotArray = []
+		&$byRefParam, MockTestFixture $objParam, array $arrayParam, float $typedParam, ?string $nullableParam,
+		$requiredParam, $mayBeNotArray = []
 	) {
 		// noop
 	}
@@ -275,39 +308,43 @@ class MockTestFixture
 	 * @return array
 	 */
 	public static function defaultValues(
-		$arrayParam = ['a' => [null]], $floatParam = 2.5, $stringParam = 'asd', $boolParam = true, $nullParam = null
-	) {
+		array $arrayParam = ['a' => [null]], float $floatParam = 2.5, string $stringParam = 'asd',
+		bool $boolParam = true, $nullParam = null
+	): array {
 		return [];
 	}
 
 	/**
 	 * Функция с вариадиком
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+	 *
 	 * @param \int[] ...$variadicParam
 	 * @return array
 	 */
-	public static function variadicParam(int ...$variadicParam) {
+	public static function variadicParam(int ...$variadicParam)
+	{
 		return [];
 	}
 
 	/**
 	 * метод с возвращаемым значением
+	 *
 	 * @return int
 	 */
-	public static function returnInt(): int {
+	public static function returnInt(): int
+	{
 		return 1;
 	}
 
 	/**
 	 * метод с возвращаемым значением nullable
+	 *
 	 * @return int|null
 	 */
-	public static function returnNullable(): ?int {
+	public static function returnNullable(): ?int
+	{
 		return 1;
 	}
-
-
-
 
 
 }

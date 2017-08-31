@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 
@@ -17,7 +18,8 @@ class ConstantMockerTest extends TestCase
 	/**
 	 * Мок константы в классе
 	 */
-	public function testClassMock() {
+	public function testClassMock()
+	{
 		$originalValue = MockTestFixture::TEST_CONSTANT;
 		$mockValue = 'qqq';
 		ConstantMocker::mock(MockTestFixture::class, self::CLASS_CONST_NAME, $mockValue);
@@ -31,19 +33,19 @@ class ConstantMockerTest extends TestCase
 	 * Мок константы в классе.
 	 * И вызов в том же файле через self
 	 */
-	public function testClassMockSameFile() {
-		$mockValue = 'qqq';
+	public function testClassMockSameFile()
+	{
+		$mockValue = 666;
 		ConstantMocker::mock(MockTestFixture::class, self::CLASS_CONST_NAME, $mockValue);
 		self::assertEquals($mockValue, MockTestFixture::getConst());
 		ConstantMocker::restore();
 	}
 
-
-
 	/**
 	 * Мок константы вне класса
 	 */
-	public function testSingleMock() {
+	public function testSingleMock()
+	{
 		$originalValue = constant(self::GLOBAL_CONST_NAME);
 		$mockValue = 'qqq';
 		ConstantMocker::mock(null, self::GLOBAL_CONST_NAME, $mockValue);
@@ -59,7 +61,8 @@ class ConstantMockerTest extends TestCase
 	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage is not defined!
 	 */
-	public function testConstantExists() {
+	public function testConstantExists()
+	{
 		ConstantMocker::mock(null, 'BAD_CONST', 'bad');
 	}
 
@@ -69,7 +72,8 @@ class ConstantMockerTest extends TestCase
 	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage is already mocked!
 	 */
-	public function testConstantDoubleMock() {
+	public function testConstantDoubleMock()
+	{
 		ConstantMocker::mock(null, self::GLOBAL_CONST_NAME, '1');
 		ConstantMocker::mock(null, self::GLOBAL_CONST_NAME, '2');
 	}

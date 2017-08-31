@@ -101,9 +101,6 @@ class MethodMockerTest extends TestCase
 		MethodMocker::doAction('notExists', []);
 	}
 
-
-
-
 	/**
 	 * Делаем приватную статичную функцию доступной
 	 */
@@ -243,8 +240,10 @@ class MethodMockerTest extends TestCase
 			[1],
 			[2],
 		];
+		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs')->expectArgsList($expectedArgs)
+			->willReturnValue('');
+
 		$testObject = new MockTestFixture();
-		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs')->expectArgsList($expectedArgs);
 		$testObject->methodNoArgs();
 		$testObject->methodNoArgs(...$expectedArgs[1]);
 		$testObject->methodNoArgs();
@@ -262,8 +261,11 @@ class MethodMockerTest extends TestCase
 		$expectedArgs = [
 			false,
 		];
+
+		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs')->expectArgsList($expectedArgs)
+			->willReturnValue('');
+
 		$testObject = new MockTestFixture();
-		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs')->expectArgsList($expectedArgs);
 		$testObject->methodNoArgs();
 		$testObject->methodNoArgs();
 	}
@@ -280,7 +282,8 @@ class MethodMockerTest extends TestCase
 			false,
 		];
 		$testObject = new MockTestFixture();
-		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs')->expectArgsList($expectedArgs);
+		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs')->expectArgsList($expectedArgs)
+			->willReturnValue('');
 		$testObject->methodNoArgs();
 		$testObject->methodNoArgs(123);
 	}
@@ -301,7 +304,8 @@ class MethodMockerTest extends TestCase
 	 * @expectedExceptionMessage unexpected call count
 	 */
 	public function testCalledLess() {
-		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectCall(2);
+		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectCall(2)
+			->willReturnValue('');
 		MockTestFixture::staticMethodArgs(1, 2);
 		MethodMocker::restore();
 	}
@@ -312,7 +316,8 @@ class MethodMockerTest extends TestCase
 	 * @expectedExceptionMessage expected 1 calls, but more appeared
 	 */
 	public function testCalledMore() {
-		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->singleCall();
+		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->singleCall()
+			->willReturnValue('');
 		MockTestFixture::staticMethodArgs(1, 2);
 		MockTestFixture::staticMethodArgs(1, 2);
 	}
@@ -322,7 +327,8 @@ class MethodMockerTest extends TestCase
 	 */
 	public function testGoodCallCount() {
 		$testObject = new MockTestFixture();
-		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs')->expectCall(2);
+		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs')->expectCall(2)
+			->willReturnValue('');
 		$testObject->methodNoArgs();
 		$testObject->methodNoArgs();
 
@@ -341,7 +347,8 @@ class MethodMockerTest extends TestCase
 	 */
 	public function testFullRestore() {
 		$mock1 = MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs');
-		$mock2 = MethodMocker::mock(MockTestFixture::class, 'staticFunc')->expectCall(2);
+		$mock2 = MethodMocker::mock(MockTestFixture::class, 'staticFunc')->expectCall(2)
+			->willReturnValue('');
 		MockTestFixture::staticFunc();
 		try {
 			MethodMocker::restore();
@@ -363,6 +370,7 @@ class MethodMockerTest extends TestCase
 			->willReturnAction(function ($params, $var) use ($someVar) {
 				self::assertEquals([], $params, 'Неожиданные параметры');
 				self::assertEquals($someVar, $var, 'Не записалась обычная (не массив) переменная');
+				return '';
 			});
 		MockTestFixture::staticFunc();
 
@@ -420,14 +428,14 @@ class MethodMockerTest extends TestCase
 			null,
 			[[[['cvb']]]]
 		];
-		MethodMocker::mock(MockTestFixture::class, 'staticFunc')->willReturnValueList($returnList);
+		MethodMocker::mock(MockTestFixture::class, 'staticFuncMixedResult')->willReturnValueList($returnList);
 		$returned = [
-			MockTestFixture::staticFunc(),
-			MockTestFixture::staticFunc(),
-			MockTestFixture::staticFunc(),
-			MockTestFixture::staticFunc(),
-			MockTestFixture::staticFunc(),
-			MockTestFixture::staticFunc(),
+			MockTestFixture::staticFuncMixedResult(),
+			MockTestFixture::staticFuncMixedResult(),
+			MockTestFixture::staticFuncMixedResult(),
+			MockTestFixture::staticFuncMixedResult(),
+			MockTestFixture::staticFuncMixedResult(),
+			MockTestFixture::staticFuncMixedResult(),
 		];
 		self::assertEquals($returnList, $returned, 'Неправильно работает willReturnValueList');
 	}
@@ -519,7 +527,8 @@ class MethodMockerTest extends TestCase
 	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testRedefineFail() {
-		$mock = MethodMocker::mock(MockTestFixture::class, 'staticFunc');
+		$mock = MethodMocker::mock(MockTestFixture::class, 'staticFunc')
+			->willReturnValue('');
 
 		$expectArgs = 'arg1';
 		$mock->expectArgs($expectArgs);
@@ -537,7 +546,8 @@ class MethodMockerTest extends TestCase
 	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testRedefineListFail() {
-		$mock = MethodMocker::mock(MockTestFixture::class, 'staticFunc');
+		$mock = MethodMocker::mock(MockTestFixture::class, 'staticFunc')
+			->willReturnValue('');
 
 		$expectArgs = 'arg1';
 		$mock->expectArgs($expectArgs);

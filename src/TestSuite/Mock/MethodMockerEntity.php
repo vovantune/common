@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\TestSuite\Mock;
 
 use \ReflectionMethod;
@@ -141,8 +142,8 @@ class MethodMockerEntity
 	 * Кидаемый ексепшн
 	 *
 	 * @var array {
-	 * 		@var string $message
-	 * 		@var string $class
+	 * @var string $message
+	 * @var string $class
 	 * }
 	 */
 	private $_exceptionConf = null;
@@ -153,6 +154,13 @@ class MethodMockerEntity
 	 * @var null|array
 	 */
 	private $_returnValueList = null;
+
+	/**
+	 * Задано ли возвращение результата. Нужно для того, что еще и вернуть void для PHP7
+	 *
+	 * @var bool
+	 */
+	private $_isReturnDataSet = false;
 
 	/**
 	 * Полная подмена или нет
@@ -177,7 +185,8 @@ class MethodMockerEntity
 	 * @param bool $sniffMode
 	 * @param null|callable|string $newAction - полная подмена
 	 */
-	public function __construct($mockId, $className, $methodName, $sniffMode = false, $newAction = null) {
+	public function __construct($mockId, $className, $methodName, $sniffMode = false, $newAction = null)
+	{
 		$calledFrom = debug_backtrace();
 		$this->_callerFile = isset($calledFrom[1]['file']) ? $calledFrom[1]['file'] : $calledFrom[0]['file'];
 		$this->_callerLine = isset($calledFrom[1]['line']) ? $calledFrom[1]['line'] : $calledFrom[0]['line'];
@@ -201,7 +210,8 @@ class MethodMockerEntity
 	 * @param ReflectionMethod $reflectionMethod
 	 * @return int
 	 */
-	private function _getRunkitFlags(ReflectionMethod $reflectionMethod): int {
+	private function _getRunkitFlags(ReflectionMethod $reflectionMethod): int
+	{
 		$flags = 0;
 		if ($reflectionMethod->isPublic()) {
 			$flags |= RUNKIT_ACC_PUBLIC;
@@ -225,7 +235,8 @@ class MethodMockerEntity
 	 * @return string
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	private function _getMethodParameters(ReflectionMethod $reflectionMethod): string {
+	private function _getMethodParameters(ReflectionMethod $reflectionMethod): string
+	{
 		$arguments = [];
 		$parameters = (array)$reflectionMethod->getParameters();
 		/** @var \ReflectionParameter $parameter */
@@ -259,7 +270,8 @@ class MethodMockerEntity
 	 * @param ReflectionMethod $reflectionMethod
 	 * @return string
 	 */
-	private function _getReturnType(ReflectionMethod $reflectionMethod): string {
+	private function _getReturnType(ReflectionMethod $reflectionMethod): string
+	{
 		$returnTypeDeclaration = '';
 		$returnType = $reflectionMethod->getReturnType();
 		if (!empty($returnType)) {
@@ -274,7 +286,8 @@ class MethodMockerEntity
 	 * @return $this
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public function singleCall() {
+	public function singleCall()
+	{
 		return $this->expectCall(1);
 	}
 
@@ -284,7 +297,8 @@ class MethodMockerEntity
 	 * @return $this
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public function anyCall() {
+	public function anyCall()
+	{
 		return $this->expectCall(self::EXPECT_CALL_ONCE);
 	}
 
@@ -295,7 +309,8 @@ class MethodMockerEntity
 	 * @return $this
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public function expectCall($times = 1) {
+	public function expectCall($times = 1)
+	{
 		$this->_checkNotRestored();
 		$this->_expectedCallCount = $times;
 		return $this;
@@ -310,7 +325,8 @@ class MethodMockerEntity
 	 * @return $this
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public function expectArgs(...$args) {
+	public function expectArgs(...$args)
+	{
 		$this->_checkNotRestored();
 
 		if (empty($args)) {
@@ -328,7 +344,8 @@ class MethodMockerEntity
 	 *
 	 * @return $this
 	 */
-	public function expectNoArgs() {
+	public function expectNoArgs()
+	{
 		$this->_checkNotRestored();
 		$this->_unsetExpectArgs();
 		$this->_expectedArgs = false;
@@ -341,7 +358,8 @@ class MethodMockerEntity
 	 * @param array $argsSubset - массив с числовым индексом - номером аргумента.
 	 * @return $this
 	 */
-	public function expectSomeArgs(array $argsSubset) {
+	public function expectSomeArgs(array $argsSubset)
+	{
 		$this->_checkNotRestored();
 
 		if (empty($argsSubset)) {
@@ -361,7 +379,8 @@ class MethodMockerEntity
 	 * Если ожидается вызов без аргументов, то вместо массива аргументов - false.
 	 * @return $this
 	 */
-	public function expectArgsList(array $argsList) {
+	public function expectArgsList(array $argsList)
+	{
 		$this->_checkNotRestored();
 		if (empty($argsList)) {
 			$this->_fail('empty args list in expectArgsList()!');
@@ -382,7 +401,8 @@ class MethodMockerEntity
 	 * @param mixed $var Новое значение дополнительной переменной
 	 * @return $this
 	 */
-	public function setAdditionalVar($var) {
+	public function setAdditionalVar($var)
+	{
 		$this->_checkNotRestored();
 		$this->_additionalVar = $var;
 		return $this;
@@ -391,7 +411,8 @@ class MethodMockerEntity
 	/**
 	 * Сброс ожидаемых значений
 	 */
-	private function _unsetExpectArgs() {
+	private function _unsetExpectArgs()
+	{
 		$this->_expectedArgs = null;
 		$this->_expectedArgsList = null;
 		$this->_expectedArgsSubset = null;
@@ -400,7 +421,9 @@ class MethodMockerEntity
 	/**
 	 * Сброс возвращаемого действия
 	 */
-	private function _unsetReturn() {
+	private function _unsetReturn()
+	{
+		$this->_isReturnDataSet = false;
 		$this->_returnAction = null;
 		$this->_returnValue = null;
 		$this->_exceptionConf = null;
@@ -414,10 +437,12 @@ class MethodMockerEntity
 	 * @return $this
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public function willReturnValue($value) {
+	public function willReturnValue($value)
+	{
 		$this->_checkNotRestored();
 		$this->_unsetReturn();
 		$this->_returnValue = $value;
+		$this->_isReturnDataSet = true;
 		return $this;
 	}
 
@@ -433,10 +458,12 @@ class MethodMockerEntity
 	 * @return $this
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public function willReturnAction($action) {
+	public function willReturnAction($action)
+	{
 		$this->_checkNotRestored();
 		$this->_unsetReturn();
 		$this->_returnAction = $action;
+		$this->_isReturnDataSet = true;
 		return $this;
 	}
 
@@ -447,13 +474,15 @@ class MethodMockerEntity
 	 * @param null|string $class
 	 * @return $this
 	 */
-	public function willThrowException($message, $class = null) {
+	public function willThrowException($message, $class = null)
+	{
 		$this->_checkNotRestored();
 		$this->_unsetReturn();
 		$this->_exceptionConf = [
 			'message' => $message,
 			'class' => (($class === null) ? \Exception::class : $class),
 		];
+		$this->_isReturnDataSet = true;
 		return $this;
 	}
 
@@ -464,10 +493,12 @@ class MethodMockerEntity
 	 * @param array $valueList
 	 * @return $this
 	 */
-	public function willReturnValueList(array $valueList) {
+	public function willReturnValueList(array $valueList)
+	{
 		$this->_checkNotRestored();
 		$this->_unsetReturn();
 		$this->_returnValueList = $valueList;
+		$this->_isReturnDataSet = true;
 		return $this;
 	}
 
@@ -479,7 +510,8 @@ class MethodMockerEntity
 	 * @return mixed
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public function doAction($args, $origMethodResult = null) {
+	public function doAction($args, $origMethodResult = null)
+	{
 		$this->_checkNotRestored();
 		$this->_incCounter();
 		$this->_checkArgs($args);
@@ -489,7 +521,8 @@ class MethodMockerEntity
 	/**
 	 * Увеличение счётчика вызовов и проверка кол-ва вызовов
 	 */
-	private function _incCounter() {
+	private function _incCounter()
+	{
 		if (($this->_expectedCallCount > self::EXPECT_CALL_ONCE) && ($this->_callCounter >= $this->_expectedCallCount)) {
 			$this->_fail('expected ' . $this->_expectedCallCount . ' calls, but more appeared');
 		}
@@ -502,7 +535,8 @@ class MethodMockerEntity
 	 *
 	 * @param array $args
 	 */
-	private function _checkArgs($args) {
+	private function _checkArgs($args)
+	{
 		if ($this->_expectedArgsList !== null) {
 			if (empty($this->_expectedArgsList)) {
 				$this->_fail('expect args list ended');
@@ -533,9 +567,14 @@ class MethodMockerEntity
 	 *
 	 * @param array $args
 	 * @param mixed $origMethodResult
-	 * @return mixed
+	 * @return mixed|void
 	 */
-	private function _getReturnValue($args, $origMethodResult) {
+	private function _getReturnValue(array $args, $origMethodResult)
+	{
+		if (!$this->_isReturnDataSet) {
+			return;
+		}
+
 		if ($this->_returnValue !== null) {
 			return $this->_returnValue;
 		} elseif ($this->_returnAction !== null) {
@@ -554,7 +593,7 @@ class MethodMockerEntity
 			}
 			return array_shift($this->_returnValueList);
 		} else {
-			return;
+			return null;
 		}
 	}
 
@@ -563,7 +602,8 @@ class MethodMockerEntity
 	 *
 	 * @return string
 	 */
-	public function getOriginalMethodName() {
+	public function getOriginalMethodName()
+	{
 		return self::RENAME_PREFIX . $this->_method;
 	}
 
@@ -572,14 +612,16 @@ class MethodMockerEntity
 	 *
 	 * @return int
 	 */
-	public function getCallCount() {
+	public function getCallCount()
+	{
 		return $this->_callCounter;
 	}
 
 	/**
 	 * Деструктор
 	 */
-	public function __destruct() {
+	public function __destruct()
+	{
 		$this->restore();
 	}
 
@@ -589,7 +631,8 @@ class MethodMockerEntity
 	 * @param bool $hasFailed Был ли тест завален
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	public function restore($hasFailed = false) {
+	public function restore($hasFailed = false)
+	{
 		if ($this->_mockRestored) {
 			return;
 		}
@@ -611,9 +654,11 @@ class MethodMockerEntity
 
 	/**
 	 * восстановлен ли мок
+	 *
 	 * @return bool
 	 */
-	public function isRestored() {
+	public function isRestored()
+	{
 		return $this->_mockRestored;
 	}
 
@@ -622,7 +667,8 @@ class MethodMockerEntity
 	 *
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	private function _mockOriginalMethod() {
+	private function _mockOriginalMethod()
+	{
 		$reflectionMethod = new ReflectionMethod($this->_class, $this->_method);
 
 		$flags = $this->_getRunkitFlags($reflectionMethod);
@@ -665,7 +711,7 @@ class MethodMockerEntity
 			$success = runkit_method_add($this->_class, $this->_method, $mockAction, $flags);
 		}
 		if (!$success) {
-			$this->_fail("can't mock method");		// @codeCoverageIgnore
+			$this->_fail("can't mock method");        // @codeCoverageIgnore
 		}
 	}
 
@@ -675,15 +721,18 @@ class MethodMockerEntity
 	 * @param string $msg
 	 * @return string
 	 */
-	private function _getErrorMessage($msg) {
+	private function _getErrorMessage($msg)
+	{
 		return $this->_class . '::' . $this->_method . ' (mocked in ' . $this->_callerFile . ' line ' . $this->_callerLine . ') - ' . $msg;
 	}
 
 	/**
 	 * Если мок восстановлен, то кидает ексепшн
+	 *
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	private function _checkNotRestored() {
+	private function _checkNotRestored()
+	{
 		if ($this->_mockRestored) {
 			$this->_fail('mock entity is restored!');
 		}
@@ -691,9 +740,11 @@ class MethodMockerEntity
 
 	/**
 	 * Проверка, что такой метод можно мокнуть
+	 *
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */
-	private function _checkCanMock() {
+	private function _checkCanMock()
+	{
 		if (!class_exists($this->_class)) {
 			$this->_fail('class "' . $this->_class . '" does not exist!');
 		}
@@ -730,7 +781,8 @@ class MethodMockerEntity
 	 *
 	 * @param string $message
 	 */
-	private function _fail($message) {
+	private function _fail($message)
+	{
 		MethodMocker::fail($this->_getErrorMessage($message));
 	}
 
@@ -741,7 +793,8 @@ class MethodMockerEntity
 	 * @param mixed $actual
 	 * @param string $message
 	 */
-	private function _assertEquals($expected, $actual, $message) {
+	private function _assertEquals($expected, $actual, $message)
+	{
 		MethodMocker::assertEquals($expected, $actual, $this->_getErrorMessage($message));
 	}
 }
