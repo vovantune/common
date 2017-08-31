@@ -4,6 +4,7 @@ namespace ArtSkills\Test\TestCase\TestSuite\HttpClientMock;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientMockerEntity;
 use Cake\Http\Client\Request;
+use \PHPUnit\Framework\ExpectationFailedException;
 
 class HttpClientMockerEntityTest extends AppTestCase
 {

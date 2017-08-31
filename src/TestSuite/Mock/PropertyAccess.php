@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ArtSkills\TestSuite\Mock;
 
 use ArtSkills\Traits\Library;
@@ -9,14 +11,14 @@ use PHPUnit\Framework\AssertionFailedError;
  */
 class PropertyAccess
 {
-    use Library;
+	use Library;
 
 	/**
 	 * Массив значений, которые нужно восстановить
 	 *
 	 * @var array
 	 */
-    private static $_toRestore = [];
+	private static $_toRestore = [];
 
 	/**
 	 * Запись в статическое свойство
@@ -25,7 +27,8 @@ class PropertyAccess
 	 * @param string $propertyName
 	 * @param mixed $value
 	 */
-	public static function setStatic($className, $propertyName, $value) {
+	public static function setStatic(string $className, string $propertyName, $value): void
+	{
 		$property = new \ReflectionProperty($className, $propertyName);
 		$property->setAccessible(true);
 		$property->setValue($value);
@@ -38,7 +41,8 @@ class PropertyAccess
 	 * @param string $propertyName
 	 * @param mixed $value
 	 */
-	public static function setStaticAndRestore($className, $propertyName, $value) {
+	public static function setStaticAndRestore(string $className, string $propertyName, $value): void
+	{
 		$storeKey = self::_makeStoreKey($className, $propertyName);
 		if (!array_key_exists($storeKey, self::$_toRestore)) {
 			self::$_toRestore[$storeKey] = self::getStatic($className, $propertyName);
@@ -56,7 +60,8 @@ class PropertyAccess
 	 * @param string $propertyName
 	 * @return string
 	 */
-	private static function _makeStoreKey($className, $propertyName) {
+	private static function _makeStoreKey(string $className, string $propertyName): string
+	{
 		return $className . '::' . $propertyName;
 	}
 
@@ -66,7 +71,8 @@ class PropertyAccess
 	 * @param string $storeKey
 	 * @return string[]
 	 */
-	private static function _getClassAndPropertyFromKey($storeKey) {
+	private static function _getClassAndPropertyFromKey(string $storeKey): array
+	{
 		return explode('::', $storeKey);
 	}
 
@@ -77,7 +83,8 @@ class PropertyAccess
 	 * @param string $propertyName
 	 * @throws \Exception
 	 */
-	public static function restoreStatic($className, $propertyName) {
+	public static function restoreStatic(string $className, string $propertyName): void
+	{
 		$storeKey = self::_makeStoreKey($className, $propertyName);
 		if (!array_key_exists($storeKey, self::$_toRestore)) {
 			throw new AssertionFailedError("$storeKey was not modified");
@@ -89,7 +96,8 @@ class PropertyAccess
 	/**
 	 * Восстановить все изменённые статические свойства
 	 */
-	public static function restoreStaticAll() {
+	public static function restoreStaticAll(): void
+	{
 		foreach (self::$_toRestore as $key => $value) {
 			list($className, $propertyName) = self::_getClassAndPropertyFromKey($key);
 			self::setStatic($className, $propertyName, $value);
@@ -104,7 +112,8 @@ class PropertyAccess
 	 * @param string $propertyName
 	 * @param mixed $value
 	 */
-	public static function set($object, $propertyName, $value) {
+	public static function set($object, string $propertyName, $value): void
+	{
 		$property = new \ReflectionProperty($object, $propertyName);
 		$property->setAccessible(true);
 		$property->setValue($object, $value);
@@ -118,7 +127,8 @@ class PropertyAccess
 	 * @param string $propertyName
 	 * @return mixed
 	 */
-	public static function getStatic($className, $propertyName) {
+	public static function getStatic(string $className, string $propertyName)
+	{
 		$property = new \ReflectionProperty($className, $propertyName);
 		$property->setAccessible(true);
 		return $property->getValue();
@@ -131,11 +141,10 @@ class PropertyAccess
 	 * @param string $propertyName
 	 * @return mixed
 	 */
-	public static function get($object, $propertyName) {
+	public static function get($object, string $propertyName)
+	{
 		$property = new \ReflectionProperty(get_class($object), $propertyName);
 		$property->setAccessible(true);
 		return $property->getValue($object);
 	}
-
-
 }
