@@ -32,6 +32,25 @@ class MockTestFixture
 	private static $_otherProperty = 'testPrivateStatic';
 
 	/**
+	 * Константа
+	 *
+	 * @return int
+	 */
+	public static function getConst() {
+		return self::TEST_CONSTANT;
+	}
+
+	/**
+	 * Константа, к которой обращаются через static
+	 *
+	 * @return int
+	 */
+	public static function getConstStatic() {
+		return static::TEST_CONSTANT;
+	}
+
+
+	/**
 	 * Тестовый метод
 	 *
 	 * @return string
@@ -229,14 +248,16 @@ class MockTestFixture
 	 * Функция с типизированными и обязательными параметрами и передачей по ссылке
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 *
-	 * @param MockTestFixture $typedParam
 	 * @param mixed $byRefParam
+	 * @param MockTestFixture $objParam
 	 * @param array $arrayParam
+	 * @param float $typedParam
+	 * @param string|null $nullableParam
 	 * @param mixed $requiredParam
 	 * @param array $mayBeNotArray
 	 */
 	public static function complexParams(
-		MockTestFixture $typedParam, &$byRefParam, array $arrayParam, $requiredParam, $mayBeNotArray = []
+		&$byRefParam, MockTestFixture $objParam, array $arrayParam, float $typedParam, ?string $nullableParam, $requiredParam, $mayBeNotArray = []
 	) {
 		// noop
 	}
@@ -262,11 +283,27 @@ class MockTestFixture
 	/**
 	 * Функция с вариадиком
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-	 * @param array ...$variadicParam
+	 * @param \int[] ...$variadicParam
 	 * @return array
 	 */
-	public static function variadicParam(...$variadicParam) {
+	public static function variadicParam(int ...$variadicParam) {
 		return [];
+	}
+
+	/**
+	 * метод с возвращаемым значением
+	 * @return int
+	 */
+	public static function returnInt(): int {
+		return 1;
+	}
+
+	/**
+	 * метод с возвращаемым значением nullable
+	 * @return int|null
+	 */
+	public static function returnNullable(): ?int {
+		return 1;
 	}
 
 

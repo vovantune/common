@@ -373,43 +373,45 @@ class MethodMockerEntityTest extends TestCase
 	public function mockInheritedProvider(): array
 	{
 		return [
-			/* тип вызова,
+			/*
+			тип вызова,
 			метод переопределён?,
 			замокать класс-наследник? (или родитель),
-			вызываемый метод определён в наследнике? (или в родителе),
-			результат - замокан? (или вернётся исходный) */
-			['this', false, false, false, true],
-			['this', false, false, true, true],
-			//['this', false, true, false, true],
-			//['this', false, true, true, true],
-			['this', true, false, false, false],
-			['this', true, false, true, false],
-			['this', true, true, false, true],
-			['this', true, true, true, true],
+			вызывающий метод определён в наследнике? (или в родителе),
+			результат - замокан? (или вернётся исходный)
+			*/
+			['this', 'notRedefined', 'mockParent', 'callFromParent', 'resultMocked'],
+			['this', 'notRedefined', 'mockParent', 'callFromChild', 'resultMocked'],
+			//['this', 'notRedefined', 'mockChild', 'callFromParent', 'resultMocked'],
+			//['this', 'notRedefined', 'mockChild', 'callFromChild', 'resultMocked'],
+			['this', 'isRedefined', 'mockParent', 'callFromParent', 'resultOriginal'],
+			['this', 'isRedefined', 'mockParent', 'callFromChild', 'resultOriginal'],
+			['this', 'isRedefined', 'mockChild', 'callFromParent', 'resultMocked'],
+			['this', 'isRedefined', 'mockChild', 'callFromChild', 'resultMocked'],
 
 
-			['self', false, false, false, true],
-			['self', false, false, true, true],
-			//['self', false, true, false, false],
-			//['self', false, true, true, true],
-			['self', true, false, false, true],
-			['self', true, false, true, false],
-			['self', true, true, false, false],
-			['self', true, true, true, true],
+			['self', 'notRedefined', 'mockParent', 'callFromParent', 'resultMocked'],
+			['self', 'notRedefined', 'mockParent', 'callFromChild', 'resultMocked'],
+			//['self', 'notRedefined', 'mockChild', 'callFromParent', 'resultOriginal'],
+			//['self', 'notRedefined', 'mockChild', 'callFromChild', 'resultMocked'],
+			['self', 'isRedefined', 'mockParent', 'callFromParent', 'resultMocked'],
+			['self', 'isRedefined', 'mockParent', 'callFromChild', 'resultOriginal'],
+			['self', 'isRedefined', 'mockChild', 'callFromParent', 'resultOriginal'],
+			['self', 'isRedefined', 'mockChild', 'callFromChild', 'resultMocked'],
 
-			['static', false, false, false, true],
-			['static', false, false, true, true],
-			//['static', false, true, false, true],
-			//['static', false, true, true, true],
-			['static', true, false, false, false],
-			['static', true, false, true, false],
-			['static', true, true, false, true],
-			['static', true, true, true, true],
+			['static', 'notRedefined', 'mockParent', 'callFromParent', 'resultMocked'],
+			['static', 'notRedefined', 'mockParent', 'callFromChild', 'resultMocked'],
+			//['static', 'notRedefined', 'mockChild', 'callFromParent', 'resultMocked'],
+			//['static', 'notRedefined', 'mockChild', 'callFromChild', 'resultMocked'],
+			['static', 'isRedefined', 'mockParent', 'callFromParent', 'resultOriginal'],
+			['static', 'isRedefined', 'mockParent', 'callFromChild', 'resultOriginal'],
+			['static', 'isRedefined', 'mockChild', 'callFromParent', 'resultMocked'],
+			['static', 'isRedefined', 'mockChild', 'callFromChild', 'resultMocked'],
 
-			['parent', false, false, true, true],
-			//['parent', false, true, true, false],
-			['parent', true, false, true, true],
-			['parent', true, true, true, false],
+			['parent', 'notRedefined', 'mockParent', 'callFromChild', 'resultMocked'],
+			//['parent', 'notRedefined', 'mockChild', 'callFromChild', 'resultOriginal'],
+			['parent', 'isRedefined', 'mockParent', 'callFromChild', 'resultMocked'],
+			['parent', 'isRedefined', 'mockChild', 'callFromChild', 'resultOriginal'],
 		];
 	}
 
@@ -418,14 +420,16 @@ class MethodMockerEntityTest extends TestCase
 	 *
 	 * @dataProvider mockInheritedProvider
 	 * @param string $callType тип вызова
-	 * @param bool $isRedefined метод переопределён?
-	 * @param bool $mockChild замокать класс-наследник? (или родитель)
-	 * @param bool $callChild вызываемый метод определён в наследнике? (или в родителе)
-	 * @param bool $changedResult результат - замокан? (или вернётся исходный)
+	 * @param string $redefinedParam метод переопределён?
+	 * @param string $mockParam замокать класс-наследник? (или родитель)
+	 * @param string $callParam вызываемый метод определён в наследнике? (или в родителе)
+	 * @param string $resultParam результат - замокан? (или вернётся исходный)
 	 */
-	public function testInheritedMocks(
-		string $callType, bool $isRedefined, bool $mockChild, bool $callChild, bool $changedResult
-	) {
+	public function testInheritedMocks($callType, $redefinedParam, $mockParam, $callParam, $resultParam) {
+		$callChild = ($callParam === 'callFromChild');
+		$isRedefined = ($redefinedParam === 'isRedefined');
+		$mockChild = ($mockParam === 'mockChild');
+
 		if (!$callChild && ($callType === 'parent')) {
 			self::fail('бред');
 		}
@@ -443,7 +447,7 @@ class MethodMockerEntityTest extends TestCase
 		$mockResult = 'mock ' . $methodName . ' ' . $callType . ' ' . (int)$mockChild . ' ' . (int)$callChild;
 		$mock = new MethodMockerEntity('mockid', $mockClass, $methodName, false, "return '$mockResult';");
 
-		if ($changedResult) {
+		if ($resultParam === 'resultMocked') {
 			$expectedResult = $mockResult;
 		} else {
 			$expectedResult = $originalResult;
@@ -513,14 +517,93 @@ class MethodMockerEntityTest extends TestCase
 	/**
 	 * При переопределении метода его прототип должен оставаться тем же,
 	 * чтобы не было конфликта с наследниками
-	 * Должны сохраняться: класс/array, передача по ссылке и количество обязательных параметров
+	 * Должны сохраняться: тип, передача по ссылке и количество обязательных параметров
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
 	public function testStrictParams()
 	{
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'complexParams', false, 'return 123;');
+		// при одиночном запуске теста, если что-то не так, будет strict error
 		MockTestChildFixture::staticFunc();
 		self::assertTrue(true); // всё хорошо, скрипт не упал
+	}
+
+	/**
+	 * Провайдер для проверок определения типов
+	 *
+	 * @return array
+	 */
+	public function paramDeclareProvider() {
+		$objParam = new MockTestFixture();
+		$arrParam = [];
+		$floatParam = 1.1;
+		$stringParam = 'asd';
+		$requiredParam = 1;
+		return [
+			0 => [[
+				'params' => [true, $objParam, $arrParam, $floatParam, $stringParam],
+				'errorClass' => \ArgumentCountError::class,
+				'errorMsg' => 'Too few arguments',
+			]],
+			1 => [[
+				'params' => [true, 1, $arrParam, $floatParam, $stringParam, $requiredParam],
+				'errorClass' => \TypeError::class,
+				'errorMsg' => 'must be an instance of ' . MockTestFixture::class,
+			]],
+			2 => [[
+				'params' => [true, $objParam, 1, $floatParam, $stringParam, $requiredParam],
+				'errorClass' => \TypeError::class,
+				'errorMsg' => 'must be of the type array',
+			]],
+			3 => [[
+				'params' => [true, $objParam, $arrParam, [], $stringParam, $requiredParam],
+				'errorClass' => \TypeError::class,
+				'errorMsg' => 'must be of the type float',
+			]],
+			4 => [[
+				'params' => [true, $objParam, $arrParam, $floatParam, [], $requiredParam],
+				'errorClass' => \TypeError::class,
+				'errorMsg' => 'must be of the type string',
+			]],
+			5 => [[
+				// тут всё ок
+				'params' => [true, $objParam, $arrParam, $floatParam, $stringParam, $requiredParam],
+				'errorClass' => '',
+				'errorMsg' => '',
+			]],
+			6 => [[
+				// тут всё ок
+				'params' => [true, $objParam, $arrParam, $floatParam, null, $requiredParam],
+				'errorClass' => '',
+				'errorMsg' => '',
+			]],
+			// отсутствует тест того, что передача параметра по ссылке сохраняется
+		];
+	}
+
+	/**
+	 * Ещё один тест, проверяющий объявление параметров
+	 * Должны сохраняться: тип, передача по ссылке и количество обязательных параметров
+	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
+	 * @dataProvider paramDeclareProvider
+	 */
+	public function testParamDeclare(array $testData) {
+		['params' => $params, 'errorClass' => $errorClass, 'errorMsg' => $errorMsg] = $testData;
+		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'complexParams', false, "return 123;");
+		$refParam = 1;
+		$useRefParam = array_shift($params);
+		try {
+			MockTestFixture::complexParams($refParam, ...$params);
+			$error = null;
+		} catch (\Throwable $e) {
+			$error = $e;
+		}
+		if (empty($errorClass)) {
+			self::assertEquals(null, $error);
+		} else {
+			self::assertInstanceOf($errorClass, $error);
+			self::assertContains($errorMsg, $error->getMessage());
+		}
 	}
 
 
@@ -555,5 +638,53 @@ class MethodMockerEntityTest extends TestCase
 		self::assertEquals(['variadicParam' => [1, 2]], MockTestFixture::variadicParam(1, 2));
 	}
 
+	/**
+	 * variadic с типом
+	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
+	 * @expectedException \TypeError
+	 * @expectedExceptionMessage must be of the type integer
+	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
+	 */
+	public function testVariadicParamType() {
+		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'variadicParam', false, 'return get_defined_vars();');
+		MockTestFixture::variadicParam('asd');
+	}
+
+
+	/**
+	 * Сохранение типа возвращаемого значения
+	 *
+	 * @expectedException \TypeError
+	 * @expectedExceptionMessage must be of the type integer, null returned
+	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
+	 */
+	public function testReturnTypeError() {
+		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, 'return null;');
+		MockTestFixture::returnInt();
+	}
+
+	/**
+	 * Сохранение типа возвращаемого значения
+	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
+	 */
+	public function testReturnTypeGood() {
+		$returnInt = 4;
+		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, "return $returnInt;");
+		$mockNullable = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return null;');
+		self::assertEquals($returnInt, MockTestFixture::returnInt());
+		self::assertEquals(null, MockTestFixture::returnNullable());
+	}
+
+	/**
+	 * Сохранение типа возвращаемого значения
+	 *
+	 * @expectedException \TypeError
+	 * @expectedExceptionMessage must be of the type integer or null, array returned
+	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
+	 */
+	public function testReturnTypeNullableError() {
+		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return [];');
+		MockTestFixture::returnNullable();
+	}
 
 }

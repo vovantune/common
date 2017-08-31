@@ -33,7 +33,7 @@ class TableTest extends AppTestCase
 	 */
 	public function testGetEntity() {
 		self::assertEquals('TestTableOne', MethodMocker::callPrivate(TestTableOneTable::class, '_getAlias'), 'Не сработало получение алиаса');
-		$this->assertInstanceOf(TestTableOneTable::class, TestTableOneTable::instance(), 'Не сработало получение инстанса');
+		self::assertInstanceOf(TestTableOneTable::class, TestTableOneTable::instance(), 'Не сработало получение инстанса');
 
 		self::assertFalse($this->TestTableOne->getEntity(-1)); // не выкинулся ексепшн
 
@@ -42,7 +42,7 @@ class TableTest extends AppTestCase
 		self::assertInstanceOf(TestTableOne::class, $testEntity, 'Не вернулась сущность');
 		self::assertEquals($testId, $testEntity->id, 'Вернулась не та сущность');
 		self::assertNotEmpty($testEntity->TestTableTwo, 'Не применились опции');
-		self::assertTrue($testEntity === $this->TestTableOne->getEntity($testEntity), 'Не вернулась сущность');
+		self::assertSame($testEntity, $this->TestTableOne->getEntity($testEntity), 'Не вернулась сущность');
 	}
 
 	/**

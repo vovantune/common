@@ -59,7 +59,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Защита от вызова несколько раз
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage expected 1 calls, but more appeared
 	 */
 	public function testSingleCallCheck() {
@@ -75,7 +75,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Ни разу не вызвали
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage is not called
 	 */
 	public function testNoCallCheck() {
@@ -107,7 +107,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Не указали возвращаемый результат
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Return mock action is not defined
 	 */
 	public function testEmptyResultCheck() {
@@ -117,7 +117,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Указали POST данные для GET запроса
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Body for GET method is not required
 	 */
 	public function testBodySetForGetMethod() {
@@ -127,7 +127,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Задали плохой код ответа
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
 	public function testSetStatusCodeBad() {
@@ -137,7 +137,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Задали слишком маленький код ответа
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
 	public function testSetStatusCodeSmall() {
@@ -147,7 +147,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Задали слишком большой код ответа
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
 	public function testSetStatusCodeBig() {
@@ -158,7 +158,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Ответ - не строка
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Invalid response: Array
 	 */
 	public function testReturnStringBad() {
@@ -168,7 +168,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Ответ - не строка
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Invalid response: Array
 	 */
 	public function testReturnActionBad() {
@@ -182,7 +182,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Не существующий файл
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage is not a file
 	 */
 	public function testReturnFileNotExists() {
@@ -192,7 +192,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Указали не файл
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage is not a file
 	 */
 	public function testReturnFileIsNotFile() {
@@ -210,7 +210,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * отправился запрос не с тем body,  которым ожидалось
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Expected POST body data is not equal to real data
 	 */
 	public function testUnexpectedBody() {
@@ -223,7 +223,7 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * Отправился запрос с пустым body.
 	 * Будет ошибка, если явно не указать, что ожидался пустой body
 	 *
-	 * @expectedException \PHPUnit_Framework_ExpectationFailedException
+	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Post request with empty body
 	 */
 	public function testEmptyPost() {
