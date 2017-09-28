@@ -40,6 +40,7 @@ class AssetTest extends AppTestCase
 			'dependency1',
 			'dependency2',
 			'dependency3',
+			'dependency4',
 		],
 		'TestManual' => [
 			'file_manual',
@@ -61,7 +62,8 @@ class AssetTest extends AppTestCase
 	/**
 	 * @inheritdoc
 	 */
-	public function setUp() {
+	public function setUp()
+	{
 		$this->_request = new ServerRequest();
 		$this->_assetHelper = new AssetHelper(new View($this->_request));
 		$this->_assetHelper->setAssetVersion(self::SCRIPT_VERSION);
@@ -71,7 +73,8 @@ class AssetTest extends AppTestCase
 	/**
 	 * @inheritdoc
 	 */
-	public static function setUpBeforeClass() {
+	public static function setUpBeforeClass()
+	{
 		parent::setUpBeforeClass();
 		foreach (self::$_files as $dirName => $dirFiles) {
 			foreach (['js', 'css'] as $type) {
@@ -97,7 +100,8 @@ class AssetTest extends AppTestCase
 	/**
 	 * @inheritdoc
 	 */
-	public static function tearDownAfterClass() {
+	public static function tearDownAfterClass()
+	{
 		parent::tearDownAfterClass();
 		foreach (array_keys(self::$_files) as $dirName) {
 			foreach (['js', 'css'] as $type) {
@@ -114,7 +118,8 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Название переменной должно быть строкой
 	 */
-	public function testBadVarsNameNotString() {
+	public function testBadVarsNameNotString()
+	{
 		$this->_assetHelper->setVars(
 			[
 				false => 'asd',
@@ -123,7 +128,8 @@ class AssetTest extends AppTestCase
 	}
 
 	/** Плохие названия переменных */
-	public function testBadVarsInvalidNames() {
+	public function testBadVarsInvalidNames()
+	{
 		$invalidNames = [
 			'_name',
 			'0name',
@@ -155,7 +161,8 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Переменная 'camel_case0' не camelCase
 	 */
-	public function testBadVarsSnakeCase() {
+	public function testBadVarsSnakeCase()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'camel_case0' => 'value',
@@ -169,7 +176,8 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Константа 'upper_case0' не UPPER_CASE
 	 */
-	public function testBadConst() {
+	public function testBadConst()
+	{
 		$this->_assetHelper->setConsts(
 			[
 				'upper_case0' => 'value',
@@ -178,9 +186,9 @@ class AssetTest extends AppTestCase
 	}
 
 
-
 	/** всё ок */
-	public function testVarGood() {
+	public function testVarGood()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'camelCase0' => 'value',
@@ -191,7 +199,7 @@ class AssetTest extends AppTestCase
 			"<script>\n camelCase0 = \"value\";\n</script>",
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]),
 			'Неправильно сгенерировался скрипт с переменной'
 		);
 
@@ -205,7 +213,7 @@ class AssetTest extends AppTestCase
 			"<script>\n UPPER_CASE0 = \"value1\";\n</script>",
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]),
 			'Неправильно сгенерировался скрипт с константой'
 		);
 	}
@@ -213,7 +221,8 @@ class AssetTest extends AppTestCase
 	/**
 	 * переменные заданы в 2 прохода, все возможные типы; при втором вызове load старые переменные не добавляются
 	 */
-	public function testVariableValues() {
+	public function testVariableValues()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test1' => '',
@@ -235,20 +244,21 @@ class AssetTest extends AppTestCase
 			"<script>\n test1 = \"\";\n test2 = null;\n test3 = false;\n test4 = 0;\n test5 = [];\n test6 = 123.456;\n test7 = \"1 234,00\";\n test8 = 234.567;\n</script>",
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]),
 			'Неправильно сгенерировался скрипт с параметрами'
 		);
 
 		$this->_assetHelper->load('test', 'empty');
 		self::assertEquals(
-			[], $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT), 'Заново вывелись все параметры'
+			[], MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]), 'Заново вывелись все параметры'
 		);
 	}
 
 	/**
 	 * строки с кавычками и переносами
 	 */
-	public function testRiskyStrings() {
+	public function testRiskyStrings()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'quot' => "asd\"qwe",
@@ -260,7 +270,7 @@ class AssetTest extends AppTestCase
 			"<script>\n quot = \"asd\\\"qwe\";\n newLine = \"asd\\r\\nqwe\";\n</script>",
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]),
 			'Неправильно сгенерировались строки с кавычками и переносами'
 		);
 	}
@@ -271,7 +281,8 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Не разрешено переопределять test0
 	 */
-	public function testRewriteNotAllowedAll() {
+	public function testRewriteNotAllowedAll()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test0' => 'blabla',
@@ -285,7 +296,8 @@ class AssetTest extends AppTestCase
 	}
 
 	/** Перезапись переменных */
-	public function testRewriteAllowedAll() {
+	public function testRewriteAllowedAll()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test1' => 'ololo',
@@ -303,11 +315,12 @@ class AssetTest extends AppTestCase
 		$expectedResult = [
 			"<script>\n test1 = \"qqq\";\n test2 = \"qqq\";\n</script>",
 		];
-		self::assertEquals($expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT));
+		self::assertEquals($expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]));
 	}
 
 	/** Перезапись одной переменной */
-	public function testRewriteAllowedOne() {
+	public function testRewriteAllowedOne()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test3' => 'пыщьпыщь',
@@ -324,7 +337,7 @@ class AssetTest extends AppTestCase
 		$expectedResult = [
 			"<script>\n test3 = \"ololo\";\n test4 = 2;\n</script>",
 		];
-		self::assertEquals($expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT));
+		self::assertEquals($expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]));
 	}
 
 	/**
@@ -333,7 +346,8 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Не разрешено переопределять test4
 	 */
-	public function testRewriteNotAllowedOne() {
+	public function testRewriteNotAllowedOne()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test3' => 'ololo',
@@ -354,7 +368,8 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Попытка переопределить test4 из типа num в string
 	 */
-	public function testRewriteOtherType() {
+	public function testRewriteOtherType()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test4' => 2,
@@ -368,7 +383,8 @@ class AssetTest extends AppTestCase
 	}
 
 	/** Из null переопределять можно */
-	public function testRewriteNull() {
+	public function testRewriteNull()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test5' => null,
@@ -384,7 +400,7 @@ class AssetTest extends AppTestCase
 		$expectedResult = [
 			"<script>\n test5 = \"aaa\";\n</script>",
 		];
-		self::assertEquals($expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT));
+		self::assertEquals($expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]));
 	}
 
 	/**
@@ -393,7 +409,8 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Не разрешено переопределять test0
 	 */
-	public function testRewriteAfterLoad() {
+	public function testRewriteAfterLoad()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test0' => 'blabla',
@@ -408,14 +425,15 @@ class AssetTest extends AppTestCase
 	}
 
 	/** Добавить ещё переменных после загрузки */
-	public function testAddAfterLoad() {
+	public function testAddAfterLoad()
+	{
 		$this->_assetHelper->setVars(
 			[
 				'test0' => 'blabla',
 			]
 		);
 		$this->_assetHelper->load('test', 'empty');
-		$this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT);
+		MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]);
 
 		$this->_assetHelper->setVars(
 			[
@@ -427,14 +445,19 @@ class AssetTest extends AppTestCase
 		$expectedResult = [
 			"<script>\n test1 = \"уруру\";\n</script>",
 		];
-		self::assertEquals($expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT));
+		self::assertEquals($expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]));
 	}
 
 	/** пути прописаны вручную */
-	public function testAssetManualExists() {
-		$this->_assetHelper->setActionConfig('test', 'manualExists', [
-			AssetHelper::KEY_SCRIPT => 'js/TestManual/file_manual.js',
-			AssetHelper::KEY_STYLE => 'css/TestManual/file_manual.css',
+	public function testAssetManualExists()
+	{
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'manualExists',
+			[
+				AssetHelper::KEY_SCRIPT => 'js/TestManual/file_manual.js',
+				AssetHelper::KEY_STYLE => 'css/TestManual/file_manual.css',
+			],
 		]);
 
 		$this->_assetHelper->load('test', 'manualExists');
@@ -448,7 +471,7 @@ class AssetTest extends AppTestCase
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [],
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', []),
 			'Неправильно подгрузился скрипт с зависимостями, у которых вручную прописаны пути'
 		);
 	}
@@ -459,24 +482,34 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Прописанного файла js/TestManual/notExists.js не существует
 	 */
-	public function testAssetManualNotExists() {
-		$this->_assetHelper->setActionConfig('test', 'manualNotExists', [
-			AssetHelper::KEY_SCRIPT => 'js/TestManual/notExists.js',
-			AssetHelper::KEY_STYLE => 'css/TestManual/notExists.css',
+	public function testAssetManualNotExists()
+	{
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'manualNotExists',
+			[
+				AssetHelper::KEY_SCRIPT => 'js/TestManual/notExists.js',
+				AssetHelper::KEY_STYLE => 'css/TestManual/notExists.css',
+			],
 		]);
 		$this->_assetHelper->load('test', 'manualNotExists');
 	}
 
 	/** подключение файлов с других сайтов */
-	public function testAssetUrl() {
-		$this->_assetHelper->setActionConfig('test', 'goodUrl', [
-			AssetHelper::KEY_SCRIPT => [
-				'http://asdf.ru',
-				'https://asdf.ru',
-			],
-			AssetHelper::KEY_STYLE => [
-				'http://asdf.ru',
-				'https://asdf.ru',
+	public function testAssetUrl()
+	{
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'goodUrl',
+			[
+				AssetHelper::KEY_SCRIPT => [
+					'http://asdf.ru',
+					'https://asdf.ru',
+				],
+				AssetHelper::KEY_STYLE => [
+					'http://asdf.ru',
+					'https://asdf.ru',
+				],
 			],
 		]);
 
@@ -491,7 +524,7 @@ class AssetTest extends AppTestCase
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [],
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', []),
 			'Неправильно подгрузился скрипт с зависимостями по урлу'
 		);
 	}
@@ -502,9 +535,14 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Прописанного файла ftp://asdf
 	 */
-	public function testAssetUrlBad() {
-		$this->_assetHelper->setActionConfig('test', 'badUrl', [
-			AssetHelper::KEY_SCRIPT => 'ftp://asdf',
+	public function testAssetUrlBad()
+	{
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'badUrl',
+			[
+				AssetHelper::KEY_SCRIPT => 'ftp://asdf',
+			],
 		]);
 
 		$this->_assetHelper->load('test', 'badUrl');
@@ -516,22 +554,29 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Прописанного файла js/TestManual не существует
 	 */
-	public function testAssetManualDir() {
-		$this->_assetHelper->setActionConfig('test', 'manualDir', [
-			AssetHelper::KEY_SCRIPT => ['js/TestManual'],
+	public function testAssetManualDir()
+	{
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'manualDir',
+			[
+				AssetHelper::KEY_SCRIPT => ['js/TestManual'],
+			],
 		]);
 
 		$this->_assetHelper->load('test', 'manualDir');
 	}
 
 	/** файл выбирается автоматически и его не существует */
-	public function testAutoNotExists() {
+	public function testAutoNotExists()
+	{
 		$this->_assetHelper->load('test', 'autoNotExists');
-		self::assertEquals($this->_emptyResult, $this->_assetHelper->getResult(), 'Должен быть пустой результат');
+		self::assertEquals($this->_emptyResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', []), 'Должен быть пустой результат');
 	}
 
 	/** файл выбирается автоматически он существует */
-	public function testAutoExists() {
+	public function testAutoExists()
+	{
 		$this->_assetHelper->load('testManual', 'fileAuto');
 		$expectedResult = [
 			AssetHelper::BLOCK_SCRIPT => [
@@ -544,13 +589,14 @@ class AssetTest extends AppTestCase
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [],
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', []),
 			'Неправильно подгрузился скрипт у которого есть файлы, но его нет в конфиге'
 		);
 	}
 
 	/** Добавляется префикс */
-	public function testUrlPrefix() {
+	public function testUrlPrefix()
+	{
 		$urlPrefix = '/prefix';
 		$this->_request = new ServerRequest(['webroot' => $urlPrefix]);
 		$this->_assetHelper = new AssetHelper(new View($this->_request));
@@ -567,20 +613,21 @@ class AssetTest extends AppTestCase
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [],
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(), 'Неправильно подгрузился скрипт с префиксом'
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', []), 'Неправильно подгрузился скрипт с префиксом'
 		);
 	}
 
 
 	/** загрузка с зависимостями */
-	public function testDependencies() {
-		$this->_assetHelper->setConfigs(
+	public function testDependencies()
+	{
+		$this->_request->addParams(['controller' => 'test', 'action' => 'isDependent']);
+		MethodMocker::callPrivate($this->_assetHelper, '_setConfigs', [
 			[
 				'test' => [
 					'isDependent' => [
 						AssetHelper::KEY_DEPEND => [
 							'test.dependency1',
-							'test.dependency2',
 						],
 					],
 					'isDependent2' => [
@@ -599,12 +646,18 @@ class AssetTest extends AppTestCase
 					],
 					'dependency3' => [
 					],
+					'dependency4' => [
+					],
 				],
-			]
-		);
-		$this->_assetHelper->load('test', 'isDependent');
+			],
+		]);
+		$this->_assetHelper->addDependency('test', 'dependency2');
+		$this->_assetHelper->addLayoutDependency('test', 'dependency4');
+		$this->_assetHelper->load();
 		$expectedResult = [
 			AssetHelper::BLOCK_SCRIPT => [
+				'<script id="dependency4" type="text/x-handlebars-template"></script>',
+				'<script src="/js/Test/dependency4.js?v=' . self::SCRIPT_VERSION . '"></script>',
 				'<script id="dependency2" type="text/x-handlebars-template"></script>',
 				'<script src="/js/Test/dependency2.js?v=' . self::SCRIPT_VERSION . '"></script>',
 				'<script id="dependency1" type="text/x-handlebars-template"></script>',
@@ -613,6 +666,7 @@ class AssetTest extends AppTestCase
 				'<script src="/js/Test/is_dependent.js?v=' . self::SCRIPT_VERSION . '"></script>',
 			],
 			AssetHelper::BLOCK_STYLE => [
+				'<link rel="stylesheet" href="/css/Test/dependency4.css?v=' . self::SCRIPT_VERSION . '"/>',
 				'<link rel="stylesheet" href="/css/Test/dependency2.css?v=' . self::SCRIPT_VERSION . '"/>',
 				'<link rel="stylesheet" href="/css/Test/dependency1.css?v=' . self::SCRIPT_VERSION . '"/>',
 				'<link rel="stylesheet" href="/css/Test/is_dependent.css?v=' . self::SCRIPT_VERSION . '"/>',
@@ -620,7 +674,7 @@ class AssetTest extends AppTestCase
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [],
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(), 'Неправильно подгрузился скрипт с зависимостями'
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', []), 'Неправильно подгрузился скрипт с зависимостями'
 		);
 
 		// часть зависимостей уже подгружена
@@ -640,7 +694,7 @@ class AssetTest extends AppTestCase
 			],
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', []),
 			'Неправильно подгрузился скрипт с зависимостями, когда часть зависимостей уже есть'
 		);
 	}
@@ -652,10 +706,15 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Зависимость от самого себя test.selfDependent
 	 */
-	public function testSelfDependency() {
-		$this->_assetHelper->setActionConfig('test', 'selfDependent', [
-			AssetHelper::KEY_DEPEND => [
-				'test.selfDependent',
+	public function testSelfDependency()
+	{
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'selfDependent',
+			[
+				AssetHelper::KEY_DEPEND => [
+					'test.selfDependent',
+				],
 			],
 		]);
 		$this->_assetHelper->load('test', 'selfDependent');
@@ -668,8 +727,9 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Круговая зависимость у ассета test.selfDependent
 	 */
-	public function testCircularDependencies() {
-		$this->_assetHelper->setConfigs(
+	public function testCircularDependencies()
+	{
+		MethodMocker::callPrivate($this->_assetHelper, '_setConfigs', [
 			[
 				'test' => [
 					'selfDependent' => [
@@ -688,8 +748,8 @@ class AssetTest extends AppTestCase
 						],
 					],
 				],
-			]
-		);
+			],
+		]);
 		$this->_assetHelper->load('test', 'selfDependent');
 	}
 
@@ -699,28 +759,38 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Попытка сконфигурировать ассет testManual.fileAuto, который уже загружен
 	 */
-	public function testConfigureLoaded() {
+	public function testConfigureLoaded()
+	{
 		$this->_assetHelper->load('testManual', 'fileAuto');
-		$this->_assetHelper->setActionConfig('testManual', 'fileAuto', [
-			AssetHelper::KEY_SCRIPT => 'asdf',
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'testManual',
+			'fileAuto',
+			[
+				AssetHelper::KEY_SCRIPT => 'asdf',
+			],
 		]);
 	}
 
 	/** добавление переменных, стилей и скриптов полсе того, как был отрисован блок скриптов */
-	public function testAddAfterFetchScript() {
+	public function testAddAfterFetchScript()
+	{
 		$this->_assetHelper->setVars(['upperVar' => 'upperValue']);
 		$this->_assetHelper->load('testManual', 'fileAuto');
 		$this->_assetHelper->setVars(['bottomVar' => 'bottomValue']);
 		$this->_assetHelper->fetchScripts();
 
-		$this->_assetHelper->setActionConfig('test', 'exceptScript', [
-			AssetHelper::KEY_STYLE => 'http://asdf',
-			AssetHelper::KEY_SCRIPT => 'http://asdf',
-			AssetHelper::KEY_IS_BOTTOM => true,
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'exceptScript',
+			[
+				AssetHelper::KEY_STYLE => 'http://asdf',
+				AssetHelper::KEY_SCRIPT => 'http://asdf',
+				AssetHelper::KEY_IS_BOTTOM => true,
+			],
 		]);
 		$this->_assetHelper->setVars(['bottomVar2' => 'bottomValue2']);
 		$this->_assetHelper->load('test', 'exceptScript');
-		$res = $this->_assetHelper->getResult();
+		$res = MethodMocker::callPrivate($this->_assetHelper, '_getResult', []);
 		// fileAuto добавил стиль и скрипт; setVars добавил переменную в блок скриптов
 		// блок скриптов был уже отрисован
 		// новые стили нормально добавились в блок стилей
@@ -729,8 +799,8 @@ class AssetTest extends AppTestCase
 		$expectedResult = [
 			AssetHelper::BLOCK_SCRIPT => [
 				"<script>\n upperVar = \"upperValue\";\n</script>",
-        		'<script id="file_auto" type="text/x-handlebars-template"></script>',
-        		'<script src="/js/TestManual/file_auto.js?v=123"></script>',
+				'<script id="file_auto" type="text/x-handlebars-template"></script>',
+				'<script src="/js/TestManual/file_auto.js?v=123"></script>',
 			],
 			AssetHelper::BLOCK_STYLE => [
 				'<link rel="stylesheet" href="/css/TestManual/file_auto.css?v=123"/>',
@@ -738,15 +808,19 @@ class AssetTest extends AppTestCase
 			],
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [
 				"<script>\n bottomVar = \"bottomValue\";\n bottomVar2 = \"bottomValue2\";\n</script>",
-				"\n\t<script src=\"http://asdf\"></script>\n"
+				"\n\t<script src=\"http://asdf\"></script>\n",
 			],
 		];
 		self::assertEquals($expectedResult, $res);
 
 		// но при попытке добавить ещё что-то в блок скриптов кидается ексепшн
 		// потому что этот блок уже был отрисован
-		$this->_assetHelper->setActionConfig('test', 'script', [
-			AssetHelper::KEY_SCRIPT => 'http://asdf',
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'script',
+			[
+				AssetHelper::KEY_SCRIPT => 'http://asdf',
+			],
 		]);
 		try {
 			$this->_assetHelper->load('test', 'script');
@@ -757,46 +831,59 @@ class AssetTest extends AppTestCase
 	}
 
 	/** добавление переменных, стилей и скриптов полсе того, как был отрисован блок стилей */
-	public function testAddAfterFetchStyle() {
+	public function testAddAfterFetchStyle()
+	{
 		$this->_assetHelper->setVars(['upperVar' => 'upperValue']);
 		$this->_assetHelper->load('testManual', 'fileAuto');
 		$this->_assetHelper->fetchStyles();
 
 		$this->_assetHelper->setVars(['upperVar2' => 'upperValue2']);
-		$this->_assetHelper->setActionConfig('test', 'script', [
-			AssetHelper::KEY_SCRIPT => 'http://asdf',
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'script',
+			[
+				AssetHelper::KEY_SCRIPT => 'http://asdf',
+			],
 		]);
-		$this->_assetHelper->setActionConfig('test', 'scriptBottom', [
-			AssetHelper::KEY_SCRIPT => 'http://asdfg',
-			AssetHelper::KEY_IS_BOTTOM => true,
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'scriptBottom',
+			[
+				AssetHelper::KEY_SCRIPT => 'http://asdfg',
+				AssetHelper::KEY_IS_BOTTOM => true,
+			],
 		]);
 		$this->_assetHelper->load('test', 'script');
 		$this->_assetHelper->load('test', 'scriptBottom');
-		$res = $this->_assetHelper->getResult();
+		$res = MethodMocker::callPrivate($this->_assetHelper, '_getResult', []);
 		// fileAuto добавил стиль и скрипт
 		// блок стилей был уже отрисован
 		// новые скрипты и переменные нормально добавились куда надо
 		$expectedResult = [
 			AssetHelper::BLOCK_SCRIPT => [
 				"<script>\n upperVar = \"upperValue\";\n</script>",
-        		'<script id="file_auto" type="text/x-handlebars-template"></script>',
-        		'<script src="/js/TestManual/file_auto.js?v=123"></script>',
+				'<script id="file_auto" type="text/x-handlebars-template"></script>',
+				'<script src="/js/TestManual/file_auto.js?v=123"></script>',
 				"<script>\n upperVar2 = \"upperValue2\";\n</script>",
-				"\n\t<script src=\"http://asdf\"></script>\n"
+				"\n\t<script src=\"http://asdf\"></script>\n",
 			],
 			AssetHelper::BLOCK_STYLE => [
 				'<link rel="stylesheet" href="/css/TestManual/file_auto.css?v=123"/>',
 			],
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [
-				"\n\t<script src=\"http://asdfg\"></script>\n"
+				"\n\t<script src=\"http://asdfg\"></script>\n",
 			],
 		];
 		self::assertEquals($expectedResult, $res);
 
 		// но при попытке добавить ещё что-то в блок скриптов кидается ексепшн
 		// потому что этот блок уже был отрисован
-		$this->_assetHelper->setActionConfig('test', 'style', [
-			AssetHelper::KEY_STYLE => 'http://asdfv',
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'style',
+			[
+				AssetHelper::KEY_STYLE => 'http://asdfv',
+			],
 		]);
 		try {
 			$this->_assetHelper->load('test', 'style');
@@ -807,23 +894,32 @@ class AssetTest extends AppTestCase
 	}
 
 	/** добавление переменных, стилей и скриптов полсе того, как был отрисован блок скриптов */
-	public function testAddAfterFetchBottom() {
+	public function testAddAfterFetchBottom()
+	{
 		$this->_assetHelper->setVars(['upperVar' => 'upperValue']);
-		$this->_assetHelper->setActionConfig('test', 'scriptBottom', [
-			AssetHelper::KEY_STYLE => 'http://asdfgh',
-			AssetHelper::KEY_SCRIPT => 'http://asdf',
-			AssetHelper::KEY_IS_BOTTOM => true,
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'scriptBottom',
+			[
+				AssetHelper::KEY_STYLE => 'http://asdfgh',
+				AssetHelper::KEY_SCRIPT => 'http://asdf',
+				AssetHelper::KEY_IS_BOTTOM => true,
+			],
 		]);
 		$this->_assetHelper->load('test', 'scriptBottom');
 		$this->_assetHelper->fetchScriptsBottom();
 
 		$this->_assetHelper->setVars(['upperVar2' => 'upperValue2']);
-		$this->_assetHelper->setActionConfig('test', 'exceptBottom', [
-			AssetHelper::KEY_SCRIPT => 'http://asdfr',
-			AssetHelper::KEY_STYLE => 'http://asdfg',
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'exceptBottom',
+			[
+				AssetHelper::KEY_SCRIPT => 'http://asdfr',
+				AssetHelper::KEY_STYLE => 'http://asdfg',
+			],
 		]);
 		$this->_assetHelper->load('test', 'exceptBottom');
-		$res = $this->_assetHelper->getResult();
+		$res = MethodMocker::callPrivate($this->_assetHelper, '_getResult', []);
 		// добавлен стиль и скрипт снизу
 		// нижний блок был уже отрисован
 		// новые скрипты и переменные нормально добавились куда надо
@@ -831,23 +927,27 @@ class AssetTest extends AppTestCase
 			AssetHelper::BLOCK_SCRIPT => [
 				"<script>\n upperVar = \"upperValue\";\n</script>",
 				"<script>\n upperVar2 = \"upperValue2\";\n</script>",
-				"\n\t<script src=\"http://asdfr\"></script>\n"
+				"\n\t<script src=\"http://asdfr\"></script>\n",
 			],
 			AssetHelper::BLOCK_STYLE => [
 				"\n\t<link rel=\"stylesheet\" href=\"http://asdfgh\"/>\n",
 				"\n\t<link rel=\"stylesheet\" href=\"http://asdfg\"/>\n",
 			],
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [
-				"\n\t<script src=\"http://asdf\"></script>\n"
+				"\n\t<script src=\"http://asdf\"></script>\n",
 			],
 		];
 		self::assertEquals($expectedResult, $res);
 
 		// но при попытке добавить ещё что-то в блок скриптов кидается ексепшн
 		// потому что этот блок уже был отрисован
-		$this->_assetHelper->setActionConfig('test', 'newBottom', [
-			AssetHelper::KEY_SCRIPT => 'http://asdfv',
-			AssetHelper::KEY_IS_BOTTOM => true,
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'newBottom',
+			[
+				AssetHelper::KEY_SCRIPT => 'http://asdfv',
+				AssetHelper::KEY_IS_BOTTOM => true,
+			],
 		]);
 		try {
 			$this->_assetHelper->load('test', 'newBottom');
@@ -864,7 +964,8 @@ class AssetTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Все блоки для переменных уже были выведены
 	 */
-	public function testAddVarsAfterFetchScripts() {
+	public function testAddVarsAfterFetchScripts()
+	{
 		$this->_assetHelper->load('testManual', 'fileAuto');
 		$this->_assetHelper->fetchScripts();
 		$this->_assetHelper->fetchScriptsBottom();
@@ -874,14 +975,21 @@ class AssetTest extends AppTestCase
 	/**
 	 * тесты параметров load
 	 */
-	public function testLoadParams() {
-		$this->_assetHelper->setActionConfig('test', 'fromParams', [
-			AssetHelper::KEY_VARS => [
-				'testLoad' => AssetHelper::TYPE_STRING,
+	public function testLoadParams()
+	{
+
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'fromParams',
+			[
+				AssetHelper::KEY_VARS => [
+					'testLoad' => AssetHelper::TYPE_STRING,
+				],
 			],
 		]);
 
 		$this->_request->addParams(['controller' => 'test', 'action' => 'fromParams']);
+
 		$errorMsg = '';
 		try {
 			$this->_assetHelper->load();
@@ -917,8 +1025,9 @@ class AssetTest extends AppTestCase
 	/**
 	 * тесты на подгрузку списка обязательных переменных из зависиммостей, тесты проверок объявления и типов обязательных переменных
 	 */
-	public function testLoadAssetVars() {
-		$this->_assetHelper->setConfigs(
+	public function testLoadAssetVars()
+	{
+		MethodMocker::callPrivate($this->_assetHelper, '_setConfigs', [
 			[
 				'test' => [
 					'vars' => [
@@ -959,8 +1068,8 @@ class AssetTest extends AppTestCase
 						],
 					],
 				],
-			]
-		);
+			],
+		]);
 		$errorMsg = '';
 		try {
 			$this->_assetHelper->setVars(
@@ -983,7 +1092,7 @@ class AssetTest extends AppTestCase
 			"<script>\n var1 = \"asd\";\n var2 = true;\n var3 = 3;\n</script>",
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]),
 			'Неправильно сгенерировался скрипт с параметрами'
 		);
 
@@ -1007,7 +1116,7 @@ class AssetTest extends AppTestCase
 			"<script>\n var4 = 4;\n</script>",
 		];
 		self::assertEquals(
-			$expectedResult, $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT),
+			$expectedResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]),
 			'Неправильно сгенерировался скрипт с параметрами'
 		);
 
@@ -1024,7 +1133,7 @@ class AssetTest extends AppTestCase
 		);
 
 		self::assertEquals(
-			[], $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT), 'Должен быть пустой результат'
+			[], MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]), 'Должен быть пустой результат'
 		);
 
 		$errorMsg = '';
@@ -1045,7 +1154,7 @@ class AssetTest extends AppTestCase
 		);
 
 		self::assertEquals(
-			[], $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT), 'Должен быть пустой результат'
+			[], MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]), 'Должен быть пустой результат'
 		);
 
 		$errorMsg = '';
@@ -1065,10 +1174,8 @@ class AssetTest extends AppTestCase
 		);
 
 		self::assertEquals(
-			[], $this->_assetHelper->getResult(AssetHelper::BLOCK_SCRIPT), 'Должен быть пустой результат'
+			[], MethodMocker::callPrivate($this->_assetHelper, '_getResult', [AssetHelper::BLOCK_SCRIPT]), 'Должен быть пустой результат'
 		);
 
 	}
-
-
 }

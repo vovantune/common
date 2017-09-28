@@ -55,7 +55,7 @@ class HttpClientMockerTest extends AppTestCase
 	/** Тест полного цикла снифа */
 	public function testRealSniff() {
 		HttpClientAdapter::disableDebug();
-		$url = 'http://www.artskills.ru';
+		$url = 'https://www.artskills.ru';
 		$client = new Client();
 		$clientResponse = $client->get($url);
 
