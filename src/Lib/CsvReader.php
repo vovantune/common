@@ -1,6 +1,10 @@
 <?php
+
 namespace ArtSkills\Lib;
 
+/**
+ * TODO: переделать дефолтовый разделитель, поменять в конструкторе последние 2 параметра местами
+ */
 class CsvReader
 {
 	const DEFAULT_ENCODING = 'UTF-8';
@@ -28,7 +32,8 @@ class CsvReader
 	 * @param string $fileEncoding
 	 * @throws \Exception
 	 */
-	public function __construct($csvFl, $delimiter = self::DEFAULT_DELIMITER, $fileEncoding = self::DEFAULT_ENCODING) {
+	public function __construct($csvFl, $delimiter = self::DEFAULT_DELIMITER, $fileEncoding = self::DEFAULT_ENCODING)
+	{
 		if (!is_file($csvFl)) {
 			throw new \Exception('File "' . $csvFl . '" does not exist');
 		}
@@ -37,7 +42,8 @@ class CsvReader
 	}
 
 	/** закрываем хэндл */
-	public function __destruct() {
+	public function __destruct()
+	{
 		$this->_closeFile();
 	}
 
@@ -46,7 +52,8 @@ class CsvReader
 	 *
 	 * @return string[]|false
 	 */
-	public function getRow() {
+	public function getRow()
+	{
 		$row = fgetcsv($this->_handle, null, $this->_delimiter);
 		if (empty($row) || (count($row) == 1) && trim($row[0]) === '') {
 			return false;
@@ -61,7 +68,8 @@ class CsvReader
 	 * @return string[]
 	 * @throws \Exception
 	 */
-	public function getAll() {
+	public function getAll()
+	{
 		if (empty($this->_handle)) {
 			throw new \Exception('File is not open');
 		}
@@ -81,7 +89,8 @@ class CsvReader
 	 * @return array|bool
 	 * @throws \Exception
 	 */
-	public function getAllAssoc() {
+	public function getAllAssoc()
+	{
 		$lines = $this->getAll();
 		if (count($lines) < 2) {
 			return false;
@@ -110,7 +119,8 @@ class CsvReader
 	 * @param string $fileEncoding
 	 * @return resource
 	 */
-	private function _openFile($csvFl, $fileEncoding = self::DEFAULT_ENCODING) {
+	private function _openFile($csvFl, $fileEncoding = self::DEFAULT_ENCODING)
+	{
 		ini_set('auto_detect_line_endings', true);
 		$handle = fopen($csvFl, 'r');
 		stream_filter_append($handle, 'convert.iconv.' . $fileEncoding . '/UTF-8');
@@ -120,7 +130,8 @@ class CsvReader
 	/**
 	 * Закрываем открытый файл
 	 */
-	private function _closeFile() {
+	private function _closeFile()
+	{
 		if (!empty($this->_handle)) {
 			fclose($this->_handle);
 			ini_set('auto_detect_line_endings', false);
