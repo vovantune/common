@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Log\Engine;
 
 use ArtSkills\Lib\Arrays;
@@ -10,6 +11,7 @@ use Cake\Log\Engine\BaseLog;
 use Cake\Log\Log;
 use Cake\Log\LogTrait;
 use Cake\Network\Exception\NotFoundException;
+use Cake\Network\Exception\UnauthorizedException;
 
 class SentryLog extends BaseLog
 {
@@ -88,7 +90,8 @@ class SentryLog extends BaseLog
 	 *
 	 * @param int $add
 	 */
-	public static function addDeleteTraceLevel($add) {
+	public static function addDeleteTraceLevel($add)
+	{
 		self::$_addDeleteTraceLevel += $add;
 	}
 
@@ -97,14 +100,16 @@ class SentryLog extends BaseLog
 	 *
 	 * @param array $info
 	 */
-	public static function addInfo($info) {
+	public static function addInfo($info)
+	{
 		self::$_addInfo += $info;
 	}
 
 	/**
 	 * Сказать, что сейчас придёт ошибка из шатдауна
 	 */
-	public static function setShutdown() {
+	public static function setShutdown()
+	{
 		self::$_isShutdown = true;
 	}
 
@@ -114,7 +119,8 @@ class SentryLog extends BaseLog
 	 *
 	 * @return \Raven_Client
 	 */
-	public static function getSentry() {
+	public static function getSentry()
+	{
 		if (empty(self::$_client)) {
 			// если dsn нет, то просто ничего не будет отсылаться
 			$options = (Env::getSentryOptions() ?: []);
@@ -127,7 +133,8 @@ class SentryLog extends BaseLog
 	/**
 	 * @inheritdoc
 	 */
-	public function log($level, $message, array $context = []) {
+	public function log($level, $message, array $context = [])
+	{
 		self::_log($level, $message, null, $context);
 	}
 
@@ -139,7 +146,8 @@ class SentryLog extends BaseLog
 	 * @param \Exception|null $exception
 	 * @param array $context
 	 */
-	private static function _log($level, $message, $exception, array $context = []) {
+	private static function _log($level, $message, $exception, array $context = [])
+	{
 		$sentryLevel = array_key_exists($level, self::LEVEL_MAP) ? self::LEVEL_MAP[$level] : \Raven_Client::ERROR;
 		if (
 			empty($context[self::KEY_IS_HANDLED])
@@ -160,7 +168,8 @@ class SentryLog extends BaseLog
 	 * @param array $context
 	 * @param bool|null $alert
 	 */
-	public static function logException(\Exception $exception, array $context = [], $alert = null) {
+	public static function logException(\Exception $exception, array $context = [], $alert = null)
+	{
 		Env::checkTestException($exception);
 		if (($exception instanceof \ArtSkills\Error\Exception) && (!$exception->isLogged())) {
 			$exception->log();
@@ -181,9 +190,10 @@ class SentryLog extends BaseLog
 	 * @param bool|null $alert
 	 * @return string
 	 */
-	protected static function _getExceptionLevel(\Exception $exception, $alert = null) {
+	protected static function _getExceptionLevel(\Exception $exception, $alert = null)
+	{
 		if ($alert === null) {
-			$alert = !($exception instanceof NotFoundException);
+			$alert = !($exception instanceof NotFoundException) && !($exception instanceof UnauthorizedException);
 		}
 		return ($alert ? 'error' : 'warning');
 	}
@@ -195,7 +205,8 @@ class SentryLog extends BaseLog
 	 * @SuppressWarnings(PHPMD.FunctionRule)
 	 * @SuppressWarnings(PHPMD.Superglobals)
 	 */
-	protected static function _addSentryContext($context = null) {
+	protected static function _addSentryContext($context = null)
+	{
 		if (array_key_exists(self::KEY_ADD_INFO, $context)) {
 			self::addInfo($context[self::KEY_ADD_INFO]);
 		}
@@ -229,7 +240,8 @@ class SentryLog extends BaseLog
 	 * @param mixed $var
 	 * @return string
 	 */
-	private static function _exportVar($var) {
+	private static function _exportVar($var)
+	{
 		return empty($var) ? 'empty' : Debugger::exportVar($var, self::INFO_MAX_NEST_LEVEL);
 	}
 
@@ -241,7 +253,8 @@ class SentryLog extends BaseLog
 	 * @param \Exception|null $exception
 	 * @param array $context
 	 */
-	protected static function _sendToSentry($level, $message, $exception, $context) {
+	protected static function _sendToSentry($level, $message, $exception, $context)
+	{
 		self::_addSentryContext($context);
 
 		$client = self::getSentry();
@@ -279,7 +292,8 @@ class SentryLog extends BaseLog
 	 * @param string $level
 	 * @param array $traceFull
 	 */
-	protected static function _addBreadCrumb($message, $level, $traceFull) {
+	protected static function _addBreadCrumb($message, $level, $traceFull)
+	{
 		$where = [];
 		if (!empty($traceFull)) {
 			$where = array_shift($traceFull);
@@ -290,7 +304,7 @@ class SentryLog extends BaseLog
 			'level' => $level,
 			'data' => [
 				'from' => $where,
-				'error_extra' => Arrays::get($client->context->extra, '_extra_as_string', '')
+				'error_extra' => Arrays::get($client->context->extra, '_extra_as_string', ''),
 			],
 		]);
 	}
@@ -301,7 +315,8 @@ class SentryLog extends BaseLog
 	 * @param array $trace
 	 * @return array
 	 */
-	private static function _sliceTrace($trace) {
+	private static function _sliceTrace($trace)
+	{
 		// 0, 1, 2 - стереть
 		// 3 - Log::write, нужно стереть, если он был вызван из другого метода (например Log::error) или из LogTrait::log, иначе оставить
 		// т.е. нужно проверить 4й уровень
@@ -339,7 +354,8 @@ class SentryLog extends BaseLog
 	 * @param array $trace
 	 * @param int $toSlice
 	 */
-	private static function _addCallArgs($trace, $toSlice) {
+	private static function _addCallArgs($trace, $toSlice)
+	{
 		$result = [];
 		$argsLevels = range($toSlice - 1, $toSlice + 1);
 		foreach ($argsLevels as $level) {
