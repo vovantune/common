@@ -34,6 +34,7 @@ class EntityBuilder
 		'integer' => 'int',
 		'biginteger' => 'int',
 		'tinyinteger' => 'int',
+		'smallinteger' => 'int',
 		'boolean' => 'boolean',
 		'float' => 'float',
 		'decimal' => 'float',
