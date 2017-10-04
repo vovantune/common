@@ -124,7 +124,7 @@ abstract class DeploymentShell extends Shell
 		if (empty($this->params['type'])) {
 			$this->abort('Не указан обязательный параметр type');
 		}
-		$deployer = $this->_getDeployer($this->params['type']);
+		$this->_getDeployer($this->params['type']);
 		// if !$deployer->canRollBack() then out 'can't rollback'
 		// else $success = $deployer->rollBack()
 		// success or fail message

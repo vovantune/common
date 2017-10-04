@@ -63,7 +63,7 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 			$subset = json_decode($subset, true);
 		}
 		$array = json_decode($json, true);
-		$this->assertArraySubset($subset, $array, $strict, $message);
+		self::assertArraySubset($subset, $array, $strict, $message);
 	}
 
 	/**

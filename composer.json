@@ -10,7 +10,7 @@
 	],
 	"require": {
 		"php": "^7.1",
-		"cakephp/cakephp": "3.4.*",
+		"cakephp/cakephp": "^3.4",
 		"robmorgan/phinx": "^0.6.2",
 		"sentry/sentry": "^1.1",
 		"jan-swiecki/simple-annotations": "*",

@@ -64,7 +64,7 @@ class Table extends \Cake\ORM\Table
 				$fieldsToDirty = array_intersect($fieldsToDirty, (array)$options['dirtyFields']);
 			}
 			foreach ($fieldsToDirty as $fieldName) {
-				$entity->dirty($fieldName, true);
+				$entity->setDirty($fieldName, true);
 			}
 		}
 		return $this->save($entity, $options);
@@ -292,7 +292,7 @@ class Table extends \Cake\ORM\Table
 	private function _setAssocDirty(EntityInterface $entity) {
 		$associations = $this->associations();
 		foreach ($associations as $assoc) {
-			$propertyName = $assoc->property();
+			$propertyName = $assoc->getProperty();
 			if (empty($entity->{$propertyName})) {
 				continue;
 			}
