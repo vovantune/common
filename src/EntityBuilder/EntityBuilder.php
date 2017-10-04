@@ -33,6 +33,7 @@ class EntityBuilder
 	const SCHEMA_TYPE_MAP = [
 		'integer' => 'int',
 		'biginteger' => 'int',
+		'tinyinteger' => 'int',
 		'boolean' => 'boolean',
 		'float' => 'float',
 		'decimal' => 'float',
