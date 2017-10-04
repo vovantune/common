@@ -4,7 +4,6 @@ namespace ArtSkills\TestSuite;
 
 use ArtSkills\Filesystem\Folder;
 use ArtSkills\Lib\AppCache;
-use ArtSkills\Lib\Arrays;
 use ArtSkills\Mailer\Transport\TestEmailTransport;
 use ArtSkills\ORM\Entity;
 use ArtSkills\Lib\Env;

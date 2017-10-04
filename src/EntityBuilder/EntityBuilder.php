@@ -637,7 +637,7 @@ class EntityBuilder
 
 		$result = [];
 		foreach ($columnList as $column) {
-			$columnInfo = $tableSchema->column($column);
+			$columnInfo = $tableSchema->getColumn($column);
 			$result[$column] = ' * @property ' . static::SCHEMA_TYPE_MAP[$columnInfo['type']] . ' $' . $column .
 				(array_key_exists($column, $defaultValues) ? ' = ' . var_export($defaultValues[$column], true) : '') .
 				(!empty($columnInfo['comment']) ? ' ' . $columnInfo['comment'] : '');
