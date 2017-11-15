@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ArtSkills\Lib;
 
 use Cake\Cache\Cache;
@@ -26,17 +28,19 @@ class AppCache
 	/**
 	 * Почистить весь кеш
 	 */
-	public static function flushAll() {
-		static::flushExcept(false);
+	public static function flushAll()
+	{
+		static::flushExcept();
 	}
 
 	/**
 	 * Чистит кэш за исключением переданных конфигов
 	 * По умолчанию исключает static::$_excludeFlushCacheList
 	 *
-	 * @param array $skipConfigs
+	 * @param null|array $skipConfigs
 	 */
-	public static function flushExcept($skipConfigs = null) {
+	public static function flushExcept(?array $skipConfigs = null)
+	{
 		if ($skipConfigs === null) {
 			$skipConfigs = static::$_excludeFlushCacheList;
 		}
@@ -50,18 +54,12 @@ class AppCache
 	}
 
 	/**
-	 * @deprecated
-	 */
-	public static function flush($skipConfigs = null) {
-		static::flushExcept($skipConfigs);
-	}
-
-	/**
 	 * Инициализация конфига кэша для bootstrap.php
 	 *
 	 * @return array
 	 */
-	public static function getConfig() {
+	public static function getConfig(): array
+	{
 		$cacheConfig = Configure::consume('Cache');
 		$currentServer = Env::getServerName();
 		if (Env::isUnitTest()) {
@@ -91,7 +89,8 @@ class AppCache
 				}
 			}
 
-			$configItem['prefix'] = $currentServer . $configVersionPrefix . '_' . $configName . (!empty($configItem['prefix']) ? '_' . $configItem['prefix'] : '');
+			$configItem['prefix'] = $currentServer . $configVersionPrefix . '_' . $configName . (!empty($configItem['prefix'])
+					? '_' . $configItem['prefix'] : '');
 		}
 		return $cacheConfig;
 	}
