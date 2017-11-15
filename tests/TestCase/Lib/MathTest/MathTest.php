@@ -29,5 +29,10 @@ class MathTest extends AppTestCase
 
 		$testNumber = 2.0;
 		self::assertEquals($testNumber, Math::roundUpToNearest($testNumber, $precision));
+
+		$testNumber = 105.5;
+		$precision = 100;
+		self::assertEquals(200, Math::roundUpToNearest($testNumber, $precision));
+
 	}
 }
