@@ -70,7 +70,11 @@ class GitBranchTrimShell extends Shell
 			throw new InternalException('Не сконфигурирован Git');
 		}
 
-		$gitConfig = static::DEFAULT_CONFIGURATION + $gitConfig;
+		$gitConfig += static::DEFAULT_CONFIGURATION;
+
+		if (empty($gitConfig['dir']) || !is_dir($gitConfig['dir'])) {
+			throw new InternalException('Не сконфигурирована Git рабочая папка');
+		}
 
 		$this->_fromDir = $gitConfig['dir'];
 		$this->_branchDeleteInterval = $gitConfig['branchDeleteInterval'];
