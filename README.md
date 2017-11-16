@@ -34,7 +34,7 @@ require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . D
 * Удобные [чтение](src/Lib/CsvReader.php) и [запись](src/Lib/CsvWriter.php) в csv
 * Немного более [удобная](src/Lib/DB.php) работа с Connection
 * Определение [окружения](src/Lib/Env.php) и автодополнение для чтения из Configure
-* Класс для работы с [git](src/Lib/Git.php) и [чистка](src/Lib/GitBranchTrim.php) устаревших веток
+* Класс для работы с [git](src/Lib/Git.php) и [чистка](src/Shell/GitBranchTrim.php) устаревших веток
 * Однострочный вызов [http](src/Lib/Http.php) запросов и получение результата в нужном формате
 * [Русская граматика](src/Lib/RusGram.php): правильное склонение слов с числитильными; даты
 * [Транслит](src/Lib/Translit.php)

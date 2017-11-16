@@ -1,20 +1,23 @@
 <?php
-namespace App\Test\TestCase\Lib;
+
+namespace App\Test\TestCase\Shell;
 
 use ArtSkills\Lib\Shell;
 use ArtSkills\Lib\Git;
-use ArtSkills\Lib\GitBranchTrim;
+use ArtSkills\Shell\GitBranchTrimShell;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\TestSuite\Mock\PropertyAccess;
+use Cake\Core\Configure;
 use Cake\I18n\Time;
 
-class GitBranchTrimTest extends AppTestCase
+class GitBranchTrimShellTest extends AppTestCase
 {
 	/**
 	 * Тест того, что вызывалось при запуске
 	 */
-	public function test() {
+	public function test()
+	{
 		$git = Git::getInstance();
 
 		$branchBefore = $git->getCurrentBranchName();
@@ -22,11 +25,19 @@ class GitBranchTrimTest extends AppTestCase
 		$history = [];
 		$this->_mockExecute($history);
 
-		GitBranchTrim::run();
+		Configure::write(GitBranchTrimShell::CONFIGURATION_NAME, [
+			'dir' => __DIR__,
+		]);
+
+		MethodMocker::mock(\Cake\Console\Shell::class, 'out');
+
+		$shell = new GitBranchTrimShell();
+		$shell->main();
 
 		self::assertEquals($branchBefore, $git->getCurrentBranchName(), 'Ветка не вернулась обратно');
 
-		$deleteDateFrom = Time::parse(PropertyAccess::getStatic(GitBranchTrim::class, '_branchDeleteInterval'))->format('Y-m-d');
+		$deleteDateFrom = Time::parse(GitBranchTrimShell::DEFAULT_CONFIGURATION['branchDeleteInterval'])
+			->format('Y-m-d');
 		$skipBranches = [Git::BRANCH_NAME_MASTER, Git::BRANCH_NAME_HEAD, $branchBefore];
 
 		$actualHistory = $history;
@@ -60,7 +71,8 @@ class GitBranchTrimTest extends AppTestCase
 	 * @param array $history
 	 * @throws \Exception
 	 */
-	private function _mockExecute(&$history) {
+	private function _mockExecute(&$history)
+	{
 		MethodMocker::mock(Shell::class, '_exec')
 			->willReturnAction(function ($args) use (&$history) {
 				$history[] = $args[0];
@@ -79,7 +91,8 @@ class GitBranchTrimTest extends AppTestCase
 	 * @param string $type
 	 * @return array|bool
 	 */
-	private function _getCommandListMerged($type) {
+	private function _getCommandListMerged($type)
+	{
 		$list = [];
 		if ($type == Git::BRANCH_TYPE_REMOTE) {
 			$list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/remotes/origin --merged 2>&1';
@@ -98,7 +111,8 @@ class GitBranchTrimTest extends AppTestCase
 	 * @param string $type
 	 * @return array|bool
 	 */
-	private function _getCommandListDelete($branchDelete, $type) {
+	private function _getCommandListDelete($branchDelete, $type)
+	{
 		$list = $this->_getCommandListMerged($type);
 		if (empty($list)) {
 			return false;
