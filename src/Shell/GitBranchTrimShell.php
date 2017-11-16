@@ -1,27 +1,61 @@
 <?php
-namespace ArtSkills\Lib;
+declare(strict_types=1);
 
+namespace ArtSkills\Shell;
+
+use ArtSkills\Error\InternalException;
+use ArtSkills\Lib\Env;
+use ArtSkills\Lib\Git;
+use Cake\Console\Shell;
+use Cake\Core\Configure;
 use Cake\I18n\Time;
 
 /**
- * По смыслу это должен был быть Shell
- * Но для возможности наследования от AppShell проекта, я вынес это не как Shell
+ * Чистилка старых (смерженных с мастером) веток.
+ * Запускается из шелла посредством наследования данного класса.
+ * Конфигурация:
+ *    в app.php прописываем следующее:
+ *    ```
+ *    'Git' => [
+ *        'dir' => 'Корневая попка с Git',
+ *        'branchDeleteInterval' => '-7 days', // через сколько удалять смерженную с мастером ветку
+ *    ],
+ *    ```
  */
-class GitBranchTrim
+class GitBranchTrimShell extends Shell
 {
+	const CONFIGURATION_NAME = 'Git';
+	const DEFAULT_CONFIGURATION = [
+		'dir' => '',
+		'branchDeleteInterval' => '-7 days',
+	];
+
 	/**
 	 * Из какой директории запускать
 	 *
 	 * @var string
 	 */
-	protected static $_fromDir = '';
+	protected $_fromDir = '';
 
 	/**
 	 * Возраст удаляемых веток
 	 *
 	 * @var int
 	 */
-	protected static $_branchDeleteInterval = '-7 days';
+	protected $_branchDeleteInterval = '-7 days';
+
+	/**
+	 * Чистка старых веток
+	 */
+	public function main()
+	{
+		$this->out("Start: " . date('Y-m-d H:i:s'));
+
+		$log = $this->_run();
+		$this->out(implode("\n", $log));
+
+		$this->out("Finish!");
+	}
 
 	/**
 	 * Удаление старых неиспользуемых веток
@@ -29,16 +63,27 @@ class GitBranchTrim
 	 * @return string[]
 	 * @throws \Exception
 	 */
-	public static function run() {
+	private function _run(): array
+	{
+		$gitConfig = Configure::read(static::CONFIGURATION_NAME);
+		if (empty($gitConfig)) {
+			throw new InternalException('Не сконфигурирован Git');
+		}
+
+		$gitConfig = static::DEFAULT_CONFIGURATION + $gitConfig;
+
+		$this->_fromDir = $gitConfig['dir'];
+		$this->_branchDeleteInterval = $gitConfig['branchDeleteInterval'];
+
 		$currentDir = getcwd();
-		$fromDir = static::_fromDir();
+		$fromDir = $this->_fromDir();
 		if (!empty($fromDir)) {
 			// возможность запускать из любого места
 			// чтобы можно было работать с гитом, нужно переключиться в правильную папку
 			chdir($fromDir);
 		}
 
-		$git = static::_git();
+		$git = $this->_git();
 		$currentBranch = $git->getCurrentBranchName();
 		if (empty($currentBranch)) {
 			throw new \Exception('Гит не инициализирован');
@@ -52,13 +97,13 @@ class GitBranchTrim
 
 		$git->updateRefs();
 		$toDeleteTypes = [Git::BRANCH_TYPE_LOCAL];
-		if (static::_canDeleteRemote()) {
+		if ($this->_canDeleteRemote()) {
 			array_unshift($toDeleteTypes, Git::BRANCH_TYPE_REMOTE);
 		}
 
 		$log = [];
 		foreach ($toDeleteTypes as $type) {
-			$log = array_merge($log, static::_deleteMergedOldBranches($type, [$currentBranch]));
+			$log = array_merge($log, $this->_deleteMergedOldBranches($type, [$currentBranch]));
 		}
 
 		if ($currentBranch != Git::BRANCH_NAME_MASTER) {
@@ -77,7 +122,8 @@ class GitBranchTrim
 	 *
 	 * @return bool
 	 */
-	protected static function _canDeleteRemote() {
+	protected function _canDeleteRemote(): bool
+	{
 		return Env::isTestServer() || Env::isUnitTest();
 	}
 
@@ -86,7 +132,8 @@ class GitBranchTrim
 	 *
 	 * @return Git
 	 */
-	protected static function _git() {
+	protected function _git(): Git
+	{
 		return Git::getInstance();
 	}
 
@@ -94,12 +141,15 @@ class GitBranchTrim
 	 * Из какой директории запускать
 	 *
 	 * @return string
+	 * @throws InternalException
 	 */
-	protected static function _fromDir() {
+	protected function _fromDir(): string
+	{
 		if (Env::isLocal() || Env::isUnitTest()) {
 			return '';
 		}
-		return static::$_fromDir;
+
+		return $this->_fromDir;
 	}
 
 	/**
@@ -109,11 +159,12 @@ class GitBranchTrim
 	 * @param string[] $skipBranches
 	 * @return string[] log
 	 */
-	protected static function _deleteMergedOldBranches($type, $skipBranches = []) {
-		$git = static::_git();
+	protected function _deleteMergedOldBranches(string $type, array $skipBranches = []): array
+	{
+		$git = $this->_git();
 		$skipBranches = array_merge($skipBranches, [Git::BRANCH_NAME_MASTER, Git::BRANCH_NAME_HEAD]);
 		$mergedBranches = $git->getMergedBranches($type);
-		$deleteDateFrom = Time::parse(static::$_branchDeleteInterval)->format('Y-m-d');
+		$deleteDateFrom = Time::parse($this->_branchDeleteInterval)->format('Y-m-d');
 		$log = [];
 		foreach ($mergedBranches as $branchName => $lastCommitDate) {
 			if ($lastCommitDate > $deleteDateFrom) {
