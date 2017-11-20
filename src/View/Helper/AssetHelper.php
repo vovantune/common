@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace ArtSkills\View\Helper;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Lib\Env;
+use ArtSkills\Lib\Strings;
 use ArtSkills\Lib\Url;
 use ArtSkills\Filesystem\File;
 use Cake\Utility\Inflector;
@@ -154,14 +156,14 @@ class AssetHelper extends Helper
 	 * Задать счётчик версий ассетов
 	 *
 	 * @param int $version
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function setAssetVersion(int $version)
 	{
 		if (empty($version)) {
 			$this->_assetPostfix = '';
 		} elseif ($version < 0) {
-			throw new \Exception('Невалидная версия ассетов');
+			throw new InternalException('Невалидная версия ассетов');
 		} else {
 			$this->_assetPostfix = '?v=' . $version;
 		}
@@ -219,7 +221,7 @@ class AssetHelper extends Helper
 	 * и по названиям переменных пройдутся preg_match и инфлектор, чтоб туда не попадало говно
 	 * @param bool|array $overwrite можно ли перезаписать переменные, если они уже определены.
 	 * bool сразу для всех, массив - для каждого по отдельности
-	 * @throws \Exception если переданы неправильные параметры
+	 * @throws InternalException если переданы неправильные параметры
 	 * или при попытке переопределить переменную, когда это не разрешено
 	 */
 	public function setVars(array $variables, $overwrite = false)
@@ -235,7 +237,7 @@ class AssetHelper extends Helper
 	 * и по названиям переменных пройдутся preg_match и инфлектор, чтоб туда не попадало говно
 	 * @param bool|array $overwrite можно ли перезаписать константы, если они уже определены.
 	 * bool сразу для всех, массив - для каждого по отдельности
-	 * @throws \Exception если переданы неправильные параметры
+	 * @throws InternalException если переданы неправильные параметры
 	 * или при попытке переопределить константу, когда это не разрешено
 	 */
 	public function setConsts(array $constants, $overwrite = false)
@@ -248,15 +250,15 @@ class AssetHelper extends Helper
 	 *
 	 * @param string $blockName
 	 * @return string
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function fetchBlock(string $blockName): string
 	{
 		if (!array_key_exists($blockName, $this->_blockFetched)) {
-			throw new \Exception("Неизвестный блок $blockName");
+			throw new InternalException("Неизвестный блок $blockName");
 		}
 		if ($this->_blockFetched[$blockName]) {
-			throw new \Exception("Блок $blockName уже был выведен");
+			throw new InternalException("Блок $blockName уже был выведен");
 		}
 		$this->_blockFetched[$blockName] = true;
 		return $this->_View->fetch($blockName);
@@ -297,7 +299,7 @@ class AssetHelper extends Helper
 	 *
 	 * @param null|string $controller по умолчанию из request
 	 * @param null|string $action по умолчанию из request
-	 * @throws \Exception если была какая-то ошибка
+	 * @throws InternalException если была какая-то ошибка
 	 */
 	public function load(string $controller = null, string $action = null)
 	{
@@ -308,7 +310,7 @@ class AssetHelper extends Helper
 			$this->_loadAsset("$controller.$action");
 			$this->_render();
 			$this->_finish(true);
-		} catch (\Exception $e) {
+		} catch (InternalException $e) {
 			$this->_finish(false);
 			throw $e;
 		}
@@ -322,28 +324,28 @@ class AssetHelper extends Helper
 	 * @param string $action
 	 * @param array $config
 	 * @param bool $merge добавить или перезаписать
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	protected function _setActionConfig(string $controller, string $action, array $config, bool $merge = true)
 	{
 		$assetName = "$controller.$action";
 		if ($this->_isLoaded($assetName)) {
-			throw new \Exception("Попытка сконфигурировать ассет $assetName, который уже загружен");
+			throw new InternalException("Попытка сконфигурировать ассет $assetName, который уже загружен");
 		}
 		if (!empty($config[self::KEY_DEPEND])) {
 			foreach ($config[self::KEY_DEPEND] as $dependency) {
 				if (!strpos($dependency, '.')) {
-					throw new \Exception("Неправильный формат задания зависимости $dependency");
+					throw new InternalException("Неправильный формат задания зависимости $dependency");
 				}
 				list($dependFolder, $dependFile) = explode('.', $dependency);
 				if (
 					(Inflector::variable($dependFolder) != $dependFolder)
 					|| (Inflector::variable($dependFile) != $dependFile)
 				) {
-					throw new \Exception("Неправильный формат задания зависимости $dependency");
+					throw new InternalException("Неправильный формат задания зависимости $dependency");
 				}
 				if (($dependFolder == $controller) && ($dependFile == $action)) {
-					throw new \Exception("Зависимость от самого себя $dependency");
+					throw new InternalException("Зависимость от самого себя $dependency");
 				}
 			}
 		}
@@ -392,7 +394,7 @@ class AssetHelper extends Helper
 	 * @param array $variables
 	 * @param bool|array $overwrite
 	 * @param bool $isVariable переменная или константа.
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	private function _setVars(array $variables, $overwrite = false, bool $isVariable = true)
 	{
@@ -408,13 +410,13 @@ class AssetHelper extends Helper
 			} else {
 				$canOverwrite = (is_array($overwrite) ? !empty($overwrite[$varName]) : $overwrite);
 				if (!$canOverwrite) {
-					throw new \Exception("Не разрешено переопределять $varName");
+					throw new InternalException("Не разрешено переопределять $varName");
 				}
 				$newVarType = $this->_getVarType($varValue);
 				if (empty($existingVarType) || ($existingVarType == $newVarType)) {
 					$this->_definedVariables[$varName] = $varValue;
 				} else {
-					throw new \Exception("Попытка переопределить $varName из типа $existingVarType в $newVarType");
+					throw new InternalException("Попытка переопределить $varName из типа $existingVarType в $newVarType");
 				}
 			}
 		}
@@ -465,7 +467,7 @@ class AssetHelper extends Helper
 	 * Загрузка ассета со всеми зависимостями, переменными и проверками
 	 *
 	 * @param string $assetName
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	private function _loadAsset(string $assetName)
 	{
@@ -473,7 +475,7 @@ class AssetHelper extends Helper
 			return;
 		}
 		if (!empty($this->_startedAssets[$assetName])) {
-			throw new \Exception("Круговая зависимость у ассета $assetName");
+			throw new InternalException("Круговая зависимость у ассета $assetName");
 		}
 		$this->_startedAssets[$assetName] = true;
 		$this->_loadDependencies($assetName);
@@ -502,7 +504,7 @@ class AssetHelper extends Helper
 	 * Загрузка переменных
 	 *
 	 * @param string $assetName
-	 * @throws \Exception если одна переменная объявлена в нескольких ассетах с разными типами
+	 * @throws InternalException если одна переменная объявлена в нескольких ассетах с разными типами
 	 */
 	private function _loadVariables(string $assetName)
 	{
@@ -515,7 +517,7 @@ class AssetHelper extends Helper
 			if (empty($existingVarType)) {
 				$this->_newVariables[$varName] = $varType;
 			} elseif ($existingVarType != $varType) {
-				throw new \Exception("Конфликт переменных: $varName с типами $varType и $existingVarType");
+				throw new InternalException("Конфликт переменных: $varName с типами $varType и $existingVarType");
 			}
 		}
 	}
@@ -552,13 +554,13 @@ class AssetHelper extends Helper
 	/**
 	 * Вывод переменных
 	 *
-	 * @throws \Exception если какие-то переменные не определены или определены неправильно
+	 * @throws InternalException если какие-то переменные не определены или определены неправильно
 	 */
 	private function _renderVars()
 	{
 		$undefinedRequiredVars = array_diff_key($this->_newVariables, $this->_definedVariables);
 		if (!empty($undefinedRequiredVars)) {
-			throw new \Exception('Не определены обязательные переменные: ' . implode(', ', array_keys($undefinedRequiredVars)));
+			throw new InternalException('Не определены обязательные переменные: ' . implode(', ', array_keys($undefinedRequiredVars)));
 		}
 		if (empty($this->_definedVariables)) {
 			return;
@@ -569,7 +571,7 @@ class AssetHelper extends Helper
 			$expectedType = (empty($this->_newVariables[$varName]) ? null : $this->_newVariables[$varName]);
 			$actualType = $this->_getVarType($varValue);
 			if (!empty($expectedType) && ($expectedType !== $actualType)) {
-				throw new \Exception("$varName должна иметь тип $expectedType, а не $actualType");
+				throw new InternalException("$varName должна иметь тип $expectedType, а не $actualType");
 			}
 			$value = $this->_makeValue($varValue, $actualType);
 			$statements[] = "$varName = $value;";
@@ -596,12 +598,12 @@ class AssetHelper extends Helper
 	/**
 	 * Проверить, можно ли добавить ещё переменных
 	 *
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	private function _checkCanRenderVars()
 	{
 		if (empty($this->_getRenderVarsBlock())) {
-			throw new \Exception('Все блоки для переменных уже были выведены');
+			throw new InternalException('Все блоки для переменных уже были выведены');
 		}
 	}
 
@@ -673,12 +675,12 @@ class AssetHelper extends Helper
 	 *
 	 * @param string $blockName
 	 * @param string $assetName для сообщения об ошибке
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	private function _checkCanRenderBlock(string $blockName, string $assetName)
 	{
 		if ($this->_blockFetched[$blockName]) {
-			throw new \Exception("Не могу загрузить ассет $assetName: блок $blockName уже выведен");
+			throw new InternalException("Не могу загрузить ассет $assetName: блок $blockName уже выведен");
 		}
 	}
 
@@ -689,7 +691,7 @@ class AssetHelper extends Helper
 	 * @param string $type скрипт или стиль
 	 * @param bool $realPath возвращать uri или путь к файлу
 	 * @return string[]|string|null
-	 * @throws \Exception если файл явно указан, а его нет
+	 * @throws InternalException если файл явно указан, а его нет
 	 */
 	private function _getPath(string $assetName, string $type, bool $realPath = false)
 	{
@@ -700,9 +702,13 @@ class AssetHelper extends Helper
 				if (Url::isHttpUrl($path)) {
 					$finalPaths[] = $path;
 				} else {
+					// поддержка минифицированного js
+					$path = $this->_getMinifiedFile($path);
+
 					if (!is_file(WWW_ROOT . $path)) {
-						throw new \Exception("Прописанного файла $path не существует");
+						throw new InternalException("Прописанного файла $path не существует");
 					}
+
 					$finalPaths[] = '/' . $path . $this->_assetPostfix;
 				}
 			}
@@ -711,11 +717,28 @@ class AssetHelper extends Helper
 
 		$pathParts = self::DEFAULT_PATH_PARTS[$type];
 		list($controller, $action) = explode('.', $assetName);
-		$fileName = $pathParts['folder'] . '/' . Inflector::camelize($controller) . '/' . Inflector::delimit($action) . '.' . $pathParts['extension'];
+		$fileName = $this->_getMinifiedFile($pathParts['folder'] . '/' . Inflector::camelize($controller) . '/' . Inflector::delimit($action) . '.' . $pathParts['extension']);
 		if (is_file(WWW_ROOT . $fileName)) {
 			return $realPath ? realpath(WWW_ROOT . $fileName) : ('/' . $fileName . $this->_assetPostfix);
 		}
 		return null;
+	}
+
+	/**
+	 * Ищем минфицированный файл
+	 *
+	 * @param string $path
+	 * @return string
+	 */
+	private function _getMinifiedFile(string $path): string
+	{
+		if (Strings::endsWith($path, '.js') && !Strings::endsWith($path, '.min.js')) {
+			$minifiedPath = Strings::replacePostfix($path, '.js', '.min.js');
+			if (is_file(WWW_ROOT . $minifiedPath)) {
+				return $minifiedPath;
+			}
+		}
+		return $path;
 	}
 
 	/**
@@ -724,26 +747,26 @@ class AssetHelper extends Helper
 	 * @param string $varName
 	 * @param bool $isVariable
 	 * @return string
-	 * @throws \Exception если имя - не строка или там полнейшее говно
+	 * @throws InternalException если имя - не строка или там полнейшее говно
 	 */
 	private function _validVarName($varName, bool $isVariable = true): string
 	{
 		$subjectName = $isVariable ? 'переменной' : 'константы';
 		if (!is_string($varName)) {
-			throw new \Exception("Название $subjectName должно быть строкой");
+			throw new InternalException("Название $subjectName должно быть строкой");
 		}
 		if (preg_match('/([^\w\d_]|[а-яё]|^[\d_])/ui', $varName)) {
-			throw new \Exception("Невалидное название $subjectName '$varName'");
+			throw new InternalException("Невалидное название $subjectName '$varName'");
 		}
 		if ($isVariable) {
 			$validName = Inflector::variable($varName);
 			if ($validName !== $varName) {
-				throw new \Exception("Переменная '$varName' не camelCase");
+				throw new InternalException("Переменная '$varName' не camelCase");
 			}
 		} else {
 			$validName = strtoupper($varName);
 			if ($validName !== $varName) {
-				throw new \Exception("Константа '$varName' не UPPER_CASE");
+				throw new InternalException("Константа '$varName' не UPPER_CASE");
 			}
 		}
 

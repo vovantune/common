@@ -115,7 +115,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * плохой ключ
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Название переменной должно быть строкой
 	 */
 	public function testBadVarsNameNotString()
@@ -145,7 +145,7 @@ class AssetTest extends AppTestCase
 						$invalidName => 'value',
 					]
 				);
-			} catch (\Exception $e) {
+			} catch (\ArtSkills\Error\InternalException $e) {
 				$errorMsg = $e->getMessage();
 			}
 			self::assertEquals(
@@ -158,7 +158,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * не camelCase
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Переменная 'camel_case0' не camelCase
 	 */
 	public function testBadVarsSnakeCase()
@@ -173,7 +173,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * не UPPER_CASE
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Константа 'upper_case0' не UPPER_CASE
 	 */
 	public function testBadConst()
@@ -278,7 +278,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * плохое переопределение
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Не разрешено переопределять test0
 	 */
 	public function testRewriteNotAllowedAll()
@@ -343,7 +343,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * Плохое переопределение
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Не разрешено переопределять test4
 	 */
 	public function testRewriteNotAllowedOne()
@@ -365,7 +365,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * Переопределение в другой тип
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Попытка переопределить test4 из типа num в string
 	 */
 	public function testRewriteOtherType()
@@ -406,7 +406,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * Переопределение после загрузки
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Не разрешено переопределять test0
 	 */
 	public function testRewriteAfterLoad()
@@ -479,7 +479,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * файлов, прописанных вручную, нет
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Прописанного файла js/TestManual/notExists.js не существует
 	 */
 	public function testAssetManualNotExists()
@@ -532,7 +532,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * какой-то плохой урл
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Прописанного файла ftp://asdf
 	 */
 	public function testAssetUrlBad()
@@ -551,7 +551,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * прописанный файл на самом деле папка!
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Прописанного файла js/TestManual не существует
 	 */
 	public function testAssetManualDir()
@@ -621,6 +621,9 @@ class AssetTest extends AppTestCase
 	/** загрузка с зависимостями */
 	public function testDependencies()
 	{
+		touch(WWW_ROOT . 'js/Test/dependency4.min.js'); // минифицированный скрипт
+		touch(WWW_ROOT . 'js/Test/dependency2.min.js'); // минифицированный скрипт
+
 		$this->_request->addParams(['controller' => 'test', 'action' => 'isDependent']);
 		MethodMocker::callPrivate($this->_assetHelper, '_setConfigs', [
 			[
@@ -657,9 +660,9 @@ class AssetTest extends AppTestCase
 		$expectedResult = [
 			AssetHelper::BLOCK_SCRIPT => [
 				'<script id="dependency4" type="text/x-handlebars-template"></script>',
-				'<script src="/js/Test/dependency4.js?v=' . self::SCRIPT_VERSION . '"></script>',
+				'<script src="/js/Test/dependency4.min.js?v=' . self::SCRIPT_VERSION . '"></script>',
 				'<script id="dependency2" type="text/x-handlebars-template"></script>',
-				'<script src="/js/Test/dependency2.js?v=' . self::SCRIPT_VERSION . '"></script>',
+				'<script src="/js/Test/dependency2.min.js?v=' . self::SCRIPT_VERSION . '"></script>',
 				'<script id="dependency1" type="text/x-handlebars-template"></script>',
 				'<script src="/js/Test/dependency1.js?v=' . self::SCRIPT_VERSION . '"></script>',
 				'<script id="is_dependent" type="text/x-handlebars-template"></script>',
@@ -703,7 +706,7 @@ class AssetTest extends AppTestCase
 	 * Зависимость от самого себя
 	 * Определяется на этапе записи в конфиг
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Зависимость от самого себя test.selfDependent
 	 */
 	public function testSelfDependency()
@@ -724,7 +727,7 @@ class AssetTest extends AppTestCase
 	 * Неявная зависимость от самого себя
 	 * Определяется при разрешении зависимостей
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Круговая зависимость у ассета test.selfDependent
 	 */
 	public function testCircularDependencies()
@@ -756,7 +759,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * Конфигурирование уже загруженного ассета
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Попытка сконфигурировать ассет testManual.fileAuto, который уже загружен
 	 */
 	public function testConfigureLoaded()
@@ -825,7 +828,7 @@ class AssetTest extends AppTestCase
 		try {
 			$this->_assetHelper->load('test', 'script');
 			self::fail('Ожидалась ошибка');
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			self::assertContains('Не могу загрузить ассет test.script: блок script уже выведен', $e->getMessage());
 		}
 	}
@@ -888,7 +891,7 @@ class AssetTest extends AppTestCase
 		try {
 			$this->_assetHelper->load('test', 'style');
 			self::fail('Ожидалась ошибка');
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			self::assertContains('Не могу загрузить ассет test.style: блок css уже выведен', $e->getMessage());
 		}
 	}
@@ -952,7 +955,7 @@ class AssetTest extends AppTestCase
 		try {
 			$this->_assetHelper->load('test', 'newBottom');
 			self::fail('Ожидалась ошибка');
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			self::assertContains('Не могу загрузить ассет test.newBottom: блок scriptBottom уже выведен', $e->getMessage());
 		}
 	}
@@ -961,7 +964,7 @@ class AssetTest extends AppTestCase
 	/**
 	 * Добавление переменных после того, как все блоки были выведены
 	 *
-	 * @expectedException \Exception
+	 * @expectedException \ArtSkills\Error\InternalException
 	 * @expectedExceptionMessage Все блоки для переменных уже были выведены
 	 */
 	public function testAddVarsAfterFetchScripts()
@@ -993,7 +996,7 @@ class AssetTest extends AppTestCase
 		$errorMsg = '';
 		try {
 			$this->_assetHelper->load();
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			$errorMsg = $e->getMessage();
 		}
 		self::assertEquals(
@@ -1005,7 +1008,7 @@ class AssetTest extends AppTestCase
 		$errorMsg = '';
 		try {
 			$this->_assetHelper->load();
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			$errorMsg = $e->getMessage();
 		}
 		self::assertEquals('', $errorMsg, 'Не сработала автоматическая подгрузка на основе реквеста');
@@ -1014,7 +1017,7 @@ class AssetTest extends AppTestCase
 		$errorMsg = '';
 		try {
 			$this->_assetHelper->load();
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			$errorMsg = $e->getMessage();
 		}
 		self::assertEquals(
@@ -1080,7 +1083,7 @@ class AssetTest extends AppTestCase
 				]
 			);
 			$this->_assetHelper->load('test', 'vars');
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			$errorMsg = $e->getMessage();
 		}
 		self::assertEquals(
@@ -1104,7 +1107,7 @@ class AssetTest extends AppTestCase
 				]
 			);
 			$this->_assetHelper->load('test', 'varsDuplicate2');
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			$errorMsg = $e->getMessage();
 		}
 		self::assertEquals(
@@ -1124,7 +1127,7 @@ class AssetTest extends AppTestCase
 		$errorMsg = '';
 		try {
 			$this->_assetHelper->load('test', 'varsUndefined');
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			$errorMsg = $e->getMessage();
 		}
 		self::assertEquals(
@@ -1145,7 +1148,7 @@ class AssetTest extends AppTestCase
 				]
 			);
 			$this->_assetHelper->load('test', 'varsConflict');
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			$errorMsg = $e->getMessage();
 		}
 		self::assertEquals(
@@ -1165,7 +1168,7 @@ class AssetTest extends AppTestCase
 				]
 			);
 			$this->_assetHelper->load('test', 'varsWrongType');
-		} catch (\Exception $e) {
+		} catch (\ArtSkills\Error\InternalException $e) {
 			$errorMsg = $e->getMessage();
 		}
 		self::assertEquals(
