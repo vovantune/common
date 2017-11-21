@@ -22,6 +22,7 @@ require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . D
 * [Формирование](src/config/phinx.php) конфига для phinx на основе кейковского конфига подключения
 * В [контроллере](src/Controller/README.md) - методы для стандартных json ответов и стандартная обработка ошибок
 * Правильная обработка вставки NULL значений в поля типа [JSON](src/Database/Type/JsonType.php)
+* Если нужно выпилить эмодзи при сохранении в базу (16 байтные символы), то подключаем [Utf8StringType](src/Database/Type/Utf8StringType.php)
 * [zip/unzip](src/Filesystem/File.php)
 * Очистка [папок](src/Filesystem/Folder.php) по времени создания, отложенное создание папки и ещё пара мелочей
 * Незначительные изменения [Http/Client](src/Http/Client.php)
