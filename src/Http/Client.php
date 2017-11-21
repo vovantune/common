@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Http;
 
 use ArtSkills\Lib\Env;
@@ -11,7 +12,8 @@ class Client extends \Cake\Http\Client
 	 *
 	 * @param array $config
 	 */
-	public function __construct($config = ['redirect' => 2]) {
+	public function __construct($config = ['redirect' => 2])
+	{
 		// возможность глобального переопределения адаптора отправки запросов
 		if (Env::hasHttpClientAdapter()) {
 			$config['adapter'] = Env::getHttpClientAdapter();
@@ -24,8 +26,13 @@ class Client extends \Cake\Http\Client
 	 * @inheritdoc
 	 * Обернул в try/catch для, дабы чтобы код не валилися
 	 */
-	protected function _doRequest($method, $url, $data, $options) {
+	protected function _doRequest($method, $url, $data, $options)
+	{
 		try {
+			if (!empty($data) && is_array($data)) { // костыль от попытки загрузить файл, если строка начинается с '@'
+				$data = http_build_query($data);
+			}
+
 			$result = parent::_doRequest($method, $url, $data, $options);
 			return $result;
 		} catch (\Exception $error) {
