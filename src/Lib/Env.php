@@ -1,7 +1,9 @@
 <?php
 namespace ArtSkills\Lib;
 
+use ArtSkills\Error\InternalException;
 use Cake\Core\Configure;
+use Cake\Error\PHP7ErrorException;
 
 /**
  * @method static string getServerName()
@@ -40,7 +42,7 @@ class Env
 	 * @param string $name
 	 * @param array $arguments
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public static function __callStatic($name, array $arguments = []) {
 		$prefix = 'get';
@@ -60,7 +62,7 @@ class Env
 		}
 
 
-		throw new \Exception("Undefined method $name");
+		throw new InternalException("Undefined method $name");
 	}
 
 	/**
@@ -147,10 +149,10 @@ class Env
 	/**
 	 * Прокидывает PHPUnit exception'ы дальше, чтоб в тесты правильно валились
 	 *
-	 * @param \Exception $exception
-	 * @throws \PHPUnit\Framework\AssertionFailedError
+	 * @param \Exception|PHP7ErrorException $exception
+	 * @throws \PHPUnit\Framework\AssertionFailedError|PHP7ErrorException
 	 */
-	public static function checkTestException(\Exception $exception) {
+	public static function checkTestException($exception) {
 		if ($exception instanceof \PHPUnit\Framework\AssertionFailedError) {
 			// ExpectationFailedException наследуется от AssertionFailedError, достаточно одного instanceof
 			throw $exception;
