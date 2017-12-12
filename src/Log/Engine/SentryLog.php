@@ -7,6 +7,7 @@ use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Strings;
 use Cake\Error\Debugger;
 use Cake\Error\FatalErrorException;
+use Cake\Error\PHP7ErrorException;
 use Cake\Log\Engine\BaseLog;
 use Cake\Log\Log;
 use Cake\Log\LogTrait;
@@ -143,7 +144,7 @@ class SentryLog extends BaseLog
 	 *
 	 * @param string $level
 	 * @param string $message
-	 * @param \Exception|null $exception
+	 * @param \Exception|PHP7ErrorException|null $exception
 	 * @param array $context
 	 */
 	private static function _log($level, $message, $exception, array $context = [])
@@ -164,11 +165,11 @@ class SentryLog extends BaseLog
 	/**
 	 * Залогировать ексепшн
 	 *
-	 * @param \Exception $exception
+	 * @param \Exception|PHP7ErrorException $exception
 	 * @param array $context
 	 * @param bool|null $alert
 	 */
-	public static function logException(\Exception $exception, array $context = [], $alert = null)
+	public static function logException($exception, array $context = [], $alert = null)
 	{
 		Env::checkTestException($exception);
 		if (($exception instanceof \ArtSkills\Error\Exception) && (!$exception->isLogged())) {
@@ -186,11 +187,11 @@ class SentryLog extends BaseLog
 	 * Получить уровень лога для исключения, 'error' (с оповещением) или 'warning' (без)
 	 * по умолчанию оповещения шлются всегда за исключением некоторых неинтересных исключений
 	 *
-	 * @param \Exception $exception
+	 * @param \Exception|PHP7ErrorException $exception
 	 * @param bool|null $alert
 	 * @return string
 	 */
-	protected static function _getExceptionLevel(\Exception $exception, $alert = null)
+	protected static function _getExceptionLevel($exception, $alert = null)
 	{
 		if ($alert === null) {
 			$alert = !($exception instanceof NotFoundException) && !($exception instanceof UnauthorizedException);
@@ -250,7 +251,7 @@ class SentryLog extends BaseLog
 	 *
 	 * @param string $level
 	 * @param string $message
-	 * @param \Exception|null $exception
+	 * @param \Exception|null|PHP7ErrorException $exception
 	 * @param array $context
 	 */
 	protected static function _sendToSentry($level, $message, $exception, $context)
