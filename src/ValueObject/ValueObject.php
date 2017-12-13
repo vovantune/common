@@ -2,6 +2,7 @@
 
 namespace ArtSkills\ValueObject;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Strings;
@@ -38,14 +39,14 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 * constructor.
 	 *
 	 * @param array|Entity $fillValues Список заполняемых свойств
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function __construct($fillValues = []) {
 		$this->_fillExportedFields();
 
 		foreach ($fillValues as $key => $value) {
 			if (!property_exists($this, $key)) {
-				throw new \Exception('Property ' . $key . ' not exists!');
+				throw new InternalException('Property ' . $key . ' not exists!');
 			}
 
 			$this->{$key} = $value;
@@ -68,22 +69,22 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 * @param string $name
 	 * @param array $arguments
 	 * @return $this
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function __call($name, array $arguments = []) {
 		$prefix = 'set';
 		if (Strings::startsWith($name, $prefix)) {
 			$propertyName = lcfirst(Strings::replacePrefix($name, $prefix));
 			if (empty($this->_allFieldNames[$propertyName])) {
-				throw new \Exception("Undefined property $propertyName");
+				throw new InternalException("Undefined property $propertyName");
 			}
 			if (count($arguments) !== 1) {
-				throw new \Exception("Invalid argument count when calling $name");
+				throw new InternalException("Invalid argument count when calling $name");
 			}
 			$this->{$propertyName} = $arguments[0];
 			return $this;
 		}
-		throw new \Exception("Undefined method $name");
+		throw new InternalException("Undefined method $name");
 	}
 
 	/**

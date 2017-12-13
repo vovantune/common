@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\EntityBuilder;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Filesystem\File;
 use ArtSkills\Filesystem\Folder;
 use ArtSkills\Lib\Misc;
@@ -43,12 +44,12 @@ class TableDocumentation
 	 * Задать конфиг
 	 * @param EntityBuilderConfig $config
 	 * @param $config
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public static function setConfig($config) {
 		static::$_config = $config;
 		if (!empty($config) && !($config instanceof EntityBuilderConfig)) {
-			throw new \Exception('Bad config');
+			throw new InternalException('Bad config');
 		}
 	}
 
@@ -56,11 +57,11 @@ class TableDocumentation
 	 * Формируем доку
 	 *
 	 * @return bool true в случае необходимости перегрузить доку
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public static function build() {
 		if (empty(static::$_config)) {
-			throw new \Exception('Не задан конфиг');
+			throw new InternalException('Не задан конфиг');
 		}
 		static::$_config->checkValid();
 		$entityList = self::_getEntityList();

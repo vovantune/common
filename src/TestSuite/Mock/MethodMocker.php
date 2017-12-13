@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ArtSkills\TestSuite\Mock;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Traits\Library;
 use \ReflectionMethod;
 use \PHPUnit\Framework\AssertionFailedError;
@@ -178,7 +179,7 @@ class MethodMocker
 	 * Зависимость от PHPUnit
 	 * Определено в одном месте на все классы
 	 *
-	 * @throws AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|InternalException
 	 * @param string $message
 	 */
 	public static function fail(string $message): void
@@ -186,7 +187,7 @@ class MethodMocker
 		if (class_exists(\PHPUnit\Framework\Assert::class) && method_exists(\PHPUnit\Framework\Assert::class, 'fail')) {
 			\PHPUnit\Framework\Assert::fail($message);
 		} else {
-			throw new \Exception($message); // @codeCoverageIgnore
+			throw new InternalException($message); // @codeCoverageIgnore
 		}
 	}
 
@@ -195,7 +196,7 @@ class MethodMocker
 	 * Зависимость от PHPUnit
 	 * Определено в одном месте на все классы
 	 *
-	 * @throws AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|InternalException
 	 * @param mixed $expected
 	 * @param mixed $actual
 	 * @param string $message
@@ -205,7 +206,7 @@ class MethodMocker
 		if (class_exists(\PHPUnit\Framework\Assert::class) && method_exists(\PHPUnit\Framework\Assert::class, 'assertEquals')) {
 			\PHPUnit\Framework\Assert::assertEquals($expected, $actual, $message);
 		} elseif ($expected != $actual) {
-			throw new \Exception($message, ' expected: ' . print_r($expected, true) . ', actual: ' . print_r($actual, true)); // @codeCoverageIgnore
+			throw new InternalException($message, ' expected: ' . print_r($expected, true) . ', actual: ' . print_r($actual, true)); // @codeCoverageIgnore
 		}
 	}
 }

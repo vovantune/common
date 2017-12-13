@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\Filesystem;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Strings;
 
@@ -14,7 +15,7 @@ class File extends \Cake\Filesystem\File
 	 * @param string|null $newFile - полное имя нового файла. если не передать, то будет self::DOWNLOAD_PATH . uniqid()
 	 * @param bool $deleteOld - удалять ли файлы
 	 * @return string Имя файла
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public static function zip($files, $newFile = null, $deleteOld = false) {
 		$files = (array)$files;
@@ -22,7 +23,7 @@ class File extends \Cake\Filesystem\File
 		if (empty($newFile)) {
 			$defaultPath = Env::getDownloadPath();
 			if (empty($defaultPath)) {
-				throw new \Exception('Путь не задан явно и нет пути по-умолчанию');
+				throw new InternalException('Путь не задан явно и нет пути по-умолчанию');
 			}
 			Folder::createIfNotExists($defaultPath);
 			$newFile = $defaultPath . uniqid();

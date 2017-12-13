@@ -90,12 +90,12 @@ class GitBranchTrimShell extends Shell
 		$git = $this->_git();
 		$currentBranch = $git->getCurrentBranchName();
 		if (empty($currentBranch)) {
-			throw new \Exception('Гит не инициализирован');
+			throw new InternalException('Гит не инициализирован');
 		}
 
 		if ($currentBranch != Git::BRANCH_NAME_MASTER) {
 			if (!$git->checkout(Git::BRANCH_NAME_MASTER)) {
-				throw new \Exception('Не удалось переключиться на мастера');
+				throw new InternalException('Не удалось переключиться на мастера');
 			}
 		}
 

@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\EntityBuilder;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Lib\Strings;
 use ArtSkills\ORM\Entity;
 use ArtSkills\ORM\Query;
@@ -104,12 +105,12 @@ class EntityBuilderConfig extends ValueObject
 	/**
 	 * Проверить валидность заполнения
 	 *
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function checkValid() {
 		foreach ($this->_allFieldNames as $fieldName) {
 			if (empty($this->{$fieldName})) {
-				throw new \Exception("Empty value for field '$fieldName'");
+				throw new InternalException("Empty value for field '$fieldName'");
 			}
 		}
 		$trailingDsFields = ['modelFolder', 'templatesDir'];
@@ -122,6 +123,8 @@ class EntityBuilderConfig extends ValueObject
 
 	/**
 	 * Прописать себя как конфиг, где нужно
+	 *
+	 * @throws InternalException
 	 */
 	public function register() {
 		EntityBuilder::setConfig($this);

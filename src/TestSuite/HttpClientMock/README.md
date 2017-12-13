@@ -45,7 +45,7 @@ HttpClientMockerEntity HttpClientMocker::mockPost(string $url, array|string $exp
     * `willReturnJson(array <массив, который будет сконвертмрован в JSON>)`
     * `willReturnFile(string <Путь к файлу>)`
     * `willReturnAction(callable <функция>)` На вход функция получает 2 параметра: объект `Cake\Network\Http\Request` и объект текущего мока. Мок передаётся на случай, если нужно изменить код статуса. На выходе должна быть возвращена строка.
-    * Если ничего не указать, ты получим `\Exception`
+    * Если ничего не указать, ты получим `InternalException`
 * Кол-во вызовов подменённого запроса - `getCallCount()`
 
 ## Примеры

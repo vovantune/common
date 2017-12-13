@@ -2,6 +2,7 @@
 namespace ArtSkills\TestSuite;
 
 use ArtSkills\Controller\Controller;
+use ArtSkills\Error\InternalException;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\Env;
 use ArtSkills\TestSuite\Mock\MethodMocker;
@@ -33,17 +34,17 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 *
 	 * @param string $fixtureName
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	protected function _getJsonFixture($fixtureName) {
 		if (Env::hasFixtureFolder()) {
 			$fixtureFolder = Env::getFixtureFolder();
 		} else {
-			throw new \Exception('Не указана папка с фикстурами!');
+			throw new InternalException('Не указана папка с фикстурами!');
 		}
 		$fileName = $fixtureFolder . 'Json' . DS . $fixtureName . '.json';
 		if (!is_file($fileName)) {
-			throw new \Exception('Fixture file "' . $fileName . '" does not exist!');
+			throw new InternalException('Fixture file "' . $fileName . '" does not exist!');
 		}
 
 		return Arrays::decode(file_get_contents($fileName));
