@@ -22,7 +22,8 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
 	/**
 	 * определяем дефолтный класс фикстур
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		if (Env::hasBaseFixtureClass()) {
 			$this->_baseFixtureClass = Env::getBaseFixtureClass();
 		}
@@ -35,7 +36,8 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
 	 * @return void
 	 * @throws \UnexpectedValueException when a referenced fixture does not exist.
 	 */
-	protected function _loadFixtures($test) {
+	protected function _loadFixtures($test)
+	{
 		if (empty($test->fixtures)) {
 			return;
 		}

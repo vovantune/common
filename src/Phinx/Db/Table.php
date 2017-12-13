@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Phinx\Db;
 
 class Table extends \Phinx\Db\Table
@@ -7,7 +8,8 @@ class Table extends \Phinx\Db\Table
 	 * @inheritdoc
 	 * Проверка дефолтных значений и комментов к полям
 	 */
-	public function addColumn($columnName, $type = null, $options = []) {
+	public function addColumn($columnName, $type = null, $options = [])
+	{
 		if (empty($options['comment'])) {
 			throw new \InvalidArgumentException('No comment for column ' . $columnName);
 		}
@@ -26,7 +28,8 @@ class Table extends \Phinx\Db\Table
 	 * @inheritdoc
 	 * Проверка на обязательный комментарий к таблице
 	 */
-	public function create() {
+	public function create()
+	{
 		if (!array_key_exists('comment', $this->getOptions())) {
 			throw new \InvalidArgumentException('No comment for table ' . $this->getName());
 		}

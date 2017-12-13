@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Singleton;
@@ -64,11 +65,13 @@ class Git
 
 	/**
 	 * Выбираем, какой командой обращаться к гиту; вытаскиваем текущую ветку
+	 *
 	 * @param string $directory папка репозитория
 	 * возможность передать пустой параметр оставлена для обратной совместимости
 	 * todo: выпилить возможность использовать пустой параметр
 	 */
-	public function __construct($directory = '') {
+	public function __construct($directory = '')
+	{
 		$this->_directory = realpath($directory);
 		$this->_gitCommand = $this->_chooseGitCommand();
 		if (!empty($this->_gitCommand)) {
@@ -82,9 +85,11 @@ class Git
 
 	/**
 	 * Выбираем, какой командой обращаться к гиту
+	 *
 	 * @return string
 	 */
-	protected function _chooseGitCommand() {
+	protected function _chooseGitCommand()
+	{
 		if (Env::isTestServer() || Env::isProduction()) {
 			return self::GIT_COMMAND_SERVER;
 		} elseif (Env::isLocal() || Env::isUnitTest()) {
@@ -99,7 +104,8 @@ class Git
 	 * @param string $command
 	 * @return array [успех, вывод]
 	 */
-	private function _execute($command) {
+	private function _execute($command)
+	{
 		return Shell::execFromDir($this->_directory, $this->_gitCommand . ' ' . $command);
 	}
 
@@ -108,7 +114,8 @@ class Git
 	 *
 	 * @return string
 	 */
-	public function getCurrentBranchName() {
+	public function getCurrentBranchName()
+	{
 		return $this->_currentBranch;
 	}
 
@@ -118,7 +125,8 @@ class Git
 	 * @param string $name
 	 * @return bool
 	 */
-	public function checkout($name) {
+	public function checkout($name)
+	{
 		if ($this->_currentBranch == $name) {
 			return true;
 		}
@@ -134,7 +142,8 @@ class Git
 	 * @param string $type локальная или удалённая
 	 * @return array
 	 */
-	public function getBranchList($type) {
+	public function getBranchList($type)
+	{
 		if (empty($this->_currentBranch)) {
 			return [];
 		}
@@ -176,7 +185,8 @@ class Git
 	 * @param string $name
 	 * @return bool
 	 */
-	private function _checkout($name) {
+	private function _checkout($name)
+	{
 		if ($this->_currentBranch == $name) {
 			return true;
 		}
@@ -197,7 +207,8 @@ class Git
 	 * @param string $type локальная или удалённая
 	 * @return bool
 	 */
-	public function deleteBranch($name, $type) {
+	public function deleteBranch($name, $type)
+	{
 		if (
 			empty($this->_currentBranch)
 			|| (($name == $this->_currentBranch) && ($type == self::BRANCH_TYPE_LOCAL))
@@ -220,7 +231,8 @@ class Git
 	 * @param string $type локальная или удалённая
 	 * @return array
 	 */
-	public function getMergedBranches($type) {
+	public function getMergedBranches($type)
+	{
 		if (empty($this->_currentBranch)) {
 			return [];
 		}
@@ -259,7 +271,8 @@ class Git
 	 * @param string $command
 	 * @return array [bool success, output]
 	 */
-	private function _execFromMaster($command) {
+	private function _execFromMaster($command)
+	{
 		$currentBranch = $this->_currentBranch;
 		if (
 			!$this->_checkout(self::BRANCH_NAME_MASTER)
@@ -278,7 +291,8 @@ class Git
 	 *
 	 * @return array [bool success, output]
 	 */
-	public function pullCurrentBranch() {
+	public function pullCurrentBranch()
+	{
 		$currentBranch = $this->_currentBranch;
 		if (empty($currentBranch)) {
 			return [false, ['git not inited']];
@@ -299,7 +313,8 @@ class Git
 	 *
 	 * @return bool success
 	 */
-	public function updateRefs() {
+	public function updateRefs()
+	{
 		if (empty($this->_currentBranch)) {
 			return false;
 		}
@@ -312,7 +327,8 @@ class Git
 	 * @param string $branchName
 	 * @return bool
 	 */
-	public function changeCurrentBranch($branchName) {
+	public function changeCurrentBranch($branchName)
+	{
 		if (empty($this->_currentBranch) || !in_array($branchName, $this->getBranchList(self::BRANCH_TYPE_REMOTE))) {
 			return false;
 		}
@@ -326,7 +342,8 @@ class Git
 	 * @param array $requestData
 	 * @return null|array repo branch commit
 	 */
-	public static function parseGithubRequest($requestData) {
+	public static function parseGithubRequest($requestData)
+	{
 		if (empty($requestData['payload'])) {
 			return null;
 		}

@@ -1,6 +1,7 @@
 <?php
 
 namespace ArtSkills\Test\TestCase\Database\Type;
+
 use ArtSkills\ORM\Table;
 use ArtSkills\TestSuite\AppTestCase;
 use Cake\Database\Type;
@@ -17,7 +18,8 @@ class Utf8StringTypeTest extends AppTestCase
 	public $fixtures = ['TestTableOne'];
 
 	/** @inheritdoc */
-	public function tearDown() {
+	public function tearDown()
+	{
 		parent::tearDown();
 		Type::set('text', new Type\StringType('text'));
 		Type::set('string', new Type\StringType('string'));

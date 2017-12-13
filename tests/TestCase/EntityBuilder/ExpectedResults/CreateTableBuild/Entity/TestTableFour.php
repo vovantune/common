@@ -1,4 +1,5 @@
 <?php
+
 namespace TestApp\Model\Entity;
 
 use ArtSkills\ORM\Entity;

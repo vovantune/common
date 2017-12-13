@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\ORM;
 
 use Cake\Database\Expression\QueryExpression;
@@ -26,7 +27,8 @@ class Query extends \Cake\ORM\Query
 	 * @param bool $overwrite
 	 * @return $this
 	 */
-	public function orderRand($field, $overwrite = false) {
+	public function orderRand($field, $overwrite = false)
+	{
 		return $this->order([$field => 'RAND()'], $overwrite);
 	}
 
@@ -35,7 +37,8 @@ class Query extends \Cake\ORM\Query
 	 *
 	 * @return FunctionsBuilder
 	 */
-	public static function funct() {
+	public static function funct()
+	{
 		if (empty(self::$_funcBuilder)) {
 			self::$_funcBuilder = new FunctionsBuilder();
 		}
@@ -48,7 +51,8 @@ class Query extends \Cake\ORM\Query
 	 * @param null $rawExpression
 	 * @return QueryExpression
 	 */
-	public static function expr($rawExpression = null) {
+	public static function expr($rawExpression = null)
+	{
 		$expression = new QueryExpression();
 		if ($rawExpression !== null) {
 			$expression->add($rawExpression);

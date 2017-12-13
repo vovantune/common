@@ -36,7 +36,8 @@ class Controller extends \Cake\Controller\Controller
 	protected $_jsonResponseActions = [];
 
 	/** @inheritdoc */
-	public function invokeAction() {
+	public function invokeAction()
+	{
 		try {
 			return parent::invokeAction();
 		} catch (UserException $exception) {
@@ -57,7 +58,8 @@ class Controller extends \Cake\Controller\Controller
 	}
 
 	/** @inheritdoc */
-	public function isAction($action) {
+	public function isAction($action)
+	{
 		$isAction = parent::isAction($action);
 		if ($isAction) {
 			$methodName = (new \ReflectionMethod($this, $action))->getName();
@@ -71,7 +73,8 @@ class Controller extends \Cake\Controller\Controller
 	}
 
 	/** @inheritdoc */
-	public function initialize() {
+	public function initialize()
+	{
 		parent::initialize();
 		$currentAction = $this->request->getParam('action');
 		foreach ($this->_jsonResponseActions as $action) {
@@ -87,7 +90,8 @@ class Controller extends \Cake\Controller\Controller
 	 *
 	 * @param string|array|Response $redirect
 	 */
-	protected function _setErrorRedirect($redirect) {
+	protected function _setErrorRedirect($redirect)
+	{
 		if (empty($redirect)) {
 			$this->_throwInternalError('Пустой параметр $redirect');
 		}
@@ -97,7 +101,8 @@ class Controller extends \Cake\Controller\Controller
 	/**
 	 * Задать, что при обработке ошибок редиректа нет
 	 */
-	protected function _setErrorNoRedirect() {
+	protected function _setErrorNoRedirect()
+	{
 		$this->_errorRedirect = null;
 	}
 
@@ -109,7 +114,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @param bool $condition
 	 * @throws UserException
 	 */
-	private function _throwUserErrorAnyResponse($message, $redirect, $condition) {
+	private function _throwUserErrorAnyResponse($message, $redirect, $condition)
+	{
 		if ($condition) {
 			if ($redirect !== false) {
 				$this->_errorRedirect = $redirect;
@@ -125,7 +131,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @param bool $condition
 	 * @throws UserException
 	 */
-	protected function _throwUserError($message, $condition = true) {
+	protected function _throwUserError($message, $condition = true)
+	{
 		$this->_throwUserErrorAnyResponse($message, false, $condition);
 	}
 
@@ -137,7 +144,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @param bool $condition
 	 * @throws UserException
 	 */
-	protected function _throwUserErrorRedirect($message, $redirect, $condition = true) {
+	protected function _throwUserErrorRedirect($message, $redirect, $condition = true)
+	{
 		if (empty($redirect)) {
 			$this->_throwInternalError('Пустой параметр $redirect');
 		}
@@ -151,7 +159,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @param bool $condition
 	 * @throws UserException
 	 */
-	protected function _throwUserErrorNoRedirect($message, $condition = true) {
+	protected function _throwUserErrorNoRedirect($message, $condition = true)
+	{
 		$this->_throwUserErrorAnyResponse($message, null, $condition);
 	}
 
@@ -163,7 +172,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @param string|string[]|null $scope scope для логирования ошибки
 	 * @throws InternalException
 	 */
-	protected function _throwInternalError($message, $addInfo = null, $scope = null) {
+	protected function _throwInternalError($message, $addInfo = null, $scope = null)
+	{
 		throw InternalException::instance($message)->setLogAddInfo($addInfo)->setLogScope($scope);
 	}
 
@@ -171,7 +181,8 @@ class Controller extends \Cake\Controller\Controller
 	/**
 	 * Задать, что текущий экшн должен возвращать json
 	 */
-	protected function _setIsJsonAction() {
+	protected function _setIsJsonAction()
+	{
 		if (!$this->_isJsonAction()) {
 			$this->request = $this->request->withParam('_ext', self::EXTENSION_JSON);
 			Router::pushRequest($this->request);
@@ -183,7 +194,8 @@ class Controller extends \Cake\Controller\Controller
 	 *
 	 * @return bool
 	 */
-	protected function _isJsonAction() {
+	protected function _isJsonAction()
+	{
 		return ($this->request->getParam('_ext') === self::EXTENSION_JSON);
 	}
 
@@ -194,7 +206,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @return NULL
 	 */
 
-	protected function _sendJsonOk($jsonData = []) {
+	protected function _sendJsonOk($jsonData = [])
+	{
 		if ($jsonData instanceof ValueObject) {
 			$jsonData = $jsonData->toArray();
 		}
@@ -210,7 +223,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @return NULL
 	 * @internal
 	 */
-	protected function _sendJsonError($message, array $jsonData = []) {
+	protected function _sendJsonError($message, array $jsonData = [])
+	{
 		return $this->_sendJsonResponse(['status' => self::JSON_STATUS_ERROR, 'message' => $message] + $jsonData);
 	}
 
@@ -223,7 +237,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @return NULL
 	 * @internal
 	 */
-	protected function _sendJsonException(\Exception $exception, array $jsonData = []) {
+	protected function _sendJsonException(\Exception $exception, array $jsonData = [])
+	{
 		Env::checkTestException($exception);
 		if ($exception instanceof UserException) {
 			$message = $exception->getUserMessage();
@@ -240,7 +255,8 @@ class Controller extends \Cake\Controller\Controller
 	 * @return null
 	 * @internal У нас стандартизированный JSON: _sendJsonOk и _sendJsonError
 	 */
-	protected function _sendJsonResponse(array $jsonArray) {
+	protected function _sendJsonResponse(array $jsonArray)
+	{
 		if (empty($jsonArray)) { // Дабы null не слать
 			$jsonArray['status'] = self::JSON_STATUS_OK;
 		}

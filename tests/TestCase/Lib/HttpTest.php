@@ -18,7 +18,8 @@ class HttpTest extends AppTestCase
 	 *
 	 * @throws \Exception
 	 */
-	public function testGetJson() {
+	public function testGetJson()
+	{
 		$testJson = ['thisIs' => 'Json test'];
 		HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
 			->singleCall()
@@ -37,7 +38,8 @@ class HttpTest extends AppTestCase
 	 *
 	 * @throws \Exception
 	 */
-	public function testGetContent() {
+	public function testGetContent()
+	{
 		$testString = 'lala';
 		HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
 			->singleCall()
@@ -56,7 +58,8 @@ class HttpTest extends AppTestCase
 	 *
 	 * @throws \Exception
 	 */
-	public function testPostContent() {
+	public function testPostContent()
+	{
 		$testJson = ['thisIs' => 'Json test'];
 		$testData = ['testData' => '123'];
 
@@ -77,7 +80,8 @@ class HttpTest extends AppTestCase
 	 *
 	 * @throws \Exception
 	 */
-	public function testPutContent() {
+	public function testPutContent()
+	{
 		$testJson = ['thisIs' => 'Json test'];
 		$testData = ['testData' => '123'];
 
@@ -95,13 +99,13 @@ class HttpTest extends AppTestCase
 	}
 
 
-
 	/**
 	 * Проверка работы получения строки
 	 *
 	 * @throws \Exception
 	 */
-	public function testGetXml() {
+	public function testGetXml()
+	{
 		$testXml = '<?xml version="1.0" encoding="utf-8"?>
 					<!DOCTYPE recipe>
 					<recipe name="хлеб" preptime="5min" cooktime="180min">
@@ -150,7 +154,8 @@ class HttpTest extends AppTestCase
 	/**
 	 * Тестируем обычную загрузку файла
 	 */
-	public function testDownloadBasic() {
+	public function testDownloadBasic()
+	{
 		$file = Http::downloadFile('file:///' . __FILE__);
 		self::assertFileEquals($file, __FILE__, 'Файлы не совпадают');
 		unlink($file);
@@ -159,7 +164,8 @@ class HttpTest extends AppTestCase
 	/**
 	 * Проверяем загрузку на сесуществующем пути
 	 */
-	public function testDownloadError() {
+	public function testDownloadError()
+	{
 		$file = Http::downloadFile('file:///Такого пути не существует');
 		self::assertEmpty($file, 'Я сказал не существует!');
 	}
@@ -167,7 +173,8 @@ class HttpTest extends AppTestCase
 	/**
 	 * Проверяем попытку записи в никуда
 	 */
-	public function testWriteError() {
+	public function testWriteError()
+	{
 		$file = Http::downloadFile('file:///' . __FILE__, '/404Folder/file');
 		self::assertEmpty($file, 'Этот файл не должен был появится');
 	}

@@ -5,7 +5,8 @@
  * @param array ...$names
  * @return string
  */
-function assoc(...$names) {
+function assoc(...$names)
+{
 	return implode('.', $names);
 }
 
@@ -17,7 +18,8 @@ function assoc(...$names) {
  * @param null $operation сравнения, (NOT) IN, LIKE, IS NULL, и всё такое
  * @return string
  */
-function field($tableAlias, $fieldName, $operation = null) {
+function field($tableAlias, $fieldName, $operation = null)
+{
 	return $tableAlias . '.' . $fieldName . (empty($operation) ? '' : ' ' . $operation);
 }
 
@@ -29,33 +31,34 @@ function field($tableAlias, $fieldName, $operation = null) {
  * ```php
  * // можно делать
  * $query->where(fieldsWhere([
- *		'TableName1' => [
- * 			'field1' => 'val1',
- * 			'field2' => 'val2',
- * 		],
- * 		'TableName2' => [
- * 			'field1' => 'val3',
- * 			'field2' => 'val4',
- * 		],
- * 		'' => [
- * 			'field3' => 'val',
- * 		]
- * 	]));
+ *        'TableName1' => [
+ *            'field1' => 'val1',
+ *            'field2' => 'val2',
+ *        ],
+ *        'TableName2' => [
+ *            'field1' => 'val3',
+ *            'field2' => 'val4',
+ *        ],
+ *        '' => [
+ *            'field3' => 'val',
+ *        ]
+ *    ]));
  * // вместо
  * $query->where([
- * 		'TableName1.field1' => 'val1',
- * 		'TableName1.field2' => 'val2',
- * 		'TableName2.field1' => 'val3',
- * 		'TableName2.field2' => 'val4',
- * 		'field3' => 'val',
- * 	]);
+ *        'TableName1.field1' => 'val1',
+ *        'TableName1.field2' => 'val2',
+ *        'TableName2.field1' => 'val3',
+ *        'TableName2.field2' => 'val4',
+ *        'field3' => 'val',
+ *    ]);
  * ```
  *
  * @param array $conditionsByTable
  * @throws Exception при дублировании ключей
  * @return array
  */
-function fieldsWhere(array $conditionsByTable) {
+function fieldsWhere(array $conditionsByTable)
+{
 	$noTableKey = '';
 	if (array_key_exists($noTableKey, $conditionsByTable)) {
 		$newConditions = $conditionsByTable[$noTableKey];
@@ -81,35 +84,36 @@ function fieldsWhere(array $conditionsByTable) {
  * ```php
  * // можно делать
  * $query->select(fieldsSelect([
- *		'Table1' => [
- *			'field1',
- *			'field2',
- *		],
- *		'Table2' => [
- *			'field1',
- *			'alias' => 'field2',
- *		],
- *		'' => [
- *			'field4',
- *			'other_alias' => 'field5',
- *		],
- * 	]));
+ *        'Table1' => [
+ *            'field1',
+ *            'field2',
+ *        ],
+ *        'Table2' => [
+ *            'field1',
+ *            'alias' => 'field2',
+ *        ],
+ *        '' => [
+ *            'field4',
+ *            'other_alias' => 'field5',
+ *        ],
+ *    ]));
  * // вместо
  * $query->select([
- *		'Table1.field1',
- *		'Table1.field2',
- *		'Table2.field1',
- *		'alias' => 'Table2.field2',
- * 		'field4',
- *		'other_alias' => 'field5',
- * 	]);
+ *        'Table1.field1',
+ *        'Table1.field2',
+ *        'Table2.field1',
+ *        'alias' => 'Table2.field2',
+ *        'field4',
+ *        'other_alias' => 'field5',
+ *    ]);
  * ```
  *
  * @param array $fieldsByTable
  * @throws Exception при дублировании ключей
  * @return string[]
  */
-function fieldsSelect($fieldsByTable) {
+function fieldsSelect($fieldsByTable)
+{
 	$noTableKey = '';
 	if (array_key_exists($noTableKey, $fieldsByTable)) {
 		$newFields = $fieldsByTable[$noTableKey];
@@ -142,7 +146,8 @@ if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
 	 * @param string $enc
 	 * @return string
 	 */
-	function mb_ucfirst($string, $enc = 'utf-8') {
+	function mb_ucfirst($string, $enc = 'utf-8')
+	{
 		$string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_strtolower(mb_substr($string, 1, mb_strlen($string, $enc) - 1, $enc), $enc);
 		return $string;
 	}

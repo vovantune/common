@@ -27,7 +27,8 @@ class TestEmailTransport extends AbstractTransport
 	 * @param bool $clear
 	 * @return array
 	 */
-	public static function getMessages($clear = true) {
+	public static function getMessages($clear = true)
+	{
 		$return = self::$_messages;
 		if ($clear) {
 			self::clearMessages();
@@ -39,7 +40,8 @@ class TestEmailTransport extends AbstractTransport
 	/**
 	 * Очистить список посланных сообщений
 	 */
-	public static function clearMessages() {
+	public static function clearMessages()
+	{
 		self::$_messages = [];
 	}
 
@@ -49,7 +51,8 @@ class TestEmailTransport extends AbstractTransport
 	 * @param \Cake\Mailer\Email $email Cake Email
 	 * @return array
 	 */
-	public function send(Email $email) {
+	public function send(Email $email)
+	{
 		self::$_messages[] = [
 			'to' => $email->getTo(),
 			'subject' => $email->getSubject(),

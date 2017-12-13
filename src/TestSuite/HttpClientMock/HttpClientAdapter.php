@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\TestSuite\HttpClientMock;
 
 
@@ -33,7 +34,8 @@ class HttpClientAdapter extends Stream
 	 * @param Request $request
 	 * @return array
 	 */
-	protected function _send(Request $request) {
+	protected function _send(Request $request)
+	{
 		$this->_currentRequestData = [
 			'request' => $request,
 			'response' => '',
@@ -41,7 +43,10 @@ class HttpClientAdapter extends Stream
 
 		$mockData = HttpClientMocker::getMockedData($request);
 		if ($mockData !== null) {
-			return $this->createResponses(['HTTP/1.1 ' . $mockData['status'], 'Server: nginx/1.2.1'], $mockData['response']);
+			return $this->createResponses([
+				'HTTP/1.1 ' . $mockData['status'],
+				'Server: nginx/1.2.1',
+			], $mockData['response']);
 		} else {
 			/** @var Response[] $result */
 			$result = parent::_send($request);
@@ -60,7 +65,8 @@ class HttpClientAdapter extends Stream
 	/**
 	 * @inheritdoc
 	 */
-	public function createResponses($headers, $content) {
+	public function createResponses($headers, $content)
+	{
 		$result = parent::createResponses($headers, $content);
 
 		$this->_currentRequestData['response'] = end($result);
@@ -74,14 +80,16 @@ class HttpClientAdapter extends Stream
 	/**
 	 * Включаем вывод запросов в консоль
 	 */
-	public static function enableDebug() {
+	public static function enableDebug()
+	{
 		self::$_debugRequests = true;
 	}
 
 	/**
 	 * Выключаем вывод запросов в консоль
 	 */
-	public static function disableDebug() {
+	public static function disableDebug()
+	{
 		self::$_debugRequests = false;
 	}
 }

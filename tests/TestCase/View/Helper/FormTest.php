@@ -25,14 +25,16 @@ class FormTest extends AppTestCase
 	private $_helper = null;
 
 	/** @inheritdoc */
-	public function setUp() {
+	public function setUp()
+	{
 		$this->_request = new ServerRequest();
 		$this->_helper = new FormHelper(new View($this->_request));
 		parent::setUp();
 	}
 
 	/** Дописывание текста сразу после инпута */
-	public function testAppend() {
+	public function testAppend()
+	{
 		// по-умолчанию
 		$result = $this->_helper->control('test');
 		$expectedResult = '<div class="input text"><label for="test">Test</label><input type="text" name="test" id="test"/></div>';
@@ -70,7 +72,8 @@ class FormTest extends AppTestCase
 	}
 
 	/** Изменение шаблона контейнера и добавление ему атрибутов */
-	public function testContainer() {
+	public function testContainer()
+	{
 		// класс контейнера
 		$result = $this->_helper->control('test', [
 			'containerClass' => 'test-cont-class',
@@ -114,7 +117,8 @@ class FormTest extends AppTestCase
 	}
 
 	/** изменение шаблона инпута */
-	public function testInputChange() {
+	public function testInputChange()
+	{
 		// другой инпут
 		$result = $this->_helper->control('test', [
 			'inputTemplate' => 'inputDiv',
@@ -137,8 +141,6 @@ class FormTest extends AppTestCase
 		$expectedResult = '<div class="input text"><label for="test">Test</label><input type="text" name="test" id="test"/></div>';
 		self::assertEquals($expectedResult, $result);
 	}
-
-
 
 
 }

@@ -425,7 +425,8 @@ class MethodMockerEntityTest extends TestCase
 	 * @param string $callParam вызываемый метод определён в наследнике? (или в родителе)
 	 * @param string $resultParam результат - замокан? (или вернётся исходный)
 	 */
-	public function testInheritedMocks($callType, $redefinedParam, $mockParam, $callParam, $resultParam) {
+	public function testInheritedMocks($callType, $redefinedParam, $mockParam, $callParam, $resultParam)
+	{
 		$callChild = ($callParam === 'callFromChild');
 		$isRedefined = ($redefinedParam === 'isRedefined');
 		$mockChild = ($mockParam === 'mockChild');
@@ -533,50 +534,65 @@ class MethodMockerEntityTest extends TestCase
 	 *
 	 * @return array
 	 */
-	public function paramDeclareProvider() {
+	public function paramDeclareProvider()
+	{
 		$objParam = new MockTestFixture();
 		$arrParam = [];
 		$floatParam = 1.1;
 		$stringParam = 'asd';
 		$requiredParam = 1;
 		return [
-			0 => [[
-				'params' => [true, $objParam, $arrParam, $floatParam, $stringParam],
-				'errorClass' => \ArgumentCountError::class,
-				'errorMsg' => 'Too few arguments',
-			]],
-			1 => [[
-				'params' => [true, 1, $arrParam, $floatParam, $stringParam, $requiredParam],
-				'errorClass' => \TypeError::class,
-				'errorMsg' => 'must be an instance of ' . MockTestFixture::class,
-			]],
-			2 => [[
-				'params' => [true, $objParam, 1, $floatParam, $stringParam, $requiredParam],
-				'errorClass' => \TypeError::class,
-				'errorMsg' => 'must be of the type array',
-			]],
-			3 => [[
-				'params' => [true, $objParam, $arrParam, [], $stringParam, $requiredParam],
-				'errorClass' => \TypeError::class,
-				'errorMsg' => 'must be of the type float',
-			]],
-			4 => [[
-				'params' => [true, $objParam, $arrParam, $floatParam, [], $requiredParam],
-				'errorClass' => \TypeError::class,
-				'errorMsg' => 'must be of the type string',
-			]],
-			5 => [[
-				// тут всё ок
-				'params' => [true, $objParam, $arrParam, $floatParam, $stringParam, $requiredParam],
-				'errorClass' => '',
-				'errorMsg' => '',
-			]],
-			6 => [[
-				// тут всё ок
-				'params' => [true, $objParam, $arrParam, $floatParam, null, $requiredParam],
-				'errorClass' => '',
-				'errorMsg' => '',
-			]],
+			0 => [
+				[
+					'params' => [true, $objParam, $arrParam, $floatParam, $stringParam],
+					'errorClass' => \ArgumentCountError::class,
+					'errorMsg' => 'Too few arguments',
+				],
+			],
+			1 => [
+				[
+					'params' => [true, 1, $arrParam, $floatParam, $stringParam, $requiredParam],
+					'errorClass' => \TypeError::class,
+					'errorMsg' => 'must be an instance of ' . MockTestFixture::class,
+				],
+			],
+			2 => [
+				[
+					'params' => [true, $objParam, 1, $floatParam, $stringParam, $requiredParam],
+					'errorClass' => \TypeError::class,
+					'errorMsg' => 'must be of the type array',
+				],
+			],
+			3 => [
+				[
+					'params' => [true, $objParam, $arrParam, [], $stringParam, $requiredParam],
+					'errorClass' => \TypeError::class,
+					'errorMsg' => 'must be of the type float',
+				],
+			],
+			4 => [
+				[
+					'params' => [true, $objParam, $arrParam, $floatParam, [], $requiredParam],
+					'errorClass' => \TypeError::class,
+					'errorMsg' => 'must be of the type string',
+				],
+			],
+			5 => [
+				[
+					// тут всё ок
+					'params' => [true, $objParam, $arrParam, $floatParam, $stringParam, $requiredParam],
+					'errorClass' => '',
+					'errorMsg' => '',
+				],
+			],
+			6 => [
+				[
+					// тут всё ок
+					'params' => [true, $objParam, $arrParam, $floatParam, null, $requiredParam],
+					'errorClass' => '',
+					'errorMsg' => '',
+				],
+			],
 			// отсутствует тест того, что передача параметра по ссылке сохраняется
 		];
 	}
@@ -585,9 +601,11 @@ class MethodMockerEntityTest extends TestCase
 	 * Ещё один тест, проверяющий объявление параметров
 	 * Должны сохраняться: тип, передача по ссылке и количество обязательных параметров
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
+	 *
 	 * @dataProvider paramDeclareProvider
 	 */
-	public function testParamDeclare(array $testData) {
+	public function testParamDeclare(array $testData)
+	{
 		['params' => $params, 'errorClass' => $errorClass, 'errorMsg' => $errorMsg] = $testData;
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'complexParams', false, "return 123;");
 		$refParam = 1;
@@ -641,11 +659,13 @@ class MethodMockerEntityTest extends TestCase
 	/**
 	 * variadic с типом
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
+	 *
 	 * @expectedException \TypeError
 	 * @expectedExceptionMessage must be of the type integer
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
-	public function testVariadicParamType() {
+	public function testVariadicParamType()
+	{
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'variadicParam', false, 'return get_defined_vars();');
 		MockTestFixture::variadicParam('asd');
 	}
@@ -658,7 +678,8 @@ class MethodMockerEntityTest extends TestCase
 	 * @expectedExceptionMessage must be of the type integer, null returned
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
-	public function testReturnTypeError() {
+	public function testReturnTypeError()
+	{
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, 'return null;');
 		MockTestFixture::returnInt();
 	}
@@ -667,7 +688,8 @@ class MethodMockerEntityTest extends TestCase
 	 * Сохранение типа возвращаемого значения
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
-	public function testReturnTypeGood() {
+	public function testReturnTypeGood()
+	{
 		$returnInt = 4;
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, "return $returnInt;");
 		$mockNullable = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return null;');
@@ -682,7 +704,8 @@ class MethodMockerEntityTest extends TestCase
 	 * @expectedExceptionMessage must be of the type integer or null, array returned
 	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
-	public function testReturnTypeNullableError() {
+	public function testReturnTypeNullableError()
+	{
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return [];');
 		MockTestFixture::returnNullable();
 	}

@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Error;
 
 use Cake\Error\FatalErrorException;
@@ -12,10 +13,10 @@ class ConsoleErrorHandler extends \Cake\Console\ConsoleErrorHandler
 
 	/**
 	 * @inheritdoc
-	 *
 	 * Убрал отображение fatal error, т.к. это и так выводится на экран
 	 */
-	public function handleException(\Exception $exception) {
+	public function handleException(\Exception $exception)
+	{
 		if (!($exception instanceof FatalErrorException)) {
 			$this->_displayException($exception);
 		}

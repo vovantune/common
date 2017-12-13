@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Filesystem;
 
 use ArtSkills\Error\InternalException;
@@ -17,7 +18,8 @@ class File extends \Cake\Filesystem\File
 	 * @return string Имя файла
 	 * @throws InternalException
 	 */
-	public static function zip($files, $newFile = null, $deleteOld = false) {
+	public static function zip($files, $newFile = null, $deleteOld = false)
+	{
 		$files = (array)$files;
 
 		if (empty($newFile)) {
@@ -68,7 +70,8 @@ class File extends \Cake\Filesystem\File
 	 * @param null|string $unzipFolder
 	 * @throws \Exception
 	 */
-	public static function unZip($pathToFile, $unzipFolder = null) {
+	public static function unZip($pathToFile, $unzipFolder = null)
+	{
 		$extension = strstr(pathinfo($pathToFile)['basename'], '.');
 		if (!empty($unzipFolder)) {
 			!file_exists($unzipFolder) ? mkdir($unzipFolder) : null;

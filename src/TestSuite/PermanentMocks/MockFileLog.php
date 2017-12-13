@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\TestSuite\PermanentMocks;
 
 use ArtSkills\TestSuite\ClassMockEntity;
@@ -11,7 +12,8 @@ class MockFileLog extends ClassMockEntity
 	/**
 	 * @inheritdoc
 	 */
-	public static function init() {
+	public static function init()
+	{
 		MethodMocker::mock(FileLog::class, 'log', 'return ' . self::class . '::log(...func_get_args());');
 	}
 
@@ -21,7 +23,8 @@ class MockFileLog extends ClassMockEntity
 	 * @param string $level
 	 * @param string $message
 	 */
-	public static function log($level, $message) {
+	public static function log($level, $message)
+	{
 		$trace = Debugger::trace();
 		$trace = explode("\n", $trace);
 		$test = '';

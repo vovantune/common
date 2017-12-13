@@ -1,4 +1,5 @@
 <?php
+
 namespace TestApp\Model\Query;
 
 use ArtSkills\ORM\Query;

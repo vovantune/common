@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\TestSuite\HttpClientMock;
 
 use ArtSkills\TestSuite\AppTestCase;
@@ -14,7 +15,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Разовый вызов
 	 */
-	public function testOnceAndReturnString() {
+	public function testOnceAndReturnString()
+	{
 		$testUrl = self::DEFAULT_TEST_URL;
 		$testData = self::DEFAULT_POST_DATA;
 		$correctTestData = ['bar' => 'babar', 'foo' => 'barr'];
@@ -38,15 +40,16 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Несколько раз вызвали с кэлбаком
 	 */
-	public function testAnyAndReturnAction() {
+	public function testAnyAndReturnAction()
+	{
 		$testUrl = self::DEFAULT_TEST_URL;
 		$testMethod = Request::METHOD_GET;
 		$returnVal = 'test';
 
 		$mock = new HttpClientMockerEntity($testUrl, $testMethod);
 		$mock->willReturnAction(function () use ($returnVal) {
-				return $returnVal;
-			});
+			return $returnVal;
+		});
 
 		$request = new Request($testUrl, $testMethod);
 
@@ -63,7 +66,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage expected 1 calls, but more appeared
 	 */
-	public function testSingleCallCheck() {
+	public function testSingleCallCheck()
+	{
 		$mock = $this->_makeGetMock()
 			->singleCall()
 			->willReturnString('test');
@@ -79,13 +83,15 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage is not called
 	 */
-	public function testNoCallCheck() {
+	public function testNoCallCheck()
+	{
 		$mock = $this->_makeGetMock();
 		$mock->callCheck();
 	}
 
 	/** Ни разу не вызвали, но так и должно быть */
-	public function testExpectedNoCallCheck() {
+	public function testExpectedNoCallCheck()
+	{
 		$mock = $this->_makeGetMock()->noCalls();
 		$mock->callCheck();
 		self::assertTrue(true, 'Не кинулся ексепшн');
@@ -95,7 +101,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Проверка check метода
 	 */
-	public function testCheck() {
+	public function testCheck()
+	{
 		$testUrl = self::DEFAULT_TEST_URL;
 		$testMethod = Request::METHOD_GET;
 
@@ -111,7 +118,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Return mock action is not defined
 	 */
-	public function testEmptyResultCheck() {
+	public function testEmptyResultCheck()
+	{
 		$this->_makeGetMock()->doAction($this->_makeGetRequest());
 	}
 
@@ -121,7 +129,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Body for GET method is not required
 	 */
-	public function testBodySetForGetMethod() {
+	public function testBodySetForGetMethod()
+	{
 		$this->_makeGetMock()->expectBody(self::DEFAULT_POST_DATA);
 	}
 
@@ -131,7 +140,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
-	public function testSetStatusCodeBad() {
+	public function testSetStatusCodeBad()
+	{
 		$this->_makeGetMock()->willReturnStatus('233asd');
 	}
 
@@ -141,7 +151,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
-	public function testSetStatusCodeSmall() {
+	public function testSetStatusCodeSmall()
+	{
 		$this->_makeGetMock()->willReturnStatus(99);
 	}
 
@@ -151,7 +162,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
-	public function testSetStatusCodeBig() {
+	public function testSetStatusCodeBig()
+	{
 		$this->_makeGetMock()->willReturnStatus(600);
 	}
 
@@ -162,7 +174,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Invalid response: Array
 	 */
-	public function testReturnStringBad() {
+	public function testReturnStringBad()
+	{
 		$this->_makeGetMock()->willReturnString(['asd' => 'qwe']);
 	}
 
@@ -172,7 +185,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Invalid response: Array
 	 */
-	public function testReturnActionBad() {
+	public function testReturnActionBad()
+	{
 		$this->_makeGetMock()
 			->willReturnAction(function () {
 				return ['asd' => 'qwe'];
@@ -186,7 +200,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage is not a file
 	 */
-	public function testReturnFileNotExists() {
+	public function testReturnFileNotExists()
+	{
 		$this->_makeGetMock()->willReturnFile(__DIR__ . DS . 'non_existent_file.txt');
 	}
 
@@ -196,12 +211,14 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage is not a file
 	 */
-	public function testReturnFileIsNotFile() {
+	public function testReturnFileIsNotFile()
+	{
 		$this->_makeGetMock()->willReturnFile(__DIR__);
 	}
 
 	/** содержимое ответа берётся из файла */
-	public function testReturnFile() {
+	public function testReturnFile()
+	{
 		$result = $this->_makeGetMock()
 			->willReturnFile(__DIR__ . DS . 'file_response.txt')
 			->doAction($this->_makeGetRequest());
@@ -214,7 +231,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Expected POST body data is not equal to real data
 	 */
-	public function testUnexpectedBody() {
+	public function testUnexpectedBody()
+	{
 		$this->_makePostMock(['asd' => 'qwe'])
 			->willReturnString('')
 			->doAction($this->_makePostRequest(['asd' => 'zxc']));
@@ -227,14 +245,16 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Post request with empty body
 	 */
-	public function testEmptyPost() {
+	public function testEmptyPost()
+	{
 		$this->_makePostMock(null)
 			->willReturnString('')
 			->doAction($this->_makePostRequest(''));
 	}
 
 	/** сравнение содержимого post body, сравнение проходит */
-	public function testExpectBodyGood() {
+	public function testExpectBodyGood()
+	{
 		$mock = $this->_makePostMock()->willReturnString('');
 
 		$request = $this->_makePostRequest(['asd' => 'qwe']);
@@ -254,16 +274,14 @@ class HttpClientMockerEntityTest extends AppTestCase
 	}
 
 
-
-
-
 	/**
 	 * Получить объект Request с методом GET
 	 *
 	 * @param string $url
 	 * @return Request
 	 */
-	private function _makeGetRequest($url = self::DEFAULT_TEST_URL) {
+	private function _makeGetRequest($url = self::DEFAULT_TEST_URL)
+	{
 		return $this->_makeRequest(Request::METHOD_GET, $url);
 	}
 
@@ -274,7 +292,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @param string $url
 	 * @return Request
 	 */
-	private function _makePostRequest($data = self::DEFAULT_POST_DATA, $url = self::DEFAULT_TEST_URL) {
+	private function _makePostRequest($data = self::DEFAULT_POST_DATA, $url = self::DEFAULT_TEST_URL)
+	{
 		return $this->_makeRequest(Request::METHOD_POST, $url, $data);
 	}
 
@@ -286,7 +305,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @param array|string $data
 	 * @return Request
 	 */
-	private function _makeRequest($method, $url = self::DEFAULT_TEST_URL, $data = self::DEFAULT_POST_DATA) {
+	private function _makeRequest($method, $url = self::DEFAULT_TEST_URL, $data = self::DEFAULT_POST_DATA)
+	{
 		$request = new Request($url, $method);
 		if ($method === Request::METHOD_POST) {
 			$request->body($data);
@@ -300,7 +320,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @param string $url
 	 * @return HttpClientMockerEntity
 	 */
-	private function _makeGetMock($url = self::DEFAULT_TEST_URL) {
+	private function _makeGetMock($url = self::DEFAULT_TEST_URL)
+	{
 		return $this->_makeMock(Request::METHOD_GET, $url);
 	}
 
@@ -311,7 +332,8 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @param string $url
 	 * @return HttpClientMockerEntity
 	 */
-	private function _makePostMock($data = self::DEFAULT_POST_DATA, $url = self::DEFAULT_TEST_URL) {
+	private function _makePostMock($data = self::DEFAULT_POST_DATA, $url = self::DEFAULT_TEST_URL)
+	{
 		return $this->_makeMock(Request::METHOD_POST, $url, $data);
 	}
 
@@ -323,14 +345,14 @@ class HttpClientMockerEntityTest extends AppTestCase
 	 * @param array|string $data
 	 * @return HttpClientMockerEntity
 	 */
-	private function _makeMock($method, $url = self::DEFAULT_TEST_URL, $data = self::DEFAULT_POST_DATA) {
+	private function _makeMock($method, $url = self::DEFAULT_TEST_URL, $data = self::DEFAULT_POST_DATA)
+	{
 		$mock = new HttpClientMockerEntity($url, $method);
 		if ($method === Request::METHOD_POST) {
 			$mock->expectBody($data);
 		}
 		return $mock;
 	}
-
 
 
 }

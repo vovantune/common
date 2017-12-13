@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Filesystem\FileTest;
 
 use ArtSkills\Filesystem\File;
@@ -12,7 +13,8 @@ class FileTest extends AppTestCase
 	 * Тест зиповки
 	 * @SuppressWarnings(PHPMD.FunctionRule)
 	 */
-	public function testZip() {
+	public function testZip()
+	{
 		$testFile1 = __DIR__ . '/temptest.txt';
 		file_put_contents($testFile1, 'temptest');
 		$zipName = __DIR__ . '/actual_zip_1.zip';
@@ -37,7 +39,8 @@ class FileTest extends AppTestCase
 	/**
 	 * Тест распаковки
 	 */
-	public function testUnzip() {
+	public function testUnzip()
+	{
 		File::unZip(__DIR__ . '/to_unzip.tar.gz', __DIR__ . '/targz');
 		$folder = new Folder(__DIR__ . '/targz');
 		self::assertEquals(['f81ff56c9a.json'], $folder->find(), 'Не распаковался архив tar.gz');

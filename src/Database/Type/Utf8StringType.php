@@ -9,11 +9,8 @@ use Cake\Database\Type\StringType;
 
 /**
  * Надстройка над строковым типом данных, который выпиливает все эмодзи.
- *
  * Важно! В объекте результата $table->save() удаление символов не происходит, а только в таблице.
- *
  * Подключение:
- *
  *  В bootstrap.php прописываем следуюее:
  * ```
  * \Cake\Database\Type::map('text', \ArtSkills\Database\Type\Utf8StringType::class);

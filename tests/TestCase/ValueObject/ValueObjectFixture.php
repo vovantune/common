@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\ValueObject;
 
 use ArtSkills\Lib\Strings;
@@ -13,12 +14,13 @@ use Cake\Utility\String as CakeString;
 class ValueObjectFixture extends ValueObject
 {
 	const EXCLUDE_EXPORT_PROPS = [
-		'field2'
+		'field2',
 	];
 
 	/**
 	 * блаблабла
 	 * трололо
+	 *
 	 * @var string
 	 */
 	public $field1 = 'asd';

@@ -11,7 +11,8 @@ class FolderTest extends AppTestCase
 	/**
 	 * Проверка чистилки файлов
 	 */
-	public function testCleanupDirByLifetime() {
+	public function testCleanupDirByLifetime()
+	{
 		$csvFile = __DIR__ . '/temp.csv';
 		$pdfFile = __DIR__ . '/temp.pdf';
 		$pdfNewFile = __DIR__ . '/tempNew.pdf';

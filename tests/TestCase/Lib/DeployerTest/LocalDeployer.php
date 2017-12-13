@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Lib\DeployerTest;
 
 use ArtSkills\Lib\Deployer;
@@ -10,7 +11,7 @@ class LocalDeployer extends Deployer
 	// константы для использования в тесте
 	const REPO_NAME = 'common';
 	const DIR_CURRENT = __DIR__ . DS . 'project-1';
-	const DIR_NEXT =  __DIR__ . DS . 'project-2';
+	const DIR_NEXT = __DIR__ . DS . 'project-2';
 	const SYMLINK = __DIR__ . DS . 'symlink';
 	const CAKE_SUB_PATH = 'subfolder';
 	const VERSION_FILE = self::CAKE_SUB_PATH . DS . 'version.txt';
@@ -32,10 +33,10 @@ class LocalDeployer extends Deployer
 		'/var/www/common-3',
 	];
 
-	/** @inheritdoc  */
+	/** @inheritdoc */
 	protected $_cakeSubPath = self::CAKE_SUB_PATH;
 
-	/** @inheritdoc  */
+	/** @inheritdoc */
 	protected $_versionFile = self::VERSION_FILE_PATH;
 
 	/** @inheritdoc */
@@ -47,7 +48,8 @@ class LocalDeployer extends Deployer
 	];
 
 	/** @inheritdoc */
-	public function __construct(array $config = []) {
+	public function __construct(array $config = [])
+	{
 		if (!array_key_exists('isDeployEnv', $config)) {
 			$config['isDeployEnv'] = true;
 		}

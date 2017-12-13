@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
@@ -12,9 +13,9 @@ class Translit
 	 *
 	 * @param string $string
 	 * @return string
-	 * 
 	 */
-	public static function transliterate($string) {
+	public static function transliterate($string)
+	{
 		$translit = [
 			"А" => "A",
 			"Б" => "B",
@@ -89,9 +90,9 @@ class Translit
 	 *
 	 * @param string $string
 	 * @return string
-	 * 
 	 */
-	public static function generateUrlAlias($string) {
+	public static function generateUrlAlias($string)
+	{
 		$res = preg_replace('/\_+/', '_', preg_replace('/[^0-9a-zA-Z]/', '_', strtolower(self::transliterate(trim($string)))));
 		if (mb_substr($res, mb_strlen($res, 'utf-8') - 1, 1, 'utf-8') == '_') {
 			$res = mb_substr($res, 0, mb_strlen($res, 'utf-8') - 1, 'utf-8');

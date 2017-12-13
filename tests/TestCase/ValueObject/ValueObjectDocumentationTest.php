@@ -12,7 +12,8 @@ use Cake\Utility\String as CakeString;
 class ValueObjectDocumentationTest extends AppTestCase
 {
 	/** Генерилка доки */
-	public function testMain() {
+	public function testMain()
+	{
 		ValueObjectDocumentation::buildJsDoc(__DIR__ . '/ValueObjectFixture.php', TMP);
 		$jsDocFile = TMP . 'ArtSkills_Test_TestCase_ValueObject_ValueObjectFixture.js';
 		self::assertFileExists($jsDocFile);
@@ -28,7 +29,8 @@ class ValueObjectDocumentationTest extends AppTestCase
 	}
 
 	/** Дока с наследованием */
-	public function testMainInheritance() {
+	public function testMainInheritance()
+	{
 		ValueObjectDocumentation::buildJsonSchema(__DIR__ . '/ValueObjectFixtureSecond.php', TMP, 'https://www.artskills.ru/jsonSchema/');
 		$jsDocFile = TMP . 'ArtSkills_Test_TestCase_ValueObject_ValueObjectFixtureSecond.json';
 		self::assertFileExists($jsDocFile);
@@ -66,7 +68,8 @@ class ValueObjectDocumentationTest extends AppTestCase
 	}
 
 	/** Список использованных объектов */
-	public function testGetUsesList() {
+	public function testGetUsesList()
+	{
 		self::assertEquals([
 			'Strings' => Strings::class,
 			'ValueObject' => ValueObject::class,

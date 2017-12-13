@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\ORM;
 
 use ArtSkills\TestSuite\AppTestCase;
@@ -19,7 +20,8 @@ class EntityTest extends AppTestCase
 	];
 
 	/** тест работы алиасов */
-	public function testAliases() {
+	public function testAliases()
+	{
 		$entityId = 88;
 		$entity = $this->TestTableTwo->get($entityId);
 
@@ -62,7 +64,7 @@ class EntityTest extends AppTestCase
 			'id' => $entityId,
 			'table_one_fk' => $newValue,
 			'fieldAlias' => $newValue,
-			'col_text' => null
+			'col_text' => null,
 		];
 		self::assertEquals($expectedArray, $entity->toArray());
 
@@ -73,7 +75,8 @@ class EntityTest extends AppTestCase
 	}
 
 	/** проверка на изменение значения поля */
-	public function testChanged() {
+	public function testChanged()
+	{
 		$entity = $this->TestTableTwo->get(88);
 		$entity->table_one_fk = $entity->table_one_fk;
 		self::assertTrue($entity->isDirty('table_one_fk'));
@@ -81,7 +84,8 @@ class EntityTest extends AppTestCase
 	}
 
 	/** удаление дочерней сущности */
-	public function testDeleteChild() {
+	public function testDeleteChild()
+	{
 		$assocName = 'TestTableTwo';
 		$childIds = [88, 90];
 
@@ -97,10 +101,12 @@ class EntityTest extends AppTestCase
 
 	/**
 	 * удаление несуществующей дочерней сущности
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Unknown property TestTableTwo
 	 */
-	public function testDeleteChildNotExists() {
+	public function testDeleteChildNotExists()
+	{
 		$entity = $this->TestTableOne->get(45);
 		$entity->deleteChild('TestTableTwo', 0);
 	}

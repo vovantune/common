@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Lib\EmailTest;
 
 use ArtSkills\Mailer\Email;
@@ -11,7 +12,8 @@ class EmailTest extends AppTestCase
 	 * Тест на замену домена в адресе почты
 	 * И работу перма-мокалки
 	 */
-	public function testChangeRecipient() {
+	public function testChangeRecipient()
+	{
 		$text = 'test email text';
 		$email = new Email();
 		$email->setFrom('test@artskills.ru')

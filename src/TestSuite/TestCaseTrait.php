@@ -52,14 +52,16 @@ trait TestCaseTrait
 
 
 	/** вызывать в реальном setUpBeforeClass */
-	protected static function _setUpBeforeClass() {
+	protected static function _setUpBeforeClass()
+	{
 		static::_clearSingletones();
 	}
 
 	/**
 	 * Инициализация тестового окружения
 	 */
-	protected function _setUp() {
+	protected function _setUp()
+	{
 		$this->_clearCache();
 		$this->_initPermanentMocks();
 		$this->_loadFixtureModels();
@@ -71,7 +73,8 @@ trait TestCaseTrait
 	/**
 	 * Чиста тестового окружения
 	 */
-	protected function _tearDown() {
+	protected function _tearDown()
+	{
 		/** @var TestCase $this */
 		ConstantMocker::restore();
 		PropertyAccess::restoreStaticAll();
@@ -90,12 +93,14 @@ trait TestCaseTrait
 	}
 
 	/** для локальных действий на setUp */
-	protected function _setUpLocal() {
+	protected function _setUpLocal()
+	{
 		// noop
 	}
 
 	/** для локальных действий на tearDown */
-	protected function _tearDownLocal() {
+	protected function _tearDownLocal()
+	{
 		// noop
 	}
 
@@ -105,21 +110,24 @@ trait TestCaseTrait
 	 *
 	 * @param string $mockClass
 	 */
-	protected function _disablePermanentMock($mockClass) {
+	protected function _disablePermanentMock($mockClass)
+	{
 		$this->_disabledMocks[$mockClass] = true;
 	}
 
 	/**
 	 * Чистка кеша
 	 */
-	protected function _clearCache() {
+	protected function _clearCache()
+	{
 		AppCache::flushExcept(['_cake_core_', '_cake_model_']);
 	}
 
 	/**
 	 * loadModel на все таблицы фикстур
 	 */
-	protected function _loadFixtureModels() {
+	protected function _loadFixtureModels()
+	{
 		if (empty($this->fixtures)) {
 			return;
 		}
@@ -140,7 +148,8 @@ trait TestCaseTrait
 	 *
 	 * @throws InternalException
 	 */
-	private function _initPermanentMocks() {
+	private function _initPermanentMocks()
+	{
 		$permanentMocks = [
 			// folder => namespace
 			__DIR__ . '/PermanentMocks' => Misc::namespaceSplit(MockFileLog::class)[0],
@@ -171,7 +180,8 @@ trait TestCaseTrait
 	/**
 	 * Сбрасываем все перманентые моки
 	 */
-	private function _destroyPermanentMocks() {
+	private function _destroyPermanentMocks()
+	{
 		foreach ($this->_permanentMocksList as $mockClass) {
 			$mockClass::destroy();
 		}
@@ -182,7 +192,8 @@ trait TestCaseTrait
 	 * очищаем одиночек
 	 * то, что одиночки создаются 1 раз, иногда может очень мешать
 	 */
-	protected static function _clearSingletones() {
+	protected static function _clearSingletones()
+	{
 		$singletones = static::_getSingletones();
 		foreach ($singletones as $className) {
 			PropertyAccess::setStatic($className, '_instance', null);
@@ -199,7 +210,8 @@ trait TestCaseTrait
 	 *
 	 * @return string[]
 	 */
-	protected static function _getSingletones() {
+	protected static function _getSingletones()
+	{
 		// Приходится использовать метод, ибо переопределить свойство при использовании трейта нельзя
 		// А заполнить свойство не получится, ибо _clearSingletones статичен
 		return [];
@@ -215,7 +227,8 @@ trait TestCaseTrait
 	 * Полезно тем, что в базу микросекунды всё равно не сохранятся
 	 * @return Time
 	 */
-	protected function _setTestNow($time = null, $clearMicroseconds = true) {
+	protected function _setTestNow($time = null, $clearMicroseconds = true)
+	{
 		if (!($time instanceof Time)) {
 			$time = new Time($time);
 		}

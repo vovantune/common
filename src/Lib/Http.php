@@ -23,7 +23,8 @@ class Http
 	 * @param string $url
 	 * @return string|null
 	 */
-	public static function getContent($url) {
+	public static function getContent($url)
+	{
 		$request = static::_makeRequest();
 		$result = static::_getRequest($url, $request);
 
@@ -42,7 +43,8 @@ class Http
 	 * @param array $options
 	 * @return array|null
 	 */
-	public static function getJson($url, $data = [], $options = []) {
+	public static function getJson($url, $data = [], $options = [])
+	{
 		$request = static::_makeRequest();
 		return static::_getResponseJson(static::_getRequest($url, $request, $data, $options));
 	}
@@ -55,7 +57,8 @@ class Http
 	 * @param array $options
 	 * @return array|null
 	 */
-	public static function postJson($url, $data, $options = []) {
+	public static function postJson($url, $data, $options = [])
+	{
 		$request = self::_makeRequest();
 		return static::_getResponseJson($request->post($url, $data, $options));
 	}
@@ -68,7 +71,8 @@ class Http
 	 * @param array $options
 	 * @return array|null
 	 */
-	public static function putJson($url, $data, $options = []) {
+	public static function putJson($url, $data, $options = [])
+	{
 		$request = self::_makeRequest();
 		return static::_getResponseJson($request->put($url, $data, $options));
 	}
@@ -79,7 +83,8 @@ class Http
 	 * @param string $url
 	 * @return \SimpleXMLElement|null
 	 */
-	public static function getXml($url) {
+	public static function getXml($url)
+	{
 		$request = static::_makeRequest();
 		$result = static::_getRequest($url, $request);
 		if (!empty($result)) {
@@ -97,7 +102,8 @@ class Http
 	 * @param int $timeout
 	 * @return string
 	 */
-	public static function downloadFile($url, $targetFile = '', $timeout = 30) {
+	public static function downloadFile($url, $targetFile = '', $timeout = 30)
+	{
 
 		if (empty($targetFile)) {
 			$targetFile = TMP . uniqid() . '.tmp';
@@ -134,7 +140,8 @@ class Http
 	 * @param Response|null $response
 	 * @return array|null
 	 */
-	private static function  _getResponseJson($response) {
+	private static function _getResponseJson($response)
+	{
 		if (!empty($response)) {
 			return $response->json;
 		} else {
@@ -151,7 +158,8 @@ class Http
 	 * @param array $options
 	 * @return Response
 	 */
-	private static function _getRequest($url, $request, $data = [], $options = []) {
+	private static function _getRequest($url, $request, $data = [], $options = [])
+	{
 		return $request->get($url, $data, $options);
 	}
 
@@ -160,7 +168,8 @@ class Http
 	 *
 	 * @return Client
 	 */
-	private static function _makeRequest() {
+	private static function _makeRequest()
+	{
 		if (static::$_httpClient == null) {
 			static::$_httpClient = new Client();
 		}

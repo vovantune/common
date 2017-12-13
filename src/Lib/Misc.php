@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 class Misc
@@ -16,7 +17,8 @@ class Misc
 	 * @param bool $onlyClass
 	 * @return string|string[]
 	 */
-	public static function namespaceSplit($class, $onlyClass = false) {
+	public static function namespaceSplit($class, $onlyClass = false)
+	{
 		$pos = strrpos($class, '\\');
 		if ($pos === false) {
 			$res = ['', $class];
@@ -36,10 +38,10 @@ class Misc
 	 * @param string[] ...$parts
 	 * @return string
 	 */
-	public static function implodeDs(...$parts) {
+	public static function implodeDs(...$parts)
+	{
 		return trim(implode(DS, $parts));
 	}
-
 
 
 }

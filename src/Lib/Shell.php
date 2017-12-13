@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
@@ -19,7 +20,8 @@ class Shell
 	 * @param bool $stopOnFail если передан список команд, то останавливаться ли на ошибке (склеивать команды через && или ;)
 	 * @return array [успех, вывод, результирующая команда, код возврата]
 	 */
-	public static function exec($commands, $withErrors = true, $stopOnFail = true) {
+	public static function exec($commands, $withErrors = true, $stopOnFail = true)
+	{
 		$resultCommand = self::_processCommandList($commands, $withErrors, $stopOnFail);
 		return self::_exec($resultCommand);
 	}
@@ -30,7 +32,8 @@ class Shell
 	 * @param string $command
 	 * @param string $outputRedirect
 	 */
-	public static function execInBackground($command, $outputRedirect = '/dev/null') {
+	public static function execInBackground($command, $outputRedirect = '/dev/null')
+	{
 		exec('nohup ' . $command . ' > ' . escapeshellarg($outputRedirect) . ' 2>&1 &');
 	}
 
@@ -44,7 +47,8 @@ class Shell
 	 * Но если свалится смена директорий, то дальше не пойдёт независимо от этого параметра
 	 * @return array [успех, вывод, результирующая команда, код возврата]
 	 */
-	public static function execFromDir($directory, $commands, $withErrors = true, $stopOnFail = true) {
+	public static function execFromDir($directory, $commands, $withErrors = true, $stopOnFail = true)
+	{
 		$resultCommand = self::_processCommandList($commands, $withErrors, $stopOnFail);
 		if (!empty($directory) && (getcwd() !== $directory)) {
 			$cdCommand = 'cd ' . escapeshellarg($directory) . ($withErrors ? ' 2>&1' : '');
@@ -59,7 +63,8 @@ class Shell
 	 * @param string $command
 	 * @return array [успех, вывод, результирующая команда, код возврата]
 	 */
-	private static function _exec($command) {
+	private static function _exec($command)
+	{
 		exec($command, $output, $returnCode);
 		return [$returnCode === 0, $output, $command, $returnCode];
 	}
@@ -72,7 +77,8 @@ class Shell
 	 * @param bool $stopOnFail
 	 * @return string
 	 */
-	private static function _processCommandList($commands, $withErrors = true, $stopOnFail = true) {
+	private static function _processCommandList($commands, $withErrors = true, $stopOnFail = true)
+	{
 		$commands = (array)$commands;
 		if ($stopOnFail) {
 			$glue = ' && ';

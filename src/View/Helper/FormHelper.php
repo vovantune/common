@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\View\Helper;
 
 use ArtSkills\Lib\Arrays;
@@ -30,7 +31,8 @@ class FormHelper extends \Cake\View\Helper\FormHelper
 	];
 
 	/** @inheritdoc */
-	public function __construct(View $View, array $config = []) {
+	public function __construct(View $View, array $config = [])
+	{
 		$this->_defaultConfig['templates'] = $this->_resetTemplates += $this->_defaultConfig['templates'];
 		parent::__construct($View, $config);
 	}
@@ -47,7 +49,8 @@ class FormHelper extends \Cake\View\Helper\FormHelper
 	 * 'inputTemplate' - использовать нестандартный шаблон для инпута, строка;
 	 * 'divAttrs' - атрибуты для тега div в шаблоне 'inputDiv', массив;
 	 */
-	protected function _parseOptions($fieldName, $options) {
+	protected function _parseOptions($fieldName, $options)
+	{
 		$options = parent::_parseOptions($fieldName, $options);
 		if (!empty($options['inputTemplate'])) {
 			Arrays::initPath($options, 'templates', []);
@@ -72,7 +75,8 @@ class FormHelper extends \Cake\View\Helper\FormHelper
 		}
 
 		if (!empty($options['templateVars']['divAttrs'])) {
-			$options['templateVars']['divAttrs'] = $this->templater()->formatAttributes($options['templateVars']['divAttrs']);
+			$options['templateVars']['divAttrs'] = $this->templater()
+				->formatAttributes($options['templateVars']['divAttrs']);
 		}
 
 		if (!empty($options['templateVars']['container']) && is_array($options['templateVars']['container'])) {
@@ -103,7 +107,8 @@ class FormHelper extends \Cake\View\Helper\FormHelper
 	 * Добавил возможность использовать кастомный контейнер $options['options']['templateVars']['container'] . 'Container';
 	 * И там же добавил 'containerClass' 'containerAttrs' для добавления классов и атрибутов контейнеру
 	 */
-	protected function _inputContainerTemplate($options) {
+	protected function _inputContainerTemplate($options)
+	{
 		$templateVars = isset($options['options']['templateVars']) ? $options['options']['templateVars'] : [];
 		$containerType = $options['options']['type'];
 		if (!empty($templateVars['container'])) {

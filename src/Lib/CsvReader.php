@@ -1,6 +1,7 @@
 <?php
 
 namespace ArtSkills\Lib;
+
 use ArtSkills\Error\InternalException;
 
 /**
