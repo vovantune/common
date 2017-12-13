@@ -14,7 +14,8 @@ class ErrorHandlerMiddleware extends \Cake\Error\Middleware\ErrorHandlerMiddlewa
 	 * По-умолчанию был плохой трейс и нельзя делать warn.
 	 * И исключения phpunit теперь прокидываются дальше.
 	 */
-	protected function logException($request, $exception) {
+	protected function logException($request, $exception)
+	{
 		if (!$this->getConfig('log')) {
 			return;
 		}
@@ -42,7 +43,8 @@ class ErrorHandlerMiddleware extends \Cake\Error\Middleware\ErrorHandlerMiddlewa
 	 * Таким образом при ошибке внутри render исходная ошибка тоже будет залогирована.
 	 * И исключения phpunit теперь прокидываются дальше.
 	 */
-	public function handleException($exception, $request, $response) {
+	public function handleException($exception, $request, $response)
+	{
 		$renderer = $this->getRenderer($exception);
 		try {
 			$this->logException($request, $exception);

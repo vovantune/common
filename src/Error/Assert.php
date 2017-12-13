@@ -7,5 +7,5 @@ namespace ArtSkills\Error;
  */
 class Assert extends \Webmozart\Assert\Assert
 {
-	
+
 }

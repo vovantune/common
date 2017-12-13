@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
@@ -19,15 +20,18 @@ class DB
 	 * @param bool $useAliases
 	 * @return Connection
 	 */
-	public static function getConnection($name = self::CONNECTION_DEFAULT, $useAliases = true) {
+	public static function getConnection($name = self::CONNECTION_DEFAULT, $useAliases = true)
+	{
 		return ConnectionManager::get($name, $useAliases);
 	}
 
 	/**
 	 * переподсоединиться, если отвалился
+	 *
 	 * @param string $connectionName
 	 */
-	public static function restoreConnection($connectionName = self::CONNECTION_DEFAULT) {
+	public static function restoreConnection($connectionName = self::CONNECTION_DEFAULT)
+	{
 		$connection = self::getConnection($connectionName);
 		if (!$connection->isConnected()) {
 			$connection->connect();
@@ -41,7 +45,8 @@ class DB
 	 * @param string $connectionName
 	 * @return \Cake\Database\Statement\MysqlStatement
 	 */
-	public static function customQuery($sql, $connectionName = self::CONNECTION_DEFAULT) {
+	public static function customQuery($sql, $connectionName = self::CONNECTION_DEFAULT)
+	{
 		return self::getConnection($connectionName)->execute($sql);
 	}
 

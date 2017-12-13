@@ -14,7 +14,8 @@ class ErrorController extends Controller
 {
 
 	/** Скопировано из Cake\Controller\ErrorController */
-	public function initialize() {
+	public function initialize()
+	{
 		$this->loadComponent('RequestHandler');
 	}
 
@@ -25,7 +26,8 @@ class ErrorController extends Controller
 	 * @param \Cake\Event\Event $event
 	 * @return void
 	 */
-	public function beforeRender(Event $event) {
+	public function beforeRender(Event $event)
+	{
 		$this->viewBuilder()->setTemplatePath('Error');
 		if ($this->_isJsonAction()) {
 			$serializedVars = Arrays::get($this->viewVars, '_serialize', ['message']);

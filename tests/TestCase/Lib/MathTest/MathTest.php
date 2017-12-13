@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Lib\MathTest;
 
 
@@ -8,7 +9,8 @@ use ArtSkills\TestSuite\AppTestCase;
 class MathTest extends AppTestCase
 {
 	/** Тест округления */
-	public function testRoundUpToNearest() {
+	public function testRoundUpToNearest()
+	{
 		$testNumber = 0.5;
 		self::assertEquals($testNumber, Math::roundUpToNearest($testNumber, 0));
 

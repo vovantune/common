@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Lib;
 
 use ArtSkills\Lib\AppCache;
@@ -10,7 +11,8 @@ class AppCacheTest extends AppTestCase
 	/**
 	 * Чистилка кэша
 	 */
-	public function testFlush() {
+	public function testFlush()
+	{
 		Cache::write('qwe', 123, 'short');
 		Cache::write('qwerty', 12345, '_cake_core_');
 		Cache::write('qwertyuio', 123456789, 'default');

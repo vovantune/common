@@ -11,7 +11,8 @@ class ValueObjectTest extends AppTestCase
 	/**
 	 * Цепочка вызовов и превращение в массив
 	 */
-	public function test() {
+	public function test()
+	{
 		$obj = new ValueObjectFixture();
 		self::assertEquals('asd', $obj->field1);
 		self::assertEquals('qwe', $obj->field2);
@@ -53,7 +54,8 @@ class ValueObjectTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Undefined property field5
 	 */
-	public function testBadProperty() {
+	public function testBadProperty()
+	{
 		$obj = new ValueObjectFixture();
 		$obj->setField5();
 	}
@@ -64,7 +66,8 @@ class ValueObjectTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Invalid argument count when calling setField3
 	 */
-	public function testBadParams() {
+	public function testBadParams()
+	{
 		$obj = new ValueObjectFixture();
 		$obj->setField3('asd', 'qwe');
 	}
@@ -75,7 +78,8 @@ class ValueObjectTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectExceptionMessage Property exported_bad does not exist!
 	 */
-	public function testBadInit() {
+	public function testBadInit()
+	{
 		new ValueObjectFixture(['exported_bad' => 1]);
 	}
 

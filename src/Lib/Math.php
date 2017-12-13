@@ -14,7 +14,6 @@ class Math
 
 	/**
 	 * Округляем до ближайшего числа с шагом $roundTo
-	 *
 	 * 105.5 up to nearest 1 = 106
 	 * 105.5 up to nearest 10 = 110
 	 * 105.5 up to nearest 7 = 112

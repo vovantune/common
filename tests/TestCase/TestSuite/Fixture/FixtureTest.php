@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\TestSuite\Fixture;
 
 use ArtSkills\ORM\Table;
@@ -18,17 +19,21 @@ class FixtureTest extends AppTestCase
 
 	/** @inheritdoc */
 	public $fixtures = [
-		'test_table_one', // возможность писать без app
-		'TestTableThree', // возможность в CamelCase
-		'plugin.art_skills.test_table_two', // чтобы FixtureManager подтянул классовую фикстуру, которая в необычном неймспейсе
+		'test_table_one',
+		// возможность писать без app
+		'TestTableThree',
+		// возможность в CamelCase
+		'plugin.art_skills.test_table_two',
+		// чтобы FixtureManager подтянул классовую фикстуру, которая в необычном неймспейсе
 	];
 
 	/**
 	 * Тест на получение запросов на создание таблиц
 	 */
-	public function testGetStructure() {
+	public function testGetStructure()
+	{
 		$expectedCreateTable =
-"CREATE TABLE `test_table_one` (
+			"CREATE TABLE `test_table_one` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'comment1',
   `col_enum` enum('val1','val2','val3') NOT NULL DEFAULT 'val1',
   `col_text` longtext NOT NULL,
@@ -48,10 +53,26 @@ class FixtureTest extends AppTestCase
 	/**
 	 * Тест на получение данных для загрузки в базу
 	 */
-	public function testGetData() {
-		$defaultValue = ['id' => '45', 'col_enum' => 'val3', 'col_text' => 'olololo', 'col_time' => '2017-03-14 22:33:44'];
-		$localValue = ['id' => '158', 'col_enum' => 'val2', 'col_text' => 'qweqweqweqwe', 'col_time' => '2017-03-14 11:22:33'];
-		$classValue = ['id' => '10000', 'col_enum' => 'val1', 'col_text' => 'test test test', 'col_time' => '2017-03-14 00:11:22'];
+	public function testGetData()
+	{
+		$defaultValue = [
+			'id' => '45',
+			'col_enum' => 'val3',
+			'col_text' => 'olololo',
+			'col_time' => '2017-03-14 22:33:44',
+		];
+		$localValue = [
+			'id' => '158',
+			'col_enum' => 'val2',
+			'col_text' => 'qweqweqweqwe',
+			'col_time' => '2017-03-14 11:22:33',
+		];
+		$classValue = [
+			'id' => '10000',
+			'col_enum' => 'val1',
+			'col_text' => 'test test test',
+			'col_time' => '2017-03-14 00:11:22',
+		];
 
 		$baseObjectDefault = new TestFixture('test_table_one');
 		self::assertEquals([$defaultValue], $baseObjectDefault->records, 'Неправильные данные глобальной фикстуры');
@@ -71,7 +92,8 @@ class FixtureTest extends AppTestCase
 	/**
 	 * Подтягивание моделей в свойства
 	 */
-	public function testTableModelLoad() {
+	public function testTableModelLoad()
+	{
 		self::assertInstanceOf(\Cake\ORM\Table::class, $this->TestTableThree);
 		self::assertInstanceOf('\TestApp\Model\Table\TestTableOneTable', $this->TestTableOne);
 	}
@@ -79,10 +101,18 @@ class FixtureTest extends AppTestCase
 	/**
 	 * Тест корректной работы загрузки фикстур
 	 */
-	public function testFixtureLoad() {
+	public function testFixtureLoad()
+	{
 		$res = $this->TestTableOne->find()->enableHydration(false)->toArray();
 		self::assertEquals(
-			[['id' => '158', 'col_enum' => 'val2', 'col_text' => 'qweqweqweqwe', 'col_time' => new Time('2017-03-14 11:22:33')]],
+			[
+				[
+					'id' => '158',
+					'col_enum' => 'val2',
+					'col_text' => 'qweqweqweqwe',
+					'col_time' => new Time('2017-03-14 11:22:33'),
+				],
+			],
 			$res, 'Неправильно загрузилась локальная фикстура'
 		);
 
@@ -90,7 +120,13 @@ class FixtureTest extends AppTestCase
 		self::assertEquals([['id' => '88']], $res, 'Неправильно загрузилась глобальная фикстура');
 
 		$res = $this->TestTableTwo->find()->enableHydration(false)->toArray();
-		self::assertEquals([['id' => '11', 'table_one_fk' => '1000', 'col_text' => null]], $res, 'Неправильно загрузилась фикстура наследника');
+		self::assertEquals([
+			[
+				'id' => '11',
+				'table_one_fk' => '1000',
+				'col_text' => null,
+			],
+		], $res, 'Неправильно загрузилась фикстура наследника');
 	}
 
 }

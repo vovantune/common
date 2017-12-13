@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Lib;
 
 use ArtSkills\Lib\Strings;
@@ -8,7 +9,8 @@ class StringsTest extends AppTestCase
 {
 
 	/** проверка префикса */
-	public function testStartsWith() {
+	public function testStartsWith()
+	{
 		$prefix = 'prefix';
 		$testStr = "{$prefix}asdfg";
 		self::assertTrue(Strings::startsWith($testStr, $prefix));
@@ -21,7 +23,8 @@ class StringsTest extends AppTestCase
 	}
 
 	/** проверка постфикса */
-	public function testEndsWith() {
+	public function testEndsWith()
+	{
 		$postfix = 'postfix';
 		$testStr = "asdfg{$postfix}";
 		self::assertTrue(Strings::endsWith($testStr, $postfix));
@@ -34,7 +37,8 @@ class StringsTest extends AppTestCase
 	}
 
 	/** замена префикса */
-	public function testReplacePrefix() {
+	public function testReplacePrefix()
+	{
 		$prefix = 'prefix';
 		$replacement = 'replacement';
 		$testStr = "{$prefix}asdf{$prefix}";
@@ -43,7 +47,8 @@ class StringsTest extends AppTestCase
 	}
 
 	/** замена постфикса */
-	public function testReplacePostfix() {
+	public function testReplacePostfix()
+	{
 		$postfix = 'postfix';
 		$replacement = 'replacement';
 		$testStr = "{$postfix}asdf{$postfix}";
@@ -52,7 +57,8 @@ class StringsTest extends AppTestCase
 	}
 
 	/** замена по условию */
-	public function testReplaceIfStarts() {
+	public function testReplaceIfStarts()
+	{
 		$prefix = 'prefix';
 		$restStr = 'asdfg';
 		$testStr = "{$prefix}{$restStr}";
@@ -63,7 +69,10 @@ class StringsTest extends AppTestCase
 		self::assertEquals($expectedStr, Strings::replaceIfStartsWith($testStr, [$prefix, 'shit'], $replacement));
 		self::assertEquals($expectedStr, Strings::replaceIfStartsWith($testStr, ['shit', $prefix], $replacement));
 		self::assertEquals($testStr, Strings::replaceIfStartsWith($testStr, ['shit', 'crap'], $replacement));
-		self::assertEquals($replacement . $testStr, Strings::replaceIfStartsWith($testStr, ['shit', 'crap'], $replacement, true));
+		self::assertEquals($replacement . $testStr, Strings::replaceIfStartsWith($testStr, [
+			'shit',
+			'crap',
+		], $replacement, true));
 
 		$testStr = "asd{$prefix}fg";
 		self::assertEquals($testStr, Strings::replaceIfStartsWith($testStr, $prefix, $replacement));
@@ -71,7 +80,8 @@ class StringsTest extends AppTestCase
 	}
 
 	/** замена по условию */
-	public function testReplaceIfEnds() {
+	public function testReplaceIfEnds()
+	{
 		$postfix = 'postfix';
 		$restStr = 'asdfg';
 		$testStr = "{$restStr}{$postfix}";
@@ -82,7 +92,10 @@ class StringsTest extends AppTestCase
 		self::assertEquals($expectedStr, Strings::replaceIfEndsWith($testStr, [$postfix, 'shit'], $replacement));
 		self::assertEquals($expectedStr, Strings::replaceIfEndsWith($testStr, ['shit', $postfix], $replacement));
 		self::assertEquals($testStr, Strings::replaceIfEndsWith($testStr, ['shit', 'crap'], $replacement));
-		self::assertEquals($testStr . $replacement, Strings::replaceIfEndsWith($testStr, ['shit', 'crap'], $replacement, true));
+		self::assertEquals($testStr . $replacement, Strings::replaceIfEndsWith($testStr, [
+			'shit',
+			'crap',
+		], $replacement, true));
 
 		$testStr = "asd{$postfix}fg";
 		self::assertEquals($testStr, Strings::replaceIfEndsWith($testStr, $postfix, $replacement));

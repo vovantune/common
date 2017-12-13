@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use ArtSkills\Error\InternalException;
@@ -16,7 +17,8 @@ class Arrays
 	 * @param int $depth
 	 * @return string
 	 */
-	public static function encode($array, $options = JSON_UNESCAPED_UNICODE, $depth = 512) {
+	public static function encode($array, $options = JSON_UNESCAPED_UNICODE, $depth = 512)
+	{
 		return json_encode($array, $options, $depth);
 	}
 
@@ -29,10 +31,10 @@ class Arrays
 	 * @param int $options
 	 * @return mixed
 	 */
-	public static function decode($jsonString, $assoc = true, $depth = 512, $options = 0) {
+	public static function decode($jsonString, $assoc = true, $depth = 512, $options = 0)
+	{
 		return json_decode($jsonString, $assoc, $depth, $options);
 	}
-
 
 
 	/**
@@ -42,7 +44,8 @@ class Arrays
 	 * @param string[] $keys
 	 * @return array
 	 */
-	public static function filterKeys(array $array, array $keys) {
+	public static function filterKeys(array $array, array $keys)
+	{
 		return array_intersect_key($array, array_flip($keys));
 	}
 
@@ -53,7 +56,8 @@ class Arrays
 	 * @param string[]|int[] $values
 	 * @return array
 	 */
-	public static function keysFromValues(array $values) {
+	public static function keysFromValues(array $values)
+	{
 		return array_combine($values, $values);
 	}
 
@@ -65,7 +69,8 @@ class Arrays
 	 * @param bool $notExistsNull если не найдено, то не добавлять или добавить null
 	 * @return array
 	 */
-	public static function remap(array $array, array $map, $notExistsNull = true) {
+	public static function remap(array $array, array $map, $notExistsNull = true)
+	{
 		$newArray = [];
 		foreach ($map as $oldKey => $newKey) {
 			if (array_key_exists($oldKey, $array)) {
@@ -88,7 +93,8 @@ class Arrays
 	 * @param mixed $default
 	 * @return mixed
 	 */
-	public static function get($array, $key, $default = null) {
+	public static function get($array, $key, $default = null)
+	{
 		if (is_array($array) && array_key_exists($key, $array)) {
 			return $array[$key];
 		} else {
@@ -106,7 +112,8 @@ class Arrays
 	 * @param bool $strict
 	 * @return bool
 	 */
-	public static function equals(array $array, $key, $value, $strict = true) {
+	public static function equals(array $array, $key, $value, $strict = true)
+	{
 		if ($strict) {
 			return array_key_exists($key, $array) && ($array[$key] === $value);
 		} else {
@@ -122,10 +129,11 @@ class Arrays
 	 * @param array $values
 	 * @return bool
 	 */
-	public static function equalsAny(array $array, $key, array $values) {
+	public static function equalsAny(array $array, $key, array $values)
+	{
 		return array_key_exists($key, $array) && in_array($array[$key], $values);
 	}
-	
+
 
 	/**
 	 * Инициализировать значение в массиве по ключу или пути из ключей
@@ -139,7 +147,8 @@ class Arrays
 	 * @param mixed $defaultValue
 	 * @throws InternalException
 	 */
-	public static function initPath(array &$array, $keyPath, $defaultValue) {
+	public static function initPath(array &$array, $keyPath, $defaultValue)
+	{
 		$keyPath = (array)$keyPath;
 		$lastKey = array_pop($keyPath);
 		foreach ($keyPath as $key) {
@@ -156,14 +165,14 @@ class Arrays
 	}
 
 
-
 	/**
 	 * strtolower для массива строк
 	 *
 	 * @param string[] $strings
 	 * @return string[]
 	 */
-	public static function strToLower(array $strings) {
+	public static function strToLower(array $strings)
+	{
 		return array_map('strtolower', $strings);
 	}
 
@@ -173,7 +182,8 @@ class Arrays
 	 * @param string[] $strings
 	 * @return string[]
 	 */
-	public static function trim(array $strings) {
+	public static function trim(array $strings)
+	{
 		return array_map('trim', $strings);
 	}
 

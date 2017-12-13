@@ -1,4 +1,7 @@
 <?php
+
 namespace TestApp\Controller;
 
-class ErrorController extends \ArtSkills\Controller\ErrorController {}
+class ErrorController extends \ArtSkills\Controller\ErrorController
+{
+}

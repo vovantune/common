@@ -1,5 +1,7 @@
 <?php
+
 namespace ArtSkills\Lib;
+
 use ArtSkills\Error\InternalException;
 
 /**
@@ -12,7 +14,6 @@ use ArtSkills\Error\InternalException;
  * }
  * $svFile->close(); // также возможно сделать unset($svFile) - сохраняет данные при вызове деструктора
  * ```
- *
  * - Запись ассоциативного массива целиком
  * ```php
  * $result = CsvWriter::writeCsv('svFile.csv', $lines, 'cp1251', ',');
@@ -41,7 +42,8 @@ class CsvWriter
 	 * @param string $delimiter
 	 * @throws InternalException
 	 */
-	public function __construct($filename, $encoding = "UTF-8", $delimiter = ';') {
+	public function __construct($filename, $encoding = "UTF-8", $delimiter = ';')
+	{
 		@$this->_handle = fopen($filename, 'w');
 
 		if (!$this->_handle) {
@@ -59,7 +61,8 @@ class CsvWriter
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	public function writeRow($row) {
+	public function writeRow($row)
+	{
 		if (!$this->_handle) {
 			throw new \Exception('Попытка записать в закрытый файл');
 		}
@@ -69,7 +72,8 @@ class CsvWriter
 	/**
 	 * Закрывает файл
 	 */
-	public function close() {
+	public function close()
+	{
 		fclose($this->_handle);
 		$this->_handle = null;
 	}
@@ -77,7 +81,8 @@ class CsvWriter
 	/**
 	 * Деструктов и в Африке деструктор
 	 */
-	public function __destruct() {
+	public function __destruct()
+	{
 		if ($this->_handle) {
 			$this->close();
 		}
@@ -94,7 +99,8 @@ class CsvWriter
 	 * @return bool
 	 */
 	public static function writeCsv(
-		$filename, $data, $encoding = "UTF-8", $delimiter = ',', $enclosure = '"') {
+		$filename, $data, $encoding = "UTF-8", $delimiter = ',', $enclosure = '"'
+	) {
 		$handle = fopen($filename, 'w');
 		stream_filter_append($handle, 'convert.iconv.UTF-8/' . $encoding);
 		if (!$handle) {

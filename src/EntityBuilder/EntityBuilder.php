@@ -92,16 +92,16 @@ class EntityBuilder
 		$entityClassName = self::_getClassTemplate(self::FILE_TYPE_ENTITY);
 		$queryClassName = self::_getClassTemplate(self::FILE_TYPE_QUERY);
 		static::$_tableMethods = [
-			'newEntity' => '@method ' . $entityClassName . ' newEntity(array|null $data = null, array $options = [])',
+			'newEntity' => '@method ' . $entityClassName . ' newEntity(array | null $data = null, array $options = [])',
 			'newEntities' => '@method ' . $entityClassName . '[] newEntities(array $data, array $options = [])',
 			'patchEntity' => '@method ' . $entityClassName . ' patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])',
 			'patchEntities' => '@method ' . $entityClassName . '[] patchEntities($entities, array $data, array $options = [])',
-			'save' => '@method ' . $entityClassName . '|false save(' . $entityClassName . ' $entity, array|\ArrayAccess $options = [])',
-			'saveArr' => '@method ' . $entityClassName . '|false saveArr(array $saveData, ' . $entityClassName . '|null $entity = null, array $options = [])',
-			'find' => '@method ' . $queryClassName . ' find(string $type = "all", array|\ArrayAccess $options = [])',
-			'get' => '@method ' . $entityClassName . ' get($primaryKey, array|\ArrayAccess $options = [])',
-			'getEntity' => '@method ' . $entityClassName . '|false getEntity(' . $entityClassName . '|int $entity, array|\ArrayAccess $options = [])',
-			'updateWithLock' => '@method ' . $entityClassName . '|null updateWithLock(' . $queryClassName . '|array $queryData, array $updateData)',
+			'save' => '@method ' . $entityClassName . '|false save(' . $entityClassName . ' $entity, array | \ArrayAccess $options = null)',
+			'saveArr' => '@method ' . $entityClassName . '|false saveArr(array $saveData, ' . $entityClassName . ' | null $entity = null, array $options = [])',
+			'find' => '@method ' . $queryClassName . ' find(string $type = "all", array | \ArrayAccess $options = null)',
+			'get' => '@method ' . $entityClassName . ' get($primaryKey, array | \ArrayAccess $options = null)',
+			'getEntity' => '@method ' . $entityClassName . '|false getEntity(' . $entityClassName . ' | int $entity, array | \ArrayAccess $options = null)',
+			'updateWithLock' => '@method ' . $entityClassName . '|null updateWithLock(' . $queryClassName . ' | array $queryData, array $updateData)',
 		];
 		static::$_fileTemplates = [
 			static::FILE_TYPE_TABLE => file_get_contents($config->tableTemplateFile),

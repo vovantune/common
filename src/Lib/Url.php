@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
@@ -15,7 +16,8 @@ class Url
 	 *
 	 * @return string
 	 */
-	public static function domain() {
+	public static function domain()
+	{
 		return Env::getServerName();
 	}
 
@@ -24,7 +26,8 @@ class Url
 	 *
 	 * @return string
 	 */
-	public static function protocol() {
+	public static function protocol()
+	{
 		return Env::getServerProtocol();
 	}
 
@@ -33,7 +36,8 @@ class Url
 	 *
 	 * @return string
 	 */
-	public static function domainAndProtocol() {
+	public static function domainAndProtocol()
+	{
 		return self::_build(self::domain(), self::protocol());
 	}
 
@@ -43,7 +47,8 @@ class Url
 	 * @param string[] $parts
 	 * @return string
 	 */
-	public static function path($parts) {
+	public static function path($parts)
+	{
 		return trim(implode('/', $parts));
 	}
 
@@ -57,7 +62,8 @@ class Url
 	 * @param string $hash
 	 * @return string
 	 */
-	private static function _build($domain, $protocol = '', $parts = [], $query = [], $hash = '') {
+	private static function _build($domain, $protocol = '', $parts = [], $query = [], $hash = '')
+	{
 		$url = '';
 		if (!empty($parts)) {
 			$url = self::path((array)$parts);
@@ -100,7 +106,8 @@ class Url
 	 * @param string $hash
 	 * @return string
 	 */
-	public static function withDomain($parts = [], $query = [], $hash = '') {
+	public static function withDomain($parts = [], $query = [], $hash = '')
+	{
 		return self::_build(self::domain(), false, $parts, $query, $hash);
 	}
 
@@ -112,7 +119,8 @@ class Url
 	 * @param string $hash
 	 * @return string
 	 */
-	public static function withDomainHttp($parts = [], $query = [], $hash = '') {
+	public static function withDomainHttp($parts = [], $query = [], $hash = '')
+	{
 		return self::_build(self::domain(), 'http', $parts, $query, $hash);
 	}
 
@@ -125,7 +133,8 @@ class Url
 	 * @param string $hash
 	 * @return string
 	 */
-	public static function withDomainAndProtocol($parts = [], $query = [], $hash = '') {
+	public static function withDomainAndProtocol($parts = [], $query = [], $hash = '')
+	{
 		return self::_build(self::domain(), self::protocol(), $parts, $query, $hash);
 	}
 
@@ -138,7 +147,8 @@ class Url
 	 * @param string $hash
 	 * @return string
 	 */
-	public static function withCustomDomain($domain, $parts = [], $query = [], $hash = '') {
+	public static function withCustomDomain($domain, $parts = [], $query = [], $hash = '')
+	{
 		return self::_build($domain, false, $parts, $query, $hash);
 	}
 
@@ -150,7 +160,8 @@ class Url
 	 * @param string $hash
 	 * @return string
 	 */
-	public static function withoutDomain($parts = [], $query = [], $hash = '') {
+	public static function withoutDomain($parts = [], $query = [], $hash = '')
+	{
 		return self::_build('', false, $parts, $query, $hash);
 	}
 
@@ -161,7 +172,8 @@ class Url
 	 * @param string $queryString
 	 * @return array
 	 */
-	public static function parseQuery($queryString) {
+	public static function parseQuery($queryString)
+	{
 		parse_str($queryString, $result);
 		if (empty($result)) {
 			return [];
@@ -175,7 +187,8 @@ class Url
 	 * @param array $parts
 	 * @return string
 	 */
-	public static function buildQuery(array $parts) {
+	public static function buildQuery(array $parts)
+	{
 		return http_build_query($parts);
 	}
 
@@ -185,7 +198,8 @@ class Url
 	 * @param string $url
 	 * @return bool
 	 */
-	public static function isHttpUrl($url) {
+	public static function isHttpUrl($url)
+	{
 		return Strings::startsWith(trim($url), [self::HTTP, 'https://']);
 	}
 

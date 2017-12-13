@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\EntityBuilder;
 
 use ArtSkills\Filesystem\Folder;
@@ -19,7 +20,8 @@ class TableDocumentationTest extends AppTestCase
 	];
 
 	/** @inheritdoc */
-	public function setUp() {
+	public function setUp()
+	{
 		parent::setUp();
 
 		EntityBuilderTest::restoreModelFolder(true);
@@ -30,7 +32,8 @@ class TableDocumentationTest extends AppTestCase
 	}
 
 	/** @inheritdoc */
-	public function tearDown() {
+	public function tearDown()
+	{
 		parent::tearDown();
 		EntityBuilder::setConfig(null);
 		TableDocumentation::setConfig(null);
@@ -39,20 +42,24 @@ class TableDocumentationTest extends AppTestCase
 
 	/**
 	 * без конфига
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Не задан конфиг
 	 */
-	public function testNoConfig() {
+	public function testNoConfig()
+	{
 		TableDocumentation::setConfig(null);
 		TableDocumentation::build();
 	}
 
 	/**
 	 * плохой конфиг
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Empty value for field 'modelFolder'
 	 */
-	public function testBadConfig() {
+	public function testBadConfig()
+	{
 		EntityBuilderConfig::create()->register();
 		TableDocumentation::build();
 	}
@@ -60,7 +67,8 @@ class TableDocumentationTest extends AppTestCase
 	/**
 	 * Обновление существующих таблиц и создание для них всего, что нужно
 	 */
-	public function testBuild() {
+	public function testBuild()
+	{
 		/**
 		 * Он работает на основе существующих классов. если в них неактуальные комменты, то они и останутся
 		 * изменяет только 2 файла доков

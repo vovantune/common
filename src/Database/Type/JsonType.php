@@ -1,11 +1,11 @@
 <?php
+
 namespace ArtSkills\Database\Type;
 
 use Cake\Database\Driver;
 
 /**
  * Поддержка типа данных JSON в MySQL, в отличие от CakePHP позволяет сохранять null значение.
- *
  * # Подключение:
  * По-умолчанию включено bootstrap.php, если нет, то прописываем следующее:
  * ```php
@@ -17,7 +17,8 @@ class JsonType extends \Cake\Database\Type\JsonType
 {
 
 	/** @inheritdoc */
-	public function toPHP($value, Driver $driver) {
+	public function toPHP($value, Driver $driver)
+	{
 		if ($value === null) {
 			return null;
 		}
@@ -25,7 +26,8 @@ class JsonType extends \Cake\Database\Type\JsonType
 	}
 
 	/** @inheritdoc */
-	public function toDatabase($value, Driver $driver) {
+	public function toDatabase($value, Driver $driver)
+	{
 		if ($value === null) {
 			return null;
 		}
@@ -33,7 +35,8 @@ class JsonType extends \Cake\Database\Type\JsonType
 	}
 
 	/** @inheritdoc */
-	public function toStatement($value, Driver $driver) {
+	public function toStatement($value, Driver $driver)
+	{
 		if ($value === null) {
 			return \PDO::PARAM_NULL;
 		}

@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\EntityBuilder;
 
 use ArtSkills\Filesystem\Folder;
@@ -25,7 +26,8 @@ class EntityBuilderTest extends AppTestCase
 	/**
 	 * Восстановить содержимое папки Model
 	 */
-	public static function restoreModelFolder($beforeTest) {
+	public static function restoreModelFolder($beforeTest)
+	{
 		$modelFolder = new Folder(self::MODEL_PATH);
 		$backupFolder = new Folder(__DIR__ . '/Backup');
 		if ($backupFolder->exists()) {
@@ -45,7 +47,8 @@ class EntityBuilderTest extends AppTestCase
 	}
 
 	/** @inheritdoc */
-	public function setUp() {
+	public function setUp()
+	{
 		parent::setUp();
 
 		self::restoreModelFolder(true);
@@ -56,7 +59,8 @@ class EntityBuilderTest extends AppTestCase
 	}
 
 	/** @inheritdoc */
-	public function tearDown() {
+	public function tearDown()
+	{
 		parent::tearDown();
 		EntityBuilder::setConfig(null);
 		TableDocumentation::setConfig(null);
@@ -65,20 +69,24 @@ class EntityBuilderTest extends AppTestCase
 
 	/**
 	 * без конфига
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Не задан конфиг
 	 */
-	public function testNoConfig() {
+	public function testNoConfig()
+	{
 		EntityBuilder::setConfig(null);
 		EntityBuilder::build();
 	}
 
 	/**
 	 * плохой конфиг
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Empty value for field 'modelFolder'
 	 */
-	public function testBadConfig() {
+	public function testBadConfig()
+	{
 		EntityBuilderConfig::create()->register();
 		EntityBuilder::build();
 	}
@@ -87,7 +95,8 @@ class EntityBuilderTest extends AppTestCase
 	/**
 	 * Обновление существующих таблиц и создание для них всего, что нужно
 	 */
-	public function testBuild() {
+	public function testBuild()
+	{
 		/**
 		 * table_one - всё существовало, всё изменилось
 		 * table_two - всё существовало, ничего не изменилось
@@ -99,33 +108,38 @@ class EntityBuilderTest extends AppTestCase
 		$expectedFiles = $expectedFolder->tree()[1];
 		foreach ($expectedFiles as $expectedFile) {
 			$actualFile = str_replace($expectedFolder->path, self::MODEL_PATH, $expectedFile);
-			self::assertFileEquals($expectedFile, $actualFile, 'Неправильно сработал построитель сущностей');
+			self::assertFileEquals($expectedFile, $actualFile, 'Неправильно сработал построитель сущностей: ' . $expectedFile);
 		}
 		self::assertTrue($hasChanges, 'Построитель не сказал, что были изменения');
 	}
 
 	/**
 	 * Файл уже есть
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage TestTableTwoTable.php already exists
 	 */
-	public function testCreateExists() {
+	public function testCreateExists()
+	{
 		EntityBuilder::createTableClass('test_table_two');
 	}
 
 	/**
 	 * Такой таблицы нет
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Table "bad_table" does not exist in DB
 	 */
-	public function testCreateBad() {
+	public function testCreateBad()
+	{
 		EntityBuilder::createTableClass('bad_table');
 	}
 
 	/**
 	 * Создание новой таблицы
 	 */
-	public function testCreate() {
+	public function testCreate()
+	{
 		$expectedFilePath = self::MODEL_PATH . '/Table/TestTableFourTable.php';
 		$actualFilePath = EntityBuilder::createTableClass('test_table_four');
 		self::assertEquals($expectedFilePath, $actualFilePath);
@@ -141,11 +155,10 @@ class EntityBuilderTest extends AppTestCase
 		$expectedFiles = $expectedFolder->tree()[1];
 		foreach ($expectedFiles as $expectedFile) {
 			$actualFile = str_replace($expectedFolder->path, self::MODEL_PATH, $expectedFile);
-			self::assertFileEquals($expectedFile, $actualFile, 'Неправильно сработал построитель сущностей');
+			self::assertFileEquals($expectedFile, $actualFile, 'Неправильно сработал построитель сущностей ' . $expectedFile);
 		}
 		self::assertTrue($hasChanges, 'Построитель не сказал, что были изменения');
 	}
-
 
 
 }

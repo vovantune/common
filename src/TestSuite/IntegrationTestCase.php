@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\TestSuite;
 
 use ArtSkills\Controller\Controller;
@@ -36,7 +37,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @return mixed
 	 * @throws InternalException
 	 */
-	protected function _getJsonFixture($fixtureName) {
+	protected function _getJsonFixture($fixtureName)
+	{
 		if (Env::hasFixtureFolder()) {
 			$fixtureFolder = Env::getFixtureFolder();
 		} else {
@@ -59,7 +61,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $message
 	 * @return void
 	 */
-	public function assertJsonSubset($subset, $json, $strict = false, $message = '') {
+	public function assertJsonSubset($subset, $json, $strict = false, $message = '')
+	{
 		if (is_string($subset)) {
 			$subset = json_decode($subset, true);
 		}
@@ -74,7 +77,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param null|int $responseCode
 	 * @return array
 	 */
-	public function getJsonResponse($url = '', $responseCode = null) {
+	public function getJsonResponse($url = '', $responseCode = null)
+	{
 		if (!empty($url)) {
 			$this->get($url);
 		}
@@ -98,7 +102,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string|array $data
 	 * @return array
 	 */
-	public function postJsonResponse($url, $data) {
+	public function postJsonResponse($url, $data)
+	{
 		$this->post($url, $data);
 		return $this->getJsonResponse();
 	}
@@ -112,7 +117,9 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param float $delta
 	 * @param int $maxDepth
 	 */
-	public function assertJsonResponseEquals($expected, $message = '', $responseCode = null, $delta = 0.0, $maxDepth = 10) {
+	public function assertJsonResponseEquals(
+		$expected, $message = '', $responseCode = null, $delta = 0.0, $maxDepth = 10
+	) {
 		self::assertEquals($expected, $this->getJsonResponse('', $responseCode), $message, $delta, $maxDepth);
 	}
 
@@ -173,13 +180,16 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param float $delta
 	 * @param int $maxDepth
 	 */
-	public function assertJsonOKEquals($expectedData = [], $message = '', $responseCode = null, $delta = 0.0, $maxDepth = 10) {
+	public function assertJsonOKEquals(
+		$expectedData = [], $message = '', $responseCode = null, $delta = 0.0, $maxDepth = 10
+	) {
 		$expectedResponse = ['status' => Controller::JSON_STATUS_OK] + $expectedData;
 		$this->assertJsonResponseEquals($expectedResponse, $message, $responseCode, $delta, $maxDepth);
 	}
 
 	/** @inheritdoc */
-	protected function _sendRequest($url, $method, $data = []) {
+	protected function _sendRequest($url, $method, $data = [])
+	{
 		$this->_flashResult = [];
 		parent::_sendRequest($url, $method, $data);
 	}
@@ -189,7 +199,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 *
 	 * @param int $expectCall
 	 */
-	protected function _initFlashSniff($expectCall = MethodMockerEntity::EXPECT_CALL_ONCE) {
+	protected function _initFlashSniff($expectCall = MethodMockerEntity::EXPECT_CALL_ONCE)
+	{
 		$this->_flashSniff = MethodMocker::sniff(FlashComponent::class, '__call')
 			->expectCall($expectCall)
 			->willReturnAction(function ($args) {
@@ -200,7 +211,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	/**
 	 * Проверка, что можно применять ассерты флеша
 	 */
-	protected function _checkFlashInited() {
+	protected function _checkFlashInited()
+	{
 		if (empty($this->_flashSniff)) {
 			self::fail('Flash sniff is not inited');
 		}
@@ -212,7 +224,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param array $expectedFlash массив массивов [method, [message]]
 	 * @param string $message
 	 */
-	private function _assertFlashEquals($expectedFlash, $message = '') {
+	private function _assertFlashEquals($expectedFlash, $message = '')
+	{
 		$this->_checkFlashInited();
 		self::assertEquals($expectedFlash, $this->_flashResult, $message);
 	}
@@ -223,7 +236,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $expectedMessage
 	 * @param string $assertFailMessage
 	 */
-	public function assertFlashSuccess($expectedMessage, $assertFailMessage = '') {
+	public function assertFlashSuccess($expectedMessage, $assertFailMessage = '')
+	{
 		$this->assertFlashMany([$expectedMessage => 'success'], $assertFailMessage);
 	}
 
@@ -233,8 +247,9 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $expectedMessage
 	 * @param string $assertFailMessage
 	 */
-	public function assertFlashError($expectedMessage, $assertFailMessage = '') {
-		$this->assertFlashMany([$expectedMessage =>'error'], $assertFailMessage);
+	public function assertFlashError($expectedMessage, $assertFailMessage = '')
+	{
+		$this->assertFlashMany([$expectedMessage => 'error'], $assertFailMessage);
 	}
 
 	/**
@@ -243,7 +258,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param array $expectedMessages сообщение => тип
 	 * @param string $assertFailMessage
 	 */
-	public function assertFlashMany(array $expectedMessages, $assertFailMessage = '') {
+	public function assertFlashMany(array $expectedMessages, $assertFailMessage = '')
+	{
 		$expectedFlash = [];
 		foreach ($expectedMessages as $expectedMessage => $messageType) {
 			$expectedFlash[] = [$messageType, [$expectedMessage]];
@@ -257,7 +273,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param array $expectedErrors
 	 * @param string $assertFailMessage
 	 */
-	public function assertFlashManyErrors(array $expectedErrors, $assertFailMessage = '') {
+	public function assertFlashManyErrors(array $expectedErrors, $assertFailMessage = '')
+	{
 		$this->assertFlashMany(array_fill_keys($expectedErrors, 'error'), $assertFailMessage);
 	}
 
@@ -267,7 +284,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param array $expectedFlash массив [method, [message]]
 	 * @param string $message
 	 */
-	private function _assertInFlash($expectedFlash, $message = '') {
+	private function _assertInFlash($expectedFlash, $message = '')
+	{
 		$this->_checkFlashInited();
 		self::assertContains($expectedFlash, $this->_flashResult, $message);
 	}
@@ -278,7 +296,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $expectedMessage
 	 * @param string $assertFailMessage
 	 */
-	public function assertFlashHasSuccess($expectedMessage, $assertFailMessage = '') {
+	public function assertFlashHasSuccess($expectedMessage, $assertFailMessage = '')
+	{
 		$this->_assertInFlash(['success', [$expectedMessage]], $assertFailMessage);
 	}
 
@@ -288,7 +307,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $expectedMessage
 	 * @param string $assertFailMessage
 	 */
-	public function assertFlashHasError($expectedMessage, $assertFailMessage = '') {
+	public function assertFlashHasError($expectedMessage, $assertFailMessage = '')
+	{
 		$this->_assertInFlash(['error', [$expectedMessage]], $assertFailMessage);
 	}
 
@@ -297,7 +317,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 *
 	 * @param string $message
 	 */
-	public function assertNoFlash($message = '') {
+	public function assertNoFlash($message = '')
+	{
 		$this->_checkFlashInited();
 		self::assertEquals([], $this->_flashResult, $message);
 	}
@@ -305,7 +326,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	/**
 	 * Задаёт хедер User-Agent, чтоб срабатывали проверки на линукс
 	 */
-	protected function _setLinuxHeaders() {
+	protected function _setLinuxHeaders()
+	{
 		$this->_setHeader('User-Agent', 'linux');
 	}
 
@@ -315,7 +337,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $refererUrl
 	 * @param string $webroot
 	 */
-	protected function _setReferer($refererUrl, $webroot = '/') {
+	protected function _setReferer($refererUrl, $webroot = '/')
+	{
 		$this->_setHeader('referer', $refererUrl);
 		if (!array_key_exists('webroot', $this->_request)) {
 			$this->_request['webroot'] = $webroot;
@@ -328,7 +351,8 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	 * @param string $name
 	 * @param string $value
 	 */
-	protected function _setHeader($name, $value) {
+	protected function _setHeader($name, $value)
+	{
 		if (empty($this->_request['headers'])) {
 			$this->_request['headers'] = [];
 		}

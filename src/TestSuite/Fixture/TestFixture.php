@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\TestSuite\Fixture;
 
 use ArtSkills\Lib\DB;
@@ -55,7 +56,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	 * @param string $caseClass
 	 * @throws Exception
 	 */
-	public function __construct($table = null, $caseClass = null) {
+	public function __construct($table = null, $caseClass = null)
+	{
 		$this->_testCaseClass = $caseClass;
 		if (!empty($table)) {
 			$this->table = $table;
@@ -73,7 +75,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	/**
 	 * @inheritdoc
 	 */
-	public function init() {
+	public function init()
+	{
 		if (!isset($this->import['table']) || !isset($this->import['connection'])) {
 			$this->_getCreateQuery();
 		}
@@ -84,7 +87,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	/**
 	 * Получает запрос CREATE TABLE для текущей таблицы и сохраняет его в $this->_createTableSqlQuery
 	 */
-	private function _getCreateQuery() {
+	private function _getCreateQuery()
+	{
 		$this->import['connection'] = DB::CONNECTION_DEFAULT;
 
 		if (!empty($this->table)) {
@@ -111,7 +115,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	 *
 	 * @param string $caseClass
 	 */
-	public function setTestCase($caseClass) {
+	public function setTestCase($caseClass)
+	{
 		if ($this->_testCaseClass == $caseClass) {
 			return;
 		}
@@ -124,7 +129,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	 *
 	 * @return string
 	 */
-	private function _getFixtureFileName() {
+	private function _getFixtureFileName()
+	{
 		$fixtureFile = $this->import['table'] . '.xml';
 		if (!empty($this->_testCaseClass)) {
 			$testCaseFile = (new \ReflectionClass($this->_testCaseClass))->getFileName();
@@ -147,7 +153,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	/**
 	 * Загружает данные из наших XML-файликов фикстур и сохраняет их в $this->records
 	 */
-	private function _loadFixtureData() {
+	private function _loadFixtureData()
+	{
 		$fixtureDataFile = $this->_getFixtureFileName();
 		if (empty($fixtureDataFile)) {
 			$this->records = $this->_classFixtureRecords;
@@ -193,7 +200,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	/**
 	 * @inheritdoc
 	 */
-	public function create(ConnectionInterface $testConnection) {
+	public function create(ConnectionInterface $testConnection)
+	{
 		if (empty($this->_schema)) {
 			return false;
 		}
@@ -210,7 +218,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 	/**
 	 * @inheritdoc
 	 */
-	public function insert(ConnectionInterface $testConnection) {
+	public function insert(ConnectionInterface $testConnection)
+	{
 		/**  @var Connection $testConnection */
 		try {
 			// тут всё то же самое, что и в parent::insert()

@@ -3,7 +3,7 @@
 <resultset statement="SELECT * FROM common_test.test_table_three
 LIMIT 0, 5000
 "
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<row>
 		<field name="id">88</field>
 	</row>

@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Config;
 
 use ArtSkills\TestSuite\AppTestCase;
@@ -7,7 +8,8 @@ class FunctionsTest extends AppTestCase
 {
 
 	/** функция для удобства использования вложенных ассоциаций */
-	public function testAssoc() {
+	public function testAssoc()
+	{
 		self::assertEquals('Table1', assoc('Table1'));
 		self::assertEquals(
 			'Table1.Table2.Table3.Table4',
@@ -16,13 +18,15 @@ class FunctionsTest extends AppTestCase
 	}
 
 	/** функция для удобства использования полей с названием таблицы */
-	public function testField() {
+	public function testField()
+	{
 		self::assertEquals('Table.field', field('Table', 'field'));
 		self::assertEquals('Table.field >=', field('Table', 'field', '>='));
 	}
 
 	/** функция для удобства формирования списка условий для where */
-	public function testFieldsWhere() {
+	public function testFieldsWhere()
+	{
 		$conditions = [
 			'Table1' => [
 				'field1' => 'val1',
@@ -49,10 +53,12 @@ class FunctionsTest extends AppTestCase
 	/**
 	 * функция для удобства формирования списка условий для where
 	 * дублирование ключей массива
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Дублируется ключ Table1.field1
 	 */
-	public function testFieldsWhereDuplicate() {
+	public function testFieldsWhereDuplicate()
+	{
 		fieldsWhere([
 			'Table1' => [
 				'field1' => 'val1',
@@ -64,7 +70,8 @@ class FunctionsTest extends AppTestCase
 	}
 
 	/** функция для удобства формирования списка полей для select */
-	public function testFieldsSelect() {
+	public function testFieldsSelect()
+	{
 		$fields = [
 			'Table1' => [
 				'field1',
@@ -95,10 +102,12 @@ class FunctionsTest extends AppTestCase
 	/**
 	 * функция для удобства формирования списка полей для select
 	 * дублирование ключей массива
+	 *
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Дублируется ключ alias
 	 */
-	public function testFieldsSelectDuplicate() {
+	public function testFieldsSelectDuplicate()
+	{
 		fieldsSelect([
 			'Table1' => [
 				'alias' => 'field1',

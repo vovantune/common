@@ -22,7 +22,8 @@ class Email extends \Cake\Mailer\Email
 	 *
 	 * @param array|string|null $config Array of configs, or string to load configs from email.php
 	 */
-	public function __construct($config = null) {
+	public function __construct($config = null)
+	{
 		if (Env::isUnitTest()) {
 			$config = $this->_getTestConfig($config);
 		}
@@ -36,7 +37,8 @@ class Email extends \Cake\Mailer\Email
 	 * @param array|string|null $paramConfig
 	 * @return array|null
 	 */
-	private function _getTestConfig($paramConfig) {
+	private function _getTestConfig($paramConfig)
+	{
 		if (is_array($paramConfig)) {
 			$config = $paramConfig;
 		} else {
@@ -62,7 +64,8 @@ class Email extends \Cake\Mailer\Email
 	 * @param string $listId
 	 * @return $this
 	 */
-	public function addListId($listId) {
+	public function addListId($listId)
+	{
 		$this->addHeaders([
 			'List-Id' => $listId,
 			'X-Postmaster-Msgtype' => $listId,
@@ -77,7 +80,8 @@ class Email extends \Cake\Mailer\Email
 	 * @param null $content
 	 * @return bool|array
 	 */
-	public function send($content = null) {
+	public function send($content = null)
+	{
 		try {
 			$result = parent::send($content);
 		} catch (\Exception $e) {
@@ -92,7 +96,8 @@ class Email extends \Cake\Mailer\Email
 	 *
 	 * @inheritdoc
 	 */
-	protected function _setEmail($varName, $email, $name) {
+	protected function _setEmail($varName, $email, $name)
+	{
 		return parent::_setEmail($varName, $this->_getEmailList($email), $name);
 	}
 
@@ -101,7 +106,8 @@ class Email extends \Cake\Mailer\Email
 	 *
 	 * @inheritdoc
 	 */
-	protected function _addEmail($varName, $email, $name) {
+	protected function _addEmail($varName, $email, $name)
+	{
 		return parent::_addEmail($varName, $this->_getEmailList($email), $name);
 	}
 
@@ -111,7 +117,8 @@ class Email extends \Cake\Mailer\Email
 	 * @param array|string $email
 	 * @return array|string
 	 */
-	private function _getEmailList($email) {
+	private function _getEmailList($email)
+	{
 		if (!is_array($email)) {
 			return $this->_getEmail($email);
 		}
@@ -135,7 +142,8 @@ class Email extends \Cake\Mailer\Email
 	 * @return string
 	 * @throws \Exception
 	 */
-	private function _getEmail($email) {
+	private function _getEmail($email)
+	{
 		if (!Env::isProduction() && !Env::isUnitTest()) {
 			$email = Env::getDebugEmail();
 			if (empty($email)) {

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Test\TestCase\Lib;
 
 use ArtSkills\Lib\Arrays;
@@ -8,7 +9,8 @@ class ArraysTest extends AppTestCase
 {
 
 	/** фильтр части ключей */
-	public function testFilterKeys() {
+	public function testFilterKeys()
+	{
 		$array = [
 			'a' => 1,
 			'b' => 2,
@@ -23,7 +25,8 @@ class ArraysTest extends AppTestCase
 	}
 
 	/** значения в ключи */
-	public function testKeysFromValues() {
+	public function testKeysFromValues()
+	{
 		$values = ['a', 'b', 'c'];
 		$expectedResult = [
 			'a' => 'a',
@@ -34,7 +37,8 @@ class ArraysTest extends AppTestCase
 	}
 
 	/** обработка массива строк */
-	public function testTrim() {
+	public function testTrim()
+	{
 		$strings = [
 			'    asd   asd asd    ',
 			" \n\t",
@@ -49,7 +53,8 @@ class ArraysTest extends AppTestCase
 	/**
 	 * смена ключей массива
 	 */
-	public function testRemap() {
+	public function testRemap()
+	{
 		$array = [
 			'before_1' => 'asd',
 			'before_2' => 'qwe',
@@ -74,7 +79,8 @@ class ArraysTest extends AppTestCase
 	}
 
 	/** получение */
-	public function testGet() {
+	public function testGet()
+	{
 		$default = 'default';
 		$hasKey = 'hasKey';
 		$hasNotKey = 'hasNotKey';
@@ -88,7 +94,8 @@ class ArraysTest extends AppTestCase
 	}
 
 	/** инициализация значения */
-	public function testInitPath() {
+	public function testInitPath()
+	{
 		$array = [];
 		$key = 'key1';
 		$value = 'test';
@@ -129,7 +136,8 @@ class ArraysTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage По ключу nest2 находится не массив
 	 */
-	public function testInitPathFail() {
+	public function testInitPathFail()
+	{
 		$keyNestedFirst = 'nest1';
 		$keyNestedSecond = 'nest2';
 		$keyNestedThird = 'nest3';
@@ -144,7 +152,8 @@ class ArraysTest extends AppTestCase
 	}
 
 	/** Сравнение */
-	public function testEquals() {
+	public function testEquals()
+	{
 		$keyEquals = '_key';
 		$keyNotEquals = '_notEq';
 		$keyNotExists = '_notExists';

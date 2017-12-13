@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Database\Type;
 
 use ArtSkills\Database\Type\JsonType;
@@ -17,7 +18,8 @@ class JsonTypeTest extends AppTestCase
 	];
 
 	/** @inheritdoc */
-	public function tearDown() {
+	public function tearDown()
+	{
 		parent::tearDown();
 		Type::set('json', new Type\JsonType('json'));
 	}
@@ -25,7 +27,8 @@ class JsonTypeTest extends AppTestCase
 	/**
 	 * Сохранение значения Null в поле типа JSON
 	 */
-	public function testSaveNull() {
+	public function testSaveNull()
+	{
 		Type::map('json', Type\JsonType::class);
 		$newEntity = $this->TestTableFive->newEntity([
 			'col_json' => null,

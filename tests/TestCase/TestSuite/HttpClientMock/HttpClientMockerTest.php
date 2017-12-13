@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\TestSuite\HttpClientMock;
 
 use ArtSkills\Http\Client;
@@ -12,13 +13,15 @@ use Cake\Http\Client\Response;
 class HttpClientMockerTest extends AppTestCase
 {
 	/** @inheritdoc */
-	public function setUp() {
+	public function setUp()
+	{
 		parent::setUp();
 		HttpClientMocker::clean();
 	}
 
 	/** Мок запроса */
-	public function testMock() {
+	public function testMock()
+	{
 		$url = 'http://www.artskills.ru';
 		$method = Request::METHOD_POST;
 		$post = ['foo' => 'bar'];
@@ -39,7 +42,8 @@ class HttpClientMockerTest extends AppTestCase
 	}
 
 	/** Тест снифера запросов */
-	public function testSyntheticSniff() {
+	public function testSyntheticSniff()
+	{
 		$testArray = ['request' => 'request', 'response' => 'response'];
 
 		HttpClientMocker::addSniff($testArray);
@@ -53,7 +57,8 @@ class HttpClientMockerTest extends AppTestCase
 	}
 
 	/** Тест полного цикла снифа */
-	public function testRealSniff() {
+	public function testRealSniff()
+	{
 		HttpClientAdapter::disableDebug();
 		$url = 'https://www.artskills.ru';
 		$client = new Client();
@@ -75,7 +80,8 @@ class HttpClientMockerTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage GET http://www.artskills.ru is already mocked
 	 */
-	public function testMockTwice() {
+	public function testMockTwice()
+	{
 		$url = 'http://www.artskills.ru';
 		$method = Request::METHOD_GET;
 
@@ -84,7 +90,8 @@ class HttpClientMockerTest extends AppTestCase
 	}
 
 	/** Но с разными методами можно замокать 1 урл несколько раз */
-	public function testMockTwiceDifferentMethods() {
+	public function testMockTwiceDifferentMethods()
+	{
 		$url = 'http://www.artskills.ru';
 
 		HttpClientMocker::mock($url, Request::METHOD_POST)->noCalls();
@@ -93,7 +100,8 @@ class HttpClientMockerTest extends AppTestCase
 	}
 
 	/** Мок возвращает код статуса */
-	public function testStatusCode() {
+	public function testStatusCode()
+	{
 		$url = 'http://www.artskills.ru';
 		$mock = HttpClientMocker::mock($url, Request::METHOD_GET);
 		$client = new Client();
@@ -130,7 +138,8 @@ class HttpClientMockerTest extends AppTestCase
 	}
 
 	/** тест метода mockGet */
-	public function testMockGet() {
+	public function testMockGet()
+	{
 		$url = 'http://www.artskills.ru';
 		$data = ['foo' => 'bar'];
 		$responseBody = 'test response';
@@ -141,7 +150,8 @@ class HttpClientMockerTest extends AppTestCase
 	}
 
 	/** тест метода mockGet, когда в урле уже были гет-параметры */
-	public function testMockGetAppend() {
+	public function testMockGetAppend()
+	{
 		$url = 'http://www.artskills.ru';
 		$data = ['foo' => 'bar'];
 		$prevData = ['asd' => 'qwe'];
@@ -154,7 +164,8 @@ class HttpClientMockerTest extends AppTestCase
 	}
 
 	/** тест метода mockPost */
-	public function testMockPost() {
+	public function testMockPost()
+	{
 		$url = 'http://www.artskills.ru';
 		$data = ['foo' => 'bar'];
 		$responseBody = 'post test response';
@@ -170,7 +181,8 @@ class HttpClientMockerTest extends AppTestCase
 	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
 	 * @expectedExceptionMessage Expected POST body data is not equal to real data
 	 */
-	public function testMockPostUnexpectedBody() {
+	public function testMockPostUnexpectedBody()
+	{
 		$url = 'http://www.artskills.ru';
 		HttpClientMocker::mockPost($url, ['foo' => 'bar'])->willReturnString('');
 

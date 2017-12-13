@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\Fixture;
 
 use ArtSkills\TestSuite\Fixture\TestFixture;

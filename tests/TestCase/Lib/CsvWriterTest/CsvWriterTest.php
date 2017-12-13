@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Lib\CsvWriterTest;
 
 use ArtSkills\Lib\CsvReader;
@@ -11,7 +12,8 @@ class CsvWriterTest extends AppTestCase
 	/**
 	 * Тест обычной записи файла
 	 */
-	public function testNormal() {
+	public function testNormal()
+	{
 		$testFile = TMP . 'csvWriterTest.csv';
 
 		$csvWriter = new CsvWriter($testFile);
@@ -30,7 +32,8 @@ class CsvWriterTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Ошибка создания файла
 	 */
-	public function testWriteToNonExistsDirectory() {
+	public function testWriteToNonExistsDirectory()
+	{
 		$testFile = TMP . 'nonExistsDirectory/csvWriterTest.csv';
 
 		$csvWriter = new CsvWriter($testFile);
@@ -45,7 +48,8 @@ class CsvWriterTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage Попытка записать в закрытый файл
 	 */
-	public function testWriteToClosedFile() {
+	public function testWriteToClosedFile()
+	{
 		$testFile = TMP . 'csvWriterTest.csv';
 
 		$csvWriter = new CsvWriter($testFile);
@@ -62,7 +66,8 @@ class CsvWriterTest extends AppTestCase
 	 *
 	 * @throws \Exception
 	 */
-	public function testOtherEncoding() {
+	public function testOtherEncoding()
+	{
 		$testFile = TMP . 'csvWriterTest.csv';
 
 		$csvWriter = new CsvWriter($testFile, 'windows-1251');
@@ -80,7 +85,8 @@ class CsvWriterTest extends AppTestCase
 	 *
 	 * @throws \Exception
 	 */
-	public function testWriteLeftSymbols() {
+	public function testWriteLeftSymbols()
+	{
 		$testFile = TMP . 'csvWriterTest.csv';
 
 		$csvWriter = new CsvWriter($testFile);
@@ -96,7 +102,8 @@ class CsvWriterTest extends AppTestCase
 	/**
 	 * Тест перенесеной функции записывающей весь массив
 	 */
-	public function testWriteData() {
+	public function testWriteData()
+	{
 		$fileName = 'CsvTestTemp.csv';
 		$data = [
 			0 => [

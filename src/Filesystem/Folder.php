@@ -14,7 +14,8 @@ class Folder extends \Cake\Filesystem\Folder
 	private $_virtualPath = null;
 
 	/** @inheritdoc */
-	public function __construct($path = null, $create = false, $mode = false) {
+	public function __construct($path = null, $create = false, $mode = false)
+	{
 		parent::__construct($path, $create, $mode);
 		$this->_virtualPath = $path;
 	}
@@ -24,7 +25,8 @@ class Folder extends \Cake\Filesystem\Folder
 	 *
 	 * @return bool
 	 */
-	public function isEmpty() {
+	public function isEmpty()
+	{
 		if (empty($this->path)) {
 			return false;
 		}
@@ -38,7 +40,8 @@ class Folder extends \Cake\Filesystem\Folder
 	 * @param int $mode
 	 * @return bool
 	 */
-	public function createSelf($mode = 0755) {
+	public function createSelf($mode = 0755)
+	{
 		if (empty($this->_virtualPath)) {
 			return false;
 		} else {
@@ -51,19 +54,22 @@ class Folder extends \Cake\Filesystem\Folder
 	 *
 	 * @return bool
 	 */
-	public function exists() {
+	public function exists()
+	{
 		return !empty($this->path) && is_dir($this->path);
 	}
 
 	/** @inheritdoc */
-	public function copy($options) {
+	public function copy($options)
+	{
 		$res = parent::copy($options);
 		$this->cd($this->_virtualPath);
 		return $res;
 	}
 
 	/** @inheritdoc */
-	public function move($options) {
+	public function move($options)
+	{
 		$res = parent::move($options);
 		$this->path = $this->_virtualPath;
 		return $res;
@@ -108,7 +114,8 @@ class Folder extends \Cake\Filesystem\Folder
 	 * @param int $mode
 	 * @return string
 	 */
-	public static function createIfNotExists($path, $mode = 0755) {
+	public static function createIfNotExists($path, $mode = 0755)
+	{
 		if (!is_dir($path)) {
 			mkdir($path, $mode);
 		}

@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\ORM;
 
 use ArtSkills\TestSuite\Mock\MethodMocker;
@@ -31,7 +32,8 @@ class TableTest extends AppTestCase
 	/**
 	 * Получение сущности разными способами
 	 */
-	public function testGetEntity() {
+	public function testGetEntity()
+	{
 		self::assertEquals('TestTableOne', MethodMocker::callPrivate(TestTableOneTable::class, '_getAlias'), 'Не сработало получение алиаса');
 		self::assertInstanceOf(TestTableOneTable::class, TestTableOneTable::instance(), 'Не сработало получение инстанса');
 
@@ -48,7 +50,8 @@ class TableTest extends AppTestCase
 	/**
 	 * Сохранение в одно действие
 	 */
-	public function testSaveArr() {
+	public function testSaveArr()
+	{
 		// сохранение новой записи
 		$saveData = [
 			'col_enum' => 'val2',
@@ -69,7 +72,10 @@ class TableTest extends AppTestCase
 
 		// редактирование
 		$newText = '2222222222';
-		$saveResult = $this->TestTableOne->saveArr(['col_text' => $newText, 'col_time' => $saveData['col_time']], $newRecord, ['dirtyFields' => 'col_time']);
+		$saveResult = $this->TestTableOne->saveArr([
+			'col_text' => $newText,
+			'col_time' => $saveData['col_time'],
+		], $newRecord, ['dirtyFields' => 'col_time']);
 		self::assertInstanceOf(TestTableOne::class, $saveResult, 'Неправильный результат сохранения при редактировании');
 
 		$expectedData['col_text'] = $newText;
@@ -78,7 +84,10 @@ class TableTest extends AppTestCase
 
 		// редактирование по id
 		$newText = 'zzzzzzzz';
-		$saveResult = $this->TestTableOne->saveArr(['col_text' => $newText, 'col_time' => $saveData['col_time']], $newRecord->id, ['dirtyFields' => 'col_time']);
+		$saveResult = $this->TestTableOne->saveArr([
+			'col_text' => $newText,
+			'col_time' => $saveData['col_time'],
+		], $newRecord->id, ['dirtyFields' => 'col_time']);
 		self::assertInstanceOf(TestTableOne::class, $saveResult, 'Неправильный результат сохранения при редактировании по id');
 
 		$expectedData['col_text'] = $newText;
@@ -89,7 +98,8 @@ class TableTest extends AppTestCase
 	/**
 	 * Редактирование связанных сущностей
 	 */
-	public function testChildEdit() {
+	public function testChildEdit()
+	{
 		$testId = 45;
 		$assoc = 'TestTableTwo';
 
@@ -125,7 +135,8 @@ class TableTest extends AppTestCase
 	/**
 	 * exists с contain
 	 */
-	public function testExistsContain() {
+	public function testExistsContain()
+	{
 		//существование записи
 		$exists = $this->TestTableTwo->exists(['id' => 89]);
 		self::assertTrue($exists, 'Не найдена запись');
@@ -136,19 +147,22 @@ class TableTest extends AppTestCase
 
 	/**
 	 * Попытка вставить запись с плохим внешним ключом
+	 *
 	 * @expectedException \PDOException
 	 * @expectedExceptionMessage a foreign key constraint fails
 	 */
-	public function testBadFK() {
+	public function testBadFK()
+	{
 		$this->TestTableTwo->saveArr(['table_one_fk' => 88]);
 	}
 
 	/**
 	 * Получаем запись с блокировкой
 	 */
-	public function testFindAndLock() {
+	public function testFindAndLock()
+	{
 		MethodMocker::sniff(Table::class, 'save')->expectCall(1);
-		MethodMocker::sniff(Query::class, 'sql', function($args, $result) {
+		MethodMocker::sniff(Query::class, 'sql', function ($args, $result) {
 			static $firstQuery = true;
 			if ($firstQuery) {
 				self::assertContains('LIMIT 1 FOR UPDATE', $result, 'Не добавилась блокировка запроса');
@@ -156,11 +170,11 @@ class TableTest extends AppTestCase
 			}
 		});
 
-		MethodMocker::sniff(Mysql::class, 'beginTransaction', function() {
+		MethodMocker::sniff(Mysql::class, 'beginTransaction', function () {
 			self::assertTrue(true, 'Транзакция не началась');
 		});
 
-		MethodMocker::sniff(Mysql::class, 'commitTransaction', function() {
+		MethodMocker::sniff(Mysql::class, 'commitTransaction', function () {
 			self::assertTrue(true, 'Транзакция не закончилась');
 		});
 
@@ -176,7 +190,8 @@ class TableTest extends AppTestCase
 	/**
 	 * Поиск записи с блокировкой при пустом результате
 	 */
-	public function testFindAndLockEmpty() {
+	public function testFindAndLockEmpty()
+	{
 		MethodMocker::sniff(Table::class, 'save')->expectCall(0);
 		$query = $this->TestTableTwo->find()->where(['id' => 26]);
 		$result = $this->TestTableTwo->updateWithLock($query, ['table_one_fk' => 45]);
@@ -186,7 +201,8 @@ class TableTest extends AppTestCase
 	/**
 	 * короткое описание опций для findList
 	 */
-	public function testShortFindList() {
+	public function testShortFindList()
+	{
 		// одно поле - и ключ и значение
 		$classicList = $this->TestTableTwo->find('list', [
 			'keyField' => 'id',
@@ -261,7 +277,7 @@ class TableTest extends AppTestCase
 		// джоины
 		$shortList = $this->TestTableTwo
 			->find('list', [
-				'id' => 'TestTableOne.col_text'
+				'id' => 'TestTableOne.col_text',
 			])
 			->contain('TestTableOne')
 			->where([

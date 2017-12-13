@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\ORM;
 
 use ArtSkills\Error\InternalException;
@@ -13,8 +14,9 @@ class Entity extends \Cake\ORM\Entity
 	 */
 	protected $_aliases = [];
 
-	/** @inheritdoc  */
-	public function __construct(array $properties = [], array $options = []) {
+	/** @inheritdoc */
+	public function __construct(array $properties = [], array $options = [])
+	{
 		parent::__construct($properties, $options);
 		$this->_virtual = array_merge($this->_virtual, array_keys($this->_aliases));
 	}
@@ -25,12 +27,14 @@ class Entity extends \Cake\ORM\Entity
 	 * @param string $alias
 	 * @return string
 	 */
-	private function _actualProperty($alias) {
+	private function _actualProperty($alias)
+	{
 		return empty($this->_aliases[$alias]) ? $alias : $this->_aliases[$alias];
 	}
 
 	/** @inheritdoc */
-	public function set($property, $value = null, array $options = []) {
+	public function set($property, $value = null, array $options = [])
+	{
 		if (is_array($property)) {
 			$actualProperty = [];
 			foreach ($property as $name => $value) {
@@ -46,20 +50,24 @@ class Entity extends \Cake\ORM\Entity
 	}
 
 	/** @inheritdoc */
-	public function &get($property) {
+	public function &get($property)
+	{
 		return parent::get($this->_actualProperty($property));
 	}
 
 	/** @inheritdoc */
-	public function getOriginal($property) {
+	public function getOriginal($property)
+	{
 		return parent::getOriginal($this->_actualProperty($property));
 	}
 
 	/**
 	 * Ошибки без разделения по полям
+	 *
 	 * @return string[]
 	 */
-	public function getAllErrors() {
+	public function getAllErrors()
+	{
 		$errors = $this->getErrors();
 		if (empty($errors)) {
 			return [];
@@ -74,7 +82,8 @@ class Entity extends \Cake\ORM\Entity
 	 * @param string $fieldName
 	 * @return bool
 	 */
-	public function changed($fieldName) {
+	public function changed($fieldName)
+	{
 		return $this->get($fieldName) != $this->getOriginal($fieldName);
 	}
 
@@ -85,7 +94,8 @@ class Entity extends \Cake\ORM\Entity
 	 * @param null|int $index
 	 * @throws InternalException
 	 */
-	public function deleteChild($childEntity, $index = null) {
+	public function deleteChild($childEntity, $index = null)
+	{
 		if (!array_key_exists($childEntity, $this->_properties)) {
 			throw new InternalException("Unknown property $childEntity");
 		} elseif (is_array($this->{$childEntity})) {

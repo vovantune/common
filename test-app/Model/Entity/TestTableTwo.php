@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace TestApp\Model\Entity;
 
 use ArtSkills\ORM\Entity;
@@ -22,7 +24,8 @@ class TestTableTwo extends Entity
 	/**
 	 * @return string whoa!!!
 	 */
-	protected function _getVirtualField() {
+	protected function _getVirtualField()
+	{
 		return 'whoa, virtual fields!';
 	}
 }

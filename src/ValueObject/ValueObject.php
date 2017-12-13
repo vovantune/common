@@ -12,7 +12,6 @@ use Cake\Log\Log;
 
 /**
  * Основной класс [объекта-значения](https://github.com/ArtSkills/common/src/ValueObject/README.md).
- *
  * TODO: 1) изучить https://symfony.com/doc/current/components/serializer.html для вомзможного применения
  * TODO: 2) проверять значения свойств при их заполнении на соответствии типа из PHPDoc
  */
@@ -41,7 +40,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 * @param array|Entity $fillValues Список заполняемых свойств
 	 * @throws InternalException
 	 */
-	public function __construct($fillValues = []) {
+	public function __construct($fillValues = [])
+	{
 		$this->_fillExportedFields();
 
 		foreach ($fillValues as $key => $value) {
@@ -59,7 +59,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 * @param array $fillValues Список заполняемых свойств
 	 * @return static
 	 */
-	public static function create(array $fillValues = []) {
+	public static function create(array $fillValues = [])
+	{
 		return new static($fillValues);
 	}
 
@@ -71,7 +72,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 * @return $this
 	 * @throws InternalException
 	 */
-	public function __call($name, array $arguments = []) {
+	public function __call($name, array $arguments = [])
+	{
 		$prefix = 'set';
 		if (Strings::startsWith($name, $prefix)) {
 			$propertyName = lcfirst(Strings::replacePrefix($name, $prefix));
@@ -92,7 +94,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 *
 	 * @return array
 	 */
-	public function toArray() {
+	public function toArray()
+	{
 		return json_decode(json_encode($this), true);
 	}
 
@@ -101,7 +104,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 *
 	 * @return string
 	 */
-	public function toJson() {
+	public function toJson()
+	{
 		$options = JSON_UNESCAPED_UNICODE;
 		if (Env::isDevelopment()) {
 			$options |= JSON_PRETTY_PRINT;
@@ -114,7 +118,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 *
 	 * @return array
 	 */
-	public function jsonSerialize() {
+	public function jsonSerialize()
+	{
 		$result = [];
 		foreach ($this->_exportFieldNames as $fieldName) {
 			$result[$fieldName] = $this->{$fieldName};
@@ -125,7 +130,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	/**
 	 * Заполняем список полей на экспорт
 	 */
-	private function _fillExportedFields() {
+	private function _fillExportedFields()
+	{
 		$refClass = new \ReflectionClass(static::class);
 		$properties = $refClass->getProperties(\ReflectionProperty::IS_PUBLIC);
 		foreach ($properties as $property) {
@@ -138,25 +144,29 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	}
 
 	/** @inheritdoc */
-	public function offsetExists($offset) {
+	public function offsetExists($offset)
+	{
 		$this->_triggerDeprecatedError($offset);
 		return property_exists($this, $offset);
 	}
 
 	/** @inheritdoc */
-	public function offsetGet($offset) {
+	public function offsetGet($offset)
+	{
 		$this->_triggerDeprecatedError($offset);
 		return $this->{$offset};
 	}
 
 	/** @inheritdoc */
-	public function offsetSet($offset, $value) {
+	public function offsetSet($offset, $value)
+	{
 		$this->_triggerDeprecatedError($offset);
 		$this->{$offset} = $value;
 	}
 
 	/** @inheritdoc */
-	public function offsetUnset($offset) {
+	public function offsetUnset($offset)
+	{
 		$this->_triggerDeprecatedError($offset);
 		return $this->offsetSet($offset, null);
 	}
@@ -166,7 +176,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 *
 	 * @param string $offset
 	 */
-	private function _triggerDeprecatedError($offset) {
+	private function _triggerDeprecatedError($offset)
+	{
 		$trace = Debugger::trace(['start' => 2, 'depth' => 3, 'format' => 'array']);
 		$file = str_replace([CAKE_CORE_INCLUDE_PATH, ROOT], '', $trace[0]['file']);
 		$line = $trace[0]['line'];

@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Error;
 
 use ArtSkills\Log\Engine\SentryLog;
@@ -14,7 +15,8 @@ trait ErrorHandlerTrait
 	 * убрали условие, по которому ошибки не логировались в шатдауне
 	 * дополнительные действия для сентри
 	 */
-	public function register() {
+	public function register()
+	{
 		$level = -1;
 		if (isset($this->_options['errorLevel'])) {
 			$level = $this->_options['errorLevel'];
@@ -51,7 +53,8 @@ trait ErrorHandlerTrait
 	 *
 	 * @param array $error
 	 */
-	private function _logShutdown($error) {
+	private function _logShutdown($error)
+	{
 		SentryLog::setShutdown();
 		$this->handleFatalError(
 			$error['type'],
@@ -66,7 +69,8 @@ trait ErrorHandlerTrait
 	 * копия родителя
 	 * дополнительные действия для сентри
 	 */
-	public function handleFatalError($code, $description, $file, $line) {
+	public function handleFatalError($code, $description, $file, $line)
+	{
 		SentryLog::addDeleteTraceLevel(1);
 		$data = [
 			'code' => $code,
@@ -88,7 +92,8 @@ trait ErrorHandlerTrait
 	 * @inheritdoc
 	 * все notice и warning логировать как ошибки
 	 */
-	protected function _logError($level, $data) {
+	protected function _logError($level, $data)
+	{
 		SentryLog::addDeleteTraceLevel(SentryLog::DELETE_TRACE_LEVEL_HANDLER);
 		return parent::_logError(LOG_ERR, $data);
 	}
@@ -98,10 +103,13 @@ trait ErrorHandlerTrait
 	 * скопировано из родителя
 	 * добавлена обработка в сентри
 	 */
-	protected function _logException(\Exception $exception) {
+	protected function _logException(\Exception $exception)
+	{
 		$config = $this->_options;
-		$unwrapped = $exception instanceof PHP7ErrorException ?
-			$exception->getError() :
+		$unwrapped = $exception instanceof PHP7ErrorException
+			?
+			$exception->getError()
+			:
 			$exception;
 
 		if (empty($config['log'])) {

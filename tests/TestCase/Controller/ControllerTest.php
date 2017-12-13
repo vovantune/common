@@ -14,32 +14,37 @@ class ControllerTest extends AppControllerTestCase
 {
 
 	/** @inheritdoc */
-	public function tearDown() {
+	public function tearDown()
+	{
 		Env::enableDebug();
 		parent::tearDown();
 	}
 
 	/** Успешный JSON ответ */
-	public function testJsonOk() {
+	public function testJsonOk()
+	{
 		$this->get('/test/getJsonOk');
 		$this->assertJsonOKEquals(['testProperty' => 123]);
 	}
 
 	/** Ответ об ошибке */
-	public function testJsonError() {
+	public function testJsonError()
+	{
 		$this->get('/test/getJsonError');
 		$this->assertJsonErrorEquals('Тестовая ошибка', 'Некорректное сообщение об ошибке', ['errorProperty' => 123]);
 
 	}
 
 	/** Пустой JSON ответ */
-	public function testEmptyJson() {
+	public function testEmptyJson()
+	{
 		$this->get('/test/getEmptyJson');
 		$this->assertJsonOKEquals([]);
 	}
 
 	/** ValueObject в качестве результата */
-	public function testGetValueObject() {
+	public function testGetValueObject()
+	{
 		$this->get('/test/getValueObjectJson');
 		$this->assertJsonOKEquals([
 			'testProperty' => 'testData',
@@ -47,41 +52,46 @@ class ControllerTest extends AppControllerTestCase
 	}
 
 	/** ответ с ошибкой из исключения */
-	public function testErrorFromException() {
+	public function testErrorFromException()
+	{
 		$this->get('/test/getJsonException');
 		$this->assertJsonErrorEquals('test exception', 'Некорректное сообщение об ошибке', ['someData' => 'test']);
 	}
 
 	/**
 	 * Если было исключение phpunit
+	 *
 	 * @expectedException \PHPUnit\Framework\AssertionFailedError
 	 * @expectedExceptionMessage test unit exception
 	 */
-	public function testUnitException() {
+	public function testUnitException()
+	{
 		$this->get('/test/getJsonExceptionUnit');
 	}
 
 	/** Стандартная обработка ошибок, json */
-	public function testStandardErrorJson() {
+	public function testStandardErrorJson()
+	{
 		MethodMocker::mock(SentryLog::class, 'logException')->expectCall(0);
 		$this->get('/test/getStandardErrorJson');
 		$this->assertJsonErrorEquals('test json message');
 	}
 
 	/** Стандартная обработка ошибок, json, немного сконфигурированная обработка */
-	public function testStandardErrorJsonConfigured() {
+	public function testStandardErrorJsonConfigured()
+	{
 		MethodMocker::mock(SentryLog::class, 'logException')
 			->singleCall()
-			->willReturnAction(function($args) {
+			->willReturnAction(function ($args) {
 				/** @var UserException $exception */
 				$exception = $args[0];
 				self::assertEquals('log message', $exception->getMessage());
 				self::assertEquals('user message', $exception->getUserMessage());
 				self::assertEquals([
 					'scope' => [
-						(int) 0 => 'some scope'
+						(int)0 => 'some scope',
 					],
-					'_addInfo' => 'some info'
+					'_addInfo' => 'some info',
 				], $args[1]);
 				self::assertEquals(false, $args[2]);
 			});
@@ -90,7 +100,8 @@ class ControllerTest extends AppControllerTestCase
 	}
 
 	/** Стандартная обработка ошибок, html, flash */
-	public function testStandardErrorFlash() {
+	public function testStandardErrorFlash()
+	{
 		MethodMocker::mock(SentryLog::class, 'logException')->expectCall(0);
 		$this->_initFlashSniff(1);
 		$this->get('/test/getStandardErrorFlash');
@@ -99,7 +110,8 @@ class ControllerTest extends AppControllerTestCase
 	}
 
 	/** Стандартная обработка ошибок, flash, редирект */
-	public function testStandardErrorRedirect() {
+	public function testStandardErrorRedirect()
+	{
 		MethodMocker::mock(SentryLog::class, 'logException')->expectCall(0);
 		$this->_initFlashSniff(1);
 		$this->get('/test/getStandardErrorRedirect');
@@ -108,7 +120,8 @@ class ControllerTest extends AppControllerTestCase
 	}
 
 	/** Внутренняя ошибка, отдаёт 5хх; в режиме дебага есть сообщение из ексепшна */
-	public function testInternalError() {
+	public function testInternalError()
+	{
 		MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
 		$this->_initFlashSniff(0);
 		$this->get('/test/getInternalError');
@@ -118,7 +131,8 @@ class ControllerTest extends AppControllerTestCase
 	}
 
 	/** Внутренняя ошибка, отдаёт 5хх; в режиме продакшна сообщения нет */
-	public function testInternalErrorProduction() {
+	public function testInternalErrorProduction()
+	{
 		Env::setDebug(false);
 		MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
 		$this->_initFlashSniff(0);
@@ -130,7 +144,8 @@ class ControllerTest extends AppControllerTestCase
 
 
 	/** Внутренняя ошибка, отдаёт json, в режиме дебага есть информация об ексепшне */
-	public function testInternalErrorJson() {
+	public function testInternalErrorJson()
+	{
 		MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
 		$this->get('/test/getInternalErrorJson');
 		$this->assertJsonErrorEquals(
@@ -143,7 +158,7 @@ class ControllerTest extends AppControllerTestCase
 				// в котором вызван InternalError::instance
 				// при этом file и line - из TestController
 				'file' => (new \ReflectionClass(TestController::class))->getFileName(),
-				'line' => 127,
+				'line' => 139,
 			],
 			500
 		);
@@ -151,7 +166,8 @@ class ControllerTest extends AppControllerTestCase
 	}
 
 	/** проверить, что у внутренних ошибок правильный трейс */
-	public function testInternalErrorTrace() {
+	public function testInternalErrorTrace()
+	{
 		MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
 		$this->get('/test/getInternalErrorJsonTrace');
 		$this->assertJsonErrorEquals(
@@ -162,14 +178,15 @@ class ControllerTest extends AppControllerTestCase
 				'code' => 500,
 				// а здесь был сделан непосредственно throw new InternalError
 				'file' => (new \ReflectionClass(TestController::class))->getFileName(),
-				'line' => 137,
+				'line' => 150,
 			],
 			500
 		);
 	}
 
 	/** Внутренняя ошибка, отдаёт json, продакшна сообщения нет */
-	public function testInternalErrorJsonProduction() {
+	public function testInternalErrorJsonProduction()
+	{
 		Env::setDebug(false);
 		MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
 		$this->get('/test/getInternalErrorJson');
@@ -186,7 +203,8 @@ class ControllerTest extends AppControllerTestCase
 	}
 
 	/** Ещё раз убеждаемся, что трейса на продакшне нет */
-	public function testInternalErrorJsonProductionTrace() {
+	public function testInternalErrorJsonProductionTrace()
+	{
 		Env::setDebug(false);
 		MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
 		$this->get('/test/getInternalErrorJsonTrace');
@@ -202,7 +220,8 @@ class ControllerTest extends AppControllerTestCase
 	}
 
 	/** смотрим, как выбираются экшны и шаблоны */
-	public function testActionAndTemplateResolve() {
+	public function testActionAndTemplateResolve()
+	{
 		MethodMocker::mock(Log::class, 'write')->expectCall(4);
 
 		$this->get('/cake/testName');
@@ -218,7 +237,6 @@ class ControllerTest extends AppControllerTestCase
 		$this->get('/cake/testname');
 		$this->assertResponseFailure(); // 5xx
 		$this->assertResponseContains('Missing Template');
-
 
 
 		$this->get('/test/testName');

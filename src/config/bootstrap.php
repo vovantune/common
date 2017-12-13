@@ -21,7 +21,6 @@ if (!defined('CAKE_BIN')) {
 }
 
 
-
 $tableAliasesDir = APP . 'Model' . DS . 'table_names.php';
 if (file_exists($tableAliasesDir)) {
 	require_once $tableAliasesDir;

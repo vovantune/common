@@ -1,7 +1,9 @@
 <?php
+
 namespace ArtSkills\Traits;
 
-trait Singleton {
+trait Singleton
+{
 
 	/**
 	 * Объект-одиночка
@@ -12,23 +14,31 @@ trait Singleton {
 	/**
 	 * Защищаем от создания через new Singleton
 	 */
-	private function __construct() {}
+	private function __construct()
+	{
+	}
 
 	/**
 	 * Защищаем от создания через клонирование
 	 */
-	private function __clone() {}
+	private function __clone()
+	{
+	}
 
 	/**
 	 * Защищаем от создания через unserialize
 	 */
-	private function __wakeup() {}
+	private function __wakeup()
+	{
+	}
 
 	/**
 	 * Возвращает объект-одиночку
+	 *
 	 * @return static
 	 */
-	public static function getInstance() {
+	public static function getInstance()
+	{
 		if (empty(static::$_instance)) {
 			static::$_instance = new static();
 		}
@@ -39,7 +49,8 @@ trait Singleton {
 	/**
 	 * Подчищаем инстанс, если объект уничтожили
 	 */
-	public function __destruct() {
+	public function __destruct()
+	{
 		static::$_instance = null;
 	}
 }

@@ -30,7 +30,8 @@ class HttpClientMocker
 	 * @var Response $response
 	 * }
 	 */
-	public static function addSniff($element) {
+	public static function addSniff($element)
+	{
 		self::$_sniffList[] = $element;
 	}
 
@@ -39,7 +40,8 @@ class HttpClientMocker
 	 *
 	 * @return array
 	 */
-	public static function getSniffList() {
+	public static function getSniffList()
+	{
 		return self::$_sniffList;
 	}
 
@@ -48,7 +50,8 @@ class HttpClientMocker
 	 *
 	 * @param bool $hasFailed завалился ли тест
 	 */
-	public static function clean($hasFailed = false) {
+	public static function clean($hasFailed = false)
+	{
 		self::$_sniffList = [];
 
 		try {
@@ -70,7 +73,8 @@ class HttpClientMocker
 	 * @return HttpClientMockerEntity
 	 * @throws \PHPUnit\Framework\ExpectationFailedException
 	 */
-	public static function mock($url, $method) {
+	public static function mock($url, $method)
+	{
 		$mockId = self::_buildKey($url, $method);
 		if (isset(self::$_mockCallList[$mockId])) {
 			throw new ExpectationFailedException($method . ' ' . $url . ' is already mocked');
@@ -87,7 +91,8 @@ class HttpClientMocker
 	 * @param array $uriArgs
 	 * @return HttpClientMockerEntity
 	 */
-	public static function mockGet($url, array $uriArgs = []) {
+	public static function mockGet($url, array $uriArgs = [])
+	{
 		if (count($uriArgs)) {
 			$mockedUrl = $url . ((strpos($url, '?') === false) ? '?' : '&') . http_build_query($uriArgs);
 		} else {
@@ -104,7 +109,8 @@ class HttpClientMocker
 	 * @param array|string $expectedPostArgs
 	 * @return HttpClientMockerEntity
 	 */
-	public static function mockPost($url, array $expectedPostArgs = []) {
+	public static function mockPost($url, array $expectedPostArgs = [])
+	{
 		$mock = self::mock($url, Request::METHOD_POST);
 		if (count($expectedPostArgs)) {
 			$mock->expectBody($expectedPostArgs);
@@ -118,7 +124,8 @@ class HttpClientMocker
 	 * @param Request $request
 	 * @return null|array ['response' => , 'status' => ]
 	 */
-	public static function getMockedData(Request $request) {
+	public static function getMockedData(Request $request)
+	{
 		foreach (self::$_mockCallList as $mock) {
 			$url = (string)$request->getUri();
 			$method = $request->getMethod();
@@ -141,7 +148,8 @@ class HttpClientMocker
 	 * @param string $method
 	 * @return string
 	 */
-	private static function _buildKey($url, $method) {
+	private static function _buildKey($url, $method)
+	{
 		return $url . '#' . $method;
 	}
 }

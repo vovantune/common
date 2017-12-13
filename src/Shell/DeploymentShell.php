@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Shell;
 
 use ArtSkills\Lib\Arrays;
@@ -24,7 +25,8 @@ abstract class DeploymentShell extends Shell
 	 * @param string $repo обновляемая репа
 	 * @param string $branch обновляемая ветка
 	 */
-	public static function deployInBg($type, $repo, $branch) {
+	public static function deployInBg($type, $repo, $branch)
+	{
 		self::_deployInBg($type, compact('repo', 'branch'));
 	}
 
@@ -33,12 +35,14 @@ abstract class DeploymentShell extends Shell
 	 *
 	 * @param string $type
 	 */
-	public static function deployCurrentInBg($type) {
+	public static function deployCurrentInBg($type)
+	{
 		self::_deployInBg($type, ['current' => true]);
 	}
 
 	/** @inheritdoc */
-	public function getOptionParser() {
+	public function getOptionParser()
+	{
 		$parser = parent::getOptionParser();
 		$parser->addSubcommands([
 			'deploy' => [
@@ -54,7 +58,7 @@ abstract class DeploymentShell extends Shell
 							'help' => 'Информация об обновлении. JSON-строка, обязательно имеет ключи repo и branch для деплоя с проверками. Либо current для деплоя без проверок',
 							'default' => false,
 						],
-					]
+					],
 				],
 			],
 			'rollback' => [
@@ -66,7 +70,7 @@ abstract class DeploymentShell extends Shell
 							'choices' => [self::TYPE_PRODUCTION, self::TYPE_TEST],
 							'default' => false,
 						],
-					]
+					],
 				],
 			],
 			'makeProjectSymlink' => [
@@ -79,7 +83,7 @@ abstract class DeploymentShell extends Shell
 						'new-folder' => [
 							'help' => 'Название новой папки',
 						],
-					]
+					],
 				],
 			],
 
@@ -91,7 +95,8 @@ abstract class DeploymentShell extends Shell
 	/**
 	 * Деплой
 	 */
-	public function deploy() {
+	public function deploy()
+	{
 		if (empty($this->params['type'])) {
 			$this->abort('Не указан обязательный параметр type');
 		}
@@ -120,7 +125,8 @@ abstract class DeploymentShell extends Shell
 	 * Откат
 	 * todo: сделать
 	 */
-	public function rollBack() {
+	public function rollBack()
+	{
 		if (empty($this->params['type'])) {
 			$this->abort('Не указан обязательный параметр type');
 		}
@@ -133,7 +139,8 @@ abstract class DeploymentShell extends Shell
 	/**
 	 * Сделать из настоящего проекта симлинк
 	 */
-	public function makeProjectSymlink() {
+	public function makeProjectSymlink()
+	{
 		if (empty($this->params['project-path']) || empty($this->params['new-folder'])) {
 			$this->abort('Переданы не все обязательные параметры');
 		}
@@ -151,7 +158,8 @@ abstract class DeploymentShell extends Shell
 	 * @param string $type
 	 * @param array $params
 	 */
-	private static function _deployInBg($type, array $params) {
+	private static function _deployInBg($type, array $params)
+	{
 		$stringParams = escapeshellarg(json_encode($params));
 		$type = escapeshellarg($type);
 		$shellName = namespaceSplit(static::class)[1];
@@ -166,7 +174,8 @@ abstract class DeploymentShell extends Shell
 	 * @return \ArtSkills\Lib\Deployer
 	 * @throws \Exception
 	 */
-	protected function _getDeployer($type) {
+	protected function _getDeployer($type)
+	{
 		return Deployer::createFromConfig($type);
 	}
 

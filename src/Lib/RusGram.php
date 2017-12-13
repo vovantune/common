@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
@@ -17,9 +18,9 @@ class RusGram
 	 * @param array $expressionList массив из 3 фраз - [именительный, винительный, родительный]
 	 * @param bool $returnOnlyWord - не возвращать в строке число $digit
 	 * @return string
-	 *
 	 */
-	public static function declension($digit, $expressionList, $returnOnlyWord = false) {
+	public static function declension($digit, $expressionList, $returnOnlyWord = false)
+	{
 		if (empty($expressionList[2])) {
 			$expressionList[2] = $expressionList[1];
 		}
@@ -49,9 +50,9 @@ class RusGram
 	 *     месяца, l - день недели, D - краткий день недели с указанием "сегодня" и "завтра"
 	 * @param string|int $date дата в формате unixtime или Y-m-d строка
 	 * @return string
-	 *
 	 */
-	public static function getRussianDate($format, $date) {
+	public static function getRussianDate($format, $date)
+	{
 		$monthList = [
 			'January' => 'январь',
 			'February' => 'февраль',

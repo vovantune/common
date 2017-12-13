@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\ORM;
 
 use ArtSkills\Lib\Env;
@@ -14,7 +15,8 @@ class Table extends \Cake\ORM\Table
 	 * @inheritdoc
 	 * прописывание правильной сущности
 	 */
-	public function initialize(array $config) {
+	public function initialize(array $config)
+	{
 		if (!Env::isUnitTest() || !empty($config['testInit'])) {
 			// в юнит тестах иногда инициализируются классы таблиц при том, что работы с таблицей в базе не происходит
 			// и в таких случаях фикстуры обычно не объявлены и таблица в базе не создаётся
@@ -36,7 +38,8 @@ class Table extends \Cake\ORM\Table
 	 *
 	 * @return static
 	 */
-	public static function instance() {
+	public static function instance()
+	{
 		return TableRegistry::get(static::_getAlias());
 	}
 
@@ -48,7 +51,8 @@ class Table extends \Cake\ORM\Table
 	 * @param array $options
 	 * @return bool|Entity
 	 */
-	public function saveArr($saveData, $entity = null, $options = []) {
+	public function saveArr($saveData, $entity = null, $options = [])
+	{
 		if (empty($entity)) {
 			$entity = $this->newEntity();
 		} else {
@@ -77,7 +81,8 @@ class Table extends \Cake\ORM\Table
 	 * @param array $options
 	 * @return array|bool|\Cake\ORM\ResultSet
 	 */
-	public function saveManyArr($saveData, $options = []) {
+	public function saveManyArr($saveData, $options = [])
+	{
 		if (!is_array($saveData)) {
 			return false;
 		}
@@ -93,7 +98,8 @@ class Table extends \Cake\ORM\Table
 	 * @param array $options
 	 * @return Entity|false
 	 */
-	public function getEntity($entity, $options = []) {
+	public function getEntity($entity, $options = [])
+	{
 		if ($entity instanceof Entity) {
 			return $entity;
 		}
@@ -114,7 +120,8 @@ class Table extends \Cake\ORM\Table
 	 * @param array $contain
 	 * @return bool
 	 */
-	public function exists($conditions, $contain = []) {
+	public function exists($conditions, $contain = [])
+	{
 		return (bool)count(
 			$this->find('all')
 				->select(['existing' => 1])
@@ -133,11 +140,12 @@ class Table extends \Cake\ORM\Table
 	 * @param array $updateData
 	 * @return Entity|null
 	 */
-	public function updateWithLock($queryData, $updateData) {
+	public function updateWithLock($queryData, $updateData)
+	{
 		if (is_array($queryData)) {
 			$queryData = $this->find()->where($queryData);
 		}
-		return $this->getConnection()->transactional(function() use($queryData, $updateData) {
+		return $this->getConnection()->transactional(function () use ($queryData, $updateData) {
 			$result = $queryData->epilog('FOR UPDATE')
 				->first();
 			if (empty($result)) {
@@ -154,7 +162,8 @@ class Table extends \Cake\ORM\Table
 	 * добавил опцию одноразового переопределения способа сохранения ассоциаций
 	 * изменённым дочерним сущностям проставляется dirty
 	 */
-	public function save(EntityInterface $entity, $options = []) {
+	public function save(EntityInterface $entity, $options = [])
+	{
 		$this->_setAssocDirty($entity);
 		$originalStrategies = [];
 		if (!empty($options['assocStrategies'])) {
@@ -176,7 +185,8 @@ class Table extends \Cake\ORM\Table
 	 *
 	 * @return bool
 	 */
-	public function truncate() {
+	public function truncate()
+	{
 		return ((int)$this->getConnection()->execute('TRUNCATE ' . $this->getTable())->errorCode() === 0);
 	}
 
@@ -186,7 +196,8 @@ class Table extends \Cake\ORM\Table
 	 *
 	 * @return int
 	 */
-	public function truncateSafe() {
+	public function truncateSafe()
+	{
 		return $this->deleteAll(Query::CONDITION_ALL);
 	}
 
@@ -196,7 +207,8 @@ class Table extends \Cake\ORM\Table
 	 * @param array $fields
 	 * @return int
 	 */
-	public function updateAllRecords($fields) {
+	public function updateAllRecords($fields)
+	{
 		return $this->updateAll($fields, Query::CONDITION_ALL);
 	}
 
@@ -204,7 +216,8 @@ class Table extends \Cake\ORM\Table
 	 * @inheritdoc
 	 * Добавил возможность более коротких опций
 	 */
-	public function findList(\Cake\ORM\Query $query, array $options) {
+	public function findList(\Cake\ORM\Query $query, array $options)
+	{
 		if ((count($options) === 1) && empty($options['valueField'])) {
 			$newOptions = [];
 			foreach ($options as $keyField => $valueField) {
@@ -235,34 +248,40 @@ class Table extends \Cake\ORM\Table
 	}
 
 	/** @inheritdoc */
-	public function query() {
+	public function query()
+	{
 		return new Query($this->getConnection(), $this);
 	}
 
 	/** @inheritdoc */
-	public function belongsTo($associated, array $options = []) {
+	public function belongsTo($associated, array $options = [])
+	{
 		return parent::belongsTo($associated, $this->_assocOptions($associated, $options));
 	}
 
 	/** @inheritdoc */
-	public function hasOne($associated, array $options = []) {
+	public function hasOne($associated, array $options = [])
+	{
 		return parent::hasOne($associated, $this->_assocOptions($associated, $options));
 	}
 
 	/** @inheritdoc */
-	public function hasMany($associated, array $options = []) {
+	public function hasMany($associated, array $options = [])
+	{
 		return parent::hasMany($associated, $this->_assocOptions($associated, $options));
 	}
 
 	/** @inheritdoc */
-	public function belongsToMany($associated, array $options = []) {
+	public function belongsToMany($associated, array $options = [])
+	{
 		return parent::belongsToMany($associated, $this->_assocOptions($associated, $options));
 	}
 
 	/**
 	 * Автозаполнение полей создания/правки
 	 */
-	private function _initTimeStampBehavior() {
+	private function _initTimeStampBehavior()
+	{
 		$timeStampFields = [];
 		$columnList = $this->getSchema()->columns();
 
@@ -287,9 +306,11 @@ class Table extends \Cake\ORM\Table
 
 	/**
 	 * Пройтись по ассоциациям и задать им dirty, если надо
+	 *
 	 * @param EntityInterface $entity
 	 */
-	private function _setAssocDirty(EntityInterface $entity) {
+	private function _setAssocDirty(EntityInterface $entity)
+	{
 		$associations = $this->associations();
 		foreach ($associations as $assoc) {
 			$propertyName = $assoc->getProperty();
@@ -315,9 +336,11 @@ class Table extends \Cake\ORM\Table
 
 	/**
 	 * Возвращает алиас таблицы, используемый тут повсюду
+	 *
 	 * @return string
 	 */
-	private static function _getAlias() {
+	private static function _getAlias()
+	{
 		$classNameParts = explode('\\', static::class);
 		return Strings::replacePostfix(array_pop($classNameParts), 'Table');
 	}
@@ -329,7 +352,8 @@ class Table extends \Cake\ORM\Table
 	 * @param array $options
 	 * @return array
 	 */
-	private function _assocOptions($assocName, $options) {
+	private function _assocOptions($assocName, $options)
+	{
 		if (empty($options['propertyName'])) {
 			$options['propertyName'] = $assocName;
 		}

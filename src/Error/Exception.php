@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Error;
 
 use ArtSkills\Controller\Controller;
@@ -50,7 +51,8 @@ class Exception extends \Exception
 	 * @param \Exception $previous
 	 * @return static
 	 */
-	public static function instance($message = '', $code = 0, $previous = null) {
+	public static function instance($message = '', $code = 0, $previous = null)
+	{
 		return new static($message, $code, $previous);
 	}
 
@@ -60,7 +62,8 @@ class Exception extends \Exception
 	 * @param bool $writeToLog
 	 * @return $this
 	 */
-	public function setWriteToLog($writeToLog) {
+	public function setWriteToLog($writeToLog)
+	{
 		$this->_writeToLog = (bool)$writeToLog;
 		return $this;
 	}
@@ -71,7 +74,8 @@ class Exception extends \Exception
 	 * @param string|string[]|null $scope
 	 * @return $this
 	 */
-	public function setLogScope($scope) {
+	public function setLogScope($scope)
+	{
 		if ($scope === null) {
 			unset($this->_logContext['scope']);
 			return $this;
@@ -86,7 +90,8 @@ class Exception extends \Exception
 	 * @param mixed $info
 	 * @return $this
 	 */
-	public function setLogAddInfo($info) {
+	public function setLogAddInfo($info)
+	{
 		if ($info === null) {
 			unset($this->_logContext[SentryLog::KEY_ADD_INFO]);
 			return $this;
@@ -101,7 +106,8 @@ class Exception extends \Exception
 	 * @param bool $alert
 	 * @return $this
 	 */
-	public function setAlert($alert) {
+	public function setAlert($alert)
+	{
 		$this->_alert = (bool)$alert;
 		return $this->setWriteToLog(true);
 	}
@@ -113,7 +119,8 @@ class Exception extends \Exception
 	 * @param bool $fullOverwrite
 	 * @return $this
 	 */
-	public function setLogContext(array $context, $fullOverwrite = false) {
+	public function setLogContext(array $context, $fullOverwrite = false)
+	{
 		if ($fullOverwrite) {
 			$this->_logContext = $context;
 		} else {
@@ -128,7 +135,8 @@ class Exception extends \Exception
 	 * @param array|null $context
 	 * @param null|bool $alert
 	 */
-	public function log($context = [], $alert = null) {
+	public function log($context = [], $alert = null)
+	{
 		if ($this->_writeToLog && !$this->_isLogged) {
 			$contextResult = (array)$context + $this->_logContext;
 			if (!empty($this->_logAddInfo)) {
@@ -147,7 +155,8 @@ class Exception extends \Exception
 	 *
 	 * @return bool
 	 */
-	public function isLogged() {
+	public function isLogged()
+	{
 		return $this->_isLogged;
 	}
 
@@ -156,7 +165,8 @@ class Exception extends \Exception
 	 *
 	 * @return null|array ['file' => , 'line' => ]
 	 */
-	public function getActualThrowSpot() {
+	public function getActualThrowSpot()
+	{
 		$trace = $this->getTrace();
 		array_unshift($trace, ['file' => $this->getFile(), 'line' => $this->getLine()]);
 		$excludeFiles = [

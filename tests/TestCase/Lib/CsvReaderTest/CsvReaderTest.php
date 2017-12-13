@@ -1,4 +1,5 @@
 <?php
+
 namespace ArtSkills\Test\TestCase\Lib\CsvReaderTest;
 
 use ArtSkills\Lib\CsvReader;
@@ -10,7 +11,8 @@ class CsvReaderTest extends AppTestCase
 	/**
 	 * Проверка чтения сложных файлов
 	 */
-	public function testReading() {
+	public function testReading()
+	{
 		$csv = new CsvReader(__DIR__ . '/CsvFixture.csv');
 		self::assertEquals([
 			0 => [
@@ -51,7 +53,8 @@ class CsvReaderTest extends AppTestCase
 	 * @expectedException \Exception
 	 * @expectedExceptionMessage File "bad file" does not exist
 	 */
-	public function testNotOpen() {
+	public function testNotOpen()
+	{
 		new CsvReader('bad file');
 	}
 }
