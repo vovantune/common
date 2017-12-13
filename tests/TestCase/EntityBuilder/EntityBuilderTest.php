@@ -108,7 +108,7 @@ class EntityBuilderTest extends AppTestCase
 		$expectedFiles = $expectedFolder->tree()[1];
 		foreach ($expectedFiles as $expectedFile) {
 			$actualFile = str_replace($expectedFolder->path, self::MODEL_PATH, $expectedFile);
-			self::assertFileEquals($expectedFile, $actualFile, 'Неправильно сработал построитель сущностей');
+			self::assertFileEquals($expectedFile, $actualFile, 'Неправильно сработал построитель сущностей: ' . $expectedFile);
 		}
 		self::assertTrue($hasChanges, 'Построитель не сказал, что были изменения');
 	}
@@ -155,7 +155,7 @@ class EntityBuilderTest extends AppTestCase
 		$expectedFiles = $expectedFolder->tree()[1];
 		foreach ($expectedFiles as $expectedFile) {
 			$actualFile = str_replace($expectedFolder->path, self::MODEL_PATH, $expectedFile);
-			self::assertFileEquals($expectedFile, $actualFile, 'Неправильно сработал построитель сущностей');
+			self::assertFileEquals($expectedFile, $actualFile, 'Неправильно сработал построитель сущностей ' . $expectedFile);
 		}
 		self::assertTrue($hasChanges, 'Построитель не сказал, что были изменения');
 	}

@@ -20,7 +20,8 @@ class TestController extends Controller
 	 *
 	 * @return null
 	 */
-	public function getJsonOk() {
+	public function getJsonOk()
+	{
 		return $this->_sendJsonOk(['testProperty' => 123]);
 	}
 
@@ -29,14 +30,16 @@ class TestController extends Controller
 	 *
 	 * @return NULL
 	 */
-	public function getJsonError() {
+	public function getJsonError()
+	{
 		return $this->_sendJsonError('Тестовая ошибка', ['errorProperty' => 123]);
 	}
 
 	/**
 	 * JSON ответ из ValueObject
 	 */
-	public function getValueObjectJson() {
+	public function getValueObjectJson()
+	{
 		return $this->_sendJsonOk((new TestValueObject()));
 	}
 
@@ -45,7 +48,8 @@ class TestController extends Controller
 	 *
 	 * @return null
 	 */
-	public function getEmptyJson() {
+	public function getEmptyJson()
+	{
 		return $this->_sendJsonResponse([]);
 	}
 
@@ -54,7 +58,8 @@ class TestController extends Controller
 	 *
 	 * @return null
 	 */
-	public function getJsonException() {
+	public function getJsonException()
+	{
 		return $this->_sendJsonException(new \Exception('test exception'), ['someData' => 'test']);
 	}
 
@@ -63,7 +68,8 @@ class TestController extends Controller
 	 *
 	 * @return null
 	 */
-	public function getJsonExceptionUnit() {
+	public function getJsonExceptionUnit()
+	{
 		return $this->_sendJsonException(new \PHPUnit\Framework\AssertionFailedError('test unit exception'), ['someData' => 'test']);
 	}
 
@@ -72,7 +78,8 @@ class TestController extends Controller
 	 *
 	 * @throws UserException
 	 */
-	public function getStandardErrorJson() {
+	public function getStandardErrorJson()
+	{
 		$this->_setIsJsonAction();
 		$this->_throwUserError('test json message');
 	}
@@ -82,7 +89,8 @@ class TestController extends Controller
 	 *
 	 * @throws UserException
 	 */
-	public function getStandardErrorJsonConfigured() {
+	public function getStandardErrorJsonConfigured()
+	{
 		throw UserException::instance('log message')
 			->setUserMessage('user message')
 			->setLogScope('some scope')
@@ -95,7 +103,8 @@ class TestController extends Controller
 	 *
 	 * @throws UserException
 	 */
-	public function getStandardErrorFlash() {
+	public function getStandardErrorFlash()
+	{
 		$this->_throwUserError('test flash message');
 	}
 
@@ -104,7 +113,8 @@ class TestController extends Controller
 	 *
 	 * @throws UserException
 	 */
-	public function getStandardErrorRedirect() {
+	public function getStandardErrorRedirect()
+	{
 		$this->_throwUserErrorRedirect('test other flash message', '/test/getJsonOk');
 	}
 
@@ -113,7 +123,8 @@ class TestController extends Controller
 	 *
 	 * @throws InternalException
 	 */
-	public function getInternalError() {
+	public function getInternalError()
+	{
 		$this->_throwInternalError('test internal error');
 	}
 
@@ -122,7 +133,8 @@ class TestController extends Controller
 	 *
 	 * @throws InternalException
 	 */
-	public function getInternalErrorJson() {
+	public function getInternalErrorJson()
+	{
 		$this->_setIsJsonAction();
 		$this->_throwInternalError('test json message');
 	}
@@ -132,13 +144,15 @@ class TestController extends Controller
 	 *
 	 * @throws InternalException
 	 */
-	public function getInternalErrorJsonTrace() {
+	public function getInternalErrorJsonTrace()
+	{
 		$this->_setIsJsonAction();
 		throw new InternalException('test trace');
 	}
 
 	/** Тестируем обращение к экшну с разными регистрами букв */
-	public function testName() {
+	public function testName()
+	{
 	}
 
 }
