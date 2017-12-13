@@ -1,6 +1,7 @@
 <?php
 
 namespace ArtSkills\Lib;
+use ArtSkills\Error\InternalException;
 
 /**
  * TODO: переделать дефолтовый разделитель, поменять в конструкторе последние 2 параметра местами
@@ -30,12 +31,12 @@ class CsvReader
 	 * @param string $csvFl
 	 * @param string $delimiter
 	 * @param string $fileEncoding
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function __construct($csvFl, $delimiter = self::DEFAULT_DELIMITER, $fileEncoding = self::DEFAULT_ENCODING)
 	{
 		if (!is_file($csvFl)) {
-			throw new \Exception('File "' . $csvFl . '" does not exist');
+			throw new InternalException('File "' . $csvFl . '" does not exist');
 		}
 		$this->_handle = $this->_openFile($csvFl, $fileEncoding);
 		$this->_delimiter = $delimiter;
@@ -66,12 +67,12 @@ class CsvReader
 	 * Читает csv файл и возвращает массив
 	 *
 	 * @return string[]
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function getAll()
 	{
 		if (empty($this->_handle)) {
-			throw new \Exception('File is not open');
+			throw new InternalException('File is not open');
 		}
 
 		$result = [];

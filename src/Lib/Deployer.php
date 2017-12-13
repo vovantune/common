@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Log\Engine\SentryLog;
 use Cake\Core\Configure;
 use Cake\I18n\Time;
@@ -170,14 +172,15 @@ class Deployer
 	protected $_runFrom = '';
 
 
-
 	/**
 	 * конструктор
 	 *
 	 * @param array $config Конфиг. ключ => начение, клиючи - названия свойств этого класса без подчёркивания
 	 * описание в [доках](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
+	 * @throws InternalException
 	 */
-	public function __construct(array $config = []) {
+	public function __construct(array $config = [])
+	{
 		$this->_applyConfig($config);
 		$this->_normalizePaths();
 		$this->_checkProperties();
@@ -191,12 +194,13 @@ class Deployer
 	 *
 	 * @param string $type ключ
 	 * @return static
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
-	public static function createFromConfig($type) {
+	public static function createFromConfig(string $type): self
+	{
 		$configs = Configure::read('Deploy');
 		if (empty($configs[$type])) {
-			throw new \Exception("Не определён конфиг деплоя '$type'");
+			throw new InternalException("Не определён конфиг деплоя '$type'");
 		}
 		return new static($configs[$type]);
 	}
@@ -209,7 +213,8 @@ class Deployer
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function deploy($repo, $branch) {
+	public function deploy(string $repo, string $branch): bool
+	{
 		$currentDir = getcwd();
 		$this->_chdir($this->_runFrom);
 
@@ -233,7 +238,8 @@ class Deployer
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function deployCurrentBranch() {
+	public function deployCurrentBranch(): bool
+	{
 		return $this->deploy($this->_repoName, $this->_git->getCurrentBranchName());
 	}
 
@@ -244,25 +250,26 @@ class Deployer
 	 *
 	 * @param string $absProjectPath полный путь до проекта
 	 * @param string $newFolderName новое название папки, относительный путь в том же каталоге, что и проект
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
-	public static function makeProjectSymlink($absProjectPath, $newFolderName) {
+	public static function makeProjectSymlink(string $absProjectPath, string $newFolderName)
+	{
 		if (is_link($absProjectPath) || !is_dir($absProjectPath)) {
-			throw new \Exception('Передан некорректный каталог проекта');
+			throw new InternalException('Передан некорректный каталог проекта');
 		}
 		$newFolderFullName = dirname($absProjectPath) . DS . $newFolderName;
 		if (file_exists($newFolderFullName)) {
-			throw new \Exception('Такой каталог уже есть');
+			throw new InternalException('Такой каталог уже есть');
 		}
 		$newFolderFullName = escapeshellarg($newFolderFullName);
 		$absProjectPath = escapeshellarg($absProjectPath);
 		$commands = [
 			"mv $absProjectPath $newFolderFullName",
-			"ln -s $newFolderFullName $absProjectPath"
+			"ln -s $newFolderFullName $absProjectPath",
 		];
 		list($success, $output, $resultCommand) = Shell::exec($commands);
 		if (!$success) {
-			throw new \Exception("Ошибка. Команда: $resultCommand, Вывод: " . implode("\n", $output));
+			throw new InternalException("Ошибка. Команда: $resultCommand, Вывод: " . implode("\n", $output));
 		}
 	}
 
@@ -271,7 +278,8 @@ class Deployer
 	 *
 	 * @param array $config
 	 */
-	protected function _applyConfig(array $config) {
+	protected function _applyConfig(array $config)
+	{
 		$this->_isDeployEnv = Env::isProduction();
 		if (defined('CORE_VERSION')) {
 			$this->_currentVersion = CORE_VERSION;
@@ -289,54 +297,59 @@ class Deployer
 
 	/**
 	 * Делаем проверки заполненности свойств
-	 * @throws \Exception
+	 *
+	 * @throws InternalException
 	 */
-	protected function _checkProperties() {
+	protected function _checkProperties()
+	{
 		if (!empty($this->_singleRoot)) {
 			if (!empty($this->_rotateDeployFolders) || !empty($this->_projectSymlink)) {
-				throw new \Exception('Заполнены конфликтующие свойства');
+				throw new InternalException('Заполнены конфликтующие свойства');
 			}
 		} else {
 			if (count($this->_rotateDeployFolders) === 1) {
-				throw new \Exception('В списке указана одна папка. Для деплоя в текущую папку явно задайте свойство _singleRoot');
+				throw new InternalException('В списке указана одна папка. Для деплоя в текущую папку явно задайте свойство _singleRoot');
 			}
 			if (count($this->_rotateDeployFolders) !== count(array_unique($this->_rotateDeployFolders))) {
-				throw new \Exception('В списке папок есть дубли');
+				throw new InternalException('В списке папок есть дубли');
 			}
 			if (empty($this->_projectSymlink)) {
-				throw new \Exception('Не указан главный симлинк');
+				throw new InternalException('Не указан главный симлинк');
 			}
 			if (!is_link($this->_projectSymlink)) {
-				throw new \Exception("{$this->_projectSymlink} не является симлинком");
+				throw new InternalException("{$this->_projectSymlink} не является симлинком");
 			}
 			if (in_array($this->_projectSymlink, $this->_rotateDeployFolders)) {
-				throw new \Exception('Главный симлинк задан в списке папок');
+				throw new InternalException('Главный симлинк задан в списке папок');
 			}
 		}
 
 		if ($this->_autoMigrate === null) {
-			throw new \Exception('Нужно явно указать параметр _autoMigrate');
+			throw new InternalException('Нужно явно указать параметр _autoMigrate');
 		}
 		if ($this->_autoMigrate && empty($this->_phinxCommand)) {
-			throw new \Exception('Явно задан параметр миграции, но не задана команда');
+			throw new InternalException('Явно задан параметр миграции, но не задана команда');
 		}
 
 		if (empty($this->_repoName)) {
-			throw new \Exception('Не указан репозиторий');
+			throw new InternalException('Не указан репозиторий');
 		}
 	}
 
 	/**
 	 * Сделать нужные преобразования над значениями
+	 *
+	 * @throws InternalException
 	 */
-	protected function _setValues() {
+	protected function _setValues()
+	{
 		if (!empty($this->_singleRoot)) {
 			$this->_currentRoot = $this->_singleRoot;
 			$this->_rotateDeployFolders = [$this->_singleRoot];
 		} else {
 			$this->_currentRoot = $this->_cutTrailingDs(readlink($this->_projectSymlink));
 			if (!in_array($this->_currentRoot, $this->_rotateDeployFolders)) {
-				throw new \Exception('Каталог, на который сейчас ссылается симлинк, отсутствует в списке!');
+				throw new InternalException('Каталог, на который сейчас ссылается симлинк, отсутствует в списке!');
 			}
 		}
 
@@ -347,7 +360,7 @@ class Deployer
 
 		$this->_git = new Git($this->_runFrom);
 		if (empty($this->_git->getCurrentBranchName())) {
-			throw new \Exception('Не проинициализировался гит');
+			throw new InternalException('Не проинициализировался гит');
 		}
 
 		$this->_versionFile = $this->_fullPathToRelative($this->_versionFile);
@@ -364,10 +377,13 @@ class Deployer
 	/**
 	 * Привести все пути к правильному формату
 	 */
-	protected function _normalizePaths() {
+	protected function _normalizePaths()
+	{
 		// слеши в конце пути
 		$folderProperties = [
-			'_singleRoot', '_projectSymlink', '_cakeSubPath'
+			'_singleRoot',
+			'_projectSymlink',
+			'_cakeSubPath',
 		];
 		foreach ($folderProperties as $property) {
 			$this->$property = $this->_cutTrailingDs($this->$property);
@@ -384,7 +400,8 @@ class Deployer
 	 * @param string $path
 	 * @return string
 	 */
-	protected function _cutTrailingDs($path) {
+	protected function _cutTrailingDs(string $path): string
+	{
 		return Strings::replaceIfEndsWith($path, DS);
 	}
 
@@ -393,10 +410,11 @@ class Deployer
 	 * Для файлов, лежащих в текущем корне
 	 *
 	 * @param string $fullPath
-	 * @throws \Exception
+	 * @throws InternalException
 	 * @return string
 	 */
-	protected function _fullPathToRelative($fullPath) {
+	protected function _fullPathToRelative(string $fullPath): string
+	{
 		$toReplace = $this->_rotateDeployFolders;
 		$toReplace[] = $this->_projectSymlink;
 		foreach ($toReplace as &$path) {
@@ -405,7 +423,7 @@ class Deployer
 		unset($path);
 		$result = Strings::replaceIfStartsWith($fullPath, $toReplace);
 		if (!empty($result) && ($result[0] === DS)) {
-			throw new \Exception("Не могу получить относительный путь из {$fullPath}");
+			throw new InternalException("Не могу получить относительный путь из {$fullPath}");
 		}
 		return $result;
 	}
@@ -417,9 +435,10 @@ class Deployer
 	 * @param string $repo обновляемая репа
 	 * @param string $branch обновляемая ветка
 	 * @return bool
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
-	protected function _run($repo, $branch) {
+	protected function _run(string $repo, string $branch): bool
+	{
 		if (!$this->_canDeploy($repo, $branch)) {
 			$message = Time::now()->format('Y-m-d H:i:s') . ': Обновление не было запущено.';
 			Log::info($message, ['scope' => [$this->_logScope]]);
@@ -451,10 +470,9 @@ class Deployer
 
 	/**
 	 * Папка, на которую будем переключаться
-	 *
-	 * @throws \Exception
 	 */
-	protected function _getNextRoot() {
+	protected function _getNextRoot()
+	{
 		$currentFolderKey = array_search($this->_currentRoot, $this->_rotateDeployFolders);
 		if ($currentFolderKey === (count($this->_rotateDeployFolders) - 1)) {
 			$nextFolderKey = 0;
@@ -468,8 +486,10 @@ class Deployer
 	 * Переключить на указанную папку
 	 *
 	 * @param string $newActualRoot
+	 * @throws InternalException
 	 */
-	protected function _setProjectSymlink($newActualRoot) {
+	protected function _setProjectSymlink(string $newActualRoot)
+	{
 		if (!empty($this->_singleRoot)) {
 			// одна папка, деплой по живому
 			return;
@@ -483,8 +503,11 @@ class Deployer
 
 	/**
 	 * Скопировать файлы из списка
+	 *
+	 * @throws InternalException
 	 */
-	protected function _copyFiles() {
+	protected function _copyFiles()
+	{
 		if (!empty($this->_singleRoot) || empty($this->_copyFileList)) {
 			return;
 		}
@@ -501,10 +524,10 @@ class Deployer
 	 *
 	 * @param string $repo
 	 * @param string $branch
-	 * @throws \Exception
 	 * @return bool
 	 */
-	protected function _canDeploy($repo, $branch) {
+	protected function _canDeploy(string $repo, string $branch): bool
+	{
 		$currentBranch = $this->_git->getCurrentBranchName();
 		return (
 			($repo === $this->_repoName)
@@ -516,8 +539,11 @@ class Deployer
 
 	/**
 	 * Обновить репозиторий
+	 *
+	 * @throws InternalException
 	 */
-	protected function _updateRepo() {
+	protected function _updateRepo()
+	{
 		$this->_addToOutput(["\n\nGit pull\n"]);
 		list($success, $output) = $this->_git->pullCurrentBranch();
 		$this->_addToOutput($output);
@@ -526,8 +552,11 @@ class Deployer
 
 	/**
 	 * обновить зависимости композера
+	 *
+	 * @throws InternalException
 	 */
-	protected function _updateComposer() {
+	protected function _updateComposer()
+	{
 		$this->_addToOutput(["\n\nComposer\n"]);
 		if (empty($this->_composerCommand)) {
 			$this->_addToOutput(['not updating dependencies']);
@@ -548,8 +577,10 @@ class Deployer
 	 *
 	 * @param string $command
 	 * @param string $failMessage
+	 * @throws InternalException
 	 */
-	protected function _exec($command, $failMessage) {
+	protected function _exec(string $command, string $failMessage)
+	{
 		list($success, $output) = Shell::execFromDir($this->_runFrom, $command);
 		$this->_addToOutput([$command]);
 		$this->_addToOutput($output);
@@ -562,7 +593,8 @@ class Deployer
 	 *
 	 * @param string $dir
 	 */
-	protected function _chdir($dir) {
+	protected function _chdir(string $dir)
+	{
 		chdir($dir);
 		$this->_addToOutput(["cd $dir"]);
 	}
@@ -572,7 +604,8 @@ class Deployer
 	 *
 	 * @param string $data
 	 */
-	protected function _putEnv($data) {
+	protected function _putEnv(string $data)
+	{
 		putenv($data);
 		$this->_addToOutput(['putenv ' . $data]);
 	}
@@ -580,13 +613,14 @@ class Deployer
 	/**
 	 * выкидывает ошибку
 	 *
-	 * @param bool $result
+	 * @param bool $condition
 	 * @param string $errorMessage
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
-	protected function _checkSuccess($result, $errorMessage) {
-		if (!$result) {
-			throw new \Exception($errorMessage);
+	protected function _checkSuccess(bool $condition, string $errorMessage)
+	{
+		if (!$condition) {
+			throw new InternalException($errorMessage);
 		}
 	}
 
@@ -595,14 +629,18 @@ class Deployer
 	 *
 	 * @param string[] $output
 	 */
-	protected function _addToOutput($output) {
+	protected function _addToOutput(array $output)
+	{
 		$this->_output = array_merge($this->_output, $output);
 	}
 
 	/**
 	 * Запустить миграции
+	 *
+	 * @throws InternalException
 	 */
-	protected function _migrateDb() {
+	protected function _migrateDb()
+	{
 		$this->_addToOutput(["\n\nMigration\n"]);
 		if ($this->_autoMigrate && !empty($this->_phinxCommand)) {
 			$this->_exec(
@@ -623,7 +661,8 @@ class Deployer
 	/**
 	 * Обновить файл с версией
 	 */
-	protected function _updateVersion() {
+	protected function _updateVersion()
+	{
 		if (!empty($this->_versionFile) && ($this->_currentVersion !== null)) {
 			$versionFilePath = $this->_getNextRoot() . DS . $this->_versionFile;
 			file_put_contents($versionFilePath, ++$this->_currentVersion);
@@ -636,9 +675,10 @@ class Deployer
 	 * @param float $timeStart
 	 * @param float $timeEnd
 	 */
-	protected function _log($timeStart, $timeEnd) {
+	protected function _log(float $timeStart, float $timeEnd)
+	{
 		$this->_output = array_merge([
-			date('Y-m-d H:i:s', $timeStart),
+			date('Y-m-d H:i:s', (int)$timeStart),
 			'Finished in ' . round($timeEnd - $timeStart, 3) . ' seconds',
 		], $this->_output, ["\n\n"]);
 
@@ -652,16 +692,16 @@ class Deployer
 	/**
 	 * Сообщить об успехе
 	 */
-	protected function _notifySuccess() {
+	protected function _notifySuccess()
+	{
 		// todo: написать
 	}
 
 	/**
 	 * Откатиться к предыдущей версии
 	 */
-	public function rollback() {
+	public function rollback()
+	{
 		// todo: написать
 	}
-
-
 }

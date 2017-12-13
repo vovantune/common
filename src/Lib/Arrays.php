@@ -1,6 +1,7 @@
 <?php
 namespace ArtSkills\Lib;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Traits\Library;
 
 class Arrays
@@ -136,7 +137,7 @@ class Arrays
 	 * @param array $array
 	 * @param string|string[] $keyPath
 	 * @param mixed $defaultValue
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public static function initPath(array &$array, $keyPath, $defaultValue) {
 		$keyPath = (array)$keyPath;
@@ -145,7 +146,7 @@ class Arrays
 			if (!array_key_exists($key, $array)) {
 				$array[$key] = [];
 			} elseif (!is_array($array[$key])) {
-				throw new \Exception("По ключу $key находится не массив");
+				throw new InternalException("По ключу $key находится не массив");
 			}
 			$array = &$array[$key];
 		}

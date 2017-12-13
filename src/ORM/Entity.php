@@ -1,6 +1,8 @@
 <?php
 namespace ArtSkills\ORM;
 
+use ArtSkills\Error\InternalException;
+
 class Entity extends \Cake\ORM\Entity
 {
 
@@ -81,11 +83,11 @@ class Entity extends \Cake\ORM\Entity
 	 *
 	 * @param string $childEntity
 	 * @param null|int $index
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function deleteChild($childEntity, $index = null) {
 		if (!array_key_exists($childEntity, $this->_properties)) {
-			throw new \Exception("Unknown property $childEntity");
+			throw new InternalException("Unknown property $childEntity");
 		} elseif (is_array($this->{$childEntity})) {
 			if ($index === null) {
 				$this->set($childEntity, []);

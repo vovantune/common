@@ -1,5 +1,6 @@
 <?php
 namespace ArtSkills\Lib;
+use ArtSkills\Error\InternalException;
 
 /**
  * Запись в CSV файл. Работает в двух решимах:
@@ -38,13 +39,13 @@ class CsvWriter
 	 * @param string $filename
 	 * @param string $encoding
 	 * @param string $delimiter
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	public function __construct($filename, $encoding = "UTF-8", $delimiter = ';') {
 		@$this->_handle = fopen($filename, 'w');
 
 		if (!$this->_handle) {
-			throw new \Exception('Ошибка создания файла ' . $filename);
+			throw new InternalException('Ошибка создания файла ' . $filename);
 		}
 		stream_filter_append($this->_handle, 'convert.iconv.UTF-8/' . $encoding . '//TRANSLIT//IGNORE');
 		$this->_delimiter = $delimiter;

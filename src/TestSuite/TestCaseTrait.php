@@ -2,6 +2,7 @@
 
 namespace ArtSkills\TestSuite;
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Filesystem\Folder;
 use ArtSkills\Lib\AppCache;
 use ArtSkills\Mailer\Transport\TestEmailTransport;
@@ -137,7 +138,7 @@ trait TestCaseTrait
 	/**
 	 * Подменяем методы, необходимые только в тестовом окружении
 	 *
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	private function _initPermanentMocks() {
 		$permanentMocks = [
@@ -149,7 +150,7 @@ trait TestCaseTrait
 			if (Env::hasMockNamespace()) {
 				$projectMockNs = Env::getMockNamespace();
 			} else {
-				throw new \Exception('Не задан неймспейс для классов-моков');
+				throw new InternalException('Не задан неймспейс для классов-моков');
 			}
 			$permanentMocks[$projectMockFolder] = $projectMockNs;
 		}

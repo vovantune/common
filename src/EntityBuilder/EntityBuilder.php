@@ -3,6 +3,7 @@
 namespace ArtSkills\EntityBuilder;
 
 use ArtSkills\Error\Assert;
+use ArtSkills\Error\InternalException;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\DB;
 use ArtSkills\Lib\Misc;
@@ -79,9 +80,9 @@ class EntityBuilder
 	 * Задать конфиг
 	 *
 	 * @param EntityBuilderConfig|null $config
-	 * @throws \Exception
 	 */
-	public static function setConfig($config) {
+	public static function setConfig($config)
+	{
 		static::$_config = $config;
 		if (empty($config)) {
 			return;
@@ -118,8 +119,10 @@ class EntityBuilder
 	 * Генерим сущности и связи
 	 *
 	 * @return boolean
+	 * @throws InternalException
 	 */
-	public static function build() {
+	public static function build()
+	{
 		self::_checkConfig();
 		TableRegistry::clear();
 		$tblList = self::_getTableList();
@@ -143,30 +146,31 @@ class EntityBuilder
 	 * Создаём класс таблицы
 	 *
 	 * @param string $tableName
-	 * @throws \Exception
+	 * @throws InternalException
 	 * @return string
 	 */
-	public static function createTableClass($tableName) {
+	public static function createTableClass($tableName)
+	{
 		self::_checkConfig();
 		$tableName = Inflector::underscore($tableName);
 		if (!self::_checkTableExists($tableName)) {
-			throw new \Exception('Table "' . $tableName . '" does not exist in DB!');
+			throw new InternalException('Table "' . $tableName . '" does not exist in DB!');
 		}
 
 		$entityName = Inflector::camelize(str_replace('`', '', $tableName));
 		$tblClassName = $entityName . self::FILE_TYPE_TABLE;
 		if (class_exists($tblClassName)) {
-			throw new \Exception('Class "' . $tblClassName . '" already exists!');
+			throw new InternalException('Class "' . $tblClassName . '" already exists!');
 		}
 
 		$file = self::_getFile($entityName, self::FILE_TYPE_TABLE);
 		if ($file->exists()) {
-			throw new \Exception('File ' . $file->path . ' already exists!');
+			throw new InternalException('File ' . $file->path . ' already exists!');
 		}
 
 
 		if (!$file->write(self::_processFileTemplate($entityName, self::FILE_TYPE_TABLE))) {
-			throw new \Exception("File write error for $entityName; {$file->path}/{$file->name}");
+			throw new InternalException("File write error for $entityName; {$file->path}/{$file->name}");
 		};
 		$file->close();
 
@@ -179,7 +183,8 @@ class EntityBuilder
 	 * @param string $tableAlias
 	 * @return array
 	 */
-	protected static function _getRedefineMethods($tableAlias) {
+	protected static function _getRedefineMethods($tableAlias)
+	{
 		$methods = static::$_tableMethods;
 		$table = self::_getTable($tableAlias);
 		if ($table->hasBehavior('Timestamp')) {
@@ -196,7 +201,8 @@ class EntityBuilder
 	 * @param array $fields field => comment
 	 * @return array alias => field
 	 */
-	protected static function _getAliases($entityName, $fields) {
+	protected static function _getAliases($entityName, $fields)
+	{
 		$aliases = [];
 		$className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
 		if (class_exists($className)) {
@@ -220,7 +226,8 @@ class EntityBuilder
 	 * @param array $fields field => comment
 	 * @return array ['имя поля' => 'тип']
 	 */
-	private static function _getVirtualFields($entityName, $fields) {
+	private static function _getVirtualFields($entityName, $fields)
+	{
 		$virtualFields = [];
 		$className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
 		if (class_exists($className)) {
@@ -257,7 +264,8 @@ class EntityBuilder
 	 * @param string $tableAlias
 	 * @return \Cake\ORM\Table
 	 */
-	protected static function _getTable($tableAlias) {
+	protected static function _getTable($tableAlias)
+	{
 		if (TableRegistry::exists($tableAlias)) {
 			return TableRegistry::get($tableAlias);
 		}
@@ -271,7 +279,8 @@ class EntityBuilder
 	 * @param string $type
 	 * @return File
 	 */
-	private static function _getFile($entityName, $type) {
+	private static function _getFile($entityName, $type)
+	{
 		return new File(
 			static::$_config->modelFolder . $type . '/' . self::_getShortClassName($entityName, $type) . '.php'
 		);
@@ -283,7 +292,8 @@ class EntityBuilder
 	 * @param string $type
 	 * @return Folder
 	 */
-	private static function _getFolder($type) {
+	private static function _getFolder($type)
+	{
 		return new Folder(static::$_config->modelFolder . $type);
 	}
 
@@ -293,7 +303,8 @@ class EntityBuilder
 	 * @param string $type
 	 * @return string
 	 */
-	private static function _getClassTemplate($type) {
+	private static function _getClassTemplate($type)
+	{
 		return '\\' . static::$_config->modelNamespace . '\\' . $type . '\\' . self::_getShortClassName(
 				static::ENTITY_TEMPLATE_STRING, $type
 			);
@@ -306,7 +317,8 @@ class EntityBuilder
 	 * @param string $type
 	 * @return string
 	 */
-	private static function _getShortClassName($entityName, $type) {
+	private static function _getShortClassName($entityName, $type)
+	{
 		$postfix = ($type == self::FILE_TYPE_ENTITY ? '' : $type);
 		return $entityName . $postfix;
 	}
@@ -315,11 +327,12 @@ class EntityBuilder
 	/**
 	 * Проверка, что задан конфиг
 	 *
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
-	private static function _checkConfig() {
+	private static function _checkConfig()
+	{
 		if (empty(static::$_config)) {
-			throw new \Exception('Не задан конфиг');
+			throw new InternalException('Не задан конфиг');
 		}
 		static::$_config->checkValid();
 	}
@@ -331,7 +344,8 @@ class EntityBuilder
 	 * @param string $type
 	 * @return string
 	 */
-	private static function _processFileTemplate($entityName, $type) {
+	private static function _processFileTemplate($entityName, $type)
+	{
 		$search = [
 			static::ENTITY_TEMPLATE_STRING,
 			'{MODEL_NAMESPACE}',
@@ -362,10 +376,11 @@ class EntityBuilder
 	 * @param string $tableName
 	 * @return boolean
 	 */
-	private static function _checkTableExists($tableName) {
+	private static function _checkTableExists($tableName)
+	{
 		$connection = DB::getConnection(static::$_config->connectionName);
 		$existingTables = $connection->query(
-			"SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $tableName . "';"
+			"SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND TABLE_NAME='" . $tableName . "';"
 		)->fetchAll();
 		return $existingTables[0][0];
 	}
@@ -375,7 +390,8 @@ class EntityBuilder
 	 *
 	 * @return array
 	 */
-	private static function _getTableList() {
+	private static function _getTableList()
+	{
 		$folder = self::_getFolder(self::FILE_TYPE_TABLE);
 		$files = $folder->find('.*Table\.php', true);
 
@@ -395,7 +411,8 @@ class EntityBuilder
 	 * @param string $tblName
 	 * @return boolean
 	 */
-	private static function _buildTableDeps($tblName) {
+	private static function _buildTableDeps($tblName)
+	{
 		$refClass = new \ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tblName);
 
 		if ($refClass->hasProperty('useTable')) {
@@ -432,7 +449,8 @@ class EntityBuilder
 	 * @param string[] $ownMethods
 	 * @return string
 	 */
-	private static function _buildTableMethodRedefines($classComment, $entityName, $ownMethods) {
+	private static function _buildTableMethodRedefines($classComment, $entityName, $ownMethods)
+	{
 		if ($classComment !== false) {
 			$commArr = explode("\n", $classComment);
 		} else {
@@ -482,7 +500,8 @@ class EntityBuilder
 	 * @param \ReflectionClass $refClass
 	 * @return string[]
 	 */
-	private static function _getClassPublicMethods($refClass) {
+	private static function _getClassPublicMethods($refClass)
+	{
 		$methods = [];
 		foreach ($refClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
 			if ($method->class == $refClass->getName()) {
@@ -498,7 +517,8 @@ class EntityBuilder
 	 * @param \ReflectionClass $refClass
 	 * @param string $newComment
 	 */
-	private static function _writeNewClassComment($refClass, $newComment) {
+	private static function _writeNewClassComment($refClass, $newComment)
+	{
 		$file = new File($refClass->getFileName());
 		$curContent = $file->read();
 		if (empty($curContent)) {
@@ -525,7 +545,8 @@ class EntityBuilder
 	 * @param string $entityName
 	 * @return boolean
 	 */
-	private static function _createQueryClass($entityName) {
+	private static function _createQueryClass($entityName)
+	{
 		$file = self::_getFile($entityName, self::FILE_TYPE_QUERY);
 		if (!$file->exists()) {
 			$file->create();
@@ -543,7 +564,8 @@ class EntityBuilder
 	 * @param string $entityName
 	 * @return boolean
 	 */
-	private static function _createEntityClass($entityName) {
+	private static function _createEntityClass($entityName)
+	{
 		// реальные поля
 		$curTblFields = self::_getTableFieldsComments($entityName);
 
@@ -630,7 +652,8 @@ class EntityBuilder
 	 * @param string $entityName
 	 * @return array
 	 */
-	private static function _getTableFieldsComments($entityName) {
+	private static function _getTableFieldsComments($entityName)
+	{
 		$table = self::_getTable($entityName);
 		$tableSchema = $table->getSchema();
 
@@ -672,13 +695,14 @@ class EntityBuilder
 	 * @param string $entityName
 	 * @return bool|string
 	 */
-	private static function _getTableComment($entityName) {
+	private static function _getTableComment($entityName)
+	{
 		$table = self::_getTable($entityName);
 
 		$connection = DB::getConnection(static::$_config->connectionName);
 		$tableName = $table->getTable();
 		$tableComment = $connection->query(
-			"SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND table_name='" . $tableName . "';"
+			"SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND TABLE_NAME='" . $tableName . "';"
 		)->fetchAll();
 		if (!empty($tableComment) && !empty($tableComment[0][0])) {
 			return ' * @tableComment ' . $tableComment[0][0];
@@ -693,7 +717,8 @@ class EntityBuilder
 	 * @param string[] $tableList
 	 * @return bool
 	 */
-	private static function _updateTableNamesFile($tableList) {
+	private static function _updateTableNamesFile($tableList)
+	{
 		$constList = [];
 		foreach ($tableList as $className) {
 			$entityName = substr($className, 0, -5);

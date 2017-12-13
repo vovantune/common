@@ -3,6 +3,7 @@
 namespace ArtSkills\ValueObject;
 
 
+use ArtSkills\Error\InternalException;
 use ArtSkills\Filesystem\File;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\Strings;
@@ -182,7 +183,7 @@ class ValueObjectDocumentation
 	 * @param \ReflectionClass $reflectionClass
 	 * @param array $usesList
 	 * @return array ['имя метода' => ['type' => null|Var_, 'description' => null|string, 'default' => 'дефотовое значение'], ...]
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	protected static function _getPropertyList(\ReflectionClass $reflectionClass, array $usesList) {
 		$propertyList = [];
@@ -206,7 +207,7 @@ class ValueObjectDocumentation
 
 				$rawDocBlock = $property->getDocComment();
 				if (empty($rawDocBlock)) {
-					throw new \Exception($reflectionClass->getName() . '::' . $propertyName . ': Нет описания типа данных');
+					throw new InternalException($reflectionClass->getName() . '::' . $propertyName . ': Нет описания типа данных');
 				}
 
 				$docBlock = DocBlockFactory::createInstance()
@@ -215,7 +216,7 @@ class ValueObjectDocumentation
 				/** @var Var_[] $vars */
 				$vars = $docBlock->getTagsByName('var');
 				if (empty($vars)) {
-					throw new \Exception($reflectionClass->getName() . '::' . $propertyName . ': Нет описания типа данных');
+					throw new InternalException($reflectionClass->getName() . '::' . $propertyName . ': Нет описания типа данных');
 				}
 				$propertyInfo['type'] = $vars[0];
 
@@ -362,25 +363,25 @@ class ValueObjectDocumentation
 	 * @param Var_ $propertyVar
 	 * @param array $typeAliases
 	 * @return string
-	 * @throws \Exception
+	 * @throws InternalException
 	 */
 	protected static function _getJsVariableName($fullClassName, $propertyName, Var_ $propertyVar, array $typeAliases) {
 		$propertyType = $propertyVar->getType();
 		if ((empty($propertyType) && $propertyVar->getVariableName() === 'this') || $propertyType instanceof Self_ || $propertyType instanceof Static_ || $propertyType instanceof This) {
-			throw new \Exception($fullClassName . '::' . $propertyName . ': ValueObject не может ссылаться сам на себя!');
+			throw new InternalException($fullClassName . '::' . $propertyName . ': ValueObject не может ссылаться сам на себя!');
 		}
 
 		if ($propertyType instanceof Compound) {
-			throw new \Exception($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть только одного типа!');
+			throw new InternalException($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть только одного типа!');
 		}
 
 		if ($propertyType instanceof Mixed) {
-			throw new \Exception($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть только одного типа!');
+			throw new InternalException($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть только одного типа!');
 		}
 
 		if ($propertyType instanceof Array_) {
 			if ($propertyType->getValueType() instanceof Mixed) {
-				throw new \Exception($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть простым типом, либо объектом!');
+				throw new InternalException($fullClassName . '::' . $propertyName . ': Свойство ValueObject должно быть простым типом, либо объектом!');
 			}
 		}
 
