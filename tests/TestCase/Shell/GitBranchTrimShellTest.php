@@ -18,6 +18,9 @@ class GitBranchTrimShellTest extends AppTestCase
 	 */
 	public function test()
 	{
+		MethodMocker::mock(GitBranchTrimShell::class, '_canDeleteRemote')
+			->willReturnValue(true);
+
 		$git = Git::getInstance();
 
 		$branchBefore = $git->getCurrentBranchName();
