@@ -128,7 +128,7 @@ class GitBranchTrimShell extends Shell
 	 */
 	protected function _canDeleteRemote(): bool
 	{
-		return Env::isTestServer() || Env::isUnitTest();
+		return Env::isProduction();
 	}
 
 	/**
