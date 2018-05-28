@@ -117,6 +117,7 @@ class Http
 		$curlHandle = curl_init($url);
 
 		curl_setopt($curlHandle, CURLOPT_TIMEOUT, $timeout);
+		curl_setopt($curlHandle, CURLOPT_CONNECTTIMEOUT, $timeout);
 		curl_setopt($curlHandle, CURLOPT_FILE, $fileHandle);
 		curl_setopt($curlHandle, CURLOPT_FOLLOWLOCATION, true);
 		curl_exec($curlHandle);
