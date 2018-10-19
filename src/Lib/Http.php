@@ -95,6 +95,25 @@ class Http
 	}
 
 	/**
+	 * Возвращает XML ответ при POST запросе
+	 *
+	 * @param string $url
+	 * @param array $data
+	 * @param array $options
+	 * @return \SimpleXMLElement|null
+	 */
+	public static function postXml($url, $data, $options = [])
+	{
+		$request = static::_makeRequest();
+		$result = $request->post($url, $data, $options);
+		if (!empty($result)) {
+			return $result->xml;
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Скачивает файл по указанной ссылке в targetFile или во временную директорию
 	 *
 	 * @param string $url
