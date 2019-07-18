@@ -12,8 +12,8 @@ class TranslitTest extends AppTestCase
 	 */
 	public function testTransliterate()
 	{
-		$this->assertEquals('Vasya Pupkin', Translit::transliterate('Вася Пупкин'));
-		$this->assertEquals('Petya 123 Xmur', Translit::transliterate('Петя 123 Xmur'));
+		self::assertEquals('Vasya Pupkin', Translit::transliterate('Вася Пупкин'));
+		self::assertEquals('Petya 123 Xmur', Translit::transliterate('Петя 123 Xmur'));
 	}
 
 	/**
@@ -21,6 +21,6 @@ class TranslitTest extends AppTestCase
 	 */
 	public function testGenerateUrlAlias()
 	{
-		$this->assertEquals('vasya_pupkyan_556', Translit::generateUrlAlias('Вася  Пупкян-_-#556/\\"'));
+		self::assertEquals('vasya_pupkyan_556', Translit::generateUrlAlias('Вася  Пупкян-_-#556/\\"'));
 	}
 }

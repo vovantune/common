@@ -14,11 +14,11 @@ class RusGramTest extends AppTestCase
 	{
 		$words = ['рубль', 'рубля', 'рублей'];
 
-		$this->assertEquals('1 рубль', RusGram::declension(1, $words), 'Некорректное склонение в именительный падеж');
-		$this->assertEquals('2 рубля', RusGram::declension(2, $words), 'Некорректное склонение в дательный падеж');
-		$this->assertEquals('10 рублей', RusGram::declension(10, $words), 'Некорректное склонение в родительный падеж');
+		self::assertEquals('1 рубль', RusGram::declension(1, $words), 'Некорректное склонение в именительный падеж');
+		self::assertEquals('2 рубля', RusGram::declension(2, $words), 'Некорректное склонение в дательный падеж');
+		self::assertEquals('10 рублей', RusGram::declension(10, $words), 'Некорректное склонение в родительный падеж');
 
-		$this->assertEquals('рубля', RusGram::declension(2, $words, true), 'Некорректный вывод без цифры');
+		self::assertEquals('рубля', RusGram::declension(2, $words, true), 'Некорректный вывод без цифры');
 	}
 
 	/**
@@ -26,7 +26,7 @@ class RusGramTest extends AppTestCase
 	 */
 	public function testGetRussianDate()
 	{
-		$this->assertEquals('11 Окт октябрь Вс', RusGram::getRussianDate('d M FI D', '2015-10-11'), 'Некорректное формирование даты');
-		$this->assertEquals('11 октября Воскресенье', RusGram::getRussianDate('d FR l', '2015-10-11'), 'Некорректное формирование даты');
+		self::assertEquals('11 Окт октябрь Вс', RusGram::getRussianDate('d M FI D', '2015-10-11'), 'Некорректное формирование даты');
+		self::assertEquals('11 октября Воскресенье', RusGram::getRussianDate('d FR l', '2015-10-11'), 'Некорректное формирование даты');
 	}
 }

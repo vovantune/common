@@ -11,7 +11,7 @@ use Cake\Error\PHP7ErrorException;
 use Cake\Log\Engine\BaseLog;
 use Cake\Log\Log;
 use Cake\Log\LogTrait;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\NotFoundException;
 use Cake\Network\Exception\UnauthorizedException;
 
 class SentryLog extends BaseLog

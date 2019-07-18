@@ -40,7 +40,7 @@ class Table extends \Cake\ORM\Table
 	 */
 	public static function instance()
 	{
-		return TableRegistry::get(static::_getAlias());
+		return TableRegistry::getTableLocator()->get(static::_getAlias());
 	}
 
 	/**
@@ -168,14 +168,14 @@ class Table extends \Cake\ORM\Table
 		$originalStrategies = [];
 		if (!empty($options['assocStrategies'])) {
 			foreach ($options['assocStrategies'] as $assoc => $strategy) {
-				$originalStrategies[$assoc] = $this->$assoc->saveStrategy();
-				$this->$assoc->saveStrategy($strategy);
+				$originalStrategies[$assoc] = $this->$assoc->getSaveStrategy();
+				$this->$assoc->setSaveStrategy($strategy);
 			}
 			unset($options['assocStrategies']);
 		}
 		$result = parent::save($entity, $options);
 		foreach ($originalStrategies as $assoc => $strategy) {
-			$this->$assoc->saveStrategy($strategy);
+			$this->$assoc->setSaveStrategy($strategy);
 		}
 		return $result;
 	}

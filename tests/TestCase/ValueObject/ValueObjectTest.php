@@ -3,7 +3,6 @@
 namespace ArtSkills\Test\TestCase\ValueObject;
 
 use ArtSkills\TestSuite\AppTestCase;
-use ArtSkills\ValueObject\ValueObjectDocumentation;
 
 class ValueObjectTest extends AppTestCase
 {

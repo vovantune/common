@@ -54,7 +54,7 @@ class HttpClientAdapter extends Stream
 			if (self::$_debugRequests) {
 				print "==============================================================\n";
 				print 'Do ' . $request->getMethod() . ' request to ' . $request->getUri() . ', Body: ' . $request->getBody() . "\n";
-				print "Response: \n" . $result[0]->body() . "\n";
+				print "Response: \n" . $result[0]->getStringBody() . "\n";
 				print "==============================================================\n";
 			}
 

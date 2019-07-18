@@ -36,9 +36,9 @@ class HttpClientMockerTest extends AppTestCase
 			->willReturnJson($returnArray);
 
 		$client = new Client();
-		self::assertEquals($returnArray, $client->post($url, $post)->json);
+		self::assertEquals($returnArray, $client->post($url, $post)->getJson());
 		HttpClientAdapter::disableDebug();
-		self::assertNotEmpty($client->get($url)->body);
+		self::assertNotEmpty($client->get($url)->getStringBody());
 	}
 
 	/** Тест снифера запросов */
@@ -71,7 +71,7 @@ class HttpClientMockerTest extends AppTestCase
 		/** @var Response $sniffResponse */
 		$sniffResponse = $sniffCollection[0]['response'];
 		self::assertEquals($url, $sniffRequest->getUri());
-		self::assertEquals($clientResponse->body, $sniffResponse->body);
+		self::assertEquals($clientResponse->getStringBody(), $sniffResponse->getStringBody());
 	}
 
 	/**

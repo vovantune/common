@@ -45,7 +45,7 @@ class ErrorHandlerMiddleware extends \Cake\Error\Middleware\ErrorHandlerMiddlewa
 	 */
 	public function handleException($exception, $request, $response)
 	{
-		$renderer = $this->getRenderer($exception);
+		$renderer = $this->getRenderer($exception, $request);
 		try {
 			$this->logException($request, $exception);
 			$res = $renderer->render();

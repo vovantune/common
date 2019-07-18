@@ -14,12 +14,6 @@ class AssetTest extends AppTestCase
 
 	const SCRIPT_VERSION = 123;
 
-	/**
-	 * request
-	 *
-	 * @var ServerRequest
-	 */
-	private $_request = null;
 
 	/**
 	 * helper
@@ -64,10 +58,20 @@ class AssetTest extends AppTestCase
 	 */
 	public function setUp()
 	{
-		$this->_request = new ServerRequest();
-		$this->_assetHelper = new AssetHelper(new View($this->_request));
-		$this->_assetHelper->setAssetVersion(self::SCRIPT_VERSION);
+		$this->_loadHelper();
 		parent::setUp();
+	}
+
+	/**
+	 * Грузим хелпер
+	 *
+	 * @param array $options
+	 */
+	private function _loadHelper(array $options = [])
+	{
+		$request = new ServerRequest($options);
+		$this->_assetHelper = new AssetHelper(new View($request));
+		$this->_assetHelper->setAssetVersion(self::SCRIPT_VERSION);
 	}
 
 	/**
@@ -598,17 +602,15 @@ class AssetTest extends AppTestCase
 	public function testUrlPrefix()
 	{
 		$urlPrefix = '/prefix';
-		$this->_request = new ServerRequest(['webroot' => $urlPrefix]);
-		$this->_assetHelper = new AssetHelper(new View($this->_request));
-
+		$this->_loadHelper(['webroot' => $urlPrefix]);
 		$this->_assetHelper->load('testManual', 'fileAuto');
 		$expectedResult = [
 			AssetHelper::BLOCK_SCRIPT => [
 				'<script id="file_auto" type="text/x-handlebars-template"></script>',
-				'<script src="' . $urlPrefix . '/js/TestManual/file_auto.js"></script>',
+				'<script src="' . $urlPrefix . '/js/TestManual/file_auto.js?v='.self::SCRIPT_VERSION.'"></script>',
 			],
 			AssetHelper::BLOCK_STYLE => [
-				'<link rel="stylesheet" href="' . $urlPrefix . '/css/TestManual/file_auto.css"/>',
+				'<link rel="stylesheet" href="' . $urlPrefix . '/css/TestManual/file_auto.css?v='.self::SCRIPT_VERSION.'"/>',
 			],
 			AssetHelper::BLOCK_SCRIPT_BOTTOM => [],
 		];
@@ -624,7 +626,13 @@ class AssetTest extends AppTestCase
 		touch(WWW_ROOT . 'js/Test/dependency4.min.js'); // минифицированный скрипт
 		touch(WWW_ROOT . 'js/Test/dependency2.min.js'); // минифицированный скрипт
 
-		$this->_request->addParams(['controller' => 'test', 'action' => 'isDependent']);
+		$this->_loadHelper([
+			'params' => [
+				'controller' => 'test',
+				'action' => 'isDependent',
+			],
+		]);
+
 		MethodMocker::callPrivate($this->_assetHelper, '_setConfigs', [
 			[
 				'test' => [
@@ -980,6 +988,12 @@ class AssetTest extends AppTestCase
 	 */
 	public function testLoadParams()
 	{
+		$this->_loadHelper([
+			'params' => [
+				'controller' => 'test',
+				'action' => 'fromParams',
+			],
+		]);
 
 		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
 			'test',
@@ -990,8 +1004,6 @@ class AssetTest extends AppTestCase
 				],
 			],
 		]);
-
-		$this->_request->addParams(['controller' => 'test', 'action' => 'fromParams']);
 
 		$errorMsg = '';
 		try {
@@ -1004,7 +1016,22 @@ class AssetTest extends AppTestCase
 			'Не сработала автоматическая подгрузка на основе реквеста'
 		);
 
-		$this->_request->addParams(['controller' => 'test', 'action' => 'empty']);
+		$this->_loadHelper([
+			'params' => [
+				'controller' => 'test',
+				'action' => 'empty',
+			],
+		]);
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'fromParams',
+			[
+				AssetHelper::KEY_VARS => [
+					'testLoad' => AssetHelper::TYPE_STRING,
+				],
+			],
+		]);
+
 		$errorMsg = '';
 		try {
 			$this->_assetHelper->load();
@@ -1013,7 +1040,22 @@ class AssetTest extends AppTestCase
 		}
 		self::assertEquals('', $errorMsg, 'Не сработала автоматическая подгрузка на основе реквеста');
 
-		$this->_request->addParams(['controller' => 'test', 'action' => 'from_params']);
+		$this->_loadHelper([
+			'params' => [
+				'controller' => 'test',
+				'action' => 'from_params',
+			],
+		]);
+		MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
+			'test',
+			'fromParams',
+			[
+				AssetHelper::KEY_VARS => [
+					'testLoad' => AssetHelper::TYPE_STRING,
+				],
+			],
+		]);
+
 		$errorMsg = '';
 		try {
 			$this->_assetHelper->load();

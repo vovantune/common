@@ -8,5 +8,3 @@ Router::extensions(['json']);
 Router::scope('/', function (\Cake\Routing\RouteBuilder $routes) {
 	$routes->fallbacks(DashedRoute::class);
 });
-
-Plugin::routes();

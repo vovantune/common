@@ -444,7 +444,7 @@ class AssetHelper extends Helper
 	private function _getParam(?string $value, string $name): string
 	{
 		if (empty($value)) {
-			$value = $this->request->getParam($name);
+			$value = $this->getView()->getRequest()->getParam($name);
 		}
 		if (empty($value)) {
 			$value = self::DEFAULT_PARAMS[$name];

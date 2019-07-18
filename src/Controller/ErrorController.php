@@ -16,7 +16,9 @@ class ErrorController extends Controller
 	/** Скопировано из Cake\Controller\ErrorController */
 	public function initialize()
 	{
-		$this->loadComponent('RequestHandler');
+		$this->loadComponent('RequestHandler', [
+			'enableBeforeRedirect' => false,
+		]);
 	}
 
 	/**

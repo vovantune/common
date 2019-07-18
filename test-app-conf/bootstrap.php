@@ -32,6 +32,7 @@ use Cake\Core\Plugin;
 use Cake\Database\Type;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
+use Cake\Mailer\TransportFactory;
 use Cake\Routing\DispatcherFactory;
 use Cake\Utility\Security;
 use ArtSkills\Mailer\Email;
@@ -124,22 +125,9 @@ if (!Configure::read('App.fullBaseUrl')) {
 
 Cache::setConfig(Configure::consume('Cache'));
 ConnectionManager::setConfig(Configure::consume('Datasources'));
-Email::setConfigTransport(Configure::consume('EmailTransport'));
+TransportFactory::setConfig(Configure::consume('EmailTransport'));
 Email::setConfig(Configure::consume('Email'));
 Log::setConfig(Configure::consume('Log'));
-Security::salt(Configure::consume('Security.salt'));
-
-
-
-if (Configure::read('debug')) {
-	Plugin::load('DebugKit', ['bootstrap' => true]);
-}
-
-/**
- * Connect middleware/dispatcher filters.
- */
-DispatcherFactory::add('Asset');
-DispatcherFactory::add('Routing');
-DispatcherFactory::add('ControllerFactory');
+Security::setSalt(Configure::consume('Security.salt'));
 
 

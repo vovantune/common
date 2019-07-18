@@ -96,7 +96,7 @@ class EntityTest extends AppTestCase
 		$entity->deleteChild($assocName, $childIndex);
 		unset($childIds[$childIndex]);
 		self::assertEquals(array_values($childIds), array_column($entity->toArray()[$assocName], 'id'));
-		self::assertTrue($entity->dirty($assocName));
+		self::assertTrue($entity->isDirty($assocName));
 	}
 
 	/**

@@ -124,7 +124,7 @@ class EntityBuilder
 	public static function build()
 	{
 		self::_checkConfig();
-		TableRegistry::clear();
+		TableRegistry::getTableLocator()->clear();
 		$tblList = self::_getTableList();
 		$hasChanges = false;
 		foreach ($tblList as $tblName) {
@@ -137,7 +137,7 @@ class EntityBuilder
 		if ($namesUpdated) {
 			$hasChanges = true;
 		}
-		TableRegistry::clear();
+		TableRegistry::getTableLocator()->clear();
 
 		return $hasChanges;
 	}
@@ -146,8 +146,8 @@ class EntityBuilder
 	 * Создаём класс таблицы
 	 *
 	 * @param string $tableName
-	 * @throws InternalException
 	 * @return string
+	 * @throws InternalException
 	 */
 	public static function createTableClass($tableName)
 	{
@@ -266,10 +266,11 @@ class EntityBuilder
 	 */
 	protected static function _getTable($tableAlias)
 	{
-		if (TableRegistry::exists($tableAlias)) {
-			return TableRegistry::get($tableAlias);
+		if (TableRegistry::getTableLocator()->exists($tableAlias)) {
+			return TableRegistry::getTableLocator()->get($tableAlias);
+		} else {
+			return TableRegistry::getTableLocator()->get($tableAlias, ['notForceEntity' => true]);
 		}
-		return TableRegistry::get($tableAlias, ['notForceEntity' => true]);
 	}
 
 	/**
@@ -671,7 +672,7 @@ class EntityBuilder
 		$associations = $table->associations();
 		/** @type \Cake\ORM\Association $assoc */
 		foreach ($associations as $assoc) {
-			$className = $assoc->className() ? $assoc->className() : $assoc->getName();
+			$className = $assoc->getClassName() ? $assoc->getClassName() : $assoc->getName();
 			$propertyName = $assoc->getProperty();
 			$foreignKeys = $assoc->getForeignKey();
 			$bindingKeys = $assoc->getBindingKey();
