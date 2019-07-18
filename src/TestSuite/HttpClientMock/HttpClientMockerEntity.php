@@ -340,6 +340,7 @@ class HttpClientMockerEntity
 			$response = $action($request, $this);
 		} else {
 			$this->_fail('Return mock action is not defined');
+			return null;
 		}
 
 		return $this->_processResponse($response);

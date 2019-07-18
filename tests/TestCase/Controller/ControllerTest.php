@@ -158,7 +158,7 @@ class ControllerTest extends AppControllerTestCase
 				// в котором вызван InternalError::instance
 				// при этом file и line - из TestController
 				'file' => (new \ReflectionClass(TestController::class))->getFileName(),
-				'line' => 139,
+				'line' => 146,
 			],
 			500
 		);
@@ -178,7 +178,7 @@ class ControllerTest extends AppControllerTestCase
 				'code' => 500,
 				// а здесь был сделан непосредственно throw new InternalError
 				'file' => (new \ReflectionClass(TestController::class))->getFileName(),
-				'line' => 150,
+				'line' => 157,
 			],
 			500
 		);

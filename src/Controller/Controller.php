@@ -5,7 +5,7 @@ namespace ArtSkills\Controller;
 use ArtSkills\Error\InternalException;
 use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;
-use ArtSkills\Lib\ValueObject;
+use ArtSkills\ValueObject\ValueObject;
 use Cake\Http\Response;
 use Cake\Log\Log;
 use Cake\Routing\Router;
@@ -268,10 +268,10 @@ class Controller extends \Cake\Controller\Controller
 		$this->viewBuilder()->setClassName('Json');
 		$jsonPResponse = !empty($this->request->getQuery('callback'));
 		if ($jsonPResponse) {
-			$this->response->type('application/x-javascript');
+			$this->response = $this->response->withType('application/x-javascript');
 			$this->set('_jsonp', true);
 		} else {
-			$this->response->type('application/json');
+			$this->response = $this->response->withType('application/json');
 		}
 		return null;
 	}

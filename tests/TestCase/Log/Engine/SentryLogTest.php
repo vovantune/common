@@ -14,7 +14,7 @@ use Cake\Core\Configure;
 use Cake\Error\Debugger;
 use Cake\Log\Engine\FileLog;
 use Cake\Log\Log;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\NotFoundException;
 
 class SentryLogTest extends AppTestCase
 {

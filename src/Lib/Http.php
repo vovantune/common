@@ -29,7 +29,7 @@ class Http
 		$result = static::_getRequest($url, $request);
 
 		if (!empty($result)) {
-			return $result->body();
+			return $result->getStringBody();
 		} else {
 			return null;
 		}
@@ -88,7 +88,7 @@ class Http
 		$request = static::_makeRequest();
 		$result = static::_getRequest($url, $request);
 		if (!empty($result)) {
-			return $result->xml;
+			return $result->getXml();
 		} else {
 			return null;
 		}
@@ -107,7 +107,7 @@ class Http
 		$request = static::_makeRequest();
 		$result = $request->post($url, $data, $options);
 		if (!empty($result)) {
-			return $result->xml;
+			return $result->getXml();
 		} else {
 			return null;
 		}
@@ -163,7 +163,7 @@ class Http
 	private static function _getResponseJson($response)
 	{
 		if (!empty($response)) {
-			return $response->json;
+			return $response->getJson();
 		} else {
 			return null;
 		}

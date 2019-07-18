@@ -8,7 +8,7 @@ use ArtSkills\ORM\Entity;
 use ArtSkills\ORM\Query;
 use ArtSkills\ORM\Table;
 use ArtSkills\Lib\DB;
-use ArtSkills\Lib\ValueObject;
+use ArtSkills\ValueObject\ValueObject;
 
 /**
  * @method $this setConnectionName(string $name)

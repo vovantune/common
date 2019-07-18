@@ -8,7 +8,7 @@
 
 namespace TestApp\Controller;
 
-use ArtSkills\Lib\ValueObject;
+use ArtSkills\ValueObject\ValueObject;
 
 class TestValueObject extends ValueObject
 {

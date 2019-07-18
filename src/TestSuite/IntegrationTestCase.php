@@ -9,12 +9,16 @@ use ArtSkills\Lib\Env;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\TestSuite\Mock\MethodMockerEntity;
 use Cake\Controller\Component\FlashComponent;
+use Cake\TestSuite\IntegrationTestTrait;
+use Cake\TestSuite\TestCase;
 
 
-abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
+abstract class IntegrationTestCase extends TestCase
 {
 
-	use TestCaseTrait;
+	use TestCaseTrait, IntegrationTestTrait {
+		_sendRequest as protected _traitSendRequest;
+	}
 
 	/**
 	 * Снифф флеша
@@ -191,7 +195,7 @@ abstract class IntegrationTestCase extends \Cake\TestSuite\IntegrationTestCase
 	protected function _sendRequest($url, $method, $data = [])
 	{
 		$this->_flashResult = [];
-		parent::_sendRequest($url, $method, $data);
+		$this->_traitSendRequest($url, $method, $data);
 	}
 
 	/**

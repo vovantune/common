@@ -3,6 +3,7 @@ return [
 	'serverProtocol' => 'http',
 	'serverName' => 'common.artskills.ru',
 	'debug' => true,
+	'enableBeforeRedirect' => false,
 
 	'App' => [
 		'namespace' => 'TestApp',

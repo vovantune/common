@@ -389,7 +389,7 @@ class MethodMockerTest extends TestCase
 			MethodMocker::restore();
 			self::fail('должен был выкинуться ексепшн');
 		} catch (\Exception $e) {
-			$this->assertContains(' - is not called!', $e->getMessage());
+			self::assertContains(' - is not called!', $e->getMessage());
 		}
 		self::assertTrue($mock1->isRestored());
 		self::assertTrue($mock2->isRestored());

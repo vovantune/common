@@ -4,7 +4,7 @@ namespace ArtSkills\Test\TestCase\ORM;
 
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\TestSuite\AppTestCase;
-use Cake\Database\Driver\Mysql;
+use Cake\Database\Driver;
 use Cake\I18n\Time;
 use Cake\ORM\Association\HasMany;
 use Cake\ORM\Query;
@@ -114,7 +114,7 @@ class TableTest extends AppTestCase
 
 		// смена способа сохранения дочерних сущностей
 		$testEntity = $this->TestTableOne->getEntity($testId, ['contain' => $assoc]);
-		self::assertEquals(HasMany::SAVE_APPEND, $this->TestTableOne->$assoc->saveStrategy());
+		self::assertEquals(HasMany::SAVE_APPEND, $this->TestTableOne->$assoc->getSaveStrategy());
 		self::assertCount(2, $testEntity->TestTableTwo);
 		$testEntity->deleteChild($assoc, 1);
 		$this->TestTableOne->save($testEntity);
@@ -126,7 +126,7 @@ class TableTest extends AppTestCase
 		$testEntity->deleteChild($assoc, 1);
 		$this->TestTableOne->save($testEntity, ['assocStrategies' => [$assoc => HasMany::SAVE_REPLACE]]);
 		// стратегия изменилась ровно на одно сохранение
-		self::assertEquals(HasMany::SAVE_APPEND, $this->TestTableOne->$assoc->saveStrategy());
+		self::assertEquals(HasMany::SAVE_APPEND, $this->TestTableOne->$assoc->getSaveStrategy());
 		$testEntity = $this->TestTableOne->getEntity($testId, ['contain' => $assoc]);
 		self::assertCount(1, $testEntity->TestTableTwo);
 
@@ -170,11 +170,11 @@ class TableTest extends AppTestCase
 			}
 		});
 
-		MethodMocker::sniff(Mysql::class, 'beginTransaction', function () {
+		MethodMocker::sniff(Driver::class, 'beginTransaction', function () {
 			self::assertTrue(true, 'Транзакция не началась');
 		});
 
-		MethodMocker::sniff(Mysql::class, 'commitTransaction', function () {
+		MethodMocker::sniff(Driver::class, 'commitTransaction', function () {
 			self::assertTrue(true, 'Транзакция не закончилась');
 		});
 

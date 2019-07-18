@@ -10,7 +10,11 @@
 	],
 	"require": {
 		"php": "^7.1",
-		"cakephp/cakephp": "^3.4",
+		"ext-json": "*",
+		"ext-simplexml": "*",
+		"ext-curl": "*",
+		"ext-pdo": "*",
+		"cakephp/cakephp": "^3.8",
 		"robmorgan/phinx": "^0.6.2",
 		"sentry/sentry": "^1.1",
 		"jan-swiecki/simple-annotations": "*",
@@ -20,7 +24,9 @@
 		"webmozart/assert": "*"
 	},
 	"require-dev": {
-		"phpunit/phpunit": "6.3.*",
+		"ext-runkit": "*",
+		"ext-iconv": "*",
+		"phpunit/phpunit": "^6",
 		"cakephp/debug_kit": "~3.1",
 		"artskills/codestyle": "dev-master"
 	},

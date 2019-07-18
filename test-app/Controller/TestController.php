@@ -12,8 +12,15 @@ class TestController extends Controller
 	/** @inheritdoc */
 	protected $_jsonResponseActions = ['getStandardErrorJsonConfigured'];
 
-	/** @inheritdoc */
-	public $components = ['Flash', 'RequestHandler'];
+	/** @inheritDoc */
+	public function initialize()
+	{
+		$this->loadComponent('Flash');
+		$this->loadComponent('RequestHandler', [
+			'enableBeforeRedirect' => false,
+		]);
+		parent::initialize();
+	}
 
 	/**
 	 * Успешный JSON ответ

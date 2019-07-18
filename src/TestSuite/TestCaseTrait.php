@@ -133,10 +133,10 @@ trait TestCaseTrait
 		}
 		foreach ($this->fixtures as $fixtureName) {
 			$modelAlias = Inflector::camelize(Strings::lastPart('.', $fixtureName));
-			if (TableRegistry::exists($modelAlias)) {
-				TableRegistry::remove($modelAlias);
+			if (TableRegistry::getTableLocator()->exists($modelAlias)) {
+				TableRegistry::getTableLocator()->remove($modelAlias);
 			}
-			$this->{$modelAlias} = TableRegistry::get($modelAlias, [
+			$this->{$modelAlias} = TableRegistry::getTableLocator()->get($modelAlias, [
 				'className' => $modelAlias,
 				'testInit' => true,
 			]);
