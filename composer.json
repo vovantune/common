@@ -17,8 +17,7 @@
 		"cakephp/cakephp": "^3.8",
 		"robmorgan/phinx": "^0.6.2",
 		"sentry/sentry": "^1.1",
-		"jan-swiecki/simple-annotations": "*",
-		"webmozart/assert": "*"
+		"jan-swiecki/simple-annotations": "*"
 	},
 	"require-dev": {
 		"ext-runkit": "*",

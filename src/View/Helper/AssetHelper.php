@@ -10,7 +10,6 @@ use ArtSkills\Lib\Url;
 use ArtSkills\Filesystem\File;
 use Cake\Utility\Inflector;
 use Cake\View\Helper;
-use ArtSkills\Error\Assert;
 use Cake\View\View;
 
 class AssetHelper extends Helper
@@ -399,8 +398,10 @@ class AssetHelper extends Helper
 	private function _setVars(array $variables, $overwrite = false, bool $isVariable = true)
 	{
 		$this->_checkCanRenderVars();
-		Assert::isArray($variables, ($isVariable ? 'Переменные'
-				: 'Константы') . ' должны быть массивом [название => значение]');
+		if (!is_array($variables)) {
+			throw new InternalException(($isVariable ? 'Переменные'
+					: 'Константы') . ' должны быть массивом [название => значение]');
+		}
 
 		foreach ($variables as $varName => $varValue) {
 			$varName = $this->_validVarName($varName, $isVariable);
