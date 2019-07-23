@@ -2,7 +2,6 @@
 
 namespace ArtSkills\EntityBuilder;
 
-use ArtSkills\Error\Assert;
 use ArtSkills\Error\InternalException;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\DB;
@@ -80,6 +79,7 @@ class EntityBuilder
 	 * Задать конфиг
 	 *
 	 * @param EntityBuilderConfig|null $config
+	 * @throws InternalException
 	 */
 	public static function setConfig($config)
 	{
@@ -87,7 +87,9 @@ class EntityBuilder
 		if (empty($config)) {
 			return;
 		}
-		Assert::isInstanceOf($config, EntityBuilderConfig::class, 'Bad config');
+		if (!($config instanceof EntityBuilderConfig)) {
+			throw new InternalException('Bad config');
+		}
 
 		$entityClassName = self::_getClassTemplate(self::FILE_TYPE_ENTITY);
 		$queryClassName = self::_getClassTemplate(self::FILE_TYPE_QUERY);
