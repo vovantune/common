@@ -22,7 +22,7 @@ class FormHelper extends \Cake\View\Helper\FormHelper
 	 *
 	 * @var array
 	 */
-	private $_resetTemplates = [
+	protected $_resetTemplates = [
 		'inputContainer' => '<div class="input {{type}}{{required}}{{containerClass}}"{{containerAttrs}}>{{content}}{{append}}</div>',
 		'inputContainerError' => '<div class="input {{type}}{{required}} error{{containerClass}}"{{containerAttrs}}>{{content}}{{append}}{{error}}</div>',
 		'noDivContainer' => '{{content}}{{append}}',
