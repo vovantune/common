@@ -1,30 +1,23 @@
 {
 	"name": "artskills/common",
-	"description": "common utils",
+	"description": "CakePHP utils",
 	"type": "library",
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "git://github.com/ArtSkills/codeStyle.git"
-		}
-	],
 	"require": {
-		"php": "^7.1",
+		"php": "^7.2",
 		"ext-json": "*",
 		"ext-simplexml": "*",
 		"ext-curl": "*",
 		"ext-pdo": "*",
-		"cakephp/cakephp": "^3.8",
+		"cakephp/cakephp": "3.*",
 		"robmorgan/phinx": "^0.6.2",
 		"sentry/sentry": "^1.1",
 		"jan-swiecki/simple-annotations": "*"
 	},
 	"require-dev": {
-		"ext-runkit": "*",
+		"ext-runkit7": "*",
 		"ext-iconv": "*",
 		"phpunit/phpunit": "^6",
-		"cakephp/debug_kit": "~3.1",
-		"artskills/codestyle": "1"
+		"cakephp/debug_kit": "~3.1"
 	},
 	"autoload": {
 		"psr-4": {

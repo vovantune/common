@@ -34,7 +34,7 @@ class FixtureTest extends AppTestCase
 	{
 		$expectedCreateTable =
 			"CREATE TABLE `test_table_one` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'comment1',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'comment1',
   `col_enum` enum('val1','val2','val3') NOT NULL DEFAULT 'val1',
   `col_text` longtext NOT NULL,
   `col_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'comment2',

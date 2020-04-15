@@ -201,16 +201,6 @@ class HttpTest extends AppTestCase
 	}
 
 	/**
-	 * Тестируем обычную загрузку файла
-	 */
-	public function testDownloadBasic()
-	{
-		$file = Http::downloadFile('file:///' . __FILE__);
-		self::assertFileEquals($file, __FILE__, 'Файлы не совпадают');
-		unlink($file);
-	}
-
-	/**
 	 * Проверяем загрузку на сесуществующем пути
 	 */
 	public function testDownloadError()

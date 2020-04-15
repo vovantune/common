@@ -8,6 +8,7 @@ use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Strings;
 use ArtSkills\ORM\Entity;
 use Cake\Error\Debugger;
+use Cake\I18n\Time;
 use Cake\Log\Log;
 
 /**
@@ -19,6 +20,13 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 {
 	/** Методы, которые не экспортируются через json_encode */
 	const EXCLUDE_EXPORT_PROPS = [];
+
+	/**
+	 * Поля с типом Time
+	 *
+	 * @var array
+	 */
+	const TIME_FIELDS = [];
 
 	/**
 	 * Список экспортируемых свойств
@@ -43,6 +51,12 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	public function __construct($fillValues = [])
 	{
 		$this->_fillExportedFields();
+
+		foreach (static::TIME_FIELDS as $fieldName) {
+			if (!empty($fillValues[$fieldName]) && is_string($fillValues[$fieldName])) {
+				$fillValues[$fieldName] = Time::parse($fillValues[$fieldName]);
+			}
+		}
 
 		foreach ($fillValues as $key => $value) {
 			if (!property_exists($this, $key)) {
@@ -83,7 +97,11 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 			if (count($arguments) !== 1) {
 				throw new InternalException("Invalid argument count when calling $name");
 			}
-			$this->{$propertyName} = $arguments[0];
+			$setValue = $arguments[0];
+			if (in_array($propertyName, static::TIME_FIELDS) && is_string($setValue)) {
+				$setValue = Time::parse($setValue);
+			}
+			$this->{$propertyName} = $setValue;
 			return $this;
 		}
 		throw new InternalException("Undefined method $name");
