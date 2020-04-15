@@ -55,6 +55,8 @@ class TestEmailTransport extends AbstractTransport
 	{
 		self::$_messages[] = [
 			'to' => $email->getTo(),
+			'cc' => $email->getCc(),
+			'bcc' => $email->getBcc(),
 			'subject' => $email->getSubject(),
 			'template' => $email->viewBuilder()->getTemplate(),
 			'layout' => $email->viewBuilder()->getLayout(),
