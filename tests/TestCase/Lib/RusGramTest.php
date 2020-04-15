@@ -29,4 +29,11 @@ class RusGramTest extends AppTestCase
 		self::assertEquals('11 Окт октябрь Вс', RusGram::getRussianDate('d M FI D', '2015-10-11'), 'Некорректное формирование даты');
 		self::assertEquals('11 октября Воскресенье', RusGram::getRussianDate('d FR l', '2015-10-11'), 'Некорректное формирование даты');
 	}
+
+	/** Число в строку */
+	public function testNumberToString()
+	{
+		self::assertEquals('сто тысяч рублей 00 копеек', RusGram::numberToString(100000));
+		self::assertEquals('семь тысяч пятьсот сорок шесть рублей 08 копеек', RusGram::numberToString(7546.08));
+	}
 }
