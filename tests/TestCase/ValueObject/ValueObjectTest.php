@@ -31,12 +31,10 @@ class ValueObjectTest extends AppTestCase
 		self::assertEquals($expectedArray, $obj->toArray());
 		self::assertEquals(json_encode($expectedArray), json_encode($obj));
 
-		$timeString = '2020-04-01 16:15:00';
-
 		$obj = ValueObjectFixture::create([
 			'field2' => 'ololo',
 			'field3' => 'azazaz',
-			'timeField' => $timeString,
+			'timeField' => '2020-04-01 16:15:00',
 		])->setField1('qqq');
 		self::assertEquals('ololo', $obj->field2);
 		self::assertEquals([
@@ -52,6 +50,10 @@ class ValueObjectTest extends AppTestCase
     "field4": null,
     "timeField": "2020-04-01T16:15:00+03:00"
 }', $obj->toJson());
+
+		$timeString = '2020-04-02';
+		$obj->setTimeField($timeString);
+		self::assertEquals(Time::parse($timeString), $obj->timeField);
 	}
 
 	/**

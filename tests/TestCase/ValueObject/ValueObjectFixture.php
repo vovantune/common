@@ -11,6 +11,7 @@ use Cake\Utility\String as CakeString;
  * @method $this setField1(mixed $value)
  * @method $this setField2(mixed $value)
  * @method $this setField3(mixed $value)
+ * @method $this setTimeField(mixed $value)
  */
 class ValueObjectFixture extends ValueObject
 {
