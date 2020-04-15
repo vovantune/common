@@ -4,6 +4,7 @@ namespace ArtSkills\Test\TestCase\ValueObject;
 
 use ArtSkills\Lib\Strings;
 use ArtSkills\ValueObject\ValueObject;
+use Cake\I18n\Time;
 use Cake\Utility\String as CakeString;
 
 /**
@@ -15,6 +16,10 @@ class ValueObjectFixture extends ValueObject
 {
 	const EXCLUDE_EXPORT_PROPS = [
 		'field2',
+	];
+
+	const TIME_FIELDS = [
+		'timeField',
 	];
 
 	/**
@@ -33,4 +38,6 @@ class ValueObjectFixture extends ValueObject
 	/** @var CakeString */
 	public $field4;
 
+	/** @var Time */
+	public $timeField;
 }

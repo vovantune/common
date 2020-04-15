@@ -3,6 +3,7 @@
 namespace ArtSkills\Test\TestCase\ValueObject;
 
 use ArtSkills\TestSuite\AppTestCase;
+use Cake\I18n\Time;
 
 class ValueObjectTest extends AppTestCase
 {
@@ -25,25 +26,31 @@ class ValueObjectTest extends AppTestCase
 			// field2 выключен
 			'field3' => 'vbn',
 			'field4' => null,
+			'timeField' => null,
 		];
 		self::assertEquals($expectedArray, $obj->toArray());
 		self::assertEquals(json_encode($expectedArray), json_encode($obj));
 
+		$timeString = '2020-04-01 16:15:00';
+
 		$obj = ValueObjectFixture::create([
 			'field2' => 'ololo',
 			'field3' => 'azazaz',
+			'timeField' => $timeString,
 		])->setField1('qqq');
 		self::assertEquals('ololo', $obj->field2);
 		self::assertEquals([
 			'field1' => 'qqq',
 			'field3' => 'azazaz',
 			'field4' => null,
+			'timeField' => '2020-04-01T16:15:00+03:00',
 		], $obj->toArray());
 
 		self::assertEquals('{
     "field1": "qqq",
     "field3": "azazaz",
-    "field4": null
+    "field4": null,
+    "timeField": "2020-04-01T16:15:00+03:00"
 }', $obj->toJson());
 	}
 
