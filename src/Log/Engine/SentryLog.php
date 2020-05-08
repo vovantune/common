@@ -12,7 +12,6 @@ use Cake\Log\Engine\BaseLog;
 use Cake\Log\Log;
 use Cake\Log\LogTrait;
 use Cake\Http\Exception\NotFoundException;
-use Cake\Network\Exception\UnauthorizedException;
 
 class SentryLog extends BaseLog
 {
@@ -194,7 +193,9 @@ class SentryLog extends BaseLog
 	protected static function _getExceptionLevel($exception, $alert = null)
 	{
 		if ($alert === null) {
-			$alert = !($exception instanceof NotFoundException) && !($exception instanceof UnauthorizedException);
+			$alert = !($exception instanceof NotFoundException)
+				&& !($exception instanceof \Cake\Http\Exception\UnauthorizedException)
+				&& !($exception instanceof \Cake\Network\Exception\UnauthorizedException);
 		}
 		return ($alert ? 'error' : 'warning');
 	}
