@@ -98,7 +98,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 				throw new InternalException("Invalid argument count when calling $name");
 			}
 			$setValue = $arguments[0];
-			if (in_array($propertyName, static::TIME_FIELDS) && is_string($setValue)) {
+			if (in_array($propertyName, static::TIME_FIELDS) && [is_string($setValue) || is_int($setValue)]) {
 				$setValue = Time::parse($setValue);
 			}
 			$this->{$propertyName} = $setValue;
