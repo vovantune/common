@@ -2,6 +2,8 @@
 
 namespace ArtSkills\Mailer;
 
+use ArtSkills\Error\InternalException;
+use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;
 use ArtSkills\Log\Engine\SentryLog;
 
@@ -15,7 +17,7 @@ use ArtSkills\Log\Engine\SentryLog;
 class Email extends \Cake\Mailer\Email
 {
 
-	const ANY_EMAIL_PATTERN = '\S+\@\S+';
+	const ANY_EMAIL_PATTERN = '/^[а-яa-z0-9]{1}[а-яa-z0-9\.\-\_]+@[а-яa-z0-9\.\-]+\.[а-яa-z]{2,}+$/iu';
 
 	/**
 	 * Email constructor.
@@ -95,6 +97,7 @@ class Email extends \Cake\Mailer\Email
 	 * переопределяем email для тестового режима
 	 *
 	 * @inheritdoc
+	 * @throws InternalException
 	 */
 	protected function _setEmail($varName, $email, $name)
 	{
@@ -105,6 +108,7 @@ class Email extends \Cake\Mailer\Email
 	 * переопределяем email для тестового режима
 	 *
 	 * @inheritdoc
+	 * @throws InternalException
 	 */
 	protected function _addEmail($varName, $email, $name)
 	{
@@ -116,6 +120,7 @@ class Email extends \Cake\Mailer\Email
 	 *
 	 * @param array|string $email
 	 * @return array|string
+	 * @throws InternalException
 	 */
 	private function _getEmailList($email)
 	{
@@ -140,16 +145,25 @@ class Email extends \Cake\Mailer\Email
 	 *
 	 * @param string $email
 	 * @return string
-	 * @throws \Exception
+	 * @throws InternalException
+	 * @throws UserException
 	 */
 	private function _getEmail($email)
 	{
 		if (!Env::isProduction() && !Env::isUnitTest()) {
 			$email = Env::getDebugEmail();
 			if (empty($email)) {
-				throw new \Exception('Не прописан debugEmail в конфиге!');
+				throw new InternalException('Не прописан debugEmail в конфиге!');
 			}
 		}
-		return str_replace('@artskills.ru', '@artskills-studio.ru', $email);
+		if (!preg_match(self::ANY_EMAIL_PATTERN, $email)) {
+			throw new UserException("Некорректный email: $email");
+		}
+		if (preg_match('/[а-я]/i', $email)) {
+			[$name, $domain] = explode('@', $email);
+			$email = idn_to_ascii($name, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) . '@' . idn_to_ascii($domain, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+		}
+
+		return $email;
 	}
 }

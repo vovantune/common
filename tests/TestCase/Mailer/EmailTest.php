@@ -19,14 +19,14 @@ class EmailTest extends AppTestCase
 		$email->setFrom('test@artskills.ru')
 			->setTo('test@artskills.ru', 'test-name')
 			->addTo('test@yandex.ru', 'yandex-test')
-			->addTo('other@artskills.ru', 'artskills')
+			->addTo('info@фэшнстрит.рф', 'artskills')
 			->send($text);
 		$emailData = TestEmailTransport::getMessages();
 		$expectedData = [
 			'to' => [
-				'test@artskills-studio.ru' => 'test-name',
+				'test@artskills.ru' => 'test-name',
 				'test@yandex.ru' => 'yandex-test',
-				'other@artskills-studio.ru' => 'artskills',
+				'info@xn--h1ajjdfci6a7b.xn--p1ai' => 'artskills',
 			],
 			'subject' => '',
 			'template' => '',
