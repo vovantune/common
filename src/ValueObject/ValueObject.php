@@ -53,7 +53,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 		$this->_fillExportedFields();
 
 		foreach (static::TIME_FIELDS as $fieldName) {
-			if (!empty($fillValues[$fieldName]) && is_string($fillValues[$fieldName])) {
+			if (!empty($fillValues[$fieldName]) && (is_string($fillValues[$fieldName]) || is_int($fillValues[$fieldName]))) {
 				$fillValues[$fieldName] = Time::parse($fillValues[$fieldName]);
 			}
 		}
