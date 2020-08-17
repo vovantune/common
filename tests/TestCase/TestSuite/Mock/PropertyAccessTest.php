@@ -33,7 +33,8 @@ class PropertyAccessTest extends TestCase
 	 * тест несуществующего свойства
 	 */
 	public function testBadProperty()
-	{$this->expectExceptionMessage("does not exist");
+	{
+		$this->expectExceptionMessage("does not exist");
 		$this->expectException(\Exception::class);
 		PropertyAccess::setStatic(MockTestFixture::class, '_unexistent', 'asd');
 	}
@@ -64,7 +65,8 @@ class PropertyAccessTest extends TestCase
 	 * Восстановление свойства, которое не было изменено
 	 */
 	public function testRestoreNotModified()
-	{$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
+	{
+		$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
 		$this->expectException(AssertionFailedError::class);
 		PropertyAccess::restoreStatic(MockTestFixture::class, '_privateProperty');
 	}
@@ -73,7 +75,8 @@ class PropertyAccessTest extends TestCase
 	 * Восстановление свойства 2 раза
 	 */
 	public function testRestoreTwice()
-	{$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
+	{
+		$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
 		$this->expectException(AssertionFailedError::class);
 		$className = MockTestFixture::class;
 		$propertyName = '_privateProperty';
@@ -113,7 +116,8 @@ class PropertyAccessTest extends TestCase
 	 * Восстановление свойства после восстановления всего
 	 */
 	public function testRestoreAfterRestoreAll()
-	{$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
+	{
+		$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
 		$this->expectException(AssertionFailedError::class);
 		$className = MockTestFixture::class;
 		$propertyName = '_privateProperty';
