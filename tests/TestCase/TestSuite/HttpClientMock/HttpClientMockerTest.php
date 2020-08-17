@@ -9,6 +9,7 @@ use ArtSkills\TestSuite\HttpClientMock\HttpClientMocker;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientMockerEntity;
 use Cake\Http\Client\Request;
 use Cake\Http\Client\Response;
+use PHPUnit\Framework\ExpectationFailedException;
 
 class HttpClientMockerTest extends AppTestCase
 {
@@ -76,12 +77,11 @@ class HttpClientMockerTest extends AppTestCase
 
 	/**
 	 * Нельзя замокать одно и то же 2 раза
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage GET http://www.artskills.ru is already mocked
 	 */
 	public function testMockTwice()
 	{
+		$this->expectExceptionMessage("GET http://www.artskills.ru is already mocked");
+		$this->expectException(ExpectationFailedException::class);
 		$url = 'http://www.artskills.ru';
 		$method = Request::METHOD_GET;
 
@@ -177,12 +177,11 @@ class HttpClientMockerTest extends AppTestCase
 
 	/**
 	 * тест метода mockPost, запрос с неожиданным body
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Expected POST body data is not equal to real data
 	 */
 	public function testMockPostUnexpectedBody()
 	{
+		$this->expectExceptionMessage("Expected POST body data is not equal to real data");
+		$this->expectException(ExpectationFailedException::class);
 		$url = 'http://www.artskills.ru';
 		HttpClientMocker::mockPost($url, ['foo' => 'bar'])->willReturnString('');
 

@@ -11,7 +11,7 @@
 
 # Подмена методов
 ```php
-MethodMockerEntity MethodMocker::mock(string $className, string $methodName, string|callable|null $newAction = null);
+MethodMockerEntity MethodMocker::mock(string $className, string $methodName, string|callable|null $newAction = null)
 ```
 `$newAction` необходим в случае полной подменой метода без каких-либо проверок. Полезно в случае переопределения каких-то методов вывода, например `_sendJsonResponse` в CakePHP2.
 
@@ -70,7 +70,7 @@ Auth::user('utm'); // 'shop'
 
 # Сниф методов
 ```php
-MethodMockerEntity MethodMocker::sniff(string $className, string $methodName, function($args, $originalResult) { /* код снифа */ });
+MethodMockerEntity MethodMocker::sniff(string $className, string $methodName, function($args, $originalResult) { /* код снифа */ })
 ```
 Для снифа, также как и для мока, можно задавать проверку на кол-во вызовов (по-умолчанию 1).
 

@@ -8,6 +8,7 @@ use ArtSkills\Log\Engine\SentryLog;
 use ArtSkills\TestSuite\AppControllerTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use Cake\Log\Log;
+use PHPUnit\Framework\AssertionFailedError;
 use TestApp\Controller\TestController;
 
 class ControllerTest extends AppControllerTestCase
@@ -60,12 +61,11 @@ class ControllerTest extends AppControllerTestCase
 
 	/**
 	 * Если было исключение phpunit
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage test unit exception
 	 */
 	public function testUnitException()
 	{
+		$this->expectExceptionMessage("test unit exception");
+		$this->expectException(AssertionFailedError::class);
 		$this->get('/test/getJsonExceptionUnit');
 	}
 

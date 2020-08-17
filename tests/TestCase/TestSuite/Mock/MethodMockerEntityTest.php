@@ -6,6 +6,7 @@ namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 use ArtSkills\TestSuite\Mock\MethodMockerEntity;
 use ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestChildFixture;
 use ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -92,34 +93,31 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * Мок на несуществующий класс
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  class "badClass" does not exist!
 	 */
 	public function testMockBadClass()
 	{
+		$this->expectExceptionMessage("class \"badClass\" does not exist!");
+		$this->expectException(AssertionFailedError::class);
 		new MethodMockerEntity('mockid', 'badClass', '_protectedFunc');
 	}
 
 	/**
 	 * Мок на несуществующий метод
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  method "badMethod" in class "ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture" does not exist!
 	 */
 	public function testMockBadMethod()
 	{
+		$this->expectExceptionMessage("method \"badMethod\" in class \"ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture\" does not exist!");
+		$this->expectException(AssertionFailedError::class);
 		new MethodMockerEntity('mockid', MockTestFixture::class, 'badMethod');
 	}
 
 	/**
 	 * Мок с кривым экшном
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage action must be a string, a Closure or a null
 	 */
 	public function testMockBadAction()
 	{
+		$this->expectExceptionMessage("action must be a string, a Closure or a null");
+		$this->expectException(AssertionFailedError::class);
 		new MethodMockerEntity('mockid', MockTestFixture::class, 'staticFunc', false, 123);
 	}
 
@@ -138,78 +136,71 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * Мок вернули, а его конфигурируют
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage   mock entity is restored!
 	 */
 	public function testRestoredExpectCall()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->expectCall();
 	}
 
 	/**
 	 * Мок вернули, а его конфигурируют
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage   mock entity is restored!
 	 */
 	public function testRestoredExpectArgs()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->expectArgs('asd');
 	}
 
 	/**
 	 * Мок вернули, а его конфигурируют
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage   mock entity is restored!
 	 */
 	public function testRestoredExpectNoArgs()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->expectNoArgs();
 	}
 
 	/**
 	 * Мок вернули, а его конфигурируют
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage   mock entity is restored!
 	 */
 	public function testRestoredExpectSomeArgs()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->expectSomeArgs(['asd']);
 	}
 
 	/**
 	 * Мок вернули, а его конфигурируют
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage   mock entity is restored!
 	 */
 	public function testRestoredExpectArgsList()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->expectArgsList([false]);
 	}
 
 	/**
 	 * Мок вернули, а его конфигурируют
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage   mock entity is restored!
 	 */
 	public function testRestoredWillReturnValue()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->willReturnValue(true);
 	}
 
 	/**
 	 * Мок вернули, а его конфигурируют
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage   mock entity is restored!
 	 */
 	public function testRestoredWillReturnAction()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->willReturnAction(function ($args) {
 			return $args;
 		});
@@ -217,45 +208,41 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * Мок вернули, а его вызывают
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage   mock entity is restored!
 	 */
 	public function testRestoredDoAction()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->doAction([]);
 	}
 
 	/**
 	 * Мок вернули, а ему задают доп. перем-ю
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  mock entity is restored!
 	 */
 	public function testRestoredSetAdditionalVar()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->setAdditionalVar(123);
 	}
 
 	/**
 	 * Мок вернули, а ему задают ексепшн
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  mock entity is restored!
 	 */
 	public function testRestoredSetException()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->willThrowException('asd');
 	}
 
 	/**
 	 * Мок вернули, а ему задают возвращаемые значения
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  mock entity is restored!
 	 */
 	public function testRestoredReturnList()
 	{
+		$this->expectExceptionMessage("mock entity is restored!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getRestoredMock()->willReturnValueList([true]);
 	}
 
@@ -272,23 +259,21 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * Вызывали ли мок хотя бы раз
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  is not called!
 	 */
 	public function testMockCallCheck()
 	{
+		$this->expectExceptionMessage("is not called!");
+		$this->expectException(AssertionFailedError::class);
 		$this->_getMock();
 	}
 
 	/**
 	 * Пустой список ожидаемых аргументов
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  method expectArgs() requires at least one arg!
 	 */
 	public function testExpectArgsEmpty()
 	{
+		$this->expectExceptionMessage("method expectArgs() requires at least one arg!");
+		$this->expectException(AssertionFailedError::class);
 		$mock = $this->_getMock()->expectCall(0);
 		$mock->expectArgs();
 	}
@@ -306,12 +291,11 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * Пустой список ожидаемых аргументов
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage empty arguments list for expectSomeArgs()
 	 */
 	public function testExpectSomeArgsEmpty()
 	{
+		$this->expectExceptionMessage("empty arguments list for expectSomeArgs()");
+		$this->expectException(AssertionFailedError::class);
 		$mock = $this->_getMock()->expectCall(0);
 		$mock->expectSomeArgs([]);
 	}
@@ -319,48 +303,44 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * Список пуст
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  empty args list in expectArgsList()
 	 */
 	public function testExpectedArgsListEmpty()
 	{
+		$this->expectExceptionMessage("empty args list in expectArgsList()");
+		$this->expectException(AssertionFailedError::class);
 		$mock = $this->_getMock()->expectCall(0);
 		$mock->expectArgsList([]);
 	}
 
 	/**
 	 * null в списке
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  args list item 1: expected not empty array or false
 	 */
 	public function testExpectedArgsListNull()
 	{
+		$this->expectExceptionMessage("args list item 1: expected not empty array or false");
+		$this->expectException(AssertionFailedError::class);
 		$mock = $this->_getMock()->expectCall(0);
 		$mock->expectArgsList([false, null]);
 	}
 
 	/**
 	 * true в списке
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  args list item 2: expected not empty array or false
 	 */
 	public function testExpectedArgsListTrue()
 	{
+		$this->expectExceptionMessage("args list item 2: expected not empty array or false");
+		$this->expectException(AssertionFailedError::class);
 		$mock = $this->_getMock()->expectCall(0);
 		$mock->expectArgsList([false, [1], true]);
 	}
 
 	/**
 	 * пустой массив в списке
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage  args list item 0: expected not empty array or false
 	 */
 	public function testExpectedArgsListEmptyArr()
 	{
+		$this->expectExceptionMessage("args list item 0: expected not empty array or false");
+		$this->expectException(AssertionFailedError::class);
 		$mock = $this->_getMock()->expectCall(0);
 		$mock->expectArgsList([[]]);
 	}
@@ -478,12 +458,11 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * нельзя просниффать при полной подмене
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage Sniff mode does not support full mock
 	 */
 	public function testSniff()
 	{
+		$this->expectExceptionMessage("Sniff mode does not support full mock");
+		$this->expectException(AssertionFailedError::class);
 		new MethodMockerEntity('mockid', MockTestFixture::class, 'staticFunc', true, function () {
 			return 'sniff';
 		});
@@ -492,12 +471,11 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * нельзя мокать отнаследованное через анонимные функции
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage can't mock inherited method _redefinedFunc as Closure
 	 */
 	public function testMockInheritedClosure()
 	{
+		$this->expectExceptionMessage("can't mock inherited method _redefinedFunc as Closure");
+		$this->expectException(AssertionFailedError::class);
 		new MethodMockerEntity('mockid', MockTestChildFixture::class, '_redefinedFunc', false, function () {
 			return 'mock';
 		});
@@ -506,12 +484,11 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * нельзя мокать отнаследованное непереопределённое
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage method staticFunc is declared in parent class
 	 */
 	public function testMockInheritedNotRedeclared()
 	{
+		$this->expectExceptionMessage("method staticFunc is declared in parent class");
+		$this->expectException(AssertionFailedError::class);
 		new MethodMockerEntity('mockid', MockTestChildFixture::class, 'staticFunc', false, 'return 123;');
 	}
 
@@ -658,14 +635,11 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * variadic с типом
-	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
-	 *
-	 * @expectedException \TypeError
-	 * @expectedExceptionMessage must be of the type integer
-	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
 	public function testVariadicParamType()
 	{
+		$this->expectExceptionMessage("must be of the type int");
+		$this->expectException(\TypeError::class);
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'variadicParam', false, 'return get_defined_vars();');
 		MockTestFixture::variadicParam('asd');
 	}
@@ -673,20 +647,17 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * Сохранение типа возвращаемого значения
-	 *
-	 * @expectedException \TypeError
-	 * @expectedExceptionMessage must be of the type integer, null returned
-	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
 	public function testReturnTypeError()
 	{
+		$this->expectException(\TypeError::class);
+		$this->expectExceptionMessage("must be of the type int, null returned");
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, 'return null;');
 		MockTestFixture::returnInt();
 	}
 
 	/**
 	 * Сохранение типа возвращаемого значения
-	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
 	public function testReturnTypeGood()
 	{
@@ -699,13 +670,11 @@ class MethodMockerEntityTest extends TestCase
 
 	/**
 	 * Сохранение типа возвращаемого значения
-	 *
-	 * @expectedException \TypeError
-	 * @expectedExceptionMessage must be of the type integer or null, array returned
-	 * @SuppressWarnings(PHPMD.UnusedLocalVariable) переменная нужна, чтоб объект сразу же не уничтожился
 	 */
 	public function testReturnTypeNullableError()
 	{
+		$this->expectExceptionMessage("must be of the type int or null, array returned");
+		$this->expectException(\TypeError::class);
 		$mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return [];');
 		MockTestFixture::returnNullable();
 	}

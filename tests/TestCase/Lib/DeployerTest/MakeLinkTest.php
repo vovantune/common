@@ -52,12 +52,11 @@ class MakeLinkTest extends AppTestCase
 
 	/**
 	 * Исходная папка - уже симлинк
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Передан некорректный каталог проекта
 	 */
 	public function testFailLink()
 	{
+		$this->expectExceptionMessage("Передан некорректный каталог проекта");
+		$this->expectException(\Exception::class);
 		$folderName = self::TEST_PROJECT_FOLDER . '1';
 		mkdir($folderName);
 		symlink($folderName, self::TEST_PROJECT_FOLDER);
@@ -67,24 +66,22 @@ class MakeLinkTest extends AppTestCase
 
 	/**
 	 * Исходная папка - не папка
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Передан некорректный каталог проекта
 	 */
 	public function testFailNotFolder()
 	{
+		$this->expectExceptionMessage("Передан некорректный каталог проекта");
+		$this->expectException(\Exception::class);
 		file_put_contents(self::TEST_PROJECT_FOLDER, 'test');
 		Deployer::makeProjectSymlink(self::TEST_PROJECT_FOLDER, self::TEST_NEW_FOLDER);
 	}
 
 	/**
 	 * Папка назначения уже существует
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Такой каталог уже есть
 	 */
 	public function testFailExists()
 	{
+		$this->expectExceptionMessage("Такой каталог уже есть");
+		$this->expectException(\Exception::class);
 		mkdir(self::TEST_PROJECT_FOLDER);
 		mkdir(self::TEST_NEW_FOLDER_FULL);
 		Deployer::makeProjectSymlink(self::TEST_PROJECT_FOLDER, self::TEST_NEW_FOLDER);

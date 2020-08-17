@@ -42,24 +42,22 @@ class TableDocumentationTest extends AppTestCase
 
 	/**
 	 * без конфига
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Не задан конфиг
 	 */
 	public function testNoConfig()
 	{
+		$this->expectExceptionMessage("Не задан конфиг");
+		$this->expectException(\Exception::class);
 		TableDocumentation::setConfig(null);
 		TableDocumentation::build();
 	}
 
 	/**
 	 * плохой конфиг
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Empty value for field 'modelFolder'
 	 */
 	public function testBadConfig()
 	{
+		$this->expectExceptionMessage("Empty value for field 'modelFolder'");
+		$this->expectException(\Exception::class);
 		EntityBuilderConfig::create()->register();
 		TableDocumentation::build();
 	}

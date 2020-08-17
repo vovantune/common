@@ -102,7 +102,7 @@ class GitTest extends AppTestCase
 
 			$branchListMerged = $this->_git->getMergedBranches($type);
 
-			self::assertEquals(count($branchListMerged), count(array_intersect_key($branchListAll, $branchListMerged)), 'В списке смерженных веток есть что-то лишнее');
+			self::assertSameSize($branchListMerged, array_intersect_key($branchListAll, $branchListMerged), 'В списке смерженных веток есть что-то лишнее');
 			self::assertEmpty(array_intersect_key($branchListMerged, [
 				Git::BRANCH_NAME_MASTER => 1,
 				Git::BRANCH_NAME_HEAD,

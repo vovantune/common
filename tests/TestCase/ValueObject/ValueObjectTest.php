@@ -58,36 +58,33 @@ class ValueObjectTest extends AppTestCase
 
 	/**
 	 * плохой вызов магического метода
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Undefined property field5
 	 */
 	public function testBadProperty()
 	{
+		$this->expectExceptionMessage("Undefined property field5");
+		$this->expectException(\Exception::class);
 		$obj = new ValueObjectFixture();
 		$obj->setField5();
 	}
 
 	/**
 	 * плохой вызов магического метода
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Invalid argument count when calling setField3
 	 */
 	public function testBadParams()
 	{
+		$this->expectExceptionMessage("Invalid argument count when calling setField3");
+		$this->expectException(\Exception::class);
 		$obj = new ValueObjectFixture();
 		$obj->setField3('asd', 'qwe');
 	}
 
 	/**
 	 * Инициализация с несуществующим свойством
-	 *
-	 * @expectedException \Exception
-	 * @expectExceptionMessage Property exported_bad does not exist!
 	 */
 	public function testBadInit()
 	{
+		$this->expectException(\Exception::class);
+		$this->expectExceptionMessage('Property exported_bad not exists!');
 		new ValueObjectFixture(['exported_bad' => 1]);
 	}
 

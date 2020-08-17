@@ -316,9 +316,8 @@ class MockTestFixture
 
 	/**
 	 * Функция с вариадиком
-	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 *
-	 * @param \int[] ...$variadicParam
+	 * @param int[] ...$variadicParam
 	 * @return array
 	 */
 	public static function variadicParam(int ...$variadicParam)

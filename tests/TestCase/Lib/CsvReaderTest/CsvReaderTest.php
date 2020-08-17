@@ -49,12 +49,11 @@ class CsvReaderTest extends AppTestCase
 
 	/**
 	 * Открываем несуществующий файл
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage File "bad file" does not exist
 	 */
 	public function testNotOpen()
 	{
+		$this->expectExceptionMessage("File \"bad file\" does not exist");
+		$this->expectException(\Exception::class);
 		new CsvReader('bad file');
 	}
 }

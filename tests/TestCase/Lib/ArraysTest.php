@@ -132,12 +132,11 @@ class ArraysTest extends AppTestCase
 
 	/**
 	 * на пути есть немассив
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage По ключу nest2 находится не массив
 	 */
 	public function testInitPathFail()
 	{
+		$this->expectExceptionMessage("По ключу nest2 находится не массив");
+		$this->expectException(\Exception::class);
 		$keyNestedFirst = 'nest1';
 		$keyNestedSecond = 'nest2';
 		$keyNestedThird = 'nest3';

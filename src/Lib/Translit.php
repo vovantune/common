@@ -95,7 +95,7 @@ class Translit
 	 */
 	public static function generateUrlAlias($string)
 	{
-		$res = preg_replace('/\_+/', '_', preg_replace('/[^0-9a-zA-Z]/', '_', strtolower(self::transliterate(trim($string)))));
+		$res = preg_replace('/_+/', '_', preg_replace('/[^0-9a-zA-Z]/', '_', strtolower(self::transliterate(trim($string)))));
 		if (mb_substr($res, mb_strlen($res, 'utf-8') - 1, 1, 'utf-8') == '_') {
 			$res = mb_substr($res, 0, mb_strlen($res, 'utf-8') - 1, 'utf-8');
 		}

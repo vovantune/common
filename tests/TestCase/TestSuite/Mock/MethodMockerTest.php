@@ -5,6 +5,7 @@ namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -86,24 +87,22 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * Дважды замокали один метов
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage methodNoArgs already mocked!
 	 */
 	public function testDuplicateMock()
 	{
+		$this->expectExceptionMessage("methodNoArgs already mocked!");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs');
 		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs');
 	}
 
 	/**
 	 * Вызвали несуществующий запмоканый метод
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage notExists mock object doesn't exist!
 	 */
 	public function testNotExistsMockCall()
 	{
+		$this->expectExceptionMessage("notExists mock object doesn't exist!");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::doAction('notExists', []);
 	}
 
@@ -126,105 +125,96 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * Несуществующий класс
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage class "BadClass" does not exist!
 	 */
 	public function testCallPrivateBadClass()
 	{
+		$this->expectExceptionMessage("class \"BadClass\" does not exist!");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::callPrivate('BadClass', 'BlaBla');
 	}
 
 	/**
 	 * Несуществующий метод
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage method "BlaBla" in class "ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture" does not exist!
 	 */
 	public function testCallPrivateBadMethod()
 	{
+		$this->expectExceptionMessage("method \"BlaBla\" in class \"ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture\" does not exist!");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::callPrivate(MockTestFixture::class, 'BlaBla');
 	}
 
 	/**
 	 * вызов публичного
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage is not private and is not protected!
 	 */
 	public function testCallPrivatePublic()
 	{
+		$this->expectExceptionMessage("is not private and is not protected!");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::callPrivate(MockTestFixture::class, 'staticFunc');
 	}
 
 	/**
 	 * ожидалось без аргументов, а они есть
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage expected no args, but they appeared
 	 */
 	public function testUnexpectedArgs()
 	{
+		$this->expectExceptionMessage("expected no args, but they appeared");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectNoArgs();
 		MockTestFixture::staticMethodArgs('asd', 'qwe');
 	}
 
 	/**
 	 * меньше аргументов, чем ожидалось
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testLessArgs()
 	{
+		$this->expectExceptionMessage("unexpected args");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectArgs('asd', 'qwe', 'zxc');
 		MockTestFixture::staticMethodArgs('asd', 'qwe');
 	}
 
 	/**
 	 * больше аргументов, чем ожидалось
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testMoreArgs()
 	{
+		$this->expectExceptionMessage("unexpected args");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectArgs('asd');
 		MockTestFixture::staticMethodArgs('asd', 'qwe');
 	}
 
 	/**
 	 * не то значение аргумента
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testBadArgs()
 	{
+		$this->expectExceptionMessage("unexpected args");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectArgs('asd', 'zxc');
 		MockTestFixture::staticMethodArgs('asd', 'qwe');
 	}
 
 	/**
 	 * аргументы не в том порядке
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testOrderArgs()
 	{
+		$this->expectExceptionMessage("unexpected args");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectArgs('qwe', 'asd');
 		MockTestFixture::staticMethodArgs('asd', 'qwe');
 	}
 
 	/**
 	 * неправильная часть аргументов
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage unexpected args subset
 	 */
 	public function testBadArgsSubset()
 	{
+		$this->expectExceptionMessage("unexpected args subset");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectSomeArgs([1 => 'asd']);
 		MockTestFixture::staticMethodArgs('asd', 'qwe');
 	}
@@ -278,12 +268,11 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * Спасок ожидаемых аргументов закончился
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage expect args list ended
 	 */
 	public function testArgsListShort()
 	{
+		$this->expectExceptionMessage("expect args list ended");
+		$this->expectException(AssertionFailedError::class);
 		$expectedArgs = [
 			false,
 		];
@@ -298,12 +287,11 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * Ожидаемые аргументы не совпали
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage expected no args, but they appeared
 	 */
 	public function testArgsListFail()
 	{
+		$this->expectExceptionMessage("expected no args, but they appeared");
+		$this->expectException(AssertionFailedError::class);
 		$expectedArgs = [
 			false,
 			false,
@@ -317,24 +305,22 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * не вызван
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage is not called!
 	 */
 	public function testNotCalled()
 	{
+		$this->expectExceptionMessage("is not called!");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'methodNoArgs');
 		MethodMocker::restore();
 	}
 
 	/**
 	 * вызван меньше, чем ожидалось
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage unexpected call count
 	 */
 	public function testCalledLess()
 	{
+		$this->expectExceptionMessage("unexpected call count");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->expectCall(2)
 			->willReturnValue('');
 		MockTestFixture::staticMethodArgs(1, 2);
@@ -343,12 +329,11 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * вызван больше, чем ожидалось
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage expected 1 calls, but more appeared
 	 */
 	public function testCalledMore()
 	{
+		$this->expectExceptionMessage("expected 1 calls, but more appeared");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticMethodArgs')->singleCall()
 			->willReturnValue('');
 		MockTestFixture::staticMethodArgs(1, 2);
@@ -433,12 +418,11 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * Тест мока с ексепшном
-	 *
-	 * @expectedException \InvalidArgumentException
-	 * @expectedExceptionMessage  test message
 	 */
 	public function testExpectException()
 	{
+		$this->expectExceptionMessage("test message");
+		$this->expectException(\InvalidArgumentException::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticFunc')
 			->willThrowException('test message', \InvalidArgumentException::class);
 		MockTestFixture::staticFunc();
@@ -446,12 +430,11 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * Тест мока с ексепшном
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage  test message default
 	 */
 	public function testExpectExceptionDefault()
 	{
+		$this->expectExceptionMessage("test message default");
+		$this->expectException(\Exception::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticFunc')->willThrowException('test message default');
 		MockTestFixture::staticFunc();
 	}
@@ -483,12 +466,11 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * Вызовов больше, чем значений в списке
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage return value list ended
 	 */
 	public function testReturnListMore()
 	{
+		$this->expectExceptionMessage("return value list ended");
+		$this->expectException(AssertionFailedError::class);
 		MethodMocker::mock(MockTestFixture::class, 'staticFunc')->willReturnValueList([1]);
 		MockTestFixture::staticFunc();
 		MockTestFixture::staticFunc();
@@ -565,12 +547,11 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * переопределение expectArgs, срабатывание проверки
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testRedefineFail()
 	{
+		$this->expectExceptionMessage("unexpected args");
+		$this->expectException(AssertionFailedError::class);
 		$mock = MethodMocker::mock(MockTestFixture::class, 'staticFunc')
 			->willReturnValue('');
 
@@ -585,12 +566,11 @@ class MethodMockerTest extends TestCase
 
 	/**
 	 * переопределение expectArgsList, срабатывание проверки
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage unexpected args
 	 */
 	public function testRedefineListFail()
 	{
+		$this->expectExceptionMessage("unexpected args");
+		$this->expectException(AssertionFailedError::class);
 		$mock = MethodMocker::mock(MockTestFixture::class, 'staticFunc')
 			->willReturnValue('');
 

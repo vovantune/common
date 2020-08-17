@@ -255,7 +255,7 @@ class MethodMockerEntity
 			}
 			$type = $parameter->getType();
 			if (!empty($type)) {
-				$paramDeclaration = (string)$type . ' ' . $paramDeclaration;
+				$paramDeclaration = (string)$type->getName() . ' ' . $paramDeclaration;
 				if ($type->allowsNull()) {
 					$paramDeclaration = '?' . $paramDeclaration;
 				}
@@ -277,7 +277,7 @@ class MethodMockerEntity
 		$returnTypeDeclaration = '';
 		$returnType = $reflectionMethod->getReturnType();
 		if (!empty($returnType)) {
-			$returnTypeDeclaration = ($returnType->allowsNull() ? '?' : '') . (string)$returnType;
+			$returnTypeDeclaration = ($returnType->allowsNull() ? '?' : '') . (string)$returnType->getName();
 		}
 		return $returnTypeDeclaration;
 	}
@@ -323,7 +323,7 @@ class MethodMockerEntity
 	 * на аргументы не проводится.
 	 * Если нужно явно задать отсутствие аргументов, то нужно вызывать expectNoArgs()
 	 *
-	 * @param array ...$args
+	 * @param mixed ...$args
 	 * @return $this
 	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
 	 */

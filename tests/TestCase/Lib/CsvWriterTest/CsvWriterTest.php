@@ -28,12 +28,11 @@ class CsvWriterTest extends AppTestCase
 
 	/**
 	 * Пытаемся записать в файл который не должен быть доступен
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Ошибка создания файла
 	 */
 	public function testWriteToNonExistsDirectory()
 	{
+		$this->expectExceptionMessage("Ошибка создания файла");
+		$this->expectException(\Exception::class);
 		$testFile = TMP . 'nonExistsDirectory/csvWriterTest.csv';
 
 		$csvWriter = new CsvWriter($testFile);
@@ -44,12 +43,11 @@ class CsvWriterTest extends AppTestCase
 
 	/**
 	 * Пытаемся записать в файл который закрыт
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Попытка записать в закрытый файл
 	 */
 	public function testWriteToClosedFile()
 	{
+		$this->expectExceptionMessage("Попытка записать в закрытый файл");
+		$this->expectException(\Exception::class);
 		$testFile = TMP . 'csvWriterTest.csv';
 
 		$csvWriter = new CsvWriter($testFile);

@@ -62,12 +62,11 @@ class HttpClientMockerEntityTest extends AppTestCase
 
 	/**
 	 * Защита от вызова несколько раз
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage expected 1 calls, but more appeared
 	 */
 	public function testSingleCallCheck()
 	{
+		$this->expectExceptionMessage("expected 1 calls, but more appeared");
+		$this->expectException(ExpectationFailedException::class);
 		$mock = $this->_makeGetMock()
 			->singleCall()
 			->willReturnString('test');
@@ -79,12 +78,11 @@ class HttpClientMockerEntityTest extends AppTestCase
 
 	/**
 	 * Ни разу не вызвали
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage is not called
 	 */
 	public function testNoCallCheck()
 	{
+		$this->expectExceptionMessage("is not called");
+		$this->expectException(ExpectationFailedException::class);
 		$mock = $this->_makeGetMock();
 		$mock->callCheck();
 	}
@@ -114,79 +112,72 @@ class HttpClientMockerEntityTest extends AppTestCase
 
 	/**
 	 * Не указали возвращаемый результат
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Return mock action is not defined
 	 */
 	public function testEmptyResultCheck()
 	{
+		$this->expectExceptionMessage("Return mock action is not defined");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()->doAction($this->_makeGetRequest());
 	}
 
 	/**
 	 * Указали POST данные для GET запроса
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Body for GET method is not required
 	 */
 	public function testBodySetForGetMethod()
 	{
+		$this->expectExceptionMessage("Body for GET method is not required");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()->expectBody(self::DEFAULT_POST_DATA);
 	}
 
 	/**
 	 * Задали плохой код ответа
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
 	public function testSetStatusCodeBad()
 	{
+		$this->expectExceptionMessage("Status code should be integer between 100 and 599");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()->willReturnStatus('233asd');
 	}
 
 	/**
 	 * Задали слишком маленький код ответа
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
 	public function testSetStatusCodeSmall()
 	{
+		$this->expectExceptionMessage("Status code should be integer between 100 and 599");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()->willReturnStatus(99);
 	}
 
 	/**
 	 * Задали слишком большой код ответа
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Status code should be integer between 100 and 599
 	 */
 	public function testSetStatusCodeBig()
 	{
+		$this->expectExceptionMessage("Status code should be integer between 100 and 599");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()->willReturnStatus(600);
 	}
 
 
 	/**
 	 * Ответ - не строка
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Invalid response: Array
 	 */
 	public function testReturnStringBad()
 	{
+		$this->expectExceptionMessage("Invalid response: Array");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()->willReturnString(['asd' => 'qwe']);
 	}
 
 	/**
 	 * Ответ - не строка
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Invalid response: Array
 	 */
 	public function testReturnActionBad()
 	{
+		$this->expectExceptionMessage("Invalid response: Array");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()
 			->willReturnAction(function () {
 				return ['asd' => 'qwe'];
@@ -196,23 +187,21 @@ class HttpClientMockerEntityTest extends AppTestCase
 
 	/**
 	 * Не существующий файл
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage is not a file
 	 */
 	public function testReturnFileNotExists()
 	{
+		$this->expectExceptionMessage("is not a file");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()->willReturnFile(__DIR__ . DS . 'non_existent_file.txt');
 	}
 
 	/**
 	 * Указали не файл
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage is not a file
 	 */
 	public function testReturnFileIsNotFile()
 	{
+		$this->expectExceptionMessage("is not a file");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makeGetMock()->willReturnFile(__DIR__);
 	}
 
@@ -227,12 +216,11 @@ class HttpClientMockerEntityTest extends AppTestCase
 
 	/**
 	 * отправился запрос не с тем body,  которым ожидалось
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Expected POST body data is not equal to real data
 	 */
 	public function testUnexpectedBody()
 	{
+		$this->expectExceptionMessage("Expected POST body data is not equal to real data");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makePostMock(['asd' => 'qwe'])
 			->willReturnString('')
 			->doAction($this->_makePostRequest(['asd' => 'zxc']));
@@ -241,12 +229,11 @@ class HttpClientMockerEntityTest extends AppTestCase
 	/**
 	 * Отправился запрос с пустым body.
 	 * Будет ошибка, если явно не указать, что ожидался пустой body
-	 *
-	 * @expectedException \PHPUnit\Framework\ExpectationFailedException
-	 * @expectedExceptionMessage Post request with empty body
 	 */
 	public function testEmptyPost()
 	{
+		$this->expectExceptionMessage("Post request with empty body");
+		$this->expectException(ExpectationFailedException::class);
 		$this->_makePostMock(null)
 			->willReturnString('')
 			->doAction($this->_makePostRequest(''));

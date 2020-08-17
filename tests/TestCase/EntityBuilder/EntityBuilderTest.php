@@ -69,24 +69,22 @@ class EntityBuilderTest extends AppTestCase
 
 	/**
 	 * без конфига
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Не задан конфиг
 	 */
 	public function testNoConfig()
 	{
+		$this->expectExceptionMessage("Не задан конфиг");
+		$this->expectException(\Exception::class);
 		EntityBuilder::setConfig(null);
 		EntityBuilder::build();
 	}
 
 	/**
 	 * плохой конфиг
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Empty value for field 'modelFolder'
 	 */
 	public function testBadConfig()
 	{
+		$this->expectExceptionMessage("Empty value for field 'modelFolder'");
+		$this->expectException(\Exception::class);
 		EntityBuilderConfig::create()->register();
 		EntityBuilder::build();
 	}
@@ -115,23 +113,21 @@ class EntityBuilderTest extends AppTestCase
 
 	/**
 	 * Файл уже есть
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage TestTableTwoTable.php already exists
 	 */
 	public function testCreateExists()
 	{
+		$this->expectExceptionMessage("TestTableTwoTable.php already exists");
+		$this->expectException(\Exception::class);
 		EntityBuilder::createTableClass('test_table_two');
 	}
 
 	/**
 	 * Такой таблицы нет
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Table "bad_table" does not exist in DB
 	 */
 	public function testCreateBad()
 	{
+		$this->expectExceptionMessage("Table \"bad_table\" does not exist in DB");
+		$this->expectException(\Exception::class);
 		EntityBuilder::createTableClass('bad_table');
 	}
 
