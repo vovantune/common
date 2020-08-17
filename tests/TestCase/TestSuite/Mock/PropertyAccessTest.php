@@ -5,6 +5,7 @@ namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 
 use ArtSkills\TestSuite\Mock\PropertyAccess;
 use ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,12 +31,11 @@ class PropertyAccessTest extends TestCase
 
 	/**
 	 * тест несуществующего свойства
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage does not exist
 	 */
 	public function testBadProperty()
 	{
+		$this->expectExceptionMessage("does not exist");
+		$this->expectException(\Exception::class);
 		PropertyAccess::setStatic(MockTestFixture::class, '_unexistent', 'asd');
 	}
 
@@ -63,23 +63,21 @@ class PropertyAccessTest extends TestCase
 
 	/**
 	 * Восстановление свойства, которое не было изменено
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage MockTestFixture::_privateProperty was not modified
 	 */
 	public function testRestoreNotModified()
 	{
+		$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
+		$this->expectException(AssertionFailedError::class);
 		PropertyAccess::restoreStatic(MockTestFixture::class, '_privateProperty');
 	}
 
 	/**
 	 * Восстановление свойства 2 раза
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage MockTestFixture::_privateProperty was not modified
 	 */
 	public function testRestoreTwice()
 	{
+		$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
+		$this->expectException(AssertionFailedError::class);
 		$className = MockTestFixture::class;
 		$propertyName = '_privateProperty';
 
@@ -116,12 +114,11 @@ class PropertyAccessTest extends TestCase
 
 	/**
 	 * Восстановление свойства после восстановления всего
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage MockTestFixture::_privateProperty was not modified
 	 */
 	public function testRestoreAfterRestoreAll()
 	{
+		$this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
+		$this->expectException(AssertionFailedError::class);
 		$className = MockTestFixture::class;
 		$propertyName = '_privateProperty';
 

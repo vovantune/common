@@ -34,7 +34,6 @@ class TableTest extends AppTestCase
 	 */
 	public function testGetEntity()
 	{
-		self::assertEquals('TestTableOne', MethodMocker::callPrivate(TestTableOneTable::class, '_getAlias'), 'Не сработало получение алиаса');
 		self::assertInstanceOf(TestTableOneTable::class, TestTableOneTable::instance(), 'Не сработало получение инстанса');
 
 		self::assertFalse($this->TestTableOne->getEntity(-1)); // не выкинулся ексепшн
@@ -147,12 +146,11 @@ class TableTest extends AppTestCase
 
 	/**
 	 * Попытка вставить запись с плохим внешним ключом
-	 *
-	 * @expectedException \PDOException
-	 * @expectedExceptionMessage a foreign key constraint fails
 	 */
 	public function testBadFK()
 	{
+		$this->expectExceptionMessage("a foreign key constraint fails");
+		$this->expectException(\PDOException::class);
 		$this->TestTableTwo->saveArr(['table_one_fk' => 88]);
 	}
 

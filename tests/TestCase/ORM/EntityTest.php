@@ -101,12 +101,11 @@ class EntityTest extends AppTestCase
 
 	/**
 	 * удаление несуществующей дочерней сущности
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Unknown property TestTableTwo
 	 */
 	public function testDeleteChildNotExists()
 	{
+		$this->expectExceptionMessage("Unknown property TestTableTwo");
+		$this->expectException(\Exception::class);
 		$entity = $this->TestTableOne->get(45);
 		$entity->deleteChild('TestTableTwo', 0);
 	}

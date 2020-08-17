@@ -5,6 +5,7 @@ namespace ArtSkills\Test\TestCase\TestSuite\Mock;
 
 use ArtSkills\TestSuite\Mock\ConstantMocker;
 use ArtSkills\Test\TestCase\TestSuite\Mock\Fixture\MockTestFixture;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,23 +58,21 @@ class ConstantMockerTest extends TestCase
 
 	/**
 	 * Проверка на существование константы
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage is not defined!
 	 */
 	public function testConstantExists()
 	{
+		$this->expectExceptionMessage("is not defined!");
+		$this->expectException(AssertionFailedError::class);
 		ConstantMocker::mock(null, 'BAD_CONST', 'bad');
 	}
 
 	/**
 	 * Дважды одно и то же мокнули
-	 *
-	 * @expectedException \PHPUnit\Framework\AssertionFailedError
-	 * @expectedExceptionMessage is already mocked!
 	 */
 	public function testConstantDoubleMock()
 	{
+		$this->expectExceptionMessage("is already mocked!");
+		$this->expectException(AssertionFailedError::class);
 		ConstantMocker::mock(null, self::GLOBAL_CONST_NAME, '1');
 		ConstantMocker::mock(null, self::GLOBAL_CONST_NAME, '2');
 	}

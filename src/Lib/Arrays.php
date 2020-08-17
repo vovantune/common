@@ -4,6 +4,7 @@ namespace ArtSkills\Lib;
 
 use ArtSkills\Error\InternalException;
 use ArtSkills\Traits\Library;
+use ArtSkills\ValueObject\ValueObject;
 
 class Arrays
 {
@@ -12,7 +13,7 @@ class Arrays
 	/**
 	 * json_encode с JSON_UNESCAPED_UNICODE по умолчанию
 	 *
-	 * @param array|\ArtSkills\ValueObject\ValueObject $array
+	 * @param array|ValueObject $array
 	 * @param int $options
 	 * @param int $depth
 	 * @return string

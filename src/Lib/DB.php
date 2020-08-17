@@ -4,6 +4,7 @@ namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
 use Cake\Database\Connection;
+use Cake\Database\Statement\MysqlStatement;
 use Cake\Datasource\ConnectionManager;
 
 class DB
@@ -43,7 +44,7 @@ class DB
 	 *
 	 * @param string $sql
 	 * @param string $connectionName
-	 * @return \Cake\Database\Statement\MysqlStatement
+	 * @return MysqlStatement
 	 */
 	public static function customQuery($sql, $connectionName = self::CONNECTION_DEFAULT)
 	{

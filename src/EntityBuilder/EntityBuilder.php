@@ -173,7 +173,7 @@ class EntityBuilder
 
 		if (!$file->write(self::_processFileTemplate($entityName, self::FILE_TYPE_TABLE))) {
 			throw new InternalException("File write error for $entityName; {$file->path}/{$file->name}");
-		};
+		}
 		$file->close();
 
 		return $file->path;
@@ -474,7 +474,7 @@ class EntityBuilder
 				}
 
 				if (!$hasMethod && preg_match(
-						'/\s\*\s\@method\s.+' . $tplMethod . '\(.+/', $commLine
+						'/\s\*\s@method\s.+' . $tplMethod . '\(.+/', $commLine
 					)
 				) { // есть описание такого метода, но не такое, как надо
 					$commArr[$commIndex] = ' * ' . $template;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace ArtSkills\TestSuite\Mock;
 
 use ArtSkills\Traits\Library;
+use Exception;
+use PHPUnit\Framework\AssertionFailedError;
 
 /**
  * Мокалка констант в классах
@@ -25,7 +27,7 @@ class ConstantMocker
 	 * @param string|null $className
 	 * @param string $constantName
 	 * @param mixed $newValue
-	 * @throws \PHPUnit\Framework\AssertionFailedError|\Exception
+	 * @throws AssertionFailedError|Exception
 	 */
 	public static function mock(?string $className, string $constantName, $newValue): void
 	{

@@ -439,12 +439,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * конфликт конфига
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Заполнены конфликтующие свойства
 	 */
 	public function testConfigConflict()
 	{
+		$this->expectExceptionMessage("Заполнены конфликтующие свойства");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'singleRoot' => ROOT,
 		]);
@@ -452,12 +451,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * не указан automigrate
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Нужно явно указать параметр _autoMigrate
 	 */
 	public function testUnsetAutoMigrate()
 	{
+		$this->expectExceptionMessage("Нужно явно указать параметр _autoMigrate");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'autoMigrate' => null,
 		]);
@@ -465,12 +463,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * Явно задан параметр миграции, но не задана команда
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Явно задан параметр миграции, но не задана команда
 	 */
 	public function testBadAutoMigrate()
 	{
+		$this->expectExceptionMessage("Явно задан параметр миграции, но не задана команда");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'autoMigrate' => true,
 			'phinxCommand' => '',
@@ -479,12 +476,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * не указан главный симлинк
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Не указан главный симлинк
 	 */
 	public function testNoMainRoot()
 	{
+		$this->expectExceptionMessage("Не указан главный симлинк");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'projectSymlink' => '',
 		]);
@@ -492,12 +488,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * главный симлинк в списке
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Главный симлинк задан в списке папок
 	 */
 	public function testSymlinkInList()
 	{
+		$this->expectExceptionMessage("Главный симлинк задан в списке папок");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'rotateDeployFolders' => [LocalDeployer::SYMLINK, '/var/www/common-1'],
 		]);
@@ -505,12 +500,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * то же самое, но путь оканчивается на слеш
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Главный симлинк задан в списке папок
 	 */
 	public function testSymlinkInListDs()
 	{
+		$this->expectExceptionMessage("Главный симлинк задан в списке папок");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'rotateDeployFolders' => [LocalDeployer::SYMLINK . DS, '/var/www/common-1'],
 		]);
@@ -519,24 +513,22 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * не проинициализировался гит
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Не проинициализировался гит
 	 */
 	public function testGitInitFail()
 	{
+		$this->expectExceptionMessage("Не проинициализировался гит");
+		$this->expectException(\Exception::class);
 		MethodMocker::mock(Git::class, 'getCurrentBranchName')->willReturnValue('');
 		new LocalDeployer();
 	}
 
 	/**
 	 * не указан репозиторий
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Не указан репозиторий
 	 */
 	public function testNoRepo()
 	{
+		$this->expectExceptionMessage("Не указан репозиторий");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'repoName' => '',
 		]);
@@ -544,12 +536,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * только одна папка в списке
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage явно задайте свойство _singleRoot
 	 */
 	public function testOneFolderInList()
 	{
+		$this->expectExceptionMessage("явно задайте свойство _singleRoot");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'rotateDeployFolders' => [ROOT],
 		]);
@@ -557,12 +548,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * дубли в списке папок
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage В списке папок есть дубли
 	 */
 	public function testFolderDuplicates()
 	{
+		$this->expectExceptionMessage("В списке папок есть дубли");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'rotateDeployFolders' => [ROOT, ROOT],
 		]);
@@ -570,12 +560,11 @@ class DeployTest extends AppTestCase
 
 	/**
 	 * плохой файл версий
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Не могу получить относительный путь из
 	 */
 	public function testBadVersionFile()
 	{
+		$this->expectExceptionMessage("Не могу получить относительный путь из");
+		$this->expectException(\Exception::class);
 		new LocalDeployer([
 			'versionFile' => '/var/www/common/asdfgh',
 		]);

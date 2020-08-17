@@ -53,12 +53,11 @@ class FunctionsTest extends AppTestCase
 	/**
 	 * функция для удобства формирования списка условий для where
 	 * дублирование ключей массива
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Дублируется ключ Table1.field1
 	 */
 	public function testFieldsWhereDuplicate()
 	{
+		$this->expectExceptionMessage("Дублируется ключ Table1.field1");
+		$this->expectException(\Exception::class);
 		fieldsWhere([
 			'Table1' => [
 				'field1' => 'val1',
@@ -102,12 +101,11 @@ class FunctionsTest extends AppTestCase
 	/**
 	 * функция для удобства формирования списка полей для select
 	 * дублирование ключей массива
-	 *
-	 * @expectedException \Exception
-	 * @expectedExceptionMessage Дублируется ключ alias
 	 */
 	public function testFieldsSelectDuplicate()
 	{
+		$this->expectExceptionMessage("Дублируется ключ alias");
+		$this->expectException(\Exception::class);
 		fieldsSelect([
 			'Table1' => [
 				'alias' => 'field1',
