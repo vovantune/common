@@ -65,6 +65,7 @@
 			// пути начинаются с папки webroot (не включая саму папку webroot) без слеша в начале
 			
 			self::KEY_IS_BOTTOM => false,           // скрипт подключается внизу body или в head. По умолчанию = false, т.е. head
+            self::KEY_IS_MODULE => false,           // является ли скрипт модулем (type="module"). По умолчанию = false
 			self::KEY_DEPEND => [
 				'controllerName1.actionName1',		// зависимости вот в таком формате
 				'controllerName1.actionName2',		// можно задать зависимость на ассет, не определённый в конфиге, если его файлы соответствуют конвенции именования

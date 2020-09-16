@@ -649,6 +649,7 @@ class AssetTest extends AppTestCase
 					'dependency3' => [
 					],
 					'dependency4' => [
+						AssetHelper::KEY_IS_MODULE => true,
 					],
 				],
 			],
@@ -659,7 +660,7 @@ class AssetTest extends AppTestCase
 		$expectedResult = [
 			AssetHelper::BLOCK_SCRIPT => [
 				'<script id="dependency4" type="text/x-handlebars-template"></script>',
-				'<script src="/js/Test/dependency4.min.js?v=' . self::SCRIPT_VERSION . '"></script>',
+				'<script src="/js/Test/dependency4.min.js?v=' . self::SCRIPT_VERSION . '" type="module"></script>',
 				'<script id="dependency2" type="text/x-handlebars-template"></script>',
 				'<script src="/js/Test/dependency2.min.js?v=' . self::SCRIPT_VERSION . '"></script>',
 				'<script id="dependency1" type="text/x-handlebars-template"></script>',
