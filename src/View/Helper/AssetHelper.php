@@ -23,6 +23,8 @@ class AssetHelper extends Helper
 	const KEY_VARS = 'vars';
 	/** Скрипт в <head> или внизу <body> */
 	const KEY_IS_BOTTOM = 'isBottom';
+	/** @var string Скрипт является модулем или нет (type="module") */
+	const KEY_IS_MODULE = 'isModule';
 
 	const TYPE_NUM = 'num';
 	const TYPE_STRING = 'string';
@@ -336,7 +338,7 @@ class AssetHelper extends Helper
 				if (!strpos($dependency, '.')) {
 					throw new InternalException("Неправильный формат задания зависимости $dependency");
 				}
-				list($dependFolder, $dependFile) = explode('.', $dependency);
+				[$dependFolder, $dependFile] = explode('.', $dependency);
 				if (
 					(Inflector::variable($dependFolder) != $dependFolder)
 					|| (Inflector::variable($dependFile) != $dependFile)
@@ -376,7 +378,7 @@ class AssetHelper extends Helper
 	{
 		foreach ($configs as $controller => $controllerConf) {
 			if (strpos($controller, '.') !== false) {
-				list($controller, $action) = explode('.', $controller);
+				[$controller, $action] = explode('.', $controller);
 				$this->_setActionConfig($controller, $action, $controllerConf, $merge);
 			} else {
 				foreach ($controllerConf as $action => $actionConf) {
@@ -656,7 +658,12 @@ class AssetHelper extends Helper
 			$scriptPath = $this->_getPath($assetName, self::KEY_SCRIPT);
 			if (!empty($scriptPath)) {
 				$this->_checkCanRenderBlock($scriptBlock, $assetName);
-				$html = $this->_View->Html->script($scriptPath);
+				if ($this->_getAssetParam($assetName, self::KEY_IS_MODULE)) {
+					$scriptOptions = ['type' => 'module'];
+				} else {
+					$scriptOptions = [];
+				}
+				$html = $this->_View->Html->script($scriptPath, $scriptOptions);
 				$this->_result[$scriptBlock][] = $html;
 			}
 
@@ -717,7 +724,7 @@ class AssetHelper extends Helper
 		}
 
 		$pathParts = self::DEFAULT_PATH_PARTS[$type];
-		list($controller, $action) = explode('.', $assetName);
+		[$controller, $action] = explode('.', $assetName);
 		$fileName = $this->_getMinifiedFile($pathParts['folder'] . '/' . Inflector::camelize($controller) . '/' . Inflector::delimit($action) . '.' . $pathParts['extension']);
 		if (is_file(WWW_ROOT . $fileName)) {
 			return $realPath ? realpath(WWW_ROOT . $fileName) : ('/' . $fileName . $this->_assetPostfix);
