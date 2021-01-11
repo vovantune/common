@@ -18,18 +18,10 @@ $object->setProperty1('new value')->setProperty2('property 2 value'); // где 
 ```
 * Преобразование объекта в массив: ```$arr = $object->toArray();```
 * Преобразование в JSON строку: ```$string = $object->toJson();``` либо ```$string = json_encode($object);```.
+* Для того, чтобы свойство было класса ```Time``` или ```Date```, его имя необходимо описать в константе ```TIME_FIELDS``` или ```DATE_FIELDS``` соответственно.
+В таком случае при загрузке содержимого, например, из JSON файла, строковое или числовое значение автоматически преобразуется в нужный класс.
 
 # Ограничения
 * У каждого свойства должен быть описан тип, причём `mixed` и `array` запрещены, только простые типы, объекты и их массивы.
 * Дефолтные значения для свойств должны быть такого же типа данных.
 * Каждое свойство может иметь только один тип данных.
-
-### Скрипт формирования документации JSDoc
-```php 
-vendor/artskills/common/bin/valueObjectJsDocGenerator src_file|src_dir dst_dir
-```
-Его можно настроить в качестве FileWatcher для PHPStorm:
-* File type: PHP
-* Scope: в какой папке проекта лежат данные объекты, например, ```file[site]:src/Response//*```
-* Program: путь для PHP, например, ```/usr/local/bin/php```
-* Arguments: ```$ProjectFileDir$/vendor/artskills/common/bin/valueObjectJsDocGenerator $FilePath$ $ProjectFileDir$/webroot/js/TypeDef/ValueObject```

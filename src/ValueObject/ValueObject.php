@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\ValueObject;
 
@@ -8,39 +9,50 @@ use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Strings;
 use ArtSkills\ORM\Entity;
 use Cake\Error\Debugger;
+use Cake\I18n\Date;
 use Cake\I18n\Time;
 use Cake\Log\Log;
 
 /**
  * Основной класс [объекта-значения](https://github.com/ArtSkills/common/src/ValueObject/README.md).
  * TODO: 1) изучить https://symfony.com/doc/current/components/serializer.html для вомзможного применения
- * TODO: 2) проверять значения свойств при их заполнении на соответствии типа из PHPDoc
  */
 abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 {
-	/** Методы, которые не экспортируются через json_encode */
+	/**
+	 * Методы, которые не экспортируются через json_encode
+	 *
+	 * @var string[]
+	 */
 	const EXCLUDE_EXPORT_PROPS = [];
 
 	/**
 	 * Поля с типом Time
 	 *
-	 * @var array
+	 * @var string[]
 	 */
 	const TIME_FIELDS = [];
+
+	/**
+	 * Поля с типом Date
+	 *
+	 * @var string[]
+	 */
+	const DATE_FIELDS = [];
 
 	/**
 	 * Список экспортируемых свойств
 	 *
 	 * @var string[]
 	 */
-	private $_exportFieldNames = [];
+	private array $_exportFieldNames = [];
 
 	/**
 	 * Список всех полей
 	 *
 	 * @var array
 	 */
-	protected $_allFieldNames = [];
+	protected array $_allFieldNames = [];
 
 	/**
 	 * constructor.
@@ -55,6 +67,12 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 		foreach (static::TIME_FIELDS as $fieldName) {
 			if (!empty($fillValues[$fieldName]) && (is_string($fillValues[$fieldName]) || is_int($fillValues[$fieldName]))) {
 				$fillValues[$fieldName] = Time::parse($fillValues[$fieldName]);
+			}
+		}
+
+		foreach (static::DATE_FIELDS as $fieldName) {
+			if (!empty($fillValues[$fieldName]) && (is_string($fillValues[$fieldName]) || is_int($fillValues[$fieldName]))) {
+				$fillValues[$fieldName] = Date::parse($fillValues[$fieldName]);
 			}
 		}
 
@@ -86,7 +104,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 * @return $this
 	 * @throws InternalException
 	 */
-	public function __call($name, array $arguments = [])
+	public function __call(string $name, array $arguments = [])
 	{
 		$prefix = 'set';
 		if (Strings::startsWith($name, $prefix)) {
@@ -100,6 +118,8 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 			$setValue = $arguments[0];
 			if (in_array($propertyName, static::TIME_FIELDS) && [is_string($setValue) || is_int($setValue)]) {
 				$setValue = Time::parse($setValue);
+			} else if (in_array($propertyName, static::DATE_FIELDS) && [is_string($setValue) || is_int($setValue)]) {
+				$setValue = Date::parse($setValue);
 			}
 			$this->{$propertyName} = $setValue;
 			return $this;
@@ -112,7 +132,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 *
 	 * @return array
 	 */
-	public function toArray()
+	public function toArray(): array
 	{
 		return json_decode(json_encode($this), true);
 	}
@@ -122,7 +142,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 *
 	 * @return string
 	 */
-	public function toJson()
+	public function toJson(): string
 	{
 		$options = JSON_UNESCAPED_UNICODE;
 		if (Env::isDevelopment()) {
@@ -136,7 +156,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 *
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		$result = [];
 		foreach ($this->_exportFieldNames as $fieldName) {
@@ -162,7 +182,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	}
 
 	/** @inheritdoc */
-	public function offsetExists($offset)
+	public function offsetExists($offset): bool
 	{
 		$this->_triggerDeprecatedError($offset);
 		return property_exists($this, $offset);
@@ -186,7 +206,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	public function offsetUnset($offset)
 	{
 		$this->_triggerDeprecatedError($offset);
-		return $this->offsetSet($offset, null);
+		$this->offsetSet($offset, null);
 	}
 
 	/**
@@ -194,7 +214,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 	 *
 	 * @param string $offset
 	 */
-	private function _triggerDeprecatedError($offset)
+	private function _triggerDeprecatedError(string $offset)
 	{
 		$trace = Debugger::trace(['start' => 2, 'depth' => 3, 'format' => 'array']);
 		$file = str_replace([CAKE_CORE_INCLUDE_PATH, ROOT], '', $trace[0]['file']);
