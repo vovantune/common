@@ -4,6 +4,7 @@ namespace ArtSkills\Test\TestCase\ValueObject;
 
 use ArtSkills\Lib\Strings;
 use ArtSkills\ValueObject\ValueObject;
+use Cake\I18n\Date;
 use Cake\I18n\Time;
 use Cake\Utility\String as CakeString;
 
@@ -12,6 +13,7 @@ use Cake\Utility\String as CakeString;
  * @method $this setField2(mixed $value)
  * @method $this setField3(mixed $value)
  * @method $this setTimeField(mixed $value)
+ * @method $this setDateField(mixed $value)
  */
 class ValueObjectFixture extends ValueObject
 {
@@ -21,6 +23,10 @@ class ValueObjectFixture extends ValueObject
 
 	const TIME_FIELDS = [
 		'timeField',
+	];
+
+	const DATE_FIELDS = [
+		'dateField'
 	];
 
 	/**
@@ -41,4 +47,7 @@ class ValueObjectFixture extends ValueObject
 
 	/** @var Time */
 	public $timeField;
+
+	/** @var Date */
+	public $dateField;
 }

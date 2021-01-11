@@ -3,6 +3,7 @@
 namespace ArtSkills\Test\TestCase\ValueObject;
 
 use ArtSkills\TestSuite\AppTestCase;
+use Cake\I18n\Date;
 use Cake\I18n\Time;
 
 class ValueObjectTest extends AppTestCase
@@ -27,6 +28,7 @@ class ValueObjectTest extends AppTestCase
 			'field3' => 'vbn',
 			'field4' => null,
 			'timeField' => null,
+			'dateField' => null,
 		];
 		self::assertEquals($expectedArray, $obj->toArray());
 		self::assertEquals(json_encode($expectedArray), json_encode($obj));
@@ -35,6 +37,7 @@ class ValueObjectTest extends AppTestCase
 			'field2' => 'ololo',
 			'field3' => 'azazaz',
 			'timeField' => '2020-04-01 16:15:00',
+			'dateField' => '2021-11-01',
 		])->setField1('qqq');
 		self::assertEquals('ololo', $obj->field2);
 		self::assertEquals([
@@ -42,18 +45,24 @@ class ValueObjectTest extends AppTestCase
 			'field3' => 'azazaz',
 			'field4' => null,
 			'timeField' => '2020-04-01T16:15:00+03:00',
+			'dateField' => '2021-11-01T00:00:00+00:00',
 		], $obj->toArray());
 
 		self::assertEquals('{
     "field1": "qqq",
     "field3": "azazaz",
     "field4": null,
-    "timeField": "2020-04-01T16:15:00+03:00"
+    "timeField": "2020-04-01T16:15:00+03:00",
+    "dateField": "2021-11-01T00:00:00+00:00"
 }', $obj->toJson());
 
-		$timeString = '2020-04-02';
+		$timeString = '2020-04-02 18:21:00';
 		$obj->setTimeField($timeString);
 		self::assertEquals(Time::parse($timeString), $obj->timeField);
+
+		$dateString = '2021-01-12';
+		$obj->setDateField($dateString);
+		self::assertEquals(Date::parse($dateString), $obj->dateField);
 	}
 
 	/**
