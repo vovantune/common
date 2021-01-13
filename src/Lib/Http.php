@@ -1,5 +1,4 @@
 <?php
-
 namespace ArtSkills\Lib;
 
 use ArtSkills\Http\Client;
@@ -13,9 +12,9 @@ class Http
 	/**
 	 * Экземпляр http клиента
 	 *
-	 * @var null
+	 * @var null|Client
 	 */
-	private static $_httpClient = null;
+	private static ?Client $_httpClient = null;
 
 	/**
 	 * Работает по типу file_get_contents но только для url
@@ -23,7 +22,7 @@ class Http
 	 * @param string $url
 	 * @return string|null
 	 */
-	public static function getContent($url)
+	public static function getContent(string $url): ?string
 	{
 		$request = static::_makeRequest();
 		$result = static::_getRequest($url, $request);
@@ -39,11 +38,11 @@ class Http
 	 * Возвращает JSON ответ на get запрос
 	 *
 	 * @param string $url
-	 * @param array $data
+	 * @param array|string $data
 	 * @param array $options
 	 * @return array|null
 	 */
-	public static function getJson($url, $data = [], $options = [])
+	public static function getJson(string $url, $data = [], array $options = []): ?array
 	{
 		$request = static::_makeRequest();
 		return static::_getResponseJson(static::_getRequest($url, $request, $data, $options));
@@ -53,11 +52,11 @@ class Http
 	 * Возвращает Json ответ на Post запрос
 	 *
 	 * @param string $url
-	 * @param array $data
+	 * @param array|string $data
 	 * @param array $options
 	 * @return array|null
 	 */
-	public static function postJson($url, $data, $options = [])
+	public static function postJson(string $url, $data, array $options = [])
 	{
 		$request = self::_makeRequest();
 		return static::_getResponseJson($request->post($url, $data, $options));
@@ -67,11 +66,11 @@ class Http
 	 * Возвращает Json ответ на Put запрос
 	 *
 	 * @param string $url
-	 * @param array $data
+	 * @param array|string $data
 	 * @param array $options
 	 * @return array|null
 	 */
-	public static function putJson($url, $data, $options = [])
+	public static function putJson(string $url, $data, array $options = []): ?array
 	{
 		$request = self::_makeRequest();
 		return static::_getResponseJson($request->put($url, $data, $options));
@@ -83,7 +82,7 @@ class Http
 	 * @param string $url
 	 * @return \SimpleXMLElement|null
 	 */
-	public static function getXml($url)
+	public static function getXml(string $url): ?\SimpleXMLElement
 	{
 		$request = static::_makeRequest();
 		$result = static::_getRequest($url, $request);
@@ -98,11 +97,11 @@ class Http
 	 * Возвращает XML ответ при POST запросе
 	 *
 	 * @param string $url
-	 * @param array $data
+	 * @param array|string $data
 	 * @param array $options
 	 * @return \SimpleXMLElement|null
 	 */
-	public static function postXml($url, $data, $options = [])
+	public static function postXml(string $url, $data, array $options = []): ?\SimpleXMLElement
 	{
 		$request = static::_makeRequest();
 		$result = $request->post($url, $data, $options);
@@ -121,7 +120,7 @@ class Http
 	 * @param int $timeout
 	 * @return string
 	 */
-	public static function downloadFile($url, $targetFile = '', $timeout = 30)
+	public static function downloadFile(string $url, string $targetFile = '', int $timeout = 30): string
 	{
 
 		if (empty($targetFile)) {
@@ -160,7 +159,7 @@ class Http
 	 * @param Response|null $response
 	 * @return array|null
 	 */
-	private static function _getResponseJson($response)
+	private static function _getResponseJson(?Response $response): ?array
 	{
 		if (!empty($response)) {
 			return $response->getJson();
@@ -174,11 +173,11 @@ class Http
 	 *
 	 * @param string $url
 	 * @param Client $request
-	 * @param array $data
+	 * @param array|string $data
 	 * @param array $options
-	 * @return Response
+	 * @return Response|null
 	 */
-	private static function _getRequest($url, $request, $data = [], $options = [])
+	private static function _getRequest(string $url, Client $request, $data = [], array $options = []): ?Response
 	{
 		return $request->get($url, $data, $options);
 	}
@@ -188,7 +187,7 @@ class Http
 	 *
 	 * @return Client
 	 */
-	private static function _makeRequest()
+	private static function _makeRequest(): ?Client
 	{
 		if (static::$_httpClient == null) {
 			static::$_httpClient = new Client();

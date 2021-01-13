@@ -81,14 +81,14 @@ class AssetHelper extends Helper
 	 *
 	 * @var array
 	 */
-	private $_loadedAssets = [];
+	private array $_loadedAssets = [];
 
 	/**
 	 * Текущие скрипты/стили
 	 *
 	 * @var array
 	 */
-	private $_newAssets = [];
+	private array $_newAssets = [];
 
 	/**
 	 * Ассеты, которые начали обрабатываться, но ещё не закончили
@@ -96,7 +96,7 @@ class AssetHelper extends Helper
 	 *
 	 * @var array
 	 */
-	private $_startedAssets = [];
+	private array $_startedAssets = [];
 
 
 	/**
@@ -104,14 +104,14 @@ class AssetHelper extends Helper
 	 *
 	 * @var array
 	 */
-	private $_loadedVariables = [];
+	private array $_loadedVariables = [];
 
 	/**
 	 * Обязательные для текущго набора скриптов переменные
 	 *
 	 * @var array
 	 */
-	private $_newVariables = [];
+	private array $_newVariables = [];
 
 
 	/**
@@ -119,14 +119,14 @@ class AssetHelper extends Helper
 	 *
 	 * @var array
 	 */
-	private $_definedVariables = [];
+	private array $_definedVariables = [];
 
 	/**
 	 * Параметр для сброса кеша браузера
 	 *
-	 * @var int
+	 * @var string
 	 */
-	private $_assetPostfix = '';
+	private string $_assetPostfix = '';
 
 
 	/**
@@ -134,14 +134,14 @@ class AssetHelper extends Helper
 	 *
 	 * @var array
 	 */
-	private $_result = [];
+	private array $_result = [];
 
 	/**
 	 * Массив флагов того, был ли уже выведен этот блок
 	 *
 	 * @var array
 	 */
-	private $_blockFetched = [];
+	private array $_blockFetched = [];
 
 	/** @inheritdoc */
 	public function __construct(View $View, array $config = [])
@@ -725,11 +725,19 @@ class AssetHelper extends Helper
 
 		$pathParts = self::DEFAULT_PATH_PARTS[$type];
 		[$controller, $action] = explode('.', $assetName);
-		$fileName = $this->_getMinifiedFile($pathParts['folder'] . '/' . Inflector::camelize($controller) . '/' . Inflector::delimit($action) . '.' . $pathParts['extension']);
+
+
+		$fileName = $this->_getMinifiedFile($pathParts['folder'] . '/' . Inflector::camelize($controller) . '/' . $action . '.' . $pathParts['extension']);
 		if (is_file(WWW_ROOT . $fileName)) {
 			return $realPath ? realpath(WWW_ROOT . $fileName) : ('/' . $fileName . $this->_assetPostfix);
+		} else {
+			$oldFileName = $this->_getMinifiedFile($pathParts['folder'] . '/' . Inflector::camelize($controller) . '/' . Inflector::delimit($action) . '.' . $pathParts['extension']);
+			if (is_file(WWW_ROOT . $oldFileName)) {
+				return $realPath ? realpath(WWW_ROOT . $oldFileName) : ('/' . $oldFileName . $this->_assetPostfix);
+			} else {
+				return null;
+			}
 		}
-		return null;
 	}
 
 	/**
@@ -752,7 +760,7 @@ class AssetHelper extends Helper
 	/**
 	 * Проверка, что такое имя можно задать, и приведение его к camelCase
 	 *
-	 * @param string $varName
+	 * @param mixed $varName
 	 * @param bool $isVariable
 	 * @return string
 	 * @throws InternalException если имя - не строка или там полнейшее говно
