@@ -268,6 +268,7 @@ class Deployer
 			"ln -s $newFolderFullName $absProjectPath",
 		];
 		list($success, $output, $resultCommand) = Shell::exec($commands);
+		opcache_reset();
 		if (!$success) {
 			throw new InternalException("Ошибка. Команда: $resultCommand, Вывод: " . implode("\n", $output));
 		}
