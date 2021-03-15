@@ -113,6 +113,16 @@ class Exception extends \Exception
 	}
 
 	/**
+	 * Оповещать ли об ошибке или нет
+	 *
+	 * @return bool
+	 */
+	public function getAlert()
+	{
+		return $this->_alert;
+	}
+
+	/**
 	 * Задать контекст для логов.
 	 *
 	 * @param array $context
