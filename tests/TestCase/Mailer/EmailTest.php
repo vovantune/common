@@ -35,6 +35,7 @@ class EmailTest extends AppTestCase
 			'message' => [$text, '', ''],
 			'cc' => [],
 			'bcc' => [],
+			'from' => ['test@artskills.ru' => 'test@artskills.ru'],
 		];
 		self::assertEquals([$expectedData], $emailData, 'Не изменился адрес почты');
 	}
