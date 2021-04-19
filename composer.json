@@ -1,35 +1,37 @@
 {
-	"name": "artskills/common",
-	"description": "CakePHP utils",
-	"type": "library",
-	"require": {
-		"php": "^7.4",
-		"ext-json": "*",
-		"ext-simplexml": "*",
-		"ext-curl": "*",
-		"ext-pdo": "*",
-		"cakephp/cakephp": "3.*",
-		"robmorgan/phinx": "^0.6.2",
-		"sentry/sentry": "^1.1",
-		"jan-swiecki/simple-annotations": "*",
-		"ext-intl": "*",
-		"ext-zend-opcache": "*"
-	},
-	"require-dev": {
-		"ext-runkit7": "*",
-		"ext-iconv": "*",
-		"phpunit/phpunit": "^6",
-		"cakephp/debug_kit": "~3.1"
-	},
-	"autoload": {
-		"psr-4": {
-			"ArtSkills\\": "src"
-		}
-	},
-	"autoload-dev": {
-		"psr-4": {
-			"ArtSkills\\Test\\": "tests",
-			"TestApp\\": "test-app"
-		}
-	}
+  "name": "artskills/common",
+  "description": "CakePHP utils",
+  "type": "library",
+  "require": {
+    "php": "^7.4",
+    "ext-json": "*",
+    "ext-simplexml": "*",
+    "ext-curl": "*",
+    "ext-pdo": "*",
+    "cakephp/cakephp": "3.*",
+    "robmorgan/phinx": "^0.6.2",
+    "sentry/sentry": "^1.1",
+    "jan-swiecki/simple-annotations": "*",
+    "ext-intl": "*",
+    "ext-zend-opcache": "*"
+  },
+  "require-dev": {
+    "ext-runkit7": "*",
+    "ext-iconv": "*",
+    "phpunit/phpunit": "^6",
+    "cakephp/debug_kit": "~3.1",
+    "cakephp/cakephp-codesniffer": "^3.0",
+    "squizlabs/php_codesniffer": "3.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "ArtSkills\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ArtSkills\\Test\\": "tests",
+      "TestApp\\": "test-app"
+    }
+  }
 }

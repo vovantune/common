@@ -17,37 +17,37 @@ use Cake\Utility\String as CakeString;
  */
 class ValueObjectFixture extends ValueObject
 {
-	const EXCLUDE_EXPORT_PROPS = [
-		'field2',
-	];
+    const EXCLUDE_EXPORT_PROPS = [
+        'field2',
+    ];
 
-	const TIME_FIELDS = [
-		'timeField',
-	];
+    const TIME_FIELDS = [
+        'timeField',
+    ];
 
-	const DATE_FIELDS = [
-		'dateField'
-	];
+    const DATE_FIELDS = [
+        'dateField'
+    ];
 
-	/**
-	 * блаблабла
-	 * трололо
-	 *
-	 * @var string
-	 */
-	public $field1 = 'asd';
+    /**
+     * блаблабла
+     * трололо
+     *
+     * @var string
+     */
+    public $field1 = 'asd';
 
-	/** @var string */
-	public $field2 = 'qwe';
-	/** @var Strings */
-	public $field3;
+    /** @var string */
+    public $field2 = 'qwe';
+    /** @var Strings */
+    public $field3;
 
-	/** @var CakeString */
-	public $field4;
+    /** @var CakeString */
+    public $field4;
 
-	/** @var Time */
-	public $timeField;
+    /** @var Time */
+    public $timeField;
 
-	/** @var Date */
-	public $dateField;
+    /** @var Date */
+    public $dateField;
 }

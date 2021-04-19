@@ -24,23 +24,23 @@ use ArtSkills\Lib\Arrays;
 class TestTableOneTable extends Table
 {
 
-	public $asd;
+    public $asd;
 
-	public function qwe()
-	{
-		return Arrays::encode(['asd' => 'qwe']);
-	}
+    public function qwe()
+    {
+        return Arrays::encode(['asd' => 'qwe']);
+    }
 
-	public function initialize(array $config)
-	{
-		parent::initialize($config);
-		$this->hasMany('TestTableTwo', ['foreignKey' => 'table_one_fk']);
-		$this->addBehavior('Timestamp', [
-			'events' => [
-				'Model.beforeSave' => [
-					'col_time' => 'always',
-				],
-			],
-		]);
-	}
+    public function initialize(array $config)
+    {
+        parent::initialize($config);
+        $this->hasMany('TestTableTwo', ['foreignKey' => 'table_one_fk']);
+        $this->addBehavior('Timestamp', [
+            'events' => [
+                'Model.beforeSave' => [
+                    'col_time' => 'always',
+                ],
+            ],
+        ]);
+    }
 }

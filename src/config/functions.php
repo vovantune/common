@@ -7,7 +7,7 @@
  */
 function assoc(...$names)
 {
-	return implode('.', $names);
+    return implode('.', $names);
 }
 
 /**
@@ -20,7 +20,7 @@ function assoc(...$names)
  */
 function field($tableAlias, $fieldName, $operation = null)
 {
-	return $tableAlias . '.' . $fieldName . (empty($operation) ? '' : ' ' . $operation);
+    return $tableAlias . '.' . $fieldName . (empty($operation) ? '' : ' ' . $operation);
 }
 
 /**
@@ -59,23 +59,23 @@ function field($tableAlias, $fieldName, $operation = null)
  */
 function fieldsWhere(array $conditionsByTable)
 {
-	$noTableKey = '';
-	if (array_key_exists($noTableKey, $conditionsByTable)) {
-		$newConditions = $conditionsByTable[$noTableKey];
-		unset($conditionsByTable[$noTableKey]);
-	} else {
-		$newConditions = [];
-	}
-	foreach ($conditionsByTable as $tableAlias => $conditions) {
-		foreach ($conditions as $field => $value) {
-			$fieldFull = $tableAlias . '.' . $field;
-			if (array_key_exists($fieldFull, $newConditions)) {
-				throw new Exception("Дублируется ключ $fieldFull");
-			}
-			$newConditions[$fieldFull] = $value;
-		}
-	}
-	return $newConditions;
+    $noTableKey = '';
+    if (array_key_exists($noTableKey, $conditionsByTable)) {
+        $newConditions = $conditionsByTable[$noTableKey];
+        unset($conditionsByTable[$noTableKey]);
+    } else {
+        $newConditions = [];
+    }
+    foreach ($conditionsByTable as $tableAlias => $conditions) {
+        foreach ($conditions as $field => $value) {
+            $fieldFull = $tableAlias . '.' . $field;
+            if (array_key_exists($fieldFull, $newConditions)) {
+                throw new Exception("Дублируется ключ $fieldFull");
+            }
+            $newConditions[$fieldFull] = $value;
+        }
+    }
+    return $newConditions;
 }
 
 /**
@@ -114,41 +114,41 @@ function fieldsWhere(array $conditionsByTable)
  */
 function fieldsSelect($fieldsByTable)
 {
-	$noTableKey = '';
-	if (array_key_exists($noTableKey, $fieldsByTable)) {
-		$newFields = $fieldsByTable[$noTableKey];
-		unset($fieldsByTable[$noTableKey]);
-	} else {
-		$newFields = [];
-	}
-	$counterKey = count($newFields);
-	foreach ($fieldsByTable as $tableAlias => $fields) {
-		foreach ((array)$fields as $key => $field) {
-			if (!is_string($key)) {
-				$key = $counterKey;
-				$counterKey++;
-			} elseif (array_key_exists($key, $newFields)) {
-				throw new Exception("Дублируется ключ $key");
-			}
-			$newFields[$key] = $tableAlias . '.' . $field;
-		}
-	}
+    $noTableKey = '';
+    if (array_key_exists($noTableKey, $fieldsByTable)) {
+        $newFields = $fieldsByTable[$noTableKey];
+        unset($fieldsByTable[$noTableKey]);
+    } else {
+        $newFields = [];
+    }
+    $counterKey = count($newFields);
+    foreach ($fieldsByTable as $tableAlias => $fields) {
+        foreach ((array)$fields as $key => $field) {
+            if (!is_string($key)) {
+                $key = $counterKey;
+                $counterKey++;
+            } elseif (array_key_exists($key, $newFields)) {
+                throw new Exception("Дублируется ключ $key");
+            }
+            $newFields[$key] = $tableAlias . '.' . $field;
+        }
+    }
 
-	return $newFields;
+    return $newFields;
 }
 
 if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
 
-	/**
-	 * Переводим в верхний регистр первую букву
-	 *
-	 * @param string $string
-	 * @param string $enc
-	 * @return string
-	 */
-	function mb_ucfirst($string, $enc = 'utf-8')
-	{
-		$string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_strtolower(mb_substr($string, 1, mb_strlen($string, $enc) - 1, $enc), $enc);
-		return $string;
-	}
+    /**
+     * Переводим в верхний регистр первую букву
+     *
+     * @param string $string
+     * @param string $enc
+     * @return string
+     */
+    function mb_ucfirst($string, $enc = 'utf-8')
+    {
+        $string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_strtolower(mb_substr($string, 1, mb_strlen($string, $enc) - 1, $enc), $enc);
+        return $string;
+    }
 }

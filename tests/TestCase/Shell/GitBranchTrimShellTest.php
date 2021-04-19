@@ -13,122 +13,120 @@ use Cake\I18n\Time;
 
 class GitBranchTrimShellTest extends AppTestCase
 {
-	/**
-	 * Тест того, что вызывалось при запуске
-	 */
-	public function test()
-	{
-		MethodMocker::mock(GitBranchTrimShell::class, '_canDeleteRemote')
-			->willReturnValue(true);
+    /**
+     * Тест того, что вызывалось при запуске
+     */
+    public function test()
+    {
+        MethodMocker::mock(GitBranchTrimShell::class, '_canDeleteRemote')
+            ->willReturnValue(true);
 
-		$git = Git::getInstance();
+        $git = Git::getInstance();
 
-		$branchBefore = $git->getCurrentBranchName();
+        $branchBefore = $git->getCurrentBranchName();
 
-		$history = [];
-		$this->_mockExecute($history);
+        $history = [];
+        $this->_mockExecute($history);
 
-		Configure::write(GitBranchTrimShell::CONFIGURATION_NAME, [
-			'dir' => __DIR__,
-		]);
+        Configure::write(GitBranchTrimShell::CONFIGURATION_NAME, [
+            'dir' => __DIR__,
+        ]);
 
-		MethodMocker::mock(\Cake\Console\Shell::class, 'out');
+        MethodMocker::mock(\Cake\Console\Shell::class, 'out');
 
-		$shell = new GitBranchTrimShell();
-		$shell->main();
+        $shell = new GitBranchTrimShell();
+        $shell->main();
 
-		self::assertEquals($branchBefore, $git->getCurrentBranchName(), 'Ветка не вернулась обратно');
+        self::assertEquals($branchBefore, $git->getCurrentBranchName(), 'Ветка не вернулась обратно');
 
-		$deleteDateFrom = Time::parse(GitBranchTrimShell::DEFAULT_CONFIGURATION['branchDeleteInterval'])
-			->format('Y-m-d');
-		$skipBranches = [Git::BRANCH_NAME_MASTER, Git::BRANCH_NAME_HEAD, $branchBefore];
+        $deleteDateFrom = Time::parse(GitBranchTrimShell::DEFAULT_CONFIGURATION['branchDeleteInterval'])
+            ->format('Y-m-d');
+        $skipBranches = [Git::BRANCH_NAME_MASTER, Git::BRANCH_NAME_HEAD, $branchBefore];
 
-		$actualHistory = $history;
-		$expectedHistory = [];
-		if ($branchBefore !== Git::BRANCH_NAME_MASTER) {
-			$expectedHistory[] = 'git branch -a 2>&1';
-			$expectedHistory[] = 'git checkout master 2>&1';
-		}
-		$expectedHistory[] = 'git remote update --prune 2>&1';
-		$expectedHistory[] = 'git pull 2>&1';
-		foreach ([Git::BRANCH_TYPE_REMOTE, Git::BRANCH_TYPE_LOCAL] as $type) {
-			$expectedHistory = array_merge($expectedHistory, $this->_getCommandListMerged($type));
-			$mergedBranches = $git->getMergedBranches($type);
-			foreach ($mergedBranches as $branchName => $lastCommitDate) {
-				if (($lastCommitDate <= $deleteDateFrom) && !in_array($branchName, $skipBranches)) {
-					$expectedHistory = array_merge($expectedHistory, $this->_getCommandListDelete($branchName, $type));
-				}
-			}
-		}
-		if ($branchBefore !== Git::BRANCH_NAME_MASTER) {
-			$expectedHistory[] = 'git branch -a 2>&1';
-			$expectedHistory[] = 'git checkout ' . $branchBefore . ' 2>&1';
-		}
+        $actualHistory = $history;
+        $expectedHistory = [];
+        if ($branchBefore !== Git::BRANCH_NAME_MASTER) {
+            $expectedHistory[] = 'git branch -a 2>&1';
+            $expectedHistory[] = 'git checkout master 2>&1';
+        }
+        $expectedHistory[] = 'git remote update --prune 2>&1';
+        $expectedHistory[] = 'git pull 2>&1';
+        foreach ([Git::BRANCH_TYPE_REMOTE, Git::BRANCH_TYPE_LOCAL] as $type) {
+            $expectedHistory = array_merge($expectedHistory, $this->_getCommandListMerged($type));
+            $mergedBranches = $git->getMergedBranches($type);
+            foreach ($mergedBranches as $branchName => $lastCommitDate) {
+                if (($lastCommitDate <= $deleteDateFrom) && !in_array($branchName, $skipBranches)) {
+                    $expectedHistory = array_merge($expectedHistory, $this->_getCommandListDelete($branchName, $type));
+                }
+            }
+        }
+        if ($branchBefore !== Git::BRANCH_NAME_MASTER) {
+            $expectedHistory[] = 'git branch -a 2>&1';
+            $expectedHistory[] = 'git checkout ' . $branchBefore . ' 2>&1';
+        }
 
-		self::assertEquals($expectedHistory, $actualHistory, 'Неправильный набор комманд');
-	}
+        self::assertEquals($expectedHistory, $actualHistory, 'Неправильный набор комманд');
+    }
 
-	/**
-	 * Мокаем _execute в Git
-	 *
-	 * @param array $history
-	 * @throws \Exception
-	 */
-	private function _mockExecute(&$history)
-	{
-		MethodMocker::mock(Shell::class, '_exec')
-			->willReturnAction(function ($args) use (&$history) {
-				$history[] = $args[0];
-				if (preg_match('/^git (branch( -[ar])?|for-each-ref.*)/', $args[0])) {
-					exec($args[0], $output, $returnCode);
-					return [$returnCode === 0, $output];
-				} else {
-					return [true, []];
-				}
-			});
-	}
+    /**
+     * Мокаем _execute в Git
+     *
+     * @param array $history
+     * @throws \Exception
+     */
+    private function _mockExecute(&$history)
+    {
+        MethodMocker::mock(Shell::class, '_exec')
+            ->willReturnAction(function ($args) use (&$history) {
+                $history[] = $args[0];
+                if (preg_match('/^git (branch( -[ar])?|for-each-ref.*)/', $args[0])) {
+                    exec($args[0], $output, $returnCode);
+                    return [$returnCode === 0, $output];
+                } else {
+                    return [true, []];
+                }
+            });
+    }
 
-	/**
-	 * Список комманд, использованных для получения списка веток
-	 *
-	 * @param string $type
-	 * @return array|bool
-	 */
-	private function _getCommandListMerged($type)
-	{
-		$list = [];
-		if ($type == Git::BRANCH_TYPE_REMOTE) {
-			$list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/remotes/origin --merged 2>&1';
-		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
-			$list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/heads --merged 2>&1';
-		} else {
-			return false;
-		}
-		return $list;
-	}
+    /**
+     * Список комманд, использованных для получения списка веток
+     *
+     * @param string $type
+     * @return array|bool
+     */
+    private function _getCommandListMerged($type)
+    {
+        $list = [];
+        if ($type == Git::BRANCH_TYPE_REMOTE) {
+            $list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/remotes/origin --merged 2>&1';
+        } elseif ($type == Git::BRANCH_TYPE_LOCAL) {
+            $list[] = 'git for-each-ref --format="%(refname) %(authordate:short)" refs/heads --merged 2>&1';
+        } else {
+            return false;
+        }
+        return $list;
+    }
 
-	/**
-	 * Список комманд, использованных для удаления ветки
-	 *
-	 * @param string $branchDelete
-	 * @param string $type
-	 * @return array|bool
-	 */
-	private function _getCommandListDelete($branchDelete, $type)
-	{
-		$list = $this->_getCommandListMerged($type);
-		if (empty($list)) {
-			return false;
-		}
-		if ($type == Git::BRANCH_TYPE_REMOTE) {
-			$list[] = 'git push origin --delete ' . $branchDelete . ' 2>&1';
-		} elseif ($type == Git::BRANCH_TYPE_LOCAL) {
-			$list[] = 'git branch ' . $branchDelete . ' -d 2>&1';
-		} else {
-			return false;
-		}
-		return $list;
-	}
-
-
+    /**
+     * Список комманд, использованных для удаления ветки
+     *
+     * @param string $branchDelete
+     * @param string $type
+     * @return array|bool
+     */
+    private function _getCommandListDelete($branchDelete, $type)
+    {
+        $list = $this->_getCommandListMerged($type);
+        if (empty($list)) {
+            return false;
+        }
+        if ($type == Git::BRANCH_TYPE_REMOTE) {
+            $list[] = 'git push origin --delete ' . $branchDelete . ' 2>&1';
+        } elseif ($type == Git::BRANCH_TYPE_LOCAL) {
+            $list[] = 'git branch ' . $branchDelete . ' -d 2>&1';
+        } else {
+            return false;
+        }
+        return $list;
+    }
 }

@@ -16,16 +16,16 @@ use ArtSkills\ORM\Entity;
  */
 class TestTableTwo extends Entity
 {
-	/** @inheritdoc */
-	protected $_aliases = [
-		'fieldAlias' => 'table_one_fk',
-	];
+    /** @inheritdoc */
+    protected $_aliases = [
+        'fieldAlias' => 'table_one_fk',
+    ];
 
-	/**
-	 * @return string whoa!!!
-	 */
-	protected function _getVirtualField()
-	{
-		return 'whoa, virtual fields!';
-	}
+    /**
+     * @return string whoa!!!
+     */
+    protected function _getVirtualField()
+    {
+        return 'whoa, virtual fields!';
+    }
 }
