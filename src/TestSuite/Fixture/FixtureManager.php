@@ -43,13 +43,13 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
 		}
 		$testCaseClass = get_class($test);
 		foreach ($test->fixtures as $fixture) {
-			if (isset($this->_loaded[$fixture])) {
+			if (isset($this->_loaded[$fixture]) && method_exists($this->_loaded[$fixture], 'setTestCase')) {
 				$this->_loaded[$fixture]->setTestCase($testCaseClass);
 				continue;
 			}
 
 			if (stripos($fixture, '.') !== false) {
-				list($type, $pathName) = explode('.', $fixture, 2);
+				[$type, $pathName] = explode('.', $fixture, 2);
 			} else {
 				$type = 'app';
 				$pathName = $fixture;
@@ -63,7 +63,7 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
 			} elseif ($type === 'app') {
 				$baseNamespace = Configure::read('App.namespace');
 			} elseif ($type === 'plugin') {
-				list($plugin, $name) = explode('.', $pathName);
+				[$plugin, $name] = explode('.', $pathName);
 				$path = implode('\\', explode('/', $plugin));
 				$baseNamespace = Inflector::camelize(str_replace('\\', '\ ', $path));
 				$additionalPath = null;
@@ -80,7 +80,6 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
 				$name . 'Fixture',
 			];
 			$className = implode('\\', array_filter($nameSegments));
-
 
 			if (class_exists($className)) {
 				$this->_loaded[$fixture] = new $className(null, $testCaseClass);
