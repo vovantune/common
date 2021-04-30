@@ -9,7 +9,7 @@
 		"ext-curl": "*",
 		"ext-pdo": "*",
 		"cakephp/cakephp": "3.*",
-		"robmorgan/phinx": "^0.6.2",
+		"robmorgan/phinx": "^0.8.1",
 		"sentry/sentry": "^1.1",
 		"jan-swiecki/simple-annotations": "*",
 		"ext-intl": "*",
