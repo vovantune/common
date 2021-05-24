@@ -23,31 +23,14 @@ help:
 install:
 	./composer.phar install -n
 
-update: install migrate-exec
-
 cs:
 	./composer.phar cs-check
 
 cs-fix:
 	./composer.phar cs-fix
 
-test: update
+test: install
 	./composer.phar test
 
-migrate-exec:
-	vendor/bin/phinx migrate
-
-migrate-add:
-	vendor/bin/phinx create $(name)
-
-migrate-rollback:
-	vendor/bin/phinx rollback
-
-migrate-status:
-	vendor/bin/phinx status
-
-entity-builder:
-	bin/cake entity_builder
-
-js-doc:
-	bin/cake value_object_documentation
+phpmd-check:
+	./composer.phar phpmd-check
