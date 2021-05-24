@@ -6,8 +6,8 @@ use ArtSkills\TestSuite\Fixture\TestFixture;
 
 class TestTableTwoFixture extends TestFixture
 {
-	/** @inheritdoc */
-	public $records = [
-		['id' => '11', 'table_one_fk' => '1000'],
-	];
+    /** @inheritdoc */
+    public $records = [
+        ['id' => '11', 'table_one_fk' => '1000'],
+    ];
 }

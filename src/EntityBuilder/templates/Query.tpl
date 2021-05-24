@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 namespace {MODEL_NAMESPACE}\Query;
-
 {USE_BASE}use {MODEL_NAMESPACE}\Entity\{ENTITY};
 
 /**

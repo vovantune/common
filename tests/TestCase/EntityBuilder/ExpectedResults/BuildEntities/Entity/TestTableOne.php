@@ -21,38 +21,36 @@ use ArtSkills\Lib\Arrays;
  */
 class TestTableOne extends Entity
 {
-	/** @inheritdoc */
-	protected $_aliases = [
-	];
+    /** @inheritdoc */
+    protected $_aliases = [
+    ];
 
-	public function asd()
-	{
-		return Arrays::encode(['asd' => 'qwe']);
-	}
+    public function asd()
+    {
+        return Arrays::encode(['asd' => 'qwe']);
+    }
 
-	/**
-	 * @return array
-	 */
-	protected function _getNewField()
-	{
-		return [];
-	}
+    /**
+     * @return array
+     */
+    protected function _getNewField()
+    {
+        return [];
+    }
 
-	/**
-	 * @return int поле изменилось
-	 */
-	protected function _getOldField()
-	{
-		return 123;
-	}
+    /**
+     * @return int поле изменилось
+     */
+    protected function _getOldField()
+    {
+        return 123;
+    }
 
-	/**
-	 * @return object кривое описание
-	 */
-	protected function _getId()
-	{
-		return empty($this->_properties['id']) ? null : $this->_properties['id'];
-	}
-
-
+    /**
+     * @return object кривое описание
+     */
+    protected function _getId()
+    {
+        return empty($this->_properties['id']) ? null : $this->_properties['id'];
+    }
 }

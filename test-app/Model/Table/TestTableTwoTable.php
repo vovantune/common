@@ -20,9 +20,9 @@ use ArtSkills\ORM\Table;
 class TestTableTwoTable extends Table
 {
 
-	public function initialize(array $config)
-	{
-		parent::initialize($config);
-		$this->belongsTo('TestTableOne', ['foreignKey' => 'table_one_fk']);
-	}
+    public function initialize(array $config)
+    {
+        parent::initialize($config);
+        $this->belongsTo('TestTableOne', ['foreignKey' => 'table_one_fk']);
+    }
 }

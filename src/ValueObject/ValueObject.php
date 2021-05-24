@@ -19,207 +19,207 @@ use Cake\Log\Log;
  */
 abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 {
-	/**
-	 * Методы, которые не экспортируются через json_encode
-	 *
-	 * @var string[]
-	 */
-	const EXCLUDE_EXPORT_PROPS = [];
+    /**
+     * Методы, которые не экспортируются через json_encode
+     *
+     * @var string[]
+     */
+    const EXCLUDE_EXPORT_PROPS = [];
 
-	/**
-	 * Поля с типом Time
-	 *
-	 * @var string[]
-	 */
-	const TIME_FIELDS = [];
+    /**
+     * Поля с типом Time
+     *
+     * @var string[]
+     */
+    const TIME_FIELDS = [];
 
-	/**
-	 * Поля с типом Date
-	 *
-	 * @var string[]
-	 */
-	const DATE_FIELDS = [];
+    /**
+     * Поля с типом Date
+     *
+     * @var string[]
+     */
+    const DATE_FIELDS = [];
 
-	/**
-	 * Список экспортируемых свойств
-	 *
-	 * @var string[]
-	 */
-	private array $_exportFieldNames = [];
+    /**
+     * Список экспортируемых свойств
+     *
+     * @var string[]
+     */
+    private array $_exportFieldNames = [];
 
-	/**
-	 * Список всех полей
-	 *
-	 * @var array
-	 */
-	protected array $_allFieldNames = [];
+    /**
+     * Список всех полей
+     *
+     * @var array
+     */
+    protected array $_allFieldNames = [];
 
-	/**
-	 * constructor.
-	 *
-	 * @param array|Entity $fillValues Список заполняемых свойств
-	 * @throws InternalException
-	 */
-	public function __construct($fillValues = [])
-	{
-		$this->_fillExportedFields();
+    /**
+     * constructor.
+     *
+     * @param array|Entity $fillValues Список заполняемых свойств
+     * @throws InternalException
+     */
+    public function __construct($fillValues = [])
+    {
+        $this->_fillExportedFields();
 
-		foreach (static::TIME_FIELDS as $fieldName) {
-			if (!empty($fillValues[$fieldName]) && (is_string($fillValues[$fieldName]) || is_int($fillValues[$fieldName]))) {
-				$fillValues[$fieldName] = Time::parse($fillValues[$fieldName]);
-			}
-		}
+        foreach (static::TIME_FIELDS as $fieldName) {
+            if (!empty($fillValues[$fieldName]) && (is_string($fillValues[$fieldName]) || is_int($fillValues[$fieldName]))) {
+                $fillValues[$fieldName] = Time::parse($fillValues[$fieldName]);
+            }
+        }
 
-		foreach (static::DATE_FIELDS as $fieldName) {
-			if (!empty($fillValues[$fieldName]) && (is_string($fillValues[$fieldName]) || is_int($fillValues[$fieldName]))) {
-				$fillValues[$fieldName] = Date::parse($fillValues[$fieldName]);
-			}
-		}
+        foreach (static::DATE_FIELDS as $fieldName) {
+            if (!empty($fillValues[$fieldName]) && (is_string($fillValues[$fieldName]) || is_int($fillValues[$fieldName]))) {
+                $fillValues[$fieldName] = Date::parse($fillValues[$fieldName]);
+            }
+        }
 
-		foreach ($fillValues as $key => $value) {
-			if (!property_exists($this, $key)) {
-				throw new InternalException('Property ' . $key . ' not exists!');
-			}
+        foreach ($fillValues as $key => $value) {
+            if (!property_exists($this, $key)) {
+                throw new InternalException('Property ' . $key . ' not exists!');
+            }
 
-			$this->{$key} = $value;
-		}
-	}
+            $this->{$key} = $value;
+        }
+    }
 
-	/**
-	 * Создание через статический метод
-	 *
-	 * @param array $fillValues Список заполняемых свойств
-	 * @return static
-	 */
-	public static function create(array $fillValues = [])
-	{
-		return new static($fillValues);
-	}
+    /**
+     * Создание через статический метод
+     *
+     * @param array $fillValues Список заполняемых свойств
+     * @return static
+     */
+    public static function create(array $fillValues = [])
+    {
+        return new static($fillValues);
+    }
 
-	/**
-	 * Возможность использовать цепочку вызовов ->setField1($value1)->setField2($value2)
-	 *
-	 * @param string $name
-	 * @param array $arguments
-	 * @return $this
-	 * @throws InternalException
-	 */
-	public function __call(string $name, array $arguments = [])
-	{
-		$prefix = 'set';
-		if (Strings::startsWith($name, $prefix)) {
-			$propertyName = lcfirst(Strings::replacePrefix($name, $prefix));
-			if (empty($this->_allFieldNames[$propertyName])) {
-				throw new InternalException("Undefined property $propertyName");
-			}
-			if (count($arguments) !== 1) {
-				throw new InternalException("Invalid argument count when calling $name");
-			}
-			$setValue = $arguments[0];
-			if (in_array($propertyName, static::TIME_FIELDS) && [is_string($setValue) || is_int($setValue)]) {
-				$setValue = Time::parse($setValue);
-			} else if (in_array($propertyName, static::DATE_FIELDS) && [is_string($setValue) || is_int($setValue)]) {
-				$setValue = Date::parse($setValue);
-			}
-			$this->{$propertyName} = $setValue;
-			return $this;
-		}
-		throw new InternalException("Undefined method $name");
-	}
+    /**
+     * Возможность использовать цепочку вызовов ->setField1($value1)->setField2($value2)
+     *
+     * @param string $name
+     * @param array $arguments
+     * @return $this
+     * @throws InternalException
+     */
+    public function __call(string $name, array $arguments = [])
+    {
+        $prefix = 'set';
+        if (Strings::startsWith($name, $prefix)) {
+            $propertyName = lcfirst(Strings::replacePrefix($name, $prefix));
+            if (empty($this->_allFieldNames[$propertyName])) {
+                throw new InternalException("Undefined property $propertyName");
+            }
+            if (count($arguments) !== 1) {
+                throw new InternalException("Invalid argument count when calling $name");
+            }
+            $setValue = $arguments[0];
+            if (in_array($propertyName, static::TIME_FIELDS) && [is_string($setValue) || is_int($setValue)]) {
+                $setValue = Time::parse($setValue);
+            } elseif (in_array($propertyName, static::DATE_FIELDS) && [is_string($setValue) || is_int($setValue)]) {
+                $setValue = Date::parse($setValue);
+            }
+            $this->{$propertyName} = $setValue;
+            return $this;
+        }
+        throw new InternalException("Undefined method $name");
+    }
 
-	/**
-	 * Преобразуем объект в массив, используется только для юнит тестов
-	 *
-	 * @return array
-	 */
-	public function toArray(): array
-	{
-		return json_decode(json_encode($this), true);
-	}
+    /**
+     * Преобразуем объект в массив, используется только для юнит тестов
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return json_decode(json_encode($this), true);
+    }
 
-	/**
-	 * Преобразуем в json строку
-	 *
-	 * @return string
-	 */
-	public function toJson(): string
-	{
-		$options = JSON_UNESCAPED_UNICODE;
-		if (Env::isDevelopment()) {
-			$options |= JSON_PRETTY_PRINT;
-		}
-		return Arrays::encode($this, $options);
-	}
+    /**
+     * Преобразуем в json строку
+     *
+     * @return string
+     */
+    public function toJson(): string
+    {
+        $options = JSON_UNESCAPED_UNICODE;
+        if (Env::isDevelopment()) {
+            $options |= JSON_PRETTY_PRINT;
+        }
+        return Arrays::encode($this, $options);
+    }
 
-	/**
-	 * json_encode
-	 *
-	 * @return array
-	 */
-	public function jsonSerialize(): array
-	{
-		$result = [];
-		foreach ($this->_exportFieldNames as $fieldName) {
-			$result[$fieldName] = $this->{$fieldName};
-		}
-		return $result;
-	}
+    /**
+     * json_encode
+     *
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        $result = [];
+        foreach ($this->_exportFieldNames as $fieldName) {
+            $result[$fieldName] = $this->{$fieldName};
+        }
+        return $result;
+    }
 
-	/**
-	 * Заполняем список полей на экспорт
-	 */
-	private function _fillExportedFields()
-	{
-		$refClass = new \ReflectionClass(static::class);
-		$properties = $refClass->getProperties(\ReflectionProperty::IS_PUBLIC);
-		foreach ($properties as $property) {
-			$propertyName = $property->getName();
-			if (!in_array($propertyName, static::EXCLUDE_EXPORT_PROPS)) {
-				$this->_exportFieldNames[] = $propertyName;
-			}
-			$this->_allFieldNames[$propertyName] = $propertyName;
-		}
-	}
+    /**
+     * Заполняем список полей на экспорт
+     */
+    private function _fillExportedFields()
+    {
+        $refClass = new \ReflectionClass(static::class);
+        $properties = $refClass->getProperties(\ReflectionProperty::IS_PUBLIC);
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+            if (!in_array($propertyName, static::EXCLUDE_EXPORT_PROPS)) {
+                $this->_exportFieldNames[] = $propertyName;
+            }
+            $this->_allFieldNames[$propertyName] = $propertyName;
+        }
+    }
 
-	/** @inheritdoc */
-	public function offsetExists($offset): bool
-	{
-		$this->_triggerDeprecatedError($offset);
-		return property_exists($this, $offset);
-	}
+    /** @inheritdoc */
+    public function offsetExists($offset): bool
+    {
+        $this->_triggerDeprecatedError($offset);
+        return property_exists($this, $offset);
+    }
 
-	/** @inheritdoc */
-	public function offsetGet($offset)
-	{
-		$this->_triggerDeprecatedError($offset);
-		return $this->{$offset};
-	}
+    /** @inheritdoc */
+    public function offsetGet($offset)
+    {
+        $this->_triggerDeprecatedError($offset);
+        return $this->{$offset};
+    }
 
-	/** @inheritdoc */
-	public function offsetSet($offset, $value)
-	{
-		$this->_triggerDeprecatedError($offset);
-		$this->{$offset} = $value;
-	}
+    /** @inheritdoc */
+    public function offsetSet($offset, $value)
+    {
+        $this->_triggerDeprecatedError($offset);
+        $this->{$offset} = $value;
+    }
 
-	/** @inheritdoc */
-	public function offsetUnset($offset)
-	{
-		$this->_triggerDeprecatedError($offset);
-		$this->offsetSet($offset, null);
-	}
+    /** @inheritdoc */
+    public function offsetUnset($offset)
+    {
+        $this->_triggerDeprecatedError($offset);
+        $this->offsetSet($offset, null);
+    }
 
-	/**
-	 * Выводим сообщение о недопустимости обращения как к элементу массива
-	 *
-	 * @param string $offset
-	 */
-	private function _triggerDeprecatedError(string $offset)
-	{
-		$trace = Debugger::trace(['start' => 2, 'depth' => 3, 'format' => 'array']);
-		$file = str_replace([CAKE_CORE_INCLUDE_PATH, ROOT], '', $trace[0]['file']);
-		$line = $trace[0]['line'];
+    /**
+     * Выводим сообщение о недопустимости обращения как к элементу массива
+     *
+     * @param string $offset
+     */
+    private function _triggerDeprecatedError(string $offset)
+    {
+        $trace = Debugger::trace(['start' => 2, 'depth' => 3, 'format' => 'array']);
+        $file = str_replace([CAKE_CORE_INCLUDE_PATH, ROOT], '', $trace[0]['file']);
+        $line = $trace[0]['line'];
 
-		Log::error("Deprecated array access to property " . static::class . "::" . $offset . " in $file($line)", E_USER_ERROR);
-	}
+        Log::error("Deprecated array access to property " . static::class . "::" . $offset . " in $file($line)", E_USER_ERROR);
+    }
 }

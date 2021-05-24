@@ -12,5 +12,5 @@ use ArtSkills\ValueObject\ValueObject;
 
 class TestValueObject extends ValueObject
 {
-	public $testProperty = 'testData';
+    public $testProperty = 'testData';
 }

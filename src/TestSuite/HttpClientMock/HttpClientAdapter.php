@@ -2,7 +2,6 @@
 
 namespace ArtSkills\TestSuite\HttpClientMock;
 
-
 use Cake\Http\Client\Adapter\Stream;
 use Cake\Http\Client\Request;
 use Cake\Http\Client\Response;
@@ -14,82 +13,82 @@ use Cake\Http\Client\Response;
  */
 class HttpClientAdapter extends Stream
 {
-	/**
-	 * Полная инфа по текущему взаимодействию (запрос и ответ)
-	 *
-	 * @var array|null
-	 */
-	private $_currentRequestData = null;
+    /**
+     * Полная инфа по текущему взаимодействию (запрос и ответ)
+     *
+     * @var array|null
+     */
+    private $_currentRequestData = null;
 
-	/**
-	 * Выводить ли информацию о незамоканных запросах
-	 *
-	 * @var bool
-	 */
-	private static $_debugRequests = true;
+    /**
+     * Выводить ли информацию о незамоканных запросах
+     *
+     * @var bool
+     */
+    private static $_debugRequests = true;
 
-	/**
-	 * Все запросы проверяются на подмену, а также логипуются
-	 *
-	 * @param Request $request
-	 * @return array
-	 */
-	protected function _send(Request $request)
-	{
-		$this->_currentRequestData = [
-			'request' => $request,
-			'response' => '',
-		];
+    /**
+     * Все запросы проверяются на подмену, а также логипуются
+     *
+     * @param Request $request
+     * @return array
+     */
+    protected function _send(Request $request)
+    {
+        $this->_currentRequestData = [
+            'request' => $request,
+            'response' => '',
+        ];
 
-		$mockData = HttpClientMocker::getMockedData($request);
-		if ($mockData !== null) {
-			return $this->createResponses([
-				'HTTP/1.1 ' . $mockData['status'],
-				'Server: nginx/1.2.1',
-			], $mockData['response']);
-		} else {
-			/** @var Response[] $result */
-			$result = parent::_send($request);
+        $mockData = HttpClientMocker::getMockedData($request);
+        if ($mockData !== null) {
+            return $this->createResponses([
+                'HTTP/1.1 ' . $mockData['status'],
+                'Server: nginx/1.2.1',
+            ], $mockData['response']);
+        } else {
+            /** @var Response[] $result */
+            $result = parent::_send($request);
 
-			if (self::$_debugRequests) {
-				file_put_contents('php://stderr', "==============================================================\n");
-				file_put_contents('php://stderr', 'Do ' . $request->getMethod() . ' request to ' . $request->getUri() . ', Body: ' . $request->getBody() . "\n");
-				file_put_contents('php://stderr', "Response: \n" . $result[0]->getStringBody() . "\n");
-				file_put_contents('php://stderr', "==============================================================\n");
-			}
+            if (self::$_debugRequests) {
+                file_put_contents('php://stderr', "==============================================================\n");
+                file_put_contents('php://stderr', 'Do ' . $request->getMethod() . ' request to ' . $request->getUri() . ', Body: ' . $request->getBody() . "\n");
+                file_put_contents('php://stderr', "Response: \n" . $result[0]->getStringBody() . "\n");
+                file_put_contents('php://stderr', "==============================================================\n");
+            }
 
-			return $result;
-		}
-	}
+            return $result;
+        }
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function createResponses($headers, $content)
-	{
-		$result = parent::createResponses($headers, $content);
+    /**
+     * @inheritdoc
+     */
+    public function createResponses($headers, $content)
+    {
+        $result = parent::createResponses($headers, $content);
 
-		$this->_currentRequestData['response'] = end($result);
+        $this->_currentRequestData['response'] = end($result);
 
-		HttpClientMocker::addSniff($this->_currentRequestData);
-		$this->_currentRequestData = null;
+        HttpClientMocker::addSniff($this->_currentRequestData);
+        $this->_currentRequestData = null;
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Включаем вывод запросов в консоль
-	 */
-	public static function enableDebug()
-	{
-		self::$_debugRequests = true;
-	}
+    /**
+     * Включаем вывод запросов в консоль
+     */
+    public static function enableDebug()
+    {
+        self::$_debugRequests = true;
+    }
 
-	/**
-	 * Выключаем вывод запросов в консоль
-	 */
-	public static function disableDebug()
-	{
-		self::$_debugRequests = false;
-	}
+    /**
+     * Выключаем вывод запросов в консоль
+     */
+    public static function disableDebug()
+    {
+        self::$_debugRequests = false;
+    }
 }

@@ -1,35 +1,55 @@
 {
-	"name": "artskills/common",
-	"description": "CakePHP utils",
-	"type": "library",
-	"require": {
-		"php": "^7.4",
-		"ext-json": "*",
-		"ext-simplexml": "*",
-		"ext-curl": "*",
-		"ext-pdo": "*",
-		"cakephp/cakephp": "3.*",
-		"robmorgan/phinx": "^0.8.1",
-		"sentry/sentry": "^1.1",
-		"jan-swiecki/simple-annotations": "*",
-		"ext-intl": "*",
-		"ext-zend-opcache": "*"
-	},
-	"require-dev": {
-		"ext-runkit7": "*",
-		"ext-iconv": "*",
-		"phpunit/phpunit": "^6",
-		"cakephp/debug_kit": "~3.1"
-	},
-	"autoload": {
-		"psr-4": {
-			"ArtSkills\\": "src"
-		}
-	},
-	"autoload-dev": {
-		"psr-4": {
-			"ArtSkills\\Test\\": "tests",
-			"TestApp\\": "test-app"
-		}
-	}
+  "name": "artskills/common",
+  "description": "CakePHP utils",
+  "type": "library",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git://github.com/vovantune/eggheads-code-style"
+    }
+  ],
+  "require": {
+    "php": "^7.4",
+    "ext-json": "*",
+    "ext-simplexml": "*",
+    "ext-curl": "*",
+    "ext-pdo": "*",
+    "cakephp/cakephp": "3.*",
+    "robmorgan/phinx": "^0.8.1",
+    "sentry/sentry": "^1.1",
+    "jan-swiecki/simple-annotations": "*",
+    "ext-intl": "*",
+    "ext-zend-opcache": "*"
+  },
+  "require-dev": {
+    "ext-runkit7": "*",
+    "ext-iconv": "*",
+    "phpunit/phpunit": "^6",
+    "cakephp/debug_kit": "~3.1",
+    "eggheads/eggheads-code-style": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "ArtSkills\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ArtSkills\\Test\\": "tests",
+      "TestApp\\": "test-app"
+    }
+  },
+  "scripts": {
+    "post-install-cmd": "App\\Console\\Installer::postInstall",
+    "post-create-project-cmd": "App\\Console\\Installer::postInstall",
+    "check": [
+      "@cs-check",
+      "@phpmd-check",
+      "@test"
+    ],
+    "cs-check": "phpcs --colors -p src/ tests/",
+    "cs-fix": "phpcbf --colors -p src/ tests/",
+    "test": "phpunit --colors=always -c tests/phpunit.xml",
+    "phpmd-check": "vendor/bin/phpmd src/,tests/ text phpmd-ruleset.xml"
+  }
 }

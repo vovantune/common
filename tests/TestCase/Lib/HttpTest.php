@@ -13,100 +13,100 @@ class HttpTest extends AppTestCase
 {
 
 
-	/**
-	 * Проверка работы Json
-	 *
-	 * @throws \Exception
-	 */
-	public function testGetJson()
-	{
-		$testJson = ['thisIs' => 'Json test'];
-		HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
-			->singleCall()
-			->willReturnJson($testJson);
-		self::assertEquals($testJson, Http::getJson('http://testapi.com'), 'Результаты запроса не совпадают');
+    /**
+     * Проверка работы Json
+     *
+     * @throws \Exception
+     */
+    public function testGetJson()
+    {
+        $testJson = ['thisIs' => 'Json test'];
+        HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
+            ->singleCall()
+            ->willReturnJson($testJson);
+        self::assertEquals($testJson, Http::getJson('http://testapi.com'), 'Результаты запроса не совпадают');
 
-		// запрос обломался
-		MethodMocker::mock(Http::class, '_getRequest')
-			->willReturnValue(null);
+        // запрос обломался
+        MethodMocker::mock(Http::class, '_getRequest')
+            ->willReturnValue(null);
 
-		self::assertNull(Http::getJson('http://testapi.com'));
-	}
+        self::assertNull(Http::getJson('http://testapi.com'));
+    }
 
-	/**
-	 * Проверка работы получения строки
-	 *
-	 * @throws \Exception
-	 */
-	public function testGetContent()
-	{
-		$testString = 'lala';
-		HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
-			->singleCall()
-			->willReturnString($testString);
-		self::assertEquals($testString, Http::getContent('http://testapi.com'), 'Результаты запроса не совпадают');
+    /**
+     * Проверка работы получения строки
+     *
+     * @throws \Exception
+     */
+    public function testGetContent()
+    {
+        $testString = 'lala';
+        HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
+            ->singleCall()
+            ->willReturnString($testString);
+        self::assertEquals($testString, Http::getContent('http://testapi.com'), 'Результаты запроса не совпадают');
 
-		// запрос обломался
-		MethodMocker::mock(Http::class, '_getRequest')
-			->willReturnValue(null);
+        // запрос обломался
+        MethodMocker::mock(Http::class, '_getRequest')
+            ->willReturnValue(null);
 
-		self::assertNull(Http::getContent('http://testapi.com'));
-	}
+        self::assertNull(Http::getContent('http://testapi.com'));
+    }
 
-	/**
-	 * Проверка работы получения строки
-	 *
-	 * @throws \Exception
-	 */
-	public function testPostContent()
-	{
-		$testJson = ['thisIs' => 'Json test'];
-		$testData = ['testData' => '123'];
+    /**
+     * Проверка работы получения строки
+     *
+     * @throws \Exception
+     */
+    public function testPostContent()
+    {
+        $testJson = ['thisIs' => 'Json test'];
+        $testData = ['testData' => '123'];
 
-		HttpClientMocker::mockPost('http://testapi.com', $testData)
-			->singleCall()
-			->willReturnJson($testJson);
-		self::assertEquals($testJson, Http::postJson('http://testapi.com', $testData), 'Результаты запроса не совпадают');
+        HttpClientMocker::mockPost('http://testapi.com', $testData)
+            ->singleCall()
+            ->willReturnJson($testJson);
+        self::assertEquals($testJson, Http::postJson('http://testapi.com', $testData), 'Результаты запроса не совпадают');
 
-		// запрос обломался
-		MethodMocker::mock(\Cake\Http\Client::class, 'post')
-			->willReturnValue(null);
+        // запрос обломался
+        MethodMocker::mock(\Cake\Http\Client::class, 'post')
+            ->willReturnValue(null);
 
-		self::assertNull(Http::postJson('http://testapi.com', $testData));
-	}
+        self::assertNull(Http::postJson('http://testapi.com', $testData));
+    }
 
-	/**
-	 * Проверка работы получения строки
-	 *
-	 * @throws \Exception
-	 */
-	public function testPutContent()
-	{
-		$testJson = ['thisIs' => 'Json test'];
-		$testData = ['testData' => '123'];
+    /**
+     * Проверка работы получения строки
+     *
+     * @throws \Exception
+     */
+    public function testPutContent()
+    {
+        $testJson = ['thisIs' => 'Json test'];
+        $testData = ['testData' => '123'];
 
-		HttpClientMocker::mock('http://testapi.com', Request::METHOD_PUT)
-			->singleCall()
-			->expectBody($testData)
-			->willReturnJson($testJson);
-		self::assertEquals($testJson, Http::putJson('http://testapi.com', $testData), 'Результаты запроса не совпадают');
+        HttpClientMocker::mock('http://testapi.com', Request::METHOD_PUT)
+            ->singleCall()
+            ->expectBody($testData)
+            ->willReturnJson($testJson);
+        self::assertEquals($testJson, Http::putJson('http://testapi.com', $testData), 'Результаты запроса не совпадают');
 
-		// запрос обломался
-		MethodMocker::mock(\Cake\Http\Client::class, 'put')
-			->willReturnValue(null);
+        // запрос обломался
+        MethodMocker::mock(\Cake\Http\Client::class, 'put')
+            ->willReturnValue(null);
 
-		self::assertNull(Http::putJson('http://testapi.com', $testData));
-	}
+        self::assertNull(Http::putJson('http://testapi.com', $testData));
+    }
 
 
-	/**
-	 * Проверка работы получения строки
-	 *
-	 * @throws \Exception
-	 */
-	public function testGetXml()
-	{
-		$testXml = '<?xml version="1.0" encoding="utf-8"?>
+    /**
+     * Проверка работы получения строки
+     *
+     * @throws \Exception
+     */
+    public function testGetXml()
+    {
+        $testXml = '<?xml version="1.0" encoding="utf-8"?>
 					<!DOCTYPE recipe>
 					<recipe name="хлеб" preptime="5min" cooktime="180min">
 					   <title>
@@ -135,26 +135,28 @@ class HttpTest extends AppTestCase
 						 </step>
 					   </instructions>
 					</recipe>';
-		HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
-			->singleCall()
-			->willReturnString($testXml);
+        HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
+            ->singleCall()
+            ->willReturnString($testXml);
 
-		$ipDataXml = simplexml_load_string($testXml);
-		self::assertEquals(
-			$ipDataXml->asXML(), Http::getXml('http://testapi.com')->asXML(), 'Результаты запроса не совпадают'
-		);
+        $ipDataXml = simplexml_load_string($testXml);
+        self::assertEquals(
+            $ipDataXml->asXML(),
+            Http::getXml('http://testapi.com')->asXML(),
+            'Результаты запроса не совпадают'
+        );
 
-		// запрос обломался
-		MethodMocker::mock(Http::class, '_getRequest')
-			->willReturnValue(null);
+        // запрос обломался
+        MethodMocker::mock(Http::class, '_getRequest')
+            ->willReturnValue(null);
 
-		self::assertNull(Http::getXml('http://testapi.com'));
-	}
+        self::assertNull(Http::getXml('http://testapi.com'));
+    }
 
-	/** POST xml запрос */
-	public function testPostXML()
-	{
-		$testXml = '<?xml version="1.0" encoding="utf-8"?>
+    /** POST xml запрос */
+    public function testPostXML()
+    {
+        $testXml = '<?xml version="1.0" encoding="utf-8"?>
 					<!DOCTYPE recipe>
 					<recipe name="хлеб" preptime="5min" cooktime="180min">
 					   <title>
@@ -184,37 +186,39 @@ class HttpTest extends AppTestCase
 					   </instructions>
 					</recipe>';
 
-		$expArgs = [
-			'arg1' => 1,
-			'arg2' => 'two',
-		];
+        $expArgs = [
+            'arg1' => 1,
+            'arg2' => 'two',
+        ];
 
-		HttpClientMocker::mock('http://testapi.com', Request::METHOD_POST)
-			->singleCall()
-			->expectBody($expArgs)
-			->willReturnString($testXml);
+        HttpClientMocker::mock('http://testapi.com', Request::METHOD_POST)
+            ->singleCall()
+            ->expectBody($expArgs)
+            ->willReturnString($testXml);
 
-		$ipDataXml = simplexml_load_string($testXml);
-		self::assertEquals(
-			$ipDataXml->asXML(), Http::postXml('http://testapi.com', $expArgs)->asXML(), 'Результаты запроса не совпадают'
-		);
-	}
+        $ipDataXml = simplexml_load_string($testXml);
+        self::assertEquals(
+            $ipDataXml->asXML(),
+            Http::postXml('http://testapi.com', $expArgs)->asXML(),
+            'Результаты запроса не совпадают'
+        );
+    }
 
-	/**
-	 * Проверяем загрузку на сесуществующем пути
-	 */
-	public function testDownloadError()
-	{
-		$file = Http::downloadFile('file:///Такого пути не существует');
-		self::assertEmpty($file, 'Я сказал не существует!');
-	}
+    /**
+     * Проверяем загрузку на сесуществующем пути
+     */
+    public function testDownloadError()
+    {
+        $file = Http::downloadFile('file:///Такого пути не существует');
+        self::assertEmpty($file, 'Я сказал не существует!');
+    }
 
-	/**
-	 * Проверяем попытку записи в никуда
-	 */
-	public function testWriteError()
-	{
-		$file = Http::downloadFile('file:///' . __FILE__, '/404Folder/file');
-		self::assertEmpty($file, 'Этот файл не должен был появится');
-	}
+    /**
+     * Проверяем попытку записи в никуда
+     */
+    public function testWriteError()
+    {
+        $file = Http::downloadFile('file:///' . __FILE__, '/404Folder/file');
+        self::assertEmpty($file, 'Этот файл не должен был появится');
+    }
 }
