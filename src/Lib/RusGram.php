@@ -47,7 +47,7 @@ class RusGram
      * Формируем строку даты в русском формате
      *
      * @param string $format FI - месяц в именительном педеже, FR - месяц в родительном падеже, M - краткое название
-     *     месяца, l - день недели, D - краткий день недели с указанием "сегодня" и "завтра"
+     *                       месяца, l - день недели, D - краткий день недели с указанием "сегодня" и "завтра"
      * @param string|int $date дата в формате unixtime или Y-m-d строка
      * @return string
      */
@@ -176,7 +176,7 @@ class RusGram
                 if (!intval($v)) {
                     continue;
                 }
-                $uk = sizeof($unit) - $uk - 1; // unit key
+                $uk = count($unit) - $uk - 1; // unit key
                 $gender = $unit[$uk][3];
                 [$i1, $i2, $i3] = array_map('intval', str_split($v, 1));
                 // mega-logic

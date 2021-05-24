@@ -176,7 +176,7 @@ class Deployer
      * конструктор
      *
      * @param array $config Конфиг. ключ => начение, клиючи - названия свойств этого класса без подчёркивания
-     * описание в [доках](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
+     *                      описание в [доках](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
      * @throws InternalException
      */
     public function __construct(array $config = [])

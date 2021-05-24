@@ -44,7 +44,7 @@ class Shell
      * @param string|string[] $commands
      * @param bool $withErrors перенаправлять stderr в stdout
      * @param bool $stopOnFail если передан список команд, то останавливаться ли на ошибке (склеивать команды через && или ;)
-     * Но если свалится смена директорий, то дальше не пойдёт независимо от этого параметра
+     *                         Но если свалится смена директорий, то дальше не пойдёт независимо от этого параметра
      * @return array [успех, вывод, результирующая команда, код возврата]
      */
     public static function execFromDir($directory, $commands, $withErrors = true, $stopOnFail = true)

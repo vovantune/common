@@ -224,7 +224,7 @@ trait TestCaseTrait
      *
      * @param Time|string|null $time
      * @param bool $clearMicroseconds убрать из времени микросекунды (PHP7).
-     * Полезно тем, что в базу микросекунды всё равно не сохранятся
+     *                                Полезно тем, что в базу микросекунды всё равно не сохранятся
      * @return Time
      */
     protected function _setTestNow($time = null, $clearMicroseconds = true)
@@ -324,8 +324,8 @@ trait TestCaseTrait
     /**
      * Содержимое файла соответствует ожидаемой строке
      *
-     * @param string $actualFile
      * @param string $expectedString
+     * @param string $actualFile
      * @param string $message
      * @param bool $canonicalize
      * @param bool $ignoreCase

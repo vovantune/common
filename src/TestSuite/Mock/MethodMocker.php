@@ -46,7 +46,7 @@ class MethodMocker
      * @param string $className
      * @param string $methodName
      * @param null|callable $sniffAction функция, вызываемая при вызове подслушиваемого метода: function($args,
-     *     $originalResult) {}, $originalResult - результат выполнения подслушиваемого метода
+     *                                   $originalResult) {}, $originalResult - результат выполнения подслушиваемого метода
      * @return MethodMockerEntity
      * @throws AssertionFailedError|\Exception
      */

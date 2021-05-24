@@ -311,9 +311,9 @@ class EntityBuilder
     private static function _getClassTemplate($type)
     {
         return '\\' . static::$_config->modelNamespace . '\\' . $type . '\\' . self::_getShortClassName(
-                static::ENTITY_TEMPLATE_STRING,
-                $type
-            );
+            static::ENTITY_TEMPLATE_STRING,
+            $type
+        );
     }
 
     /**
@@ -479,9 +479,9 @@ class EntityBuilder
                 }
 
                 if (!$hasMethod && preg_match(
-                        '/\s\*\s@method\s.+' . $tplMethod . '\(.+/',
-                        $commLine
-                    )
+                    '/\s\*\s@method\s.+' . $tplMethod . '\(.+/',
+                    $commLine
+                )
                 ) { // есть описание такого метода, но не такое, как надо
                     $commArr[$commIndex] = ' * ' . $template;
                     $hasMethod = true;
@@ -587,10 +587,10 @@ class EntityBuilder
         foreach ($aliases as $alias => $field) {
             $aliasProperty .= "        '$alias' => '$field',\n";
             $curTblFields[$alias] = str_replace(
-                    '$' . $field,
-                    '$' . $alias,
-                    $curTblFields[$field]
-                ) . " (алиас поля $field)";
+                '$' . $field,
+                '$' . $alias,
+                $curTblFields[$field]
+            ) . " (алиас поля $field)";
         }
         $aliasProperty .= "    ";
 
@@ -631,9 +631,9 @@ class EntityBuilder
                 $hasChanges = false;
                 foreach ($commentsArr as $key => $comm) { // удаляем ненужные свойства
                     if ((stristr($comm, '@property') || stristr($comm, '@tableComment')) && !in_array(
-                            $comm,
-                            $curTblFields
-                        )
+                        $comm,
+                        $curTblFields
+                    )
                     ) {
                         unset($commentsArr[$key]);
                         $hasChanges = true;
@@ -694,12 +694,12 @@ class EntityBuilder
             $bindingKeys = $assoc->getBindingKey();
 
             $result[$propertyName] = ' * @property ' . $className . (in_array(
-                    $assoc->type(),
-                    [
+                $assoc->type(),
+                [
                         'oneToMany',
                         'manyToMany',
                     ]
-                ) ? '[]' : '') . ' $' . $propertyName . ' `' .
+            ) ? '[]' : '') . ' $' . $propertyName . ' `' .
                 implode('`, `', (array)$foreignKeys) . '` => `' .
                 implode('`, `', (array)$bindingKeys) . '`';
         }

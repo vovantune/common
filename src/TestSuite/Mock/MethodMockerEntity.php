@@ -142,10 +142,7 @@ class MethodMockerEntity
     /**
      * Кидаемый ексепшн
      *
-     * @var array {
-     * @var string $message
-     * @var string $class
-     * }
+     * @var array {$message: string, $class: string}
      */
     private $_exceptionConf = null;
 
@@ -382,7 +379,7 @@ class MethodMockerEntity
      * Ожидаемые аргументы на несколько вызовов.
      *
      * @param array $argsList - Массив списков(массивов) аргументов на каждый вызов.
-     * Если ожидается вызов без аргументов, то вместо массива аргументов - false.
+     *                        Если ожидается вызов без аргументов, то вместо массива аргументов - false.
      * @return $this
      */
     public function expectArgsList(array $argsList): self
