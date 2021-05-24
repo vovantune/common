@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "60808c4e3bf108c76f6ce37751037735",
+    "content-hash": "48cffe3f9b0e6cf6bca7b913805a2926",
     "packages": [
         {
             "name": "aura/intl",
@@ -567,16 +567,16 @@
         },
         {
             "name": "robmorgan/phinx",
-            "version": "v0.6.6",
+            "version": "v0.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/phinx.git",
-                "reference": "cc97b79f62c2180caba0be1d3744a335a296a678"
+                "reference": "7a19de5bebc59321edd9613bc2a667e7f96224ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/phinx/zipball/cc97b79f62c2180caba0be1d3744a335a296a678",
-                "reference": "cc97b79f62c2180caba0be1d3744a335a296a678",
+                "url": "https://api.github.com/repos/cakephp/phinx/zipball/7a19de5bebc59321edd9613bc2a667e7f96224ec",
+                "reference": "7a19de5bebc59321edd9613bc2a667e7f96224ec",
                 "shasum": ""
             },
             "require": {
@@ -629,7 +629,7 @@
                 "migrations",
                 "phinx"
             ],
-            "time": "2017-01-23T08:53:20+00:00"
+            "time": "2017-06-05T13:30:19+00:00"
         },
         {
             "name": "sentry/sentry",
@@ -1277,51 +1277,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "cakephp/cakephp-codesniffer",
-            "version": "3.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cakephp/cakephp-codesniffer.git",
-                "reference": "7998a191e787fd5b68cb635d7050cb0d7b55e1a1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/cakephp-codesniffer/zipball/7998a191e787fd5b68cb635d7050cb0d7b55e1a1",
-                "reference": "7998a191e787fd5b68cb635d7050cb0d7b55e1a1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.6",
-                "squizlabs/php_codesniffer": "^3.0.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "<6.0"
-            },
-            "type": "phpcodesniffer-standard",
-            "autoload": {
-                "psr-4": {
-                    "CakePHP\\": "CakePHP/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "CakePHP Community",
-                    "homepage": "https://github.com/cakephp/cakephp-codesniffer/graphs/contributors"
-                }
-            ],
-            "description": "CakePHP CodeSniffer Standards",
-            "homepage": "https://cakephp.org",
-            "keywords": [
-                "codesniffer",
-                "framework"
-            ],
-            "time": "2019-12-07T03:02:34+00:00"
-        },
         {
             "name": "cakephp/debug_kit",
             "version": "3.22.4",
@@ -3432,57 +3387,6 @@
                 "phar"
             ],
             "time": "2020-07-07T18:42:57+00:00"
-        },
-        {
-            "name": "squizlabs/php_codesniffer",
-            "version": "3.5.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "9d583721a7157ee997f235f327de038e7ea6dac4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/9d583721a7157ee997f235f327de038e7ea6dac4",
-                "reference": "9d583721a7157ee997f235f327de038e7ea6dac4",
-                "shasum": ""
-            },
-            "require": {
-                "ext-simplexml": "*",
-                "ext-tokenizer": "*",
-                "ext-xmlwriter": "*",
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
-            },
-            "bin": [
-                "bin/phpcs",
-                "bin/phpcbf"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.x-dev"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Greg Sherwood",
-                    "role": "lead"
-                }
-            ],
-            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
-            "keywords": [
-                "phpcs",
-                "standards"
-            ],
-            "time": "2020-10-23T02:01:07+00:00"
         },
         {
             "name": "symfony/finder",
