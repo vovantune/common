@@ -7,6 +7,7 @@ use ArtSkills\Filesystem\File;
 use ArtSkills\Filesystem\Folder;
 use ArtSkills\Lib\Misc;
 use ArtSkills\Traits\Library;
+use Cake\I18n\Date;
 use Cake\I18n\Time;
 use DocBlockReader\Reader;
 
@@ -25,6 +26,7 @@ class TableDocumentation
 
     const JS_TYPES = [
         '\\' . Time::class => 'string',
+        '\\' . Date::class => 'string',
         'array' => 'Array',
     ];
 
