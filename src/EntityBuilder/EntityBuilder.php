@@ -14,12 +14,15 @@ use ArtSkills\Filesystem\File;
 use ArtSkills\Filesystem\Folder;
 use Cake\I18n\Date;
 use Cake\I18n\Time;
+use Cake\ORM\Association;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
 use DocBlockReader\Reader;
+use Exception;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 
 /**
  * Конструктор сущностей для CakePHP
@@ -162,7 +165,7 @@ class EntityBuilder
      * Генерим сущности и связи
      *
      * @return bool
-     * @throws InternalException
+     * @throws InternalException|ReflectionException
      */
     public static function build(): bool
     {
@@ -209,7 +212,7 @@ class EntityBuilder
      * @param array<string, string> $fields field => comment
      * @return array<string, string> alias => field
      */
-    protected static function _getAliases(string $entityName, $fields): array
+    protected static function _getAliases(string $entityName, array $fields): array
     {
         $aliases = [];
         $className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
@@ -233,6 +236,8 @@ class EntityBuilder
      * @param string $entityName
      * @param array<string, string> $fields field => comment
      * @return array<string, string> ['имя поля' => 'тип']
+     * @throws ReflectionException
+     * @throws Exception
      */
     private static function _getVirtualFields(string $entityName, array $fields): array
     {
@@ -243,7 +248,7 @@ class EntityBuilder
             $fields = Arrays::keysFromValues(array_keys($fields));
             $refClass = new ReflectionClass($className);
             $getPrefix = '_get';
-            foreach ($refClass->getMethods(\ReflectionMethod::IS_PROTECTED) as $method) {
+            foreach ($refClass->getMethods(ReflectionMethod::IS_PROTECTED) as $method) {
                 if (Strings::startsWith($method->name, $getPrefix)) {
                     $fieldName = lcfirst(Strings::replacePrefix($method->name, $getPrefix));
                     if (!empty($fields[$fieldName])) {
@@ -314,7 +319,8 @@ class EntityBuilder
      */
     private static function _getClassTemplate(string $type): string
     {
-        return '\\' . static::$_config->modelNamespace . '\\' . $type . '\\' . self::_getShortClassName(
+        return '\\' . static::$_config->modelNamespace . '\\' . $type . '\\' .
+            self::_getShortClassName(
                 static::ENTITY_TEMPLATE_STRING,
                 $type
             );
@@ -486,10 +492,7 @@ class EntityBuilder
                     $hasMethod = true;
                 }
 
-                if (!$hasMethod && preg_match(
-                        '/\s\*\s@method\s.+' . $tplMethod . '\(.+/',
-                        $commLine
-                    )
+                if (!$hasMethod && preg_match('/\s\*\s@method\s.+' . $tplMethod . '\(.+/', $commLine)
                 ) { // есть описание такого метода, но не такое, как надо
                     $commArr[$commIndex] = ' * ' . $template;
                     $hasMethod = true;
@@ -520,7 +523,7 @@ class EntityBuilder
     private static function _getClassPublicMethods(ReflectionClass $refClass): array
     {
         $methods = [];
-        foreach ($refClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+        foreach ($refClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
             if ($method->class == $refClass->getName()) {
                 $methods[] = $method->name;
             }
@@ -583,6 +586,7 @@ class EntityBuilder
      *
      * @param string $entityName
      * @return bool
+     * @throws ReflectionException
      */
     private static function _createEntityClass(string $entityName): bool
     {
@@ -594,11 +598,7 @@ class EntityBuilder
         $aliasProperty = "\n";
         foreach ($aliases as $alias => $field) {
             $aliasProperty .= "        '$alias' => '$field',\n";
-            $curTblFields[$alias] = str_replace(
-                    '$' . $field,
-                    '$' . $alias,
-                    $curTblFields[$field]
-                ) . " (алиас поля $field)";
+            $curTblFields[$alias] = str_replace('$' . $field, '$' . $alias, $curTblFields[$field]) . " (алиас поля $field)";
         }
         $aliasProperty .= "    ";
 
@@ -638,10 +638,8 @@ class EntityBuilder
                 $toAddComments = array_diff($curTblFields, $commentsArr);
                 $hasChanges = false;
                 foreach ($commentsArr as $key => $comm) { // удаляем ненужные свойства
-                    if ((stristr($comm, '@property') || stristr($comm, '@tableComment')) && !in_array(
-                            $comm,
-                            $curTblFields
-                        )
+                    if ((stristr($comm, '@property') || stristr($comm, '@tableComment'))
+                        && !in_array($comm, $curTblFields)
                     ) {
                         unset($commentsArr[$key]);
                         $hasChanges = true;
@@ -694,14 +692,15 @@ class EntityBuilder
         }
 
         $associations = $table->associations();
-        /** @type \Cake\ORM\Association $assoc */
+        /** @type Association $assoc */
         foreach ($associations as $assoc) {
             $className = $assoc->getClassName() ? $assoc->getClassName() : $assoc->getName();
             $propertyName = $assoc->getProperty();
             $foreignKeys = $assoc->getForeignKey();
             $bindingKeys = $assoc->getBindingKey();
 
-            $result[$propertyName] = ' * @property ' . $className . (in_array(
+            $result[$propertyName] = ' * @property ' . $className
+                . (in_array(
                     $assoc->type(),
                     [
                         'oneToMany',
@@ -742,6 +741,7 @@ class EntityBuilder
      *
      * @param string[] $tableList
      * @return bool
+     * @throws ReflectionException
      */
     private static function _updateTableNamesFile(array $tableList): bool
     {
