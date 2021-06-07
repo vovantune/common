@@ -121,40 +121,13 @@ class EntityBuilder
     }
 
     /**
-     * Генерим сущности и связи
-     *
-     * @return boolean
-     * @throws InternalException
-     */
-    public static function build()
-    {
-        self::_checkConfig();
-        TableRegistry::getTableLocator()->clear();
-        $tblList = self::_getTableList();
-        $hasChanges = false;
-        foreach ($tblList as $tblName) {
-            if (self::_buildTableDeps($tblName)) {
-                $hasChanges = true;
-            }
-        }
-
-        $namesUpdated = self::_updateTableNamesFile($tblList);
-        if ($namesUpdated) {
-            $hasChanges = true;
-        }
-        TableRegistry::getTableLocator()->clear();
-
-        return $hasChanges;
-    }
-
-    /**
      * Создаём класс таблицы
      *
      * @param string $tableName
      * @return string
      * @throws InternalException
      */
-    public static function createTableClass($tableName)
+    public static function createTableClass(string $tableName): string
     {
         self::_checkConfig();
         $tableName = Inflector::underscore($tableName);
@@ -183,12 +156,39 @@ class EntityBuilder
     }
 
     /**
+     * Генерим сущности и связи
+     *
+     * @return bool
+     * @throws InternalException
+     */
+    public static function build(): bool
+    {
+        self::_checkConfig();
+        TableRegistry::getTableLocator()->clear();
+        $tblList = self::_getTableList();
+        $hasChanges = false;
+        foreach ($tblList as $tblName) {
+            if (self::_buildTableDeps($tblName)) {
+                $hasChanges = true;
+            }
+        }
+
+        $namesUpdated = self::_updateTableNamesFile($tblList);
+        if ($namesUpdated) {
+            $hasChanges = true;
+        }
+        TableRegistry::getTableLocator()->clear();
+
+        return $hasChanges;
+    }
+
+    /**
      * Методы, для которых нужны комменты
      *
      * @param string $tableAlias
-     * @return array
+     * @return array<string, string>
      */
-    protected static function _getRedefineMethods($tableAlias)
+    protected static function _getRedefineMethods(string $tableAlias): array
     {
         $methods = static::$_tableMethods;
         $table = self::_getTable($tableAlias);
@@ -395,9 +395,9 @@ class EntityBuilder
     /**
      * Формируем список таблиц
      *
-     * @return array
+     * @return string[]
      */
-    private static function _getTableList()
+    private static function _getTableList(): array
     {
         $folder = self::_getFolder(self::FILE_TYPE_TABLE);
         $files = $folder->find('.*Table\.php', true);
@@ -416,13 +416,13 @@ class EntityBuilder
      * Строим для таблицы все сущности
      *
      * @param string $tblName
-     * @return boolean
+     * @return bool
      */
-    private static function _buildTableDeps($tblName)
+    private static function _buildTableDeps(string $tblName): bool
     {
         $refClass = new ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tblName);
 
-        if ($refClass->hasProperty('useTable') || $refClass->isAbstract()) {
+        if ($refClass->isAbstract() || $refClass->hasProperty('useTable')) {
             return false;
         }
 
