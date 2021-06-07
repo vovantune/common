@@ -99,7 +99,7 @@ class Controller extends \Cake\Controller\Controller
         if ($this->request->is(self::REQUEST_EXTENSION_JSON)) {
             $this->_setIsJsonAction();
         }
-        $this->_responseExtension = $this->request->getParam('_ext', self::REQUEST_EXTENSION_JSON);
+        $this->_responseExtension = $this->request->getParam('_ext', self::REQUEST_EXTENSION_DEFAULT);
     }
 
     /**
