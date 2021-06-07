@@ -6,20 +6,25 @@ use ArtSkills\Error\InternalException;
 use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;
 use ArtSkills\ValueObject\ValueObject;
+use Cake\Error\PHP7ErrorException;
 use Cake\Http\Response;
 use Cake\Log\Log;
 use Cake\Routing\Router;
 use ReflectionMethod;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodProps)
+ * @SuppressWarnings(PHPMD.MethodArgs)
+ */
 class Controller extends \Cake\Controller\Controller
 {
 
-    const JSON_STATUS_OK = 'ok';
-    const JSON_STATUS_ERROR = 'error';
+    public const JSON_STATUS_OK = 'ok';
+    public const JSON_STATUS_ERROR = 'error';
 
-    const EXTENSION_HTML = 'html';
-    const EXTENSION_JSON = 'json';
-    const EXTENSION_DEFAULT = self::EXTENSION_HTML;
+    protected const REQUEST_EXTENSION_HTML = 'html';
+    protected const REQUEST_EXTENSION_JSON = 'json';
+    protected const REQUEST_EXTENSION_DEFAULT = self::REQUEST_EXTENSION_HTML;
 
     /**
      * Задать редирект в случае ошибки
@@ -34,7 +39,14 @@ class Controller extends \Cake\Controller\Controller
      *
      * @var string[]
      */
-    protected $_jsonResponseActions = [];
+    protected array $_jsonResponseActions = [];
+
+    /**
+     * Формат ответа
+     *
+     * @var string
+     */
+    protected string $_responseExtension = self::REQUEST_EXTENSION_DEFAULT;
 
     /** @inheritdoc */
     public function invokeAction()
@@ -84,12 +96,17 @@ class Controller extends \Cake\Controller\Controller
                 break;
             }
         }
+        if ($this->request->is(self::REQUEST_EXTENSION_JSON)) {
+            $this->_setIsJsonAction();
+        }
+        $this->_responseExtension = $this->request->getParam('_ext', self::REQUEST_EXTENSION_JSON);
     }
 
     /**
      * Задать редирект при обработке ошибок
      *
      * @param string|array|Response $redirect
+     * @throws InternalException
      */
     protected function _setErrorRedirect($redirect)
     {
@@ -115,7 +132,7 @@ class Controller extends \Cake\Controller\Controller
      * @param bool $condition
      * @throws UserException
      */
-    private function _throwUserErrorAnyResponse($message, $redirect, $condition)
+    private function _throwUserErrorAnyResponse(string $message, $redirect, bool $condition)
     {
         if ($condition) {
             if ($redirect !== false) {
@@ -132,7 +149,7 @@ class Controller extends \Cake\Controller\Controller
      * @param bool $condition
      * @throws UserException
      */
-    protected function _throwUserError($message, $condition = true)
+    protected function _throwUserError(string $message, bool $condition = true)
     {
         $this->_throwUserErrorAnyResponse($message, false, $condition);
     }
@@ -144,8 +161,9 @@ class Controller extends \Cake\Controller\Controller
      * @param string|array|Response $redirect
      * @param bool $condition
      * @throws UserException
+     * @throws InternalException
      */
-    protected function _throwUserErrorRedirect($message, $redirect, $condition = true)
+    protected function _throwUserErrorRedirect(string $message, $redirect, bool $condition = true)
     {
         if (empty($redirect)) {
             $this->_throwInternalError('Пустой параметр $redirect');
@@ -160,7 +178,7 @@ class Controller extends \Cake\Controller\Controller
      * @param bool $condition
      * @throws UserException
      */
-    protected function _throwUserErrorNoRedirect($message, $condition = true)
+    protected function _throwUserErrorNoRedirect(string $message, bool $condition = true)
     {
         $this->_throwUserErrorAnyResponse($message, null, $condition);
     }
@@ -173,7 +191,7 @@ class Controller extends \Cake\Controller\Controller
      * @param string|string[]|null $scope scope для логирования ошибки
      * @throws InternalException
      */
-    protected function _throwInternalError($message, $addInfo = null, $scope = null)
+    protected function _throwInternalError(string $message, $addInfo = null, $scope = null)
     {
         throw InternalException::instance($message)->setLogAddInfo($addInfo)->setLogScope($scope);
     }
@@ -185,7 +203,7 @@ class Controller extends \Cake\Controller\Controller
     protected function _setIsJsonAction()
     {
         if (!$this->_isJsonAction()) {
-            $this->request = $this->request->withParam('_ext', self::EXTENSION_JSON);
+            $this->request = $this->request->withParam('_ext', self::REQUEST_EXTENSION_JSON);
             Router::pushRequest($this->request);
         }
     }
@@ -195,9 +213,9 @@ class Controller extends \Cake\Controller\Controller
      *
      * @return bool
      */
-    protected function _isJsonAction()
+    protected function _isJsonAction(): bool
     {
-        return ($this->request->getParam('_ext') === self::EXTENSION_JSON);
+        return ($this->request->getParam('_ext') === self::REQUEST_EXTENSION_JSON);
     }
 
     /**
@@ -223,7 +241,7 @@ class Controller extends \Cake\Controller\Controller
      * @return NULL
      * @internal
      */
-    protected function _sendJsonError($message, array $jsonData = [])
+    protected function _sendJsonError(string $message, array $jsonData = [])
     {
         return $this->_sendJsonResponse(['status' => self::JSON_STATUS_ERROR, 'message' => $message] + $jsonData);
     }
@@ -235,6 +253,7 @@ class Controller extends \Cake\Controller\Controller
      * @param \Exception $exception
      * @param array $jsonData
      * @return NULL
+     * @throws PHP7ErrorException
      * @internal
      */
     protected function _sendJsonException(\Exception $exception, array $jsonData = [])
@@ -274,5 +293,18 @@ class Controller extends \Cake\Controller\Controller
             $this->response = $this->response->withType('application/json');
         }
         return null;
+    }
+
+    /**
+     * Отправка текстового ответа без использования view, поддержка режима тестирования
+     *
+     * @param string $text
+     * @param string $contentType
+     * @return null|Response
+     */
+    protected function _sendTextResponse(string $text, string $contentType = self::REQUEST_EXTENSION_DEFAULT): ?Response
+    {
+        $this->response = $this->response->withType($contentType);
+        return $this->response->withStringBody($text);
     }
 }

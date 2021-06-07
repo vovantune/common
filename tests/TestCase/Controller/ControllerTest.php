@@ -1,6 +1,6 @@
 <?php
 
-namespace ArtSkills\Test\Controller;
+namespace ArtSkills\Test\TestCase\Controller;
 
 use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;
@@ -158,7 +158,7 @@ class ControllerTest extends AppControllerTestCase
                 // в котором вызван InternalError::instance
                 // при этом file и line - из TestController
                 'file' => (new ReflectionClass(TestController::class))->getFileName(),
-                'line' => 146,
+                'line' => 147,
             ],
             500
         );
@@ -178,7 +178,7 @@ class ControllerTest extends AppControllerTestCase
                 'code' => 500,
                 // а здесь был сделан непосредственно throw new InternalError
                 'file' => (new ReflectionClass(TestController::class))->getFileName(),
-                'line' => 157,
+                'line' => 158,
             ],
             500
         );
