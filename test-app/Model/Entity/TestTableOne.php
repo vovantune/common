@@ -24,6 +24,9 @@ class TestTableOne extends Entity
         'bad alias' => 'ololo',
     ];
 
+    /**
+     * @return string
+     */
     public function asd()
     {
         return Arrays::encode(['asd' => 'qwe']);

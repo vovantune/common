@@ -12,5 +12,6 @@ use ArtSkills\ValueObject\ValueObject;
 
 class TestValueObject extends ValueObject
 {
+    /** @var string */
     public $testProperty = 'testData';
 }

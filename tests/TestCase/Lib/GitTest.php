@@ -76,6 +76,7 @@ class GitTest extends AppTestCase
 
     /**
      * Тест функции списка веток
+     * @group Git
      */
     public function testGetBranchList()
     {
@@ -324,6 +325,7 @@ class GitTest extends AppTestCase
 
     /**
      * Тест удаления текущей ветки
+     * @group Git
      */
     public function testDeleteCurrent()
     {

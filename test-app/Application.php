@@ -38,7 +38,7 @@ class Application extends BaseApplication
         parent::bootstrap();
 
         if (PHP_SAPI === 'cli') {
-            $this->bootstrapCli();
+            $this->_bootstrapCli();
         }
 
         /*
@@ -84,7 +84,7 @@ class Application extends BaseApplication
     /**
      * @return void
      */
-    protected function bootstrapCli()
+    protected function _bootstrapCli()
     {
         try {
             $this->addPlugin('Bake');
