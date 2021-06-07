@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\EntityBuilder;
 
@@ -10,6 +11,7 @@ use ArtSkills\Traits\Library;
 use Cake\I18n\Date;
 use Cake\I18n\Time;
 use DocBlockReader\Reader;
+use Exception;
 
 /**
  * Формируем README.md файл с данными по таблицам
@@ -18,13 +20,13 @@ class TableDocumentation
 {
     use Library;
 
-    const DEPENDENCY_ONE_TO_ONE = '/([A-Z][^\W_]+)\s\$([A-Z][^\W_]+)\s`([\w-]+)`\s=>\s`([\w-]+)`/';
-    const DEPENDENCY_ONE_TO_MANY = '/([A-Z][^\W_]+)\[\]\s\$([A-Z][^\W_]+)\s`([\w-]+)`\s=>\s`([\w-]+)`/';
+    private const DEPENDENCY_ONE_TO_ONE = '/([A-Z][^\W_]+)\s\$([A-Z][^\W_]+)\s`([\w-]+)`\s=>\s`([\w-]+)`/';
+    private const DEPENDENCY_ONE_TO_MANY = '/([A-Z][^\W_]+)\[\]\s\$([A-Z][^\W_]+)\s`([\w-]+)`\s=>\s`([\w-]+)`/';
 
     // регекспу нужно 2 слеша для экранирования в регекспе, и ещё 2 слеша для экранирования строки
-    const FIELD_INFO = '/([\\\\a-zA-Z0-9]+)\s\$([a-z]\w+)\s?(.*)/';
+    private const FIELD_INFO = '/([\\\\a-zA-Z0-9]+)\s\$([a-z]\w+)\s?(.*)/';
 
-    const JS_TYPES = [
+    private const JS_TYPES = [
         '\\' . Time::class => 'string',
         '\\' . Date::class => 'string',
         'array' => 'Array',
@@ -33,24 +35,24 @@ class TableDocumentation
     /**
      * Конфиг
      *
-     * @var EntityBuilderConfig
+     * @var ?EntityBuilderConfig
      */
-    private static $_config = null;
+    private static ?EntityBuilderConfig $_config = null;
 
     /**
      * Кеш PHPDoc описаний сущностей
      *
-     * @var array
+     * @var array<string, string>
      */
-    private static $_entityAnnotationsCache = [];
+    private static array $_entityAnnotationsCache = [];
 
     /**
      * Задать конфиг
      *
-     * @param EntityBuilderConfig $config
+     * @param ?EntityBuilderConfig $config
      * @throws InternalException
      */
-    public static function setConfig($config)
+    public static function setConfig(?EntityBuilderConfig $config)
     {
         static::$_config = $config;
         if (!empty($config) && !($config instanceof EntityBuilderConfig)) {
@@ -64,7 +66,7 @@ class TableDocumentation
      * @return bool true в случае необходимости перегрузить доку
      * @throws InternalException
      */
-    public static function build()
+    public static function build(): bool
     {
         if (empty(static::$_config)) {
             throw new InternalException('Не задан конфиг');
@@ -72,9 +74,9 @@ class TableDocumentation
         static::$_config->checkValid();
         $entityList = self::_getEntityList();
         $mdResult = self::_buildMarkDownDoc($entityList);
-        $jsRsult = self::_buildJsDoc($entityList);
+        $jsResult = self::_buildJsDoc($entityList);
 
-        return $mdResult || $jsRsult;
+        return $mdResult || $jsResult;
     }
 
     /**
@@ -83,7 +85,7 @@ class TableDocumentation
      * @param string[] $entityList
      * @return bool
      */
-    private static function _buildMarkDownDoc($entityList)
+    private static function _buildMarkDownDoc(array $entityList): bool
     {
         $mdFile = new File(static::$_config->modelFolder . '/' . static::$_config->descriptionFile);
         if ($mdFile->exists()) {
@@ -114,7 +116,7 @@ class TableDocumentation
      * @param string[] $entityList
      * @return bool
      */
-    private static function _buildJsDoc($entityList)
+    private static function _buildJsDoc(array $entityList): bool
     {
         $jsFile = new File(static::$_config->modelFolder . '/' . static::$_config->jsTypesFile);
         if ($jsFile->exists()) {
@@ -142,9 +144,9 @@ class TableDocumentation
     /**
      * Формируем список таблиц
      *
-     * @return array
+     * @return string[]
      */
-    private static function _getEntityList()
+    private static function _getEntityList(): array
     {
         $folder = new Folder(static::$_config->modelFolder . '/Entity');
         $files = $folder->find('.*\.php', true);
@@ -165,7 +167,7 @@ class TableDocumentation
      * @param string $className
      * @return string
      */
-    private static function _buildTableArticle($className)
+    private static function _buildTableArticle(string $className): string
     {
         $article = "## $className\n";
         $comment = self::_getTableComment($className);
@@ -174,9 +176,11 @@ class TableDocumentation
         }
 
         $fields = self::_getTableFields($className);
-        $article .= "### Поля:\n";
-        foreach ($fields as $field) {
-            $article .= "* " . $field . "\n";
+        if (!empty($fields)) {
+            $article .= "### Поля:\n";
+            foreach ($fields as $field) {
+                $article .= "* " . $field . "\n";
+            }
         }
 
         $deps = self::_getTableDependencies($className);
@@ -196,7 +200,7 @@ class TableDocumentation
      * @param string $className
      * @return string
      */
-    private static function _buildJsTableDescription($className)
+    private static function _buildJsTableDescription(string $className): string
     {
         $article = "/**\n * @typedef {Object} " . $className . 'Entity';
         $comment = self::_getTableComment($className);
@@ -230,9 +234,10 @@ class TableDocumentation
      * PHPDoc комментарии к классу
      *
      * @param string $className полный путь к классу
-     * @return array
+     * @return array<string, string>
+     * @throws Exception
      */
-    private static function _getEntityAnnotations($className)
+    private static function _getEntityAnnotations(string $className): array
     {
         if (empty(self::$_entityAnnotationsCache[$className])) {
             $reader = new Reader(static::$_config->modelNamespace . '\Entity\\' . $className);
@@ -245,15 +250,16 @@ class TableDocumentation
      * Комментарий к таблице
      *
      * @param string $className
-     * @return bool|string
+     * @return ?string
+     * @throws Exception
      */
-    private static function _getTableComment($className)
+    private static function _getTableComment(string $className): ?string
     {
         $annotations = self::_getEntityAnnotations($className);
         if (!empty($annotations['tableComment'])) {
             return $annotations['tableComment'];
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -261,13 +267,14 @@ class TableDocumentation
      * Список зависимостей с другими таблицами
      *
      * @param string $className
-     * @return bool|string[]
+     * @return ?string[]
+     * @throws Exception
      */
-    private static function _getTableDependencies($className)
+    private static function _getTableDependencies(string $className): ?array
     {
         $annotations = self::_getEntityAnnotations($className);
         if (empty($annotations['property'])) {
-            return false;
+            return null;
         }
         $annotations['property'] = (array)$annotations['property'];
 
@@ -290,13 +297,14 @@ class TableDocumentation
      * Поля теблицы
      *
      * @param string $className
-     * @return bool|string[]
+     * @return ?string[]
+     * @throws Exception
      */
-    private static function _getTableFields($className)
+    private static function _getTableFields(string $className): ?array
     {
         $annotations = self::_getEntityAnnotations($className);
         if (empty($annotations['property'])) {
-            return false;
+            return null;
         }
         $annotations['property'] = (array)$annotations['property'];
 

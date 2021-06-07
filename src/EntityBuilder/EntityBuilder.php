@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\EntityBuilder;
 
@@ -13,10 +14,12 @@ use ArtSkills\Filesystem\File;
 use ArtSkills\Filesystem\Folder;
 use Cake\I18n\Date;
 use Cake\I18n\Time;
+use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
 use DocBlockReader\Reader;
 use ReflectionClass;
+use ReflectionException;
 
 /**
  * Конструктор сущностей для CakePHP
@@ -203,10 +206,10 @@ class EntityBuilder
      * Возвращает список алиасов полей
      *
      * @param string $entityName
-     * @param array $fields field => comment
-     * @return array alias => field
+     * @param array<string, string> $fields field => comment
+     * @return array<string, string> alias => field
      */
-    protected static function _getAliases($entityName, $fields)
+    protected static function _getAliases(string $entityName, $fields): array
     {
         $aliases = [];
         $className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
@@ -228,10 +231,10 @@ class EntityBuilder
      * Формируем список виртуальных полей сущности
      *
      * @param string $entityName
-     * @param array $fields field => comment
-     * @return array ['имя поля' => 'тип']
+     * @param array<string, string> $fields field => comment
+     * @return array<string, string> ['имя поля' => 'тип']
      */
-    private static function _getVirtualFields($entityName, $fields)
+    private static function _getVirtualFields(string $entityName, array $fields): array
     {
         $virtualFields = [];
         $className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
@@ -267,9 +270,9 @@ class EntityBuilder
      * Получить таблицу
      *
      * @param string $tableAlias
-     * @return \Cake\ORM\Table
+     * @return Table
      */
-    protected static function _getTable($tableAlias)
+    protected static function _getTable(string $tableAlias): Table
     {
         if (TableRegistry::getTableLocator()->exists($tableAlias)) {
             return TableRegistry::getTableLocator()->get($tableAlias);
@@ -285,7 +288,7 @@ class EntityBuilder
      * @param string $type
      * @return File
      */
-    private static function _getFile($entityName, $type)
+    private static function _getFile(string $entityName, string $type): File
     {
         return new File(
             static::$_config->modelFolder . $type . '/' . self::_getShortClassName($entityName, $type) . '.php'
@@ -298,7 +301,7 @@ class EntityBuilder
      * @param string $type
      * @return Folder
      */
-    private static function _getFolder($type)
+    private static function _getFolder(string $type): Folder
     {
         return new Folder(static::$_config->modelFolder . $type);
     }
@@ -309,12 +312,12 @@ class EntityBuilder
      * @param string $type
      * @return string
      */
-    private static function _getClassTemplate($type)
+    private static function _getClassTemplate(string $type): string
     {
         return '\\' . static::$_config->modelNamespace . '\\' . $type . '\\' . self::_getShortClassName(
-            static::ENTITY_TEMPLATE_STRING,
-            $type
-        );
+                static::ENTITY_TEMPLATE_STRING,
+                $type
+            );
     }
 
     /**
@@ -324,7 +327,7 @@ class EntityBuilder
      * @param string $type
      * @return string
      */
-    private static function _getShortClassName($entityName, $type)
+    private static function _getShortClassName(string $entityName, string $type): string
     {
         $postfix = ($type == self::FILE_TYPE_ENTITY ? '' : $type);
         return $entityName . $postfix;
@@ -351,7 +354,7 @@ class EntityBuilder
      * @param string $type
      * @return string
      */
-    private static function _processFileTemplate($entityName, $type)
+    private static function _processFileTemplate(string $entityName, string $type): string
     {
         $search = [
             static::ENTITY_TEMPLATE_STRING,
@@ -381,15 +384,15 @@ class EntityBuilder
      * Проверка на существование таблицы
      *
      * @param string $tableName
-     * @return boolean
+     * @return bool
      */
-    private static function _checkTableExists($tableName)
+    private static function _checkTableExists(string $tableName): bool
     {
         $connection = DB::getConnection(static::$_config->connectionName);
         $existingTables = $connection->query(
             "SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $connection->config()['database'] . "' AND TABLE_NAME='" . $tableName . "';"
         )->fetchAll();
-        return $existingTables[0][0];
+        return (bool)$existingTables[0][0];
     }
 
     /**
@@ -417,16 +420,20 @@ class EntityBuilder
      *
      * @param string $tblName
      * @return bool
+     * @throws ReflectionException
      */
     private static function _buildTableDeps(string $tblName): bool
     {
         $refClass = new ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tblName);
-
         if ($refClass->isAbstract() || $refClass->hasProperty('useTable')) {
             return false;
         }
 
         $classComment = $refClass->getDocComment();
+        if ($classComment === false) {
+            $classComment = '';
+        }
+
         $entityName = substr($tblName, 0, -5);
         $resultComment = self::_buildTableMethodRedefines(
             $classComment,
@@ -453,14 +460,14 @@ class EntityBuilder
     /**
      * Добавляем переопределение методов
      *
-     * @param string $classComment
+     * @param string|bool $classComment
      * @param string $entityName
      * @param string[] $ownMethods
      * @return string
      */
-    private static function _buildTableMethodRedefines($classComment, $entityName, $ownMethods)
+    private static function _buildTableMethodRedefines(string $classComment, string $entityName, array $ownMethods): string
     {
-        if ($classComment !== false) {
+        if (!empty($classComment)) {
             $commArr = explode("\n", $classComment);
         } else {
             $commArr = ['/**', ' */'];
@@ -480,9 +487,9 @@ class EntityBuilder
                 }
 
                 if (!$hasMethod && preg_match(
-                    '/\s\*\s@method\s.+' . $tplMethod . '\(.+/',
-                    $commLine
-                )
+                        '/\s\*\s@method\s.+' . $tplMethod . '\(.+/',
+                        $commLine
+                    )
                 ) { // есть описание такого метода, но не такое, как надо
                     $commArr[$commIndex] = ' * ' . $template;
                     $hasMethod = true;
@@ -510,7 +517,7 @@ class EntityBuilder
      * @param ReflectionClass $refClass
      * @return string[]
      */
-    private static function _getClassPublicMethods($refClass)
+    private static function _getClassPublicMethods(ReflectionClass $refClass): array
     {
         $methods = [];
         foreach ($refClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
@@ -527,7 +534,7 @@ class EntityBuilder
      * @param ReflectionClass $refClass
      * @param string $newComment
      */
-    private static function _writeNewClassComment($refClass, $newComment)
+    private static function _writeNewClassComment(ReflectionClass $refClass, string $newComment)
     {
         $file = new File($refClass->getFileName());
         $curContent = $file->read();
@@ -556,9 +563,9 @@ class EntityBuilder
      * Создаём Query класс для каждой таблицы, если это необходимо
      *
      * @param string $entityName
-     * @return boolean
+     * @return bool
      */
-    private static function _createQueryClass($entityName)
+    private static function _createQueryClass(string $entityName): bool
     {
         $file = self::_getFile($entityName, self::FILE_TYPE_QUERY);
         if (!$file->exists()) {
@@ -575,9 +582,9 @@ class EntityBuilder
      * Создаём Entity сущность, либо обновляем текущую
      *
      * @param string $entityName
-     * @return boolean
+     * @return bool
      */
-    private static function _createEntityClass($entityName)
+    private static function _createEntityClass(string $entityName): bool
     {
         // реальные поля
         $curTblFields = self::_getTableFieldsComments($entityName);
@@ -588,10 +595,10 @@ class EntityBuilder
         foreach ($aliases as $alias => $field) {
             $aliasProperty .= "        '$alias' => '$field',\n";
             $curTblFields[$alias] = str_replace(
-                '$' . $field,
-                '$' . $alias,
-                $curTblFields[$field]
-            ) . " (алиас поля $field)";
+                    '$' . $field,
+                    '$' . $alias,
+                    $curTblFields[$field]
+                ) . " (алиас поля $field)";
         }
         $aliasProperty .= "    ";
 
@@ -632,9 +639,9 @@ class EntityBuilder
                 $hasChanges = false;
                 foreach ($commentsArr as $key => $comm) { // удаляем ненужные свойства
                     if ((stristr($comm, '@property') || stristr($comm, '@tableComment')) && !in_array(
-                        $comm,
-                        $curTblFields
-                    )
+                            $comm,
+                            $curTblFields
+                        )
                     ) {
                         unset($commentsArr[$key]);
                         $hasChanges = true;
@@ -665,12 +672,12 @@ class EntityBuilder
     }
 
     /**
-     * Список полей теблицы
+     * Список полей таблицы
      *
      * @param string $entityName
-     * @return array
+     * @return array<string, string>
      */
-    private static function _getTableFieldsComments($entityName)
+    private static function _getTableFieldsComments(string $entityName): array
     {
         $table = self::_getTable($entityName);
         $tableSchema = $table->getSchema();
@@ -695,12 +702,12 @@ class EntityBuilder
             $bindingKeys = $assoc->getBindingKey();
 
             $result[$propertyName] = ' * @property ' . $className . (in_array(
-                $assoc->type(),
-                [
+                    $assoc->type(),
+                    [
                         'oneToMany',
                         'manyToMany',
                     ]
-            ) ? '[]' : '') . ' $' . $propertyName . ' `' .
+                ) ? '[]' : '') . ' $' . $propertyName . ' `' .
                 implode('`, `', (array)$foreignKeys) . '` => `' .
                 implode('`, `', (array)$bindingKeys) . '`';
         }
@@ -712,9 +719,9 @@ class EntityBuilder
      * PHPDoc комментарий к таблице
      *
      * @param string $entityName
-     * @return bool|string
+     * @return ?string
      */
-    private static function _getTableComment($entityName)
+    private static function _getTableComment(string $entityName): ?string
     {
         $table = self::_getTable($entityName);
 
@@ -726,7 +733,7 @@ class EntityBuilder
         if (!empty($tableComment) && !empty($tableComment[0][0])) {
             return ' * @tableComment ' . $tableComment[0][0];
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -736,16 +743,18 @@ class EntityBuilder
      * @param string[] $tableList
      * @return bool
      */
-    private static function _updateTableNamesFile($tableList)
+    private static function _updateTableNamesFile(array $tableList): bool
     {
         $constList = [];
         foreach ($tableList as $className) {
-            $entityName = substr($className, 0, -5);
-            $table = self::_getTable($entityName);
-            $tableName = $table->getTable();
-            $tableAlias = $table->getAlias();
+            if (!self::_isAbstractTable($className)) {
+                $entityName = substr($className, 0, -5);
+                $table = self::_getTable($entityName);
+                $tableName = $table->getTable();
+                $tableAlias = $table->getAlias();
 
-            $constList[] = 'const ' . strtoupper($tableName) . ' = "' . $tableAlias . '";';
+                $constList[] = 'const ' . strtoupper($tableName) . ' = "' . $tableAlias . '";';
+            }
         }
 
         $newContent = "<?php\ndeclare(strict_types=1);\n\n// This file is autogenerated\n" . implode("\n", $constList) . "\n";
@@ -761,6 +770,23 @@ class EntityBuilder
         if ($curContent !== $newContent) {
             $namesFl->write($newContent);
             $namesFl->close();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Является ли таблица абстрактной
+     *
+     * @param string $tableName
+     * @return bool
+     * @throws ReflectionException
+     */
+    private static function _isAbstractTable(string $tableName): bool
+    {
+        $refClass = new ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tableName);
+        if ($refClass->isAbstract() || $refClass->hasProperty('useTable')) {
             return true;
         } else {
             return false;

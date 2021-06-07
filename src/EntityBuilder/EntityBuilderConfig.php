@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\EntityBuilder;
 
@@ -32,81 +33,81 @@ class EntityBuilderConfig extends ValueObject
      *
      * @var string
      */
-    public $connectionName = DB::CONNECTION_DEFAULT;
+    public string $connectionName = DB::CONNECTION_DEFAULT;
     /**
      * Неймспейс создаваемых классов
      *
      * @var string
      */
-    public $modelNamespace = 'App\Model';
+    public string $modelNamespace = 'App\Model';
     /**
      * Папка создаваемых классов
      *
      * @var string
      */
-    public $modelFolder = '';
+    public string $modelFolder = '';
     /**
      * Имя файла со списком констант - названий таблиц
      *
      * @var string
      */
-    public $tableNamesFile = 'table_names.php';
+    public string $tableNamesFile = 'table_names.php';
     /**
      * Имя файла с описанием таблиц
      *
      * @var string
      */
-    public $descriptionFile = 'TableList.md';
+    public string $descriptionFile = 'TableList.md';
     /**
      * Имя файла с описанием сущностей для JavaScript
      *
      * @var string
      */
-    public $jsTypesFile = 'TableEntityList.js';
+    public string $jsTypesFile = 'TableEntityList.js';
 
     /**
      * Класс, от которого наследовать таблицы
      *
      * @var string
      */
-    public $baseTableClass = Table::class;
+    public string $baseTableClass = Table::class;
     /**
      * Класс, от которого наследовать сущности
      *
      * @var string
      */
-    public $baseEntityClass = Entity::class;
+    public string $baseEntityClass = Entity::class;
     /**
      * Класс, от которого наследовать запросы
      *
      * @var string
      */
-    public $baseQueryClass = Query::class;
+    public string $baseQueryClass = Query::class;
 
     /**
      * Папка с шаблонами генерируемых файлов
      *
      * @var string
      */
-    public $templatesDir = __DIR__ . '/templates/';
+    public string $templatesDir = __DIR__ . '/templates/';
     /**
      * Файл шаблона сущности
      *
      * @var string
      */
-    public $entityTemplateFile = '';
+    public string $entityTemplateFile = '';
     /**
      * Файл шаблона запроса
      *
      * @var string
      */
-    public $queryTemplateFile = '';
+    public string $queryTemplateFile = '';
     /**
      * Файл шаблона таблицы
      *
      * @var string
      */
-    public $tableTemplateFile = '';
+    public string $tableTemplateFile = '';
 
     /** @inheritdoc */
     public function __construct(array $fillValues = [])
