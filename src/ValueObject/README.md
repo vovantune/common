@@ -31,3 +31,16 @@ $object->setProperty1('new value')->setProperty2('property 2 value'); // где 
 * Описывать классы и экшены контроллера согласно проекту https://github.com/zircote/swagger-php
 * Для формирования JSDoc описания наследуется шелл [ValueObjectDocumentationShell](../Shell/ValueObjectDocumentationShell.php).
 После каждого запуска данного шелла обновляется файл _webroot/js/valueObjects.js_
+* Для того, чтобы тестировать описание, необходимо создать тестовый класс следующего вида:
+```php
+class ApiDocumentationControllerTest extends AppControllerTestCase
+{
+    /**
+     * Тест API документации в JSON и в HTML формате. Может работать относительно долго, ибо строит апи по всему коду.
+     */
+    public function test()
+    {
+        (new ApiDocumentationTest())->testSchema($this->getJsonResponse('/apiDocumentation.json'));
+    }
+}
+```

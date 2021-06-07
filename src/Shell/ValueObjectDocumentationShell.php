@@ -15,7 +15,7 @@ use const OpenApi\UNDEFINED;
 
 class ValueObjectDocumentationShell extends Shell
 {
-    const SCHEMA_PATH_PREFIX = '#/components/schemas/';
+    protected const SCHEMA_PATH_PREFIX = '#/components/schemas/';
 
     /**
      * Генератор JS документации для ValueObject
