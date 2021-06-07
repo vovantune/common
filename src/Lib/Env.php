@@ -37,6 +37,7 @@ use PHPUnit\Framework\AssertionFailedError;
  * @method static int getThreadsLimit()
  * @method static setThreadsLimit(int $limit)
  * @method static array|null getApiInfo()
+ * @method static setDebug(bool $enableDebug)
  */
 class Env
 {

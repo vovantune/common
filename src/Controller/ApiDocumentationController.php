@@ -32,6 +32,8 @@ use function OpenApi\scan;
  */
 class ApiDocumentationController extends Controller
 {
+    protected const DOCUMENTATION_CACHE_PROFILE = 'default';
+
     /**
      *
      * Формируем документацию как в HTML, так и в JSON формате
@@ -100,7 +102,7 @@ class ApiDocumentationController extends Controller
             ]);
 
             return json_decode(json_encode($swagger), true);
-        });
+        }, static::DOCUMENTATION_CACHE_PROFILE);
     }
 
     /**
@@ -138,6 +140,6 @@ class ApiDocumentationController extends Controller
             }
             $file->delete();
             return $htmlString;
-        });
+        }, static::DOCUMENTATION_CACHE_PROFILE);
     }
 }
