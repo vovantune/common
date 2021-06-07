@@ -6,6 +6,7 @@ use ArtSkills\Traits\Singleton;
 
 /**
  * Работа с Git. Переключение веток, pull, удаление веток
+ * @SuppressWarnings(PHPMD.MethodMix)
  */
 class Git
 {

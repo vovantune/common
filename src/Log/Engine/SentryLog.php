@@ -12,10 +12,13 @@ use Cake\Log\Engine\BaseLog;
 use Cake\Log\Log;
 use Cake\Log\LogTrait;
 use Cake\Http\Exception\NotFoundException;
+use Raven_Client;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 class SentryLog extends BaseLog
 {
-
     const INFO_MAX_NEST_LEVEL = 5;
 
     const KEY_ADD_INFO = '_addInfo';
@@ -28,19 +31,19 @@ class SentryLog extends BaseLog
     const KEY_FINGERPRINT = '_fingerprint';
     const KEY_FULL_TRACE = '_addFullTrace';
 
-    const AUTO_SEND_LEVELS = [\Raven_Client::WARN, \Raven_Client::ERROR];
+    const AUTO_SEND_LEVELS = [Raven_Client::WARN, Raven_Client::ERROR];
     const LEVEL_MAP = [
         // автоматически не пошлётся, но можно вручную
-        'info' => \Raven_Client::INFO,
-        'debug' => \Raven_Client::DEBUG,
+        'info' => Raven_Client::INFO,
+        'debug' => Raven_Client::DEBUG,
         // шлётся, но без оповещения
-        'notice' => \Raven_Client::WARN,
-        'warning' => \Raven_Client::WARN,
+        'notice' => Raven_Client::WARN,
+        'warning' => Raven_Client::WARN,
         // шлётся с оповещением
-        'error' => \Raven_Client::ERROR,
-        'critical' => \Raven_Client::ERROR,
-        'alert' => \Raven_Client::ERROR,
-        'emergency' => \Raven_Client::ERROR,
+        'error' => Raven_Client::ERROR,
+        'critical' => Raven_Client::ERROR,
+        'alert' => Raven_Client::ERROR,
+        'emergency' => Raven_Client::ERROR,
     ];
 
     /**
@@ -60,7 +63,7 @@ class SentryLog extends BaseLog
     /**
      * клиент сентри
      *
-     * @var \Raven_Client
+     * @var Raven_Client
      */
     private static $_client = null;
 
@@ -117,14 +120,14 @@ class SentryLog extends BaseLog
      * Получить клиент сентри
      * Обычно для внутренних нужд, но оставил public на случай, если захочется выполнить что-то изощрённое
      *
-     * @return \Raven_Client
+     * @return Raven_Client
      */
     public static function getSentry()
     {
         if (empty(self::$_client)) {
             // если dsn нет, то просто ничего не будет отсылаться
             $options = (Env::getSentryOptions() ?: []);
-            self::$_client = new \Raven_Client(Env::getSentryDsn(), $options);
+            self::$_client = new Raven_Client(Env::getSentryDsn(), $options);
         }
         return self::$_client;
     }
@@ -148,7 +151,7 @@ class SentryLog extends BaseLog
      */
     private static function _log($level, $message, $exception, array $context = [])
     {
-        $sentryLevel = array_key_exists($level, self::LEVEL_MAP) ? self::LEVEL_MAP[$level] : \Raven_Client::ERROR;
+        $sentryLevel = array_key_exists($level, self::LEVEL_MAP) ? self::LEVEL_MAP[$level] : Raven_Client::ERROR;
         if (empty($context[self::KEY_IS_HANDLED])
             && (
                 in_array($sentryLevel, self::AUTO_SEND_LEVELS)
@@ -324,7 +327,7 @@ class SentryLog extends BaseLog
         $toSlice = self::DELETE_TRACE_LEVEL_DEFAULT;
         $logWriteCall = $trace[$toSlice];
         $aboveLogWrite = $trace[$toSlice + 1];
-        list(, $logTrait) = namespaceSplit(LogTrait::class);
+        [, $logTrait] = namespaceSplit(LogTrait::class);
         if (
             // Log::error/warning/...
             (Arrays::get($aboveLogWrite, 'class') === Log::class)

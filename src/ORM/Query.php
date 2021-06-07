@@ -5,6 +5,9 @@ namespace ArtSkills\ORM;
 use Cake\Database\Expression\QueryExpression;
 use Cake\Database\FunctionsBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 class Query extends \Cake\ORM\Query
 {
 

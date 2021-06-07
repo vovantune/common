@@ -119,6 +119,7 @@ class Http
      * @param string $targetFile
      * @param int $timeout
      * @return string
+     * @SuppressWarnings(PHPMD.ErrorControlOperator))
      */
     public static function downloadFile(string $url, string $targetFile = '', int $timeout = 30): string
     {

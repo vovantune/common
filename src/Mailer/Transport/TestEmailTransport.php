@@ -11,6 +11,7 @@ use Cake\Mailer\Email;
  * ```php
  * $sentMessages = TestEmailTransport::getMessages();
  * ```
+ * @SuppressWarnings(PHPMD.MethodMix)
  */
 class TestEmailTransport extends AbstractTransport
 {

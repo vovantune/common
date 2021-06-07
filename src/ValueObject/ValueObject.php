@@ -12,6 +12,7 @@ use Cake\Error\Debugger;
 use Cake\I18n\Date;
 use Cake\I18n\Time;
 use Cake\Log\Log;
+use ReflectionClass;
 
 /**
  * Основной класс [объекта-значения](https://github.com/ArtSkills/common/src/ValueObject/README.md).
@@ -169,7 +170,7 @@ abstract class ValueObject implements \JsonSerializable, \ArrayAccess
      */
     private function _fillExportedFields()
     {
-        $refClass = new \ReflectionClass(static::class);
+        $refClass = new ReflectionClass(static::class);
         $properties = $refClass->getProperties(\ReflectionProperty::IS_PUBLIC);
         foreach ($properties as $property) {
             $propertyName = $property->getName();

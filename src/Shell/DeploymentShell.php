@@ -9,6 +9,9 @@ use ArtSkills\Log\Engine\SentryLog;
 use Cake\Console\Shell;
 use Cake\Utility\Inflector;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 abstract class DeploymentShell extends Shell
 {
     const TYPE_PRODUCTION = 'production';

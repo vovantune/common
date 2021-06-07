@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\TestSuite\Mock\Fixture;
 
+use Exception;
+
 const SINGLE_TEST_CONST = '666';
 /**
  * @SuppressWarnings(PHPMD.UnusedPrivateField)
+ * @SuppressWarnings(PHPMD.MethodMix)
  */
 class MockTestFixture
 {
@@ -237,7 +240,7 @@ class MockTestFixture
      * @param bool $isRedefined
      * @param string $callType
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function callParent(bool $isStatic, bool $isRedefined, string $callType): string
     {
@@ -248,7 +251,7 @@ class MockTestFixture
             } elseif ($callType == 'static') {
                 return static::$methodName();
             } else {
-                throw new \Exception('bad call type');
+                throw new Exception('bad call type');
             }
         } else {
             return $this->$methodName();
@@ -327,6 +330,7 @@ class MockTestFixture
      *
      * @param int[] ...$variadicParam
      * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public static function variadicParam(int ...$variadicParam)
     {

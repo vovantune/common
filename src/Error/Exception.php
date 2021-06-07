@@ -5,9 +5,11 @@ namespace ArtSkills\Error;
 use ArtSkills\Controller\Controller;
 use ArtSkills\Lib\Arrays;
 use ArtSkills\Log\Engine\SentryLog;
+use ReflectionClass;
 
 /**
  * @internal
+ * @SuppressWarnings(PHPMD.MethodMix)
  */
 class Exception extends \Exception
 {
@@ -116,6 +118,7 @@ class Exception extends \Exception
      * Оповещать ли об ошибке или нет
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     public function getAlert()
     {
@@ -181,7 +184,7 @@ class Exception extends \Exception
         array_unshift($trace, ['file' => $this->getFile(), 'line' => $this->getLine()]);
         $excludeFiles = [
             __FILE__,
-            (new \ReflectionClass(Controller::class))->getFileName(),
+            (new ReflectionClass(Controller::class))->getFileName(),
         ];
         $actualCall = null;
         foreach ($trace as $call) {

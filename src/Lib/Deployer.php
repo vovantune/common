@@ -13,6 +13,7 @@ use Cake\Log\Log;
  * Деплойщик
  * обновляет текущий или вообще любой проект
  * [описание](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
+ * @SuppressWarnings(PHPMD.MethodMix)
  */
 class Deployer
 {

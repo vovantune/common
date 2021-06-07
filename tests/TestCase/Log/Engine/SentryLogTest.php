@@ -15,6 +15,8 @@ use Cake\Error\Debugger;
 use Cake\Log\Engine\FileLog;
 use Cake\Log\Log;
 use Cake\Http\Exception\NotFoundException;
+use Exception;
+use Raven_Client;
 
 class SentryLogTest extends AppTestCase
 {
@@ -56,11 +58,11 @@ class SentryLogTest extends AppTestCase
         PropertyAccess::setStatic(SentryLog::class, '_addInfo', []);
 
         $this->_fileLogMock = MethodMocker::mock(FileLog::class, 'log');
-        $this->_sentryLogMock = MethodMocker::mock(\Raven_Client::class, 'capture')
+        $this->_sentryLogMock = MethodMocker::mock(Raven_Client::class, 'capture')
             ->willReturnAction(
                 function ($args, $info) {
                     // проверяем уровень, сообщение, отпечаток и вершину стек-трейса
-                    $level = empty($info['level']) ? \Raven_Client::ERROR : $info['level'];
+                    $level = empty($info['level']) ? Raven_Client::ERROR : $info['level'];
                     self::assertEquals($level, $args[0]['level']);
 
                     $isException = !empty($args[0]['exception']);
@@ -143,7 +145,7 @@ class SentryLogTest extends AppTestCase
         $this->_fileLogMock->singleCall()->expectArgs('warning', $message, self::CONTEXT_DEFAULT);
         $this->_sentryLogMock->singleCall()->setAdditionalVar(
             [
-                'level' => \Raven_Client::WARNING,
+                'level' => Raven_Client::WARNING,
                 'message' => $message,
                 'trace' => [
                     'class' => Log::class,
@@ -171,7 +173,7 @@ class SentryLogTest extends AppTestCase
         $this->_fileLogMock->singleCall()->expectArgs('info', $message, self::CONTEXT_DEFAULT + $paramSentrySend);
         $this->_sentryLogMock->singleCall()->setAdditionalVar(
             [
-                'level' => \Raven_Client::INFO,
+                'level' => Raven_Client::INFO,
                 'message' => $message,
                 'trace' => [
                     'class' => Log::class,
@@ -255,7 +257,7 @@ class SentryLogTest extends AppTestCase
             self::CONTEXT_DEFAULT + [SentryLog::KEY_IS_HANDLED => true]
         );
         $this->_sentryLogMock->singleCall()->setAdditionalVar(['message' => $message, 'isException' => true]);
-        SentryLog::logException(new \Exception($message));
+        SentryLog::logException(new Exception($message));
     }
 
     /** логирование неинтересных ексепшнов */
@@ -270,7 +272,7 @@ class SentryLogTest extends AppTestCase
         $this->_sentryLogMock->singleCall()->setAdditionalVar([
             'message' => $message,
             'isException' => true,
-            'level' => \Raven_Client::WARN,
+            'level' => Raven_Client::WARN,
         ]);
         SentryLog::logException(new NotFoundException($message));
     }
@@ -337,7 +339,11 @@ class SentryLogTest extends AppTestCase
         trigger_error($message, E_USER_NOTICE);
     }
 
-    /** нотис */
+    /**
+     * нотис
+     * @SuppressWarnings(PHPMD.ShortVariable)
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     */
     public function testNotice()
     {
         $logMessageLike = 'Notice (8): Undefined variable: b';
@@ -363,7 +369,10 @@ class SentryLogTest extends AppTestCase
         $a = $b; // ошибка
     }
 
-    /** сам шатдаун не получится вызвать, но можно вызвать обработчик */
+    /**
+     * сам шатдаун не получится вызвать, но можно вызвать обработчик
+     * @SuppressWarnings(PHPMD.MissingImport)
+     */
     public function testShutdownFlag()
     {
         $testError = [
@@ -457,7 +466,7 @@ class SentryLogTest extends AppTestCase
         $crumb = $breadCrumbs[0];
         $this->assertArraySubsetEquals([
             'message' => $message,
-            'level' => \Raven_Client::WARN,
+            'level' => Raven_Client::WARN,
         ], $crumb);
         self::assertEquals(Debugger::exportVar($extra), $crumb['data']['error_extra']);
         $this->assertArraySubsetEquals([
@@ -469,7 +478,7 @@ class SentryLogTest extends AppTestCase
         // ексепшн
         $message = 'test message 16';
         $extraNew = ['test info exception' => 'asdfgh'];
-        SentryLog::logException(new \Exception($message), [
+        SentryLog::logException(new Exception($message), [
             SentryLog::KEY_ADD_INFO => $extraNew,
         ]);
 
@@ -478,7 +487,7 @@ class SentryLogTest extends AppTestCase
         $crumb = $breadCrumbs[1];
         $this->assertArraySubsetEquals([
             'message' => $message,
-            'level' => \Raven_Client::ERROR,
+            'level' => Raven_Client::ERROR,
         ], $crumb);
         self::assertEquals(Debugger::exportVar($extra + $extraNew), $crumb['data']['error_extra']);
         $this->assertArraySubsetEquals([

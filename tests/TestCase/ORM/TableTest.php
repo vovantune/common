@@ -155,6 +155,7 @@ class TableTest extends AppTestCase
 
     /**
      * Получаем запись с блокировкой
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function testFindAndLock()
     {

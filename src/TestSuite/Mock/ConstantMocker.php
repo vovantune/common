@@ -28,6 +28,7 @@ class ConstantMocker
      * @param string $constantName
      * @param mixed $newValue
      * @throws AssertionFailedError|Exception
+     * @SuppressWarnings(PHPMD.ErrorControlOperator)
      */
     public static function mock(?string $className, string $constantName, $newValue): void
     {

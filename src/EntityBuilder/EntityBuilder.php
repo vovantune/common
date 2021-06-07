@@ -16,6 +16,7 @@ use Cake\I18n\Time;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
 use DocBlockReader\Reader;
+use ReflectionClass;
 
 /**
  * Конструктор сущностей для CakePHP
@@ -237,7 +238,7 @@ class EntityBuilder
         if (class_exists($className)) {
             // field => field
             $fields = Arrays::keysFromValues(array_keys($fields));
-            $refClass = new \ReflectionClass($className);
+            $refClass = new ReflectionClass($className);
             $getPrefix = '_get';
             foreach ($refClass->getMethods(\ReflectionMethod::IS_PROTECTED) as $method) {
                 if (Strings::startsWith($method->name, $getPrefix)) {
@@ -419,7 +420,7 @@ class EntityBuilder
      */
     private static function _buildTableDeps($tblName)
     {
-        $refClass = new \ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tblName);
+        $refClass = new ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tblName);
 
         if ($refClass->hasProperty('useTable')) {
             return false;
@@ -506,7 +507,7 @@ class EntityBuilder
     /**
      * Список публичных методов без наследования
      *
-     * @param \ReflectionClass $refClass
+     * @param ReflectionClass $refClass
      * @return string[]
      */
     private static function _getClassPublicMethods($refClass)
@@ -523,7 +524,7 @@ class EntityBuilder
     /**
      * Записываем новый комментарий для файла
      *
-     * @param \ReflectionClass $refClass
+     * @param ReflectionClass $refClass
      * @param string $newComment
      */
     private static function _writeNewClassComment($refClass, $newComment)
@@ -608,7 +609,7 @@ class EntityBuilder
         $file = self::_getFile($entityName, self::FILE_TYPE_ENTITY);
         if ($file->exists()) {
             $className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
-            $refClass = new \ReflectionClass($className);
+            $refClass = new ReflectionClass($className);
 
             $file = new File($refClass->getFileName());
             $contents = $file->read();

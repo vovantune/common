@@ -9,6 +9,7 @@ use ArtSkills\ValueObject\ValueObject;
 use Cake\Http\Response;
 use Cake\Log\Log;
 use Cake\Routing\Router;
+use ReflectionMethod;
 
 class Controller extends \Cake\Controller\Controller
 {
@@ -62,7 +63,7 @@ class Controller extends \Cake\Controller\Controller
     {
         $isAction = parent::isAction($action);
         if ($isAction) {
-            $methodName = (new \ReflectionMethod($this, $action))->getName();
+            $methodName = (new ReflectionMethod($this, $action))->getName();
             if ($methodName !== $action) {
                 // разный регистр букв
                 $this->request = $this->request->withParam('action', $methodName);

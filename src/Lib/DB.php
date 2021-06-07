@@ -7,6 +7,9 @@ use Cake\Database\Connection;
 use Cake\Database\Statement\MysqlStatement;
 use Cake\Datasource\ConnectionManager;
 
+/**
+ * @SuppressWarnings(PHPMD.ShortClassName)
+ */
 class DB
 {
     use Library;

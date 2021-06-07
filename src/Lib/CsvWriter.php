@@ -3,6 +3,7 @@
 namespace ArtSkills\Lib;
 
 use ArtSkills\Error\InternalException;
+use Exception;
 
 /**
  * Запись в CSV файл. Работает в двух решимах:
@@ -18,6 +19,7 @@ use ArtSkills\Error\InternalException;
  * ```php
  * $result = CsvWriter::writeCsv('svFile.csv', $lines, 'cp1251', ',');
  * ```
+ * @SuppressWarnings(PHPMD.MethodMix)
  */
 class CsvWriter
 {
@@ -41,6 +43,7 @@ class CsvWriter
      * @param string $encoding
      * @param string $delimiter
      * @throws InternalException
+     * @SuppressWarnings(PHPMD.ErrorControlOperator)
      */
     public function __construct($filename, $encoding = "UTF-8", $delimiter = ';')
     {
@@ -60,12 +63,12 @@ class CsvWriter
      *
      * @param array $row
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function writeRow($row)
     {
         if (!$this->_handle) {
-            throw new \Exception('Попытка записать в закрытый файл');
+            throw new Exception('Попытка записать в закрытый файл');
         }
         return fputcsv($this->_handle, $row, $this->_delimiter);
     }

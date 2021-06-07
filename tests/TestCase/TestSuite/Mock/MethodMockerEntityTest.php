@@ -640,7 +640,7 @@ class MethodMockerEntityTest extends TestCase
     {
         $this->expectExceptionMessage("must be of the type int");
         $this->expectException(\TypeError::class);
-        $mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'variadicParam', false, 'return get_defined_vars();');
+        new MethodMockerEntity('mockid', MockTestFixture::class, 'variadicParam', false, 'return get_defined_vars();');
         MockTestFixture::variadicParam('asd');
     }
 
@@ -652,7 +652,7 @@ class MethodMockerEntityTest extends TestCase
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage("must be of the type int, null returned");
-        $mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, 'return null;');
+        new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, 'return null;');
         MockTestFixture::returnInt();
     }
 
@@ -662,8 +662,8 @@ class MethodMockerEntityTest extends TestCase
     public function testReturnTypeGood()
     {
         $returnInt = 4;
-        $mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, "return $returnInt;");
-        $mockNullable = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return null;');
+        new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, "return $returnInt;");
+        new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return null;');
         self::assertEquals($returnInt, MockTestFixture::returnInt());
         self::assertEquals(null, MockTestFixture::returnNullable());
     }
@@ -675,7 +675,7 @@ class MethodMockerEntityTest extends TestCase
     {
         $this->expectExceptionMessage("must be of the type int or null, array returned");
         $this->expectException(\TypeError::class);
-        $mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return [];');
+        new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return [];');
         MockTestFixture::returnNullable();
     }
 }

@@ -207,6 +207,7 @@ class RusGram
      * @param string $f2
      * @param string $f5
      * @return string
+     * @SuppressWarnings(PHPMD.ShortVariable)
      */
     private static function _morph($n, $f1, $f2, $f5)
     {
