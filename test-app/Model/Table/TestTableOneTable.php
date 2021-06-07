@@ -17,14 +17,18 @@ use ArtSkills\Lib\Arrays;
  */
 class TestTableOneTable extends Table
 {
-
+    /** @var string */
     public $asd;
 
+    /**
+     * @return string
+     */
     public function qwe()
     {
         return Arrays::encode(['asd' => 'qwe']);
     }
 
+    /** @inheritDoc */
     public function initialize(array $config)
     {
         parent::initialize($config);

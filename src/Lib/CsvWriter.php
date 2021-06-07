@@ -44,6 +44,7 @@ class CsvWriter
      */
     public function __construct($filename, $encoding = "UTF-8", $delimiter = ';')
     {
+        // phpcs:ignore
         @$this->_handle = fopen($filename, 'w');
 
         if (!$this->_handle) {

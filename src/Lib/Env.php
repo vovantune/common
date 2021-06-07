@@ -31,6 +31,8 @@ use Cake\Error\PHP7ErrorException;
  * @method static bool setFixtureFolder(string $path)
  * @method static bool setMockFolder(string $path)
  * @method static bool setMockNamespace(string $namespace)
+ * @method static int getThreadsLimit()
+ * @method static setThreadsLimit(int $limit)
  */
 class Env
 {

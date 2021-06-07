@@ -48,7 +48,6 @@ class TableDocumentation
      * Задать конфиг
      *
      * @param EntityBuilderConfig $config
-     * @param $config
      * @throws InternalException
      */
     public static function setConfig($config)

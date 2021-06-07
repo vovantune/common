@@ -101,6 +101,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 
         // false - чтобы вместо default не подставлялся test
         $structureConnection = DB::getConnection($this->import['connection'], false);
+        // phpcs:ignore
         if (@!$structureConnection->isConnected()) {
             $structureConnection->disconnect();
             $structureConnection->connect();

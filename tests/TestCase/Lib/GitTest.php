@@ -232,8 +232,8 @@ class GitTest extends AppTestCase
      * Возвращает список комманд, используемых для удаления ветки
      *
      * @param string $branchDelete
-     * @param string $branchBefore
      * @param bool $canDelete
+     * @param string $branchBefore
      * @param string $type
      * @param bool $pull
      * @return array|bool

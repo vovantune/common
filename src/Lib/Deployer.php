@@ -695,7 +695,7 @@ class Deployer
      */
     protected function _notifySuccess()
     {
-        // todo: написать
+        // не реализовано
     }
 
     /**
@@ -703,6 +703,6 @@ class Deployer
      */
     public function rollback()
     {
-        // todo: написать
+        // не реализовано
     }
 }

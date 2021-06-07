@@ -4,13 +4,10 @@ namespace ArtSkills\Lib;
 
 use ArtSkills\Error\InternalException;
 
-/**
- * TODO: переделать дефолтовый разделитель, поменять в конструкторе последние 2 параметра местами
- */
 class CsvReader
 {
     const DEFAULT_ENCODING = 'UTF-8';
-    const DEFAULT_DELIMITER = ',';
+    const DEFAULT_DELIMITER = ';';
 
     /**
      * Указатель на открытый файл
@@ -78,8 +75,10 @@ class CsvReader
 
         $result = [];
         fseek($this->_handle, 0);
-        while (($data = fgetcsv($this->_handle, null, $this->_delimiter)) !== false) {
+        $data = fgetcsv($this->_handle, null, $this->_delimiter);
+        while ($data !== false) {
             $result[] = $data;
+            $data = fgetcsv($this->_handle, null, $this->_delimiter);
         }
 
         return $result;

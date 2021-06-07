@@ -15,7 +15,6 @@ use Cake\Log\Log;
 
 /**
  * Основной класс [объекта-значения](https://github.com/ArtSkills/common/src/ValueObject/README.md).
- * TODO: 1) изучить https://symfony.com/doc/current/components/serializer.html для вомзможного применения
  */
 abstract class ValueObject implements \JsonSerializable, \ArrayAccess
 {

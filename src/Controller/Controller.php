@@ -205,7 +205,6 @@ class Controller extends \Cake\Controller\Controller
      * @param array|ValueObject $jsonData
      * @return NULL
      */
-
     protected function _sendJsonOk($jsonData = [])
     {
         if ($jsonData instanceof ValueObject) {

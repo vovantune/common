@@ -122,8 +122,7 @@ abstract class DeploymentShell extends Shell
     }
 
     /**
-     * Откат
-     * todo: сделать
+     * Откат, ещё не реализован
      */
     public function rollBack()
     {

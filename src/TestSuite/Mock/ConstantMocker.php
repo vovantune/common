@@ -36,6 +36,7 @@ class ConstantMocker
         } else {
             $fullName = $constantName;
         }
+        // phpcs:ignore
         $origValue = @constant($fullName);
         if ($origValue === null) {
             MethodMocker::fail('Constant ' . $fullName . ' is not defined!');

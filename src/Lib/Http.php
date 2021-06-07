@@ -127,6 +127,7 @@ class Http
             $targetFile = TMP . uniqid() . '.tmp';
         }
 
+        // phpcs:ignore
         @$fileHandle = fopen($targetFile, 'w+');
         if (empty($fileHandle)) {
             return '';

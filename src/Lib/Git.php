@@ -10,7 +10,6 @@ use ArtSkills\Traits\Singleton;
 class Git
 {
     // одиночка оставлен для обратной совместимости
-    // todo: выпилить одиночку
     use Singleton;
 
     const BRANCH_NAME_MASTER = 'master';
@@ -68,7 +67,6 @@ class Git
      *
      * @param string $directory папка репозитория
      *                          возможность передать пустой параметр оставлена для обратной совместимости
-     *                          todo: выпилить возможность использовать пустой параметр
      */
     public function __construct($directory = '')
     {

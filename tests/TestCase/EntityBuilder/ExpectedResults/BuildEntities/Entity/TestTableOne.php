@@ -25,6 +25,9 @@ class TestTableOne extends Entity
     protected $_aliases = [
     ];
 
+    /**
+     * @return string
+     */
     public function asd()
     {
         return Arrays::encode(['asd' => 'qwe']);
