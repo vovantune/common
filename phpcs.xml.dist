@@ -9,8 +9,12 @@
     <arg name="extensions" value="php,ctp"/>
     <arg name="parallel" value="75"/>
 
-    <rule ref="vendor/eggheads/eggheads-code-style/rules/phpcs-rules.xml"/>
+    <exclude-pattern>*bootstrap*.php</exclude-pattern>
+    <exclude-pattern>tests/TestCase/Database/Type/Utf8StringTypeTest.php</exclude-pattern>
+
+    <rule ref="vendor/eggheads/eggheads-code-style/rules/phpcs-rules.xml" />
 
     <file>src/</file>
     <file>tests/</file>
+    <file>test-app/</file>
 </ruleset>

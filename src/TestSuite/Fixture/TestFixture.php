@@ -10,6 +10,7 @@ use Cake\Database\Connection;
 use Cake\Utility\Inflector;
 use Cake\Datasource\ConnectionInterface;
 use Exception;
+use ReflectionClass;
 
 class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 {
@@ -86,6 +87,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 
     /**
      * Получает запрос CREATE TABLE для текущей таблицы и сохраняет его в $this->_createTableSqlQuery
+     * @SuppressWarnings(PHPMD.ErrorControlOperator)
      */
     private function _getCreateQuery()
     {
@@ -101,6 +103,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
 
         // false - чтобы вместо default не подставлялся test
         $structureConnection = DB::getConnection($this->import['connection'], false);
+        // phpcs:ignore
         if (@!$structureConnection->isConnected()) {
             $structureConnection->disconnect();
             $structureConnection->connect();
@@ -133,7 +136,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
     {
         $fixtureFile = $this->import['table'] . '.xml';
         if (!empty($this->_testCaseClass)) {
-            $testCaseFile = (new \ReflectionClass($this->_testCaseClass))->getFileName();
+            $testCaseFile = (new ReflectionClass($this->_testCaseClass))->getFileName();
             $testCaseDirectory = dirname($testCaseFile);
 
             $localFixtureFile = $testCaseDirectory . DS . $fixtureFile;

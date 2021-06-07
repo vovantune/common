@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ArtSkills\TestSuite\Mock;
 
+use ReflectionClass;
 use \ReflectionMethod;
 
 /**
@@ -765,7 +766,7 @@ class MethodMockerEntity
         }
 
         if (!empty($this->_action) && ($this->_action instanceof \Closure)) {
-            $reflectClass = new \ReflectionClass($this->_class);
+            $reflectClass = new ReflectionClass($this->_class);
             $reflectParent = $reflectClass->getParentClass();
             if (!empty($reflectParent) && $reflectParent->hasMethod($this->_method)) {
                 // ранкит глючит, если мокать метод в дочернем классе через коллбек

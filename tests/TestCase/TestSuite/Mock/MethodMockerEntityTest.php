@@ -635,6 +635,7 @@ class MethodMockerEntityTest extends TestCase
 
     /**
      * variadic с типом
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function testVariadicParamType()
     {
@@ -647,6 +648,7 @@ class MethodMockerEntityTest extends TestCase
 
     /**
      * Сохранение типа возвращаемого значения
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function testReturnTypeError()
     {
@@ -658,18 +660,20 @@ class MethodMockerEntityTest extends TestCase
 
     /**
      * Сохранение типа возвращаемого значения
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function testReturnTypeGood()
     {
         $returnInt = 4;
         $mock = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnInt', false, "return $returnInt;");
-        $mockNullable = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return null;');
+        $mock2 = new MethodMockerEntity('mockid', MockTestFixture::class, 'returnNullable', false, 'return null;');
         self::assertEquals($returnInt, MockTestFixture::returnInt());
         self::assertEquals(null, MockTestFixture::returnNullable());
     }
 
     /**
      * Сохранение типа возвращаемого значения
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function testReturnTypeNullableError()
     {

@@ -10,6 +10,9 @@ use ArtSkills\TestSuite\AppTestCase;
 use Cake\Http\ServerRequest;
 use Cake\View\View;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 class AssetTest extends AppTestCase
 {
 

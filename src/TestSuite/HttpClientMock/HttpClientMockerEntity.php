@@ -7,6 +7,7 @@ use Cake\Http\Client\Request;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
+use ReflectionClass;
 
 class HttpClientMockerEntity
 {
@@ -113,7 +114,7 @@ class HttpClientMockerEntity
 
         $dropTraceFiles = [
             __FILE__,
-            (new \ReflectionClass(HttpClientMocker::class))->getFileName(),
+            (new ReflectionClass(HttpClientMocker::class))->getFileName(),
         ];
         $mockedIn = null;
         $trace = debug_backtrace();

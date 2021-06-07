@@ -1,4 +1,7 @@
 <?php
+
+use ArtSkills\Error\InternalException;
+
 /**
  * Функция для удобства создания вложенных ассоциаций. Соединяет аргументы через точку
  *
@@ -54,7 +57,7 @@ function field($tableAlias, $fieldName, $operation = null)
  * ```
  *
  * @param array $conditionsByTable
- * @throws Exception при дублировании ключей
+ * @throws InternalException при дублировании ключей
  * @return array
  */
 function fieldsWhere(array $conditionsByTable)
@@ -70,7 +73,7 @@ function fieldsWhere(array $conditionsByTable)
         foreach ($conditions as $field => $value) {
             $fieldFull = $tableAlias . '.' . $field;
             if (array_key_exists($fieldFull, $newConditions)) {
-                throw new Exception("Дублируется ключ $fieldFull");
+                throw new InternalException("Дублируется ключ $fieldFull");
             }
             $newConditions[$fieldFull] = $value;
         }
@@ -109,7 +112,7 @@ function fieldsWhere(array $conditionsByTable)
  * ```
  *
  * @param array $fieldsByTable
- * @throws Exception при дублировании ключей
+ * @throws InternalException при дублировании ключей
  * @return string[]
  */
 function fieldsSelect($fieldsByTable)
@@ -128,7 +131,7 @@ function fieldsSelect($fieldsByTable)
                 $key = $counterKey;
                 $counterKey++;
             } elseif (array_key_exists($key, $newFields)) {
-                throw new Exception("Дублируется ключ $key");
+                throw new InternalException("Дублируется ключ $key");
             }
             $newFields[$key] = $tableAlias . '.' . $field;
         }

@@ -13,6 +13,7 @@ use Cake\Log\Log;
  * Деплойщик
  * обновляет текущий или вообще любой проект
  * [описание](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
+ * @SuppressWarnings(PHPMD.MethodMix)
  */
 class Deployer
 {
@@ -695,7 +696,7 @@ class Deployer
      */
     protected function _notifySuccess()
     {
-        // todo: написать
+        // не реализовано
     }
 
     /**
@@ -703,6 +704,6 @@ class Deployer
      */
     public function rollback()
     {
-        // todo: написать
+        // не реализовано
     }
 }

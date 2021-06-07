@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\EntityBuilder;
 
@@ -8,6 +9,9 @@ use ArtSkills\EntityBuilder\EntityBuilderConfig;
 use ArtSkills\EntityBuilder\TableDocumentation;
 use ArtSkills\TestSuite\AppTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 class EntityBuilderTest extends AppTestCase
 {
     const MODEL_FOLDER = 'Model';

@@ -6,7 +6,6 @@ use ArtSkills\Log\Engine\SentryLog;
 
 class ErrorHandlerMiddleware extends \Cake\Error\Middleware\ErrorHandlerMiddleware
 {
-
     /**
      * @inheritdoc
      * Копия родительского метода.
@@ -14,6 +13,7 @@ class ErrorHandlerMiddleware extends \Cake\Error\Middleware\ErrorHandlerMiddlewa
      * По-умолчанию был плохой трейс и нельзя делать warn.
      * И исключения phpunit теперь прокидываются дальше.
      */
+    // phpcs:ignore
     protected function logException($request, $exception)
     {
         if (!$this->getConfig('log')) {

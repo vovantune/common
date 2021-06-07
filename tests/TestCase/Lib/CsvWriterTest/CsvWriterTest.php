@@ -122,7 +122,7 @@ class CsvWriterTest extends AppTestCase
 
         //Для проверки на корректность записанных данных
         self::assertEquals(true, CsvWriter::writeCsv($fileName, $data), 'Ошибка записи файла');
-        self::assertEquals($data, (new CsvReader($fileName))->getAll(), 'Некорректный массив из CSV файла');
+        self::assertEquals($data, (new CsvReader($fileName, ','))->getAll(), 'Некорректный массив из CSV файла');
         unlink($fileName);
     }
 }

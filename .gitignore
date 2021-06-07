@@ -2,3 +2,4 @@
 /.idea/
 /composer.phar
 /test-app-conf/app_local.php
+phpmd-report.html

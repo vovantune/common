@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Shell;
 
@@ -9,6 +10,9 @@ use ArtSkills\Log\Engine\SentryLog;
 use Cake\Console\Shell;
 use Cake\Utility\Inflector;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 abstract class DeploymentShell extends Shell
 {
     const TYPE_PRODUCTION = 'production';
@@ -122,8 +126,7 @@ abstract class DeploymentShell extends Shell
     }
 
     /**
-     * Откат
-     * todo: сделать
+     * Откат, ещё не реализован
      */
     public function rollBack()
     {

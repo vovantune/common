@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace TestApp\Controller;
 
@@ -10,7 +11,7 @@ class TestController extends Controller
 {
 
     /** @inheritdoc */
-    protected $_jsonResponseActions = ['getStandardErrorJsonConfigured'];
+    protected array $_jsonResponseActions = ['getStandardErrorJsonConfigured'];
 
     /** @inheritDoc */
     public function initialize()

@@ -4,6 +4,9 @@ namespace ArtSkills\Filesystem;
 
 use Cake\I18n\Time;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 class Folder extends \Cake\Filesystem\Folder
 {
     /**

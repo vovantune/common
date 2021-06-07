@@ -8,6 +8,8 @@ use ArtSkills\Lib\Strings;
 
 class File extends \Cake\Filesystem\File
 {
+    /** @var string Временная папка внутри TMP для generateTempFilePath() */
+    protected const TEMP_FILE_DIR = 'downloads';
 
     /**
      * Зипует файлы
@@ -18,7 +20,7 @@ class File extends \Cake\Filesystem\File
      * @return string Имя файла
      * @throws InternalException
      */
-    public static function zip($files, $newFile = null, $deleteOld = false)
+    public static function zip($files, ?string $newFile = null, bool $deleteOld = false): string
     {
         $files = (array)$files;
 
@@ -67,10 +69,10 @@ class File extends \Cake\Filesystem\File
      * по умолчанию рядом с архивом
      *
      * @param string $pathToFile
-     * @param null|string $unzipFolder
+     * @param string|null $unzipFolder
      * @throws \Exception
      */
-    public static function unZip($pathToFile, $unzipFolder = null)
+    public static function unZip(string $pathToFile, ?string $unzipFolder = null)
     {
         $extension = strstr(pathinfo($pathToFile)['basename'], '.');
         if (!empty($unzipFolder)) {
@@ -86,5 +88,21 @@ class File extends \Cake\Filesystem\File
                 exec('unzip ' . $pathToFile . ' -d ' . $unpackPath);
                 break;
         }
+    }
+
+    /**
+     * Генерируем уникальное имя для файла в специально обученной папке
+     *
+     * @param string $prefix
+     * @return string
+     */
+    public static function generateTempFilePath(string $prefix): string
+    {
+        $tempDir = TMP . static::TEMP_FILE_DIR;
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+        Folder::cleanupDirByLifetime($tempDir, ['.*'], 3600);
+        return tempnam($tempDir, $prefix . '-');
     }
 }

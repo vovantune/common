@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\TestCase\Shell;
+namespace ArtSkills\Test\TestCase\Shell;
 
 use ArtSkills\Lib\Shell;
 use ArtSkills\Lib\Git;
@@ -15,6 +15,7 @@ class GitBranchTrimShellTest extends AppTestCase
 {
     /**
      * Тест того, что вызывалось при запуске
+     * @group Git
      */
     public function test()
     {

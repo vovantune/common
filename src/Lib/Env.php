@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
 use ArtSkills\Error\InternalException;
 use Cake\Core\Configure;
 use Cake\Error\PHP7ErrorException;
+use Exception;
+use PHPUnit\Framework\AssertionFailedError;
 
 /**
  * @method static string getServerName()
@@ -31,10 +34,13 @@ use Cake\Error\PHP7ErrorException;
  * @method static bool setFixtureFolder(string $path)
  * @method static bool setMockFolder(string $path)
  * @method static bool setMockNamespace(string $namespace)
+ * @method static int getThreadsLimit()
+ * @method static setThreadsLimit(int $limit)
+ * @method static array|null getApiInfo()
+ * @method static setDebug(bool $enableDebug)
  */
 class Env
 {
-
     /**
      * Обращение к конфигу по названию метода, а не параметром
      *
@@ -42,8 +48,9 @@ class Env
      * @param array $arguments
      * @return mixed
      * @throws InternalException
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function __callStatic($name, array $arguments = [])
+    public static function __callStatic(string $name, array $arguments = [])
     {
         $prefix = 'get';
         if (Strings::startsWith($name, $prefix)) {
@@ -70,7 +77,7 @@ class Env
      *
      * @return bool
      */
-    public static function isProduction()
+    public static function isProduction(): bool
     {
         return !Configure::read('debug');
     }
@@ -81,7 +88,7 @@ class Env
      *
      * @return bool
      */
-    public static function isTestServer()
+    public static function isTestServer(): bool
     {
         return (self::getServerName() === self::getTestServerName());
     }
@@ -91,7 +98,7 @@ class Env
      *
      * @return bool
      */
-    public static function isDevelopment()
+    public static function isDevelopment(): bool
     {
         return !self::isProduction() && !self::isTestServer() && !self::isLocal();
     }
@@ -101,7 +108,7 @@ class Env
      *
      * @return bool
      */
-    public static function isLocal()
+    public static function isLocal(): bool
     {
         return !empty($_SERVER['DEV_LOCAL']);
     }
@@ -111,7 +118,7 @@ class Env
      *
      * @return bool
      */
-    public static function isUnitTest()
+    public static function isUnitTest(): bool
     {
         return defined('TEST_MODE') && TEST_MODE;
     }
@@ -121,7 +128,7 @@ class Env
      *
      * @return bool
      */
-    public static function isNotProduction()
+    public static function isNotProduction(): bool
     {
         return !self::isProduction();
     }
@@ -131,7 +138,7 @@ class Env
      *
      * @return bool
      */
-    public static function isCli()
+    public static function isCli(): bool
     {
         return (php_sapi_name() === 'cli');
     }
@@ -141,7 +148,7 @@ class Env
      *
      * @return bool
      */
-    public static function isUserLinux()
+    public static function isUserLinux(): bool
     {
         $userAgent = env('HTTP_USER_AGENT');
         return (empty($userAgent) || (stristr($userAgent, 'Linux') || stristr($userAgent, 'Mac OS')));
@@ -158,12 +165,12 @@ class Env
     /**
      * Прокидывает PHPUnit exception'ы дальше, чтоб в тесты правильно валились
      *
-     * @param \Exception|PHP7ErrorException $exception
-     * @throws \PHPUnit\Framework\AssertionFailedError|PHP7ErrorException
+     * @param Exception|PHP7ErrorException $exception
+     * @throws AssertionFailedError|PHP7ErrorException
      */
     public static function checkTestException($exception)
     {
-        if ($exception instanceof \PHPUnit\Framework\AssertionFailedError) {
+        if ($exception instanceof AssertionFailedError) {
             // ExpectationFailedException наследуется от AssertionFailedError, достаточно одного instanceof
             throw $exception;
         }

@@ -28,6 +28,7 @@ class ConstantMocker
      * @param string $constantName
      * @param mixed $newValue
      * @throws AssertionFailedError|Exception
+     * @SuppressWarnings(PHPMD.ErrorControlOperator)
      */
     public static function mock(?string $className, string $constantName, $newValue): void
     {
@@ -36,6 +37,7 @@ class ConstantMocker
         } else {
             $fullName = $constantName;
         }
+        // phpcs:ignore
         $origValue = @constant($fullName);
         if ($origValue === null) {
             MethodMocker::fail('Constant ' . $fullName . ' is not defined!');

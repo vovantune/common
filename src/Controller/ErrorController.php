@@ -25,8 +25,9 @@ class ErrorController extends Controller
      * Скопировано из Cake\Controller\ErrorController
      * Дописал отсылку ошибок в нашем стиле
      *
-     * @param \Cake\Event\Event $event
+     * @param Event $event
      * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function beforeRender(Event $event)
     {

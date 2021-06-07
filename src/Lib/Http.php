@@ -119,6 +119,7 @@ class Http
      * @param string $targetFile
      * @param int $timeout
      * @return string
+     * @SuppressWarnings(PHPMD.ErrorControlOperator))
      */
     public static function downloadFile(string $url, string $targetFile = '', int $timeout = 30): string
     {
@@ -127,6 +128,7 @@ class Http
             $targetFile = TMP . uniqid() . '.tmp';
         }
 
+        // phpcs:ignore
         @$fileHandle = fopen($targetFile, 'w+');
         if (empty($fileHandle)) {
             return '';

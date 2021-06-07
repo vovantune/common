@@ -1,6 +1,6 @@
 <?php
 
-namespace ArtSkills\Test\Controller;
+namespace ArtSkills\Test\TestCase\Controller;
 
 use ArtSkills\Error\UserException;
 use ArtSkills\Lib\Env;
@@ -9,6 +9,7 @@ use ArtSkills\TestSuite\AppControllerTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
 use Cake\Log\Log;
 use PHPUnit\Framework\AssertionFailedError;
+use ReflectionClass;
 use TestApp\Controller\TestController;
 
 class ControllerTest extends AppControllerTestCase
@@ -156,8 +157,8 @@ class ControllerTest extends AppControllerTestCase
                 // в TestController вызван Controller->_throwInternalError
                 // в котором вызван InternalError::instance
                 // при этом file и line - из TestController
-                'file' => (new \ReflectionClass(TestController::class))->getFileName(),
-                'line' => 146,
+                'file' => (new ReflectionClass(TestController::class))->getFileName(),
+                'line' => 147,
             ],
             500
         );
@@ -176,8 +177,8 @@ class ControllerTest extends AppControllerTestCase
                 'url' => '/test/getInternalErrorJsonTrace',
                 'code' => 500,
                 // а здесь был сделан непосредственно throw new InternalError
-                'file' => (new \ReflectionClass(TestController::class))->getFileName(),
-                'line' => 157,
+                'file' => (new ReflectionClass(TestController::class))->getFileName(),
+                'line' => 158,
             ],
             500
         );

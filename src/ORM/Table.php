@@ -8,6 +8,9 @@ use Cake\Datasource\EntityInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\ORM\TableRegistry;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 class Table extends \Cake\ORM\Table
 {
 

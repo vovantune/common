@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\TestSuite\Mock\Fixture;
 
+use Exception;
+
+/**
+ * @SuppressWarnings(PHPMD.MethodMixs)
+ */
 class MockTestChildFixture extends MockTestFixture
 {
 
@@ -51,7 +56,7 @@ class MockTestChildFixture extends MockTestFixture
      * @param bool $isRedefined
      * @param string $callType
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function callChild(bool $isStatic, bool $isRedefined, string $callType): string
     {
@@ -64,7 +69,7 @@ class MockTestChildFixture extends MockTestFixture
             } elseif ($callType == 'parent') {
                 return parent::$methodName();
             } else {
-                throw new \Exception('bad call type');
+                throw new Exception('bad call type');
             }
         } else {
             return $this->$methodName();

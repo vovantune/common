@@ -13,7 +13,7 @@ class CsvReaderTest extends AppTestCase
      */
     public function testReading()
     {
-        $csv = new CsvReader(__DIR__ . '/CsvFixture.csv');
+        $csv = new CsvReader(__DIR__ . '/CsvFixture.csv', ',');
         self::assertEquals([
             0 => [
                 0 => 'row1',

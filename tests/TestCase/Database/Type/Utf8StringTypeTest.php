@@ -1,13 +1,16 @@
 <?php
-
+// phpcs:ignore
 namespace ArtSkills\Test\TestCase\Database\Type;
 
+use ArtSkills\Database\Type\Utf8StringType;
 use ArtSkills\ORM\Table;
 use ArtSkills\TestSuite\AppTestCase;
 use Cake\Database\Type;
 
-\Cake\Database\Type::map('text', \ArtSkills\Database\Type\Utf8StringType::class);
-\Cake\Database\Type::map('string', \ArtSkills\Database\Type\Utf8StringType::class);
+// phpcs:ignore
+Type::map('text', Utf8StringType::class);
+// phpcs:ignore
+Type::map('string', Utf8StringType::class);
 
 /**
  * @property Table $TestTableOne

@@ -76,6 +76,7 @@ class GitTest extends AppTestCase
 
     /**
      * Тест функции списка веток
+     * @group Git
      */
     public function testGetBranchList()
     {
@@ -232,8 +233,8 @@ class GitTest extends AppTestCase
      * Возвращает список комманд, используемых для удаления ветки
      *
      * @param string $branchDelete
-     * @param string $branchBefore
      * @param bool $canDelete
+     * @param string $branchBefore
      * @param string $type
      * @param bool $pull
      * @return array|bool
@@ -324,6 +325,7 @@ class GitTest extends AppTestCase
 
     /**
      * Тест удаления текущей ветки
+     * @group Git
      */
     public function testDeleteCurrent()
     {

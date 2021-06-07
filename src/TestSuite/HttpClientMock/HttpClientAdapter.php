@@ -10,6 +10,7 @@ use Cake\Http\Client\Response;
  * Прослайка на отправку HTTP запросов
  *
  * @package App\Test\Suite
+ * @SuppressWarnings(PHPMD.MethodMix)
  */
 class HttpClientAdapter extends Stream
 {

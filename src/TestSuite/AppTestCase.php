@@ -4,6 +4,9 @@ namespace ArtSkills\TestSuite;
 
 use Cake\TestSuite\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 abstract class AppTestCase extends TestCase
 {
     use TestCaseTrait;

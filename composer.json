@@ -19,7 +19,10 @@
     "sentry/sentry": "^1.1",
     "jan-swiecki/simple-annotations": "*",
     "ext-intl": "*",
-    "ext-zend-opcache": "*"
+    "ext-zend-opcache": "*",
+    "ext-pcntl": "*",
+    "zircote/swagger-php": "^3.0",
+    "ext-zip": "*"
   },
   "require-dev": {
     "ext-runkit7": "*",

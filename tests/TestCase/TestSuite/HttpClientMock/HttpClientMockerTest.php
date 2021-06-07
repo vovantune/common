@@ -99,7 +99,10 @@ class HttpClientMockerTest extends AppTestCase
         self::assertTrue(true, 'Не кинулся ексепшн');
     }
 
-    /** Мок возвращает код статуса */
+    /**
+     * Мок возвращает код статуса
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function testStatusCode()
     {
         $url = 'http://www.artskills.ru';

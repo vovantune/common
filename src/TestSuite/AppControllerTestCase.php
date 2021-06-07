@@ -2,6 +2,9 @@
 
 namespace ArtSkills\TestSuite;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodMix)
+ */
 abstract class AppControllerTestCase extends IntegrationTestCase
 {
     use TestCaseTrait;

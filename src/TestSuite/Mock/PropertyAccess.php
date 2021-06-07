@@ -5,6 +5,7 @@ namespace ArtSkills\TestSuite\Mock;
 
 use ArtSkills\Traits\Library;
 use PHPUnit\Framework\AssertionFailedError;
+use ReflectionProperty;
 
 /**
  * Обращения к private и protected свойствам
@@ -29,7 +30,7 @@ class PropertyAccess
      */
     public static function setStatic(string $className, string $propertyName, $value): void
     {
-        $property = new \ReflectionProperty($className, $propertyName);
+        $property = new ReflectionProperty($className, $propertyName);
         $property->setAccessible(true);
         $property->setValue($value);
     }
@@ -48,7 +49,7 @@ class PropertyAccess
             self::$_toRestore[$storeKey] = self::getStatic($className, $propertyName);
         }
 
-        $property = new \ReflectionProperty($className, $propertyName);
+        $property = new ReflectionProperty($className, $propertyName);
         $property->setAccessible(true);
         $property->setValue($value);
     }
@@ -99,7 +100,7 @@ class PropertyAccess
     public static function restoreStaticAll(): void
     {
         foreach (self::$_toRestore as $key => $value) {
-            list($className, $propertyName) = self::_getClassAndPropertyFromKey($key);
+            [$className, $propertyName] = self::_getClassAndPropertyFromKey($key);
             self::setStatic($className, $propertyName, $value);
         }
         self::$_toRestore = [];
@@ -114,7 +115,7 @@ class PropertyAccess
      */
     public static function set($object, string $propertyName, $value): void
     {
-        $property = new \ReflectionProperty($object, $propertyName);
+        $property = new ReflectionProperty($object, $propertyName);
         $property->setAccessible(true);
         $property->setValue($object, $value);
     }
@@ -129,7 +130,7 @@ class PropertyAccess
      */
     public static function getStatic(string $className, string $propertyName)
     {
-        $property = new \ReflectionProperty($className, $propertyName);
+        $property = new ReflectionProperty($className, $propertyName);
         $property->setAccessible(true);
         return $property->getValue();
     }
@@ -143,7 +144,7 @@ class PropertyAccess
      */
     public static function get($object, string $propertyName)
     {
-        $property = new \ReflectionProperty(get_class($object), $propertyName);
+        $property = new ReflectionProperty(get_class($object), $propertyName);
         $property->setAccessible(true);
         return $property->getValue($object);
     }

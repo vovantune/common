@@ -1,7 +1,24 @@
 # Установка
-* В `bootstrap.php` под строкой `require CORE_PATH . 'config' . DS . 'bootstrap.php';` дописываем следующую: 
+* В composer.json в require-dev прописываем:
+  `"artskills/common": "dev-master",`
+* Не забываем указывать там же:
+  `"minimum-stability": "dev"`
+* Подключаем репозиторий:
+
+```json
+{
+    "type": "vcs",
+    "url": "git://github.com/vovantune/common"
+}
+```
+* Запускаем `php composer.phar install` из папки проекта.
+* В `bootstrap.php` под строкой `require CORE_PATH . 'config' . DS . 'bootstrap.php';` дописываем следующую:
 ```php
 require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . DS . 'config' . DS . 'bootstrap.php';
+```
+* В  `bootstrap.php` правим следующую строку:
+```php
+Cache::setConfig(\App\Lib\AppCache::getConfig());
 ```
 * Наследуем `AppController` от [ArtSkills\Controller\Controller](src/Controller/Controller.php)
 * Наследуем `ErrorController` от [ArtSkills\Controller\ErrorController](src/Controller/ErrorController.php)
@@ -43,9 +60,9 @@ require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . D
 * [Объект](src/ValueObject/README.md) для сообщений между классами да и вообще для любых целей (использование объектов вместо ассоциативных массивов ради автодополнения)
 * Функции для удобного запуска [команд в шелле](src/Lib/Shell.php) (Удобные возвращаемые значения, ошибки по-умолчанию попадают в вывод, возможность запускать в фоновом режиме, запуск из конкретной папки)
 * Добавлены шаблоны и параметры хелпера [Form](src/View/Helper)
+* Запуск функции в несколько потоков [MultiThreads](src/Lib/MultiThreads.php)
 
- 
- 
+
  ## Доработать
 * Описать регламент работы с common (как оформлять доки, как оформлять код)
 * Выпилить использование Git как одиночки и без указания папки (сначала в проектах, потом в common)
@@ -54,7 +71,4 @@ require ROOT . DS . 'vendor' . DS . 'artskills' . DS . 'common' . DS . 'src' . D
   * Но до этого нужно откатить миграции. Сравнить миграции в текущей папке и в предыдущей, и из текущей откатить разницу
   * И нужно проверять, что в предыдущей папке сейчас более старая версия. (Если сделано более одного отката, то можно сделать круг.) Проверка по currentVersion
 * Об успешном деплое тоже можно сделать оповещение (чтоб не гадать, когда он завершился)
-* Можно в деплое добавить проверку, что сейчас ничего не деплоится/откатывается, чтобы нельзя было запустить одновременно  
-
-## Подумать
-* Можно ли как-нибудь вынести общий js код
+* Можно в деплое добавить проверку, что сейчас ничего не деплоится/откатывается, чтобы нельзя было запустить одновременно

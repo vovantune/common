@@ -7,5 +7,5 @@
          xsi:noNamespaceSchemaLocation="
                      http://pmd.sf.net/ruleset_xml_schema.xsd">
 
-    <rule ref="vendor/eggheads/eggheads-code-style/rules/phpmd-ruleset.xml"/>
+    <rule ref="vendor/eggheads/eggheads-code-style/rules/phpmd-ruleset.xml" />
 </ruleset>
