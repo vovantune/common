@@ -55,28 +55,28 @@ class EntityBuilder
     /**
      * Конфиг
      *
-     * @var EntityBuilderConfig
+     * @var ?EntityBuilderConfig
      */
-    protected static $_config = null;
+    protected static ?EntityBuilderConfig $_config = null;
 
     /**
      * Список шаблонов магических методов для таблиц
      *
-     * @var array
+     * @var array<string, string>
      */
-    protected static $_tableMethods = [];
+    protected static array $_tableMethods = [];
     /**
      * Список шаблонов файлов
      *
-     * @var array
+     * @var array<string, string>
      */
-    protected static $_fileTemplates = [];
+    protected static array $_fileTemplates = [];
     /**
      * Список базовых классов
      *
-     * @var array
+     * @var array<string, string>
      */
-    protected static $_baseClasses = [];
+    protected static array $_baseClasses = [];
 
     /**
      * Задать конфиг
@@ -84,7 +84,7 @@ class EntityBuilder
      * @param EntityBuilderConfig|null $config
      * @throws InternalException
      */
-    public static function setConfig($config)
+    public static function setConfig(?EntityBuilderConfig $config)
     {
         static::$_config = $config;
         if (empty($config)) {
@@ -422,7 +422,7 @@ class EntityBuilder
     {
         $refClass = new ReflectionClass(static::$_config->modelNamespace . '\Table\\' . $tblName);
 
-        if ($refClass->hasProperty('useTable')) {
+        if ($refClass->hasProperty('useTable') || $refClass->isAbstract()) {
             return false;
         }
 
