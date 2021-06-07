@@ -635,6 +635,7 @@ class MethodMockerEntityTest extends TestCase
 
     /**
      * variadic с типом
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function testVariadicParamType()
     {
@@ -647,6 +648,7 @@ class MethodMockerEntityTest extends TestCase
 
     /**
      * Сохранение типа возвращаемого значения
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function testReturnTypeError()
     {
