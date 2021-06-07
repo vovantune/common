@@ -12,6 +12,8 @@ use Cake\I18n\Date;
 use Cake\I18n\Time;
 use DocBlockReader\Reader;
 use Exception;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * Формируем README.md файл с данными по таблицам
@@ -65,6 +67,7 @@ class TableDocumentation
      *
      * @return bool true в случае необходимости перегрузить доку
      * @throws InternalException
+     * @throws Exception
      */
     public static function build(): bool
     {
@@ -115,6 +118,7 @@ class TableDocumentation
      *
      * @param string[] $entityList
      * @return bool
+     * @throws Exception
      */
     private static function _buildJsDoc(array $entityList): bool
     {
@@ -145,6 +149,7 @@ class TableDocumentation
      * Формируем список таблиц
      *
      * @return string[]
+     * @throws ReflectionException
      */
     private static function _getEntityList(): array
     {
@@ -155,6 +160,12 @@ class TableDocumentation
 
         $result = [];
         foreach ($files as $tblFile) {
+            $entityName = str_replace('.php', '', $tblFile);
+            $refClass = new ReflectionClass(static::$_config->modelNamespace . '\Entity\\' . $entityName);
+            if ($refClass->isAbstract()) {
+                continue;
+            }
+
             require_once $folder->pwd() . DS . $tblFile; // дабы файл может создаться раньше, а autoload не вкурсе
             $result[] = str_replace('.php', '', $tblFile);
         }
@@ -199,6 +210,7 @@ class TableDocumentation
      *
      * @param string $className
      * @return string
+     * @throws Exception
      */
     private static function _buildJsTableDescription(string $className): string
     {
@@ -210,6 +222,10 @@ class TableDocumentation
         $article .= "\n";
 
         $entityAnnotations = self::_getEntityAnnotations($className);
+        if (empty($entityAnnotations['property'])) {
+            return '';
+        }
+
         if (!is_array($entityAnnotations['property'])) {
             $entityAnnotations['property'] = (array)$entityAnnotations['property'];
         }
