@@ -39,7 +39,7 @@ class FixtureTest extends AppTestCase
   `col_text` longtext NOT NULL,
   `col_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'comment2',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='description blabla'";
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='description blabla'";
 
         $baseObject = new TestFixture('test_table_one');
         $baseObjectQuery = PropertyAccess::get($baseObject, '_createTableSqlQuery');
