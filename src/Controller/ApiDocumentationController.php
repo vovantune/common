@@ -26,6 +26,7 @@ use function OpenApi\scan;
  *    'version' => '1',
  *    'contact' => [
  *       'email' => 'tune@eggheads.solutions',
+ *       'url' => '/apiDocumentation.json', // путь к контроллеру
  *    ],
  * ],
  * ```
@@ -87,6 +88,7 @@ class ApiDocumentationController extends Controller
                 'version' => '1',
                 'contact' => [
                     'email' => 'tune@eggheads.solutions',
+                    'url' => '/apiDocumentation.json',
                 ],
             ];
 
@@ -97,7 +99,7 @@ class ApiDocumentationController extends Controller
                 'version' => $apiInfo['version'],
                 'contact' => new Contact([
                     'email' => $apiInfo['contact']['email'],
-                    'url' => Url::withDomainAndProtocol('apiDocumentation'),
+                    'url' => Url::withDomainAndProtocol($apiInfo['contact']['url']),
                 ]),
             ]);
 
