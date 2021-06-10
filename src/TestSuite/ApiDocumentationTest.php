@@ -192,7 +192,6 @@ class ApiDocumentationTest
     private function _checkForRequiredProperties(array $object, array $propertyList, string $errorMessage)
     {
         foreach ($propertyList as $propertyName) {
-
             if ($propertyName === 'type' && !empty($object['oneOf'])) {
                 Assert::assertTrue(isset($object['oneOf'][0]['$ref']), $errorMessage . '::' . $propertyName);
             } else {
