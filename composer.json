@@ -6,6 +6,14 @@
     {
       "type": "vcs",
       "url": "git://github.com/vovantune/eggheads-code-style"
+    },
+    {
+      "type": "vcs",
+      "url": "git://github.com/vovantune/PhpSpreadsheet"
+    },
+    {
+      "type": "vcs",
+      "url": "git://github.com/vovantune/PHP_XLSXWriter"
     }
   ],
   "require": {
@@ -18,6 +26,8 @@
     "robmorgan/phinx": "^0.8.1",
     "sentry/sentry": "^1.1",
     "jan-swiecki/simple-annotations": "*",
+    "mk-j/php_xlsxwriter": "dev-master",
+    "phpoffice/phpspreadsheet": "dev-master",
     "ext-intl": "*",
     "ext-zend-opcache": "*",
     "ext-pcntl": "*",
