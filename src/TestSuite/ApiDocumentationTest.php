@@ -77,9 +77,14 @@ class ApiDocumentationTest
                 $checkObject = null;
             }
             Assert::assertNotNull($checkObject, 'Не описаны свойства в ' . $definitionPath);
+            $isEmptyChildDefinition = true;
             foreach ($checkObject as $propertyIndex => $property) {
-                $this->_testDefinition($property, $definitionPath . '::' . $propertyIndex, $jsonSchema);
+                if ($property) {
+                    $this->_testDefinition($property, $definitionPath . '::' . $propertyIndex, $jsonSchema);
+                    $isEmptyChildDefinition = false;
+                }
             }
+            Assert::assertFalse($isEmptyChildDefinition, 'Не описаны свойства в ' . $definitionPath);
         } elseif ($definition['type'] === 'object') {
             Assert::assertNotEmpty($definition['properties'], 'Не описаны свойства в ' . $definitionPath);
             foreach ($definition['properties'] as $propertyName => $property) {
