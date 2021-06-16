@@ -39,4 +39,24 @@ class EmailTest extends AppTestCase
         ];
         self::assertEquals([$expectedData], $emailData, 'Не изменился адрес почты');
     }
+
+    /**
+     * Отправка нескольким получателям
+     *
+     * @see Email::setToWithDelimiter()
+     */
+    public function testSetToWithDelimiter()
+    {
+        $email = new Email();
+        $email->setToWithDelimiter('tune@nxt.ru tune2@nxt.ru, tune3@nxt.ru; tune4@nxt.ru  ');
+        $email->send('123');
+
+        $result = TestEmailTransport::getMessages();
+        self::assertEquals([
+            'tune@nxt.ru' => 'tune@nxt.ru',
+            'tune2@nxt.ru' => 'tune2@nxt.ru',
+            'tune3@nxt.ru' => 'tune3@nxt.ru',
+            'tune4@nxt.ru' => 'tune4@nxt.ru',
+        ], $result[0]['to']);
+    }
 }
