@@ -94,6 +94,31 @@ class Email extends \Cake\Mailer\Email
     }
 
     /**
+     * Добавляем массив получателей с разделителем
+     *
+     * @param string $toEmails
+     * @return Email
+     */
+    public function setToWithDelimiter(string $toEmails): self
+    {
+        $notifyEmails = preg_split("/[\s,;]+/", trim($toEmails));
+        if (!is_array($notifyEmails)) {
+            return $this;
+        }
+
+        $this->setTo(trim($notifyEmails[0]));
+        // добавляем все копии
+
+        $emailsCount = count($notifyEmails);
+        if ($emailsCount > 1) {
+            for ($i = 1; $i < $emailsCount; $i++) {
+                $this->addTo(trim($notifyEmails[$i]));
+            }
+        }
+        return $this;
+    }
+
+    /**
      * переопределяем email для тестового режима
      *
      * @inheritdoc
