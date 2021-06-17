@@ -91,7 +91,8 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
      */
     private function _getCreateQuery()
     {
-        $this->import['connection'] = DB::CONNECTION_DEFAULT;
+        $connectionName = $this->getTableLocator()->get($this->table)::defaultConnectionName();
+        $this->import['connection'] = $connectionName;
 
         if (!empty($this->table)) {
             $this->import['table'] = $this->table;
