@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace ArtSkills\Lib\Excel;
+namespace ArtSkills\Excel;
 
-use ArtSkills\Lib\Excel\Format\AbstractReaderFormat;
+use ArtSkills\Excel\Format\AbstractReaderFormat;
 use ArtSkills\Error\InternalException;
 use ArtSkills\Error\UserException;
 use ArtSkills\Traits\Library;

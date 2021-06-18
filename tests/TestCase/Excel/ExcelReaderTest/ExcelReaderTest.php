@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace ArtSkills\Test\TestCase\Lib\Excel\ExcelReaderTest;
+namespace ArtSkills\Test\TestCase\Excel\ExcelReaderTest;
 
-use ArtSkills\Lib\Excel\CheckCondition;
-use ArtSkills\Lib\Excel\ExcelReader;
-use ArtSkills\Lib\Excel\FieldMapElement;
-use ArtSkills\Lib\Excel\IncorrectCheckException;
+use ArtSkills\Excel\CheckCondition;
+use ArtSkills\Excel\ExcelReader;
+use ArtSkills\Excel\FieldMapElement;
+use ArtSkills\Excel\IncorrectCheckException;
 use ArtSkills\Error\InternalException;
 use ArtSkills\TestSuite\AppTestCase;
 use InvalidArgumentException;
