@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ArtSkills\Lib\Excel;
+namespace ArtSkills\Excel;
 
 use ArtSkills\Error\InternalException;
 

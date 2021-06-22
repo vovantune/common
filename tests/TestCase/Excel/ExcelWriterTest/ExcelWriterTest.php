@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace ArtSkills\Test\TestCase\Lib\Excel\ExcelWriterTest;
+namespace ArtSkills\Test\TestCase\Excel\ExcelWriterTest;
 
 use ArtSkills\Error\InternalException;
 use ArtSkills\Error\UserException;
-use ArtSkills\Lib\Excel\ExcelReader;
-use ArtSkills\Lib\Excel\ExcelWriter;
-use ArtSkills\Lib\Excel\FieldMapElement;
-use ArtSkills\Lib\Excel\IncorrectCheckException;
+use ArtSkills\Excel\ExcelReader;
+use ArtSkills\Excel\ExcelWriter;
+use ArtSkills\Excel\FieldMapElement;
+use ArtSkills\Excel\IncorrectCheckException;
 use ArtSkills\TestSuite\AppTestCase;
 
 class ExcelWriterTest extends AppTestCase

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace ArtSkills\Test\TestCase\Lib\Excel\DefaultReaderFormatTest;
+namespace ArtSkills\Test\TestCase\Excel\DefaultReaderFormatTest;
 
-use ArtSkills\Lib\Excel\Format\DefaultReaderFormat;
+use ArtSkills\Excel\Format\DefaultReaderFormat;
 use ArtSkills\TestSuite\AppTestCase;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 
