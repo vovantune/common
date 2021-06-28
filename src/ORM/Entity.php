@@ -41,4 +41,18 @@ class Entity extends \Cake\ORM\Entity
         }
         $this->setDirty($childEntity, true);
     }
+
+    /**
+     * Ошибки без разделения по полям
+     *
+     * @return string[]
+     */
+    public function getAllErrors(): array
+    {
+        $errors = $this->getErrors();
+        if (empty($errors)) {
+            return [];
+        }
+        return array_merge(...array_values($errors));
+    }
 }
