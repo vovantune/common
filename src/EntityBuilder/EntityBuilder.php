@@ -206,31 +206,6 @@ class EntityBuilder
     }
 
     /**
-     * Возвращает список алиасов полей
-     *
-     * @param string $entityName
-     * @param array<string, string> $fields field => comment
-     * @return array<string, string> alias => field
-     */
-    protected static function _getAliases(string $entityName, array $fields): array
-    {
-        $aliases = [];
-        $className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
-        if (class_exists($className)) {
-            // field => field
-            $fields = Arrays::keysFromValues(array_keys($fields));
-            $aliases = PropertyAccess::get(new $className, '_aliases');
-
-            foreach ($aliases as $alias => $field) {
-                if (empty($fields[$field])) {
-                    unset($aliases[$alias]);
-                }
-            }
-        }
-        return $aliases;
-    }
-
-    /**
      * Формируем список виртуальных полей сущности
      *
      * @param string $entityName
@@ -593,15 +568,6 @@ class EntityBuilder
         // реальные поля
         $curTblFields = self::_getTableFieldsComments($entityName);
 
-        // алиасы полей
-        $aliases = static::_getAliases($entityName, $curTblFields);
-        $aliasProperty = "\n";
-        foreach ($aliases as $alias => $field) {
-            $aliasProperty .= "        '$alias' => '$field',\n";
-            $curTblFields[$alias] = str_replace('$' . $field, '$' . $alias, $curTblFields[$field]) . " (алиас поля $field)";
-        }
-        $aliasProperty .= "    ";
-
         // виртуальные поля (повешены кейковские геттеры)
         $virtualFields = self::_getVirtualFields($entityName, $curTblFields);
         foreach ($virtualFields as $fieldName => $fieldType) {
@@ -617,16 +583,6 @@ class EntityBuilder
         if ($file->exists()) {
             $className = static::$_config->modelNamespace . '\Entity\\' . $entityName;
             $refClass = new ReflectionClass($className);
-
-            $file = new File($refClass->getFileName());
-            $contents = $file->read();
-            $contents = preg_replace(
-                '/protected \$_aliases = \[[^]]*\];/',
-                'protected $_aliases = [' . $aliasProperty . '];',
-                $contents
-            );
-            $file->write($contents);
-            $file->close();
 
             $classComments = $refClass->getDocComment();
             if ($classComments === false) {
@@ -661,8 +617,8 @@ class EntityBuilder
         } else {
             $file->create();
             $template = self::_processFileTemplate($entityName, static::FILE_TYPE_ENTITY);
-            $search = ['{PROPERTIES}', '{ALIASES}'];
-            $replace = [implode("\n", $curTblFields), $aliasProperty];
+            $search = ['{PROPERTIES}'];
+            $replace = [implode("\n", $curTblFields)];
             $file->write(str_replace($search, $replace, $template));
             $file->close();
             return true;

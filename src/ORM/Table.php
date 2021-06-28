@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\ORM;
 
@@ -6,14 +7,15 @@ use ArtSkills\Lib\Env;
 use ArtSkills\Lib\Strings;
 use Cake\Datasource\EntityInterface;
 use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\ORM\ResultSet;
 use Cake\ORM\TableRegistry;
+use Exception;
 
 /**
  * @SuppressWarnings(PHPMD.MethodMix)
  */
 class Table extends \Cake\ORM\Table
 {
-
     /**
      * @inheritdoc
      * прописывание правильной сущности
@@ -53,8 +55,9 @@ class Table extends \Cake\ORM\Table
      * @param Entity|null|int $entity null для новой записи, сущность или её id для редактирования
      * @param array $options
      * @return bool|Entity
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public function saveArr($saveData, $entity = null, $options = [])
+    public function saveArr(array $saveData, $entity = null, array $options = [])
     {
         if (empty($entity)) {
             $entity = $this->newEntity();
@@ -82,9 +85,11 @@ class Table extends \Cake\ORM\Table
      *
      * @param array $saveData
      * @param array $options
-     * @return array|bool|\Cake\ORM\ResultSet
+     * @return array|bool|ResultSet
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @throws Exception
      */
-    public function saveManyArr($saveData, $options = [])
+    public function saveManyArr(array $saveData, array $options = [])
     {
         if (!is_array($saveData)) {
             return false;
@@ -100,8 +105,9 @@ class Table extends \Cake\ORM\Table
      * @param Entity|int $entity
      * @param array $options
      * @return Entity|false
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public function getEntity($entity, $options = [])
+    public function getEntity($entity, array $options = [])
     {
         if ($entity instanceof Entity) {
             return $entity;
@@ -122,8 +128,9 @@ class Table extends \Cake\ORM\Table
      * @param array $conditions
      * @param array $contain
      * @return bool
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public function exists($conditions, $contain = [])
+    public function exists($conditions, array $contain = []): bool
     {
         return (bool)count(
             $this->find('all')
@@ -142,8 +149,10 @@ class Table extends \Cake\ORM\Table
      * @param Query|array $queryData
      * @param array $updateData
      * @return Entity|null
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @throws Exception
      */
-    public function updateWithLock($queryData, $updateData)
+    public function updateWithLock($queryData, array $updateData): ?Entity
     {
         if (is_array($queryData)) {
             $queryData = $this->find()->where($queryData);
@@ -188,31 +197,9 @@ class Table extends \Cake\ORM\Table
      *
      * @return bool
      */
-    public function truncate()
+    public function truncate(): bool
     {
         return ((int)$this->getConnection()->execute('TRUNCATE ' . $this->getTable())->errorCode() === 0);
-    }
-
-    /**
-     * Очистить таблицу, если нельзя применить truncate
-     * (есть внешние ключи или должна быть возможность откатиться)
-     *
-     * @return int
-     */
-    public function truncateSafe()
-    {
-        return $this->deleteAll(Query::CONDITION_ALL);
-    }
-
-    /**
-     * Обновить все строки таблицы
-     *
-     * @param array $fields
-     * @return int
-     */
-    public function updateAllRecords($fields)
-    {
-        return $this->updateAll($fields, Query::CONDITION_ALL);
     }
 
     /**
@@ -342,7 +329,7 @@ class Table extends \Cake\ORM\Table
      *
      * @return string
      */
-    private static function _getAlias()
+    private static function _getAlias(): string
     {
         $classNameParts = explode('\\', static::class);
         return Strings::replacePostfix(array_pop($classNameParts), 'Table');
@@ -354,8 +341,9 @@ class Table extends \Cake\ORM\Table
      * @param string $assocName
      * @param array $options
      * @return array
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    private function _assocOptions($assocName, $options)
+    private function _assocOptions(string $assocName, array $options): array
     {
         if (empty($options['propertyName'])) {
             $options['propertyName'] = $assocName;

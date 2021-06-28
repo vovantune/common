@@ -8,6 +8,5 @@ namespace {MODEL_NAMESPACE}\Entity;
  */
 class {ENTITY} extends {BASE}
 {
-    /** @inheritdoc */
-    protected $_aliases = [{ALIASES}];
+
 }
