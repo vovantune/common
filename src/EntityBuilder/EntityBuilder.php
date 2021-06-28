@@ -642,7 +642,7 @@ class EntityBuilder
         $result = [];
         foreach ($columnList as $column) {
             $columnInfo = $tableSchema->getColumn($column);
-            $result[$column] = ' * @property ' . static::SCHEMA_TYPE_MAP[$columnInfo['type']] . ' $' . $column .
+            $result[$column] = ' * @property ' . ($columnInfo['null'] === true ? '?' : '') . static::SCHEMA_TYPE_MAP[$columnInfo['type']] . ' $' . $column .
                 (array_key_exists($column, $defaultValues) ? ' = ' . var_export($defaultValues[$column], true) : '') .
                 (!empty($columnInfo['comment']) ? ' ' . $columnInfo['comment'] : '');
         }
@@ -655,7 +655,7 @@ class EntityBuilder
             $foreignKeys = $assoc->getForeignKey();
             $bindingKeys = $assoc->getBindingKey();
 
-            $result[$propertyName] = ' * @property ' . $className
+            $result[$propertyName] = ' * @property ?' . $className
                 . (in_array(
                     $assoc->type(),
                     [

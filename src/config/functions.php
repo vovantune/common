@@ -1,14 +1,15 @@
 <?php
+declare(strict_types=1);
 
 use ArtSkills\Error\InternalException;
 
 /**
  * Функция для удобства создания вложенных ассоциаций. Соединяет аргументы через точку
  *
- * @param array ...$names
+ * @param string[] ...$names
  * @return string
  */
-function assoc(...$names)
+function assoc(...$names): string
 {
     return implode('.', $names);
 }
@@ -18,10 +19,10 @@ function assoc(...$names)
  *
  * @param string $tableAlias
  * @param string $fieldName
- * @param null $operation сравнения, (NOT) IN, LIKE, IS NULL, и всё такое
+ * @param ?string $operation сравнения, (NOT) IN, LIKE, IS NULL, и всё такое
  * @return string
  */
-function field($tableAlias, $fieldName, $operation = null)
+function field(string $tableAlias, string $fieldName, ?string $operation = null)
 {
     return $tableAlias . '.' . $fieldName . (empty($operation) ? '' : ' ' . $operation);
 }
@@ -60,7 +61,7 @@ function field($tableAlias, $fieldName, $operation = null)
  * @throws InternalException при дублировании ключей
  * @return array
  */
-function fieldsWhere(array $conditionsByTable)
+function fieldsWhere(array $conditionsByTable): array
 {
     $noTableKey = '';
     if (array_key_exists($noTableKey, $conditionsByTable)) {
@@ -115,7 +116,7 @@ function fieldsWhere(array $conditionsByTable)
  * @throws InternalException при дублировании ключей
  * @return string[]
  */
-function fieldsSelect($fieldsByTable)
+function fieldsSelect(array $fieldsByTable): array
 {
     $noTableKey = '';
     if (array_key_exists($noTableKey, $fieldsByTable)) {
@@ -149,7 +150,7 @@ if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
      * @param string $enc
      * @return string
      */
-    function mb_ucfirst($string, $enc = 'utf-8')
+    function mb_ucfirst(string $string, string $enc = 'utf-8'): string
     {
         $string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_strtolower(mb_substr($string, 1, mb_strlen($string, $enc) - 1, $enc), $enc);
         return $string;
