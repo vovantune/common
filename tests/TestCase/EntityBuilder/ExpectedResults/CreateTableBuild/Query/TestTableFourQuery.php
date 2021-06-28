@@ -9,7 +9,7 @@ use TestApp\Model\Entity\TestTableFour;
 /**
  * Fake Query class TestTableFourQuery
  * @method TestTableFour[] toArray()
- * @method TestTableFour first()
+ * @method ?TestTableFour first()
  */
 class TestTableFourQuery extends Query
 {
