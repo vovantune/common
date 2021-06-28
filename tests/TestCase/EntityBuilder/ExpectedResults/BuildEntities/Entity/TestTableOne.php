@@ -14,7 +14,7 @@ use ArtSkills\Lib\Arrays;
  * @property string $col_enum = 'val1'
  * @property string $col_text
  * @property \Cake\I18n\Time $col_time = 'CURRENT_TIMESTAMP' comment2
- * @property TestTableTwo[] $TestTableTwo `table_one_fk` => `id`
+ * @property ?TestTableTwo[] $TestTableTwo `table_one_fk` => `id`
  * @property array $newField
  * @property int $oldField
  * @tableComment description blabla
