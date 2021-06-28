@@ -21,10 +21,6 @@ use ArtSkills\Lib\Arrays;
  */
 class TestTableOne extends Entity
 {
-    /** @inheritdoc */
-    protected $_aliases = [
-    ];
-
     /**
      * @return string
      */

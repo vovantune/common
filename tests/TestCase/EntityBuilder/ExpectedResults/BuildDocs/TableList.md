@@ -13,7 +13,6 @@ description qweqwe
 * int `id`
 * int `table_one_fk` blabla
 * string `col_text` = NULL
-* int `fieldAlias` blabla (алиас поля table_one_fk)
 * string `virtualField`
 ### Связи:
 * TestTableOne `$TestTableOne` TestTableOne.table_one_fk => TestTableTwo.id

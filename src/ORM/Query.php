@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\ORM;
 
 use Cake\Database\Expression\QueryExpression;
+use Cake\Database\ExpressionInterface;
 use Cake\Database\FunctionsBuilder;
 
 /**
@@ -10,37 +12,19 @@ use Cake\Database\FunctionsBuilder;
  */
 class Query extends \Cake\ORM\Query
 {
-
-    const CONDITION_ALL = '1=1';
-
-    const ORDER_ASC = 'ASC';
-    const ORDER_DESC = 'DESC';
-
     /**
      * Построитель функций
      *
-     * @var FunctionsBuilder
+     * @var ?FunctionsBuilder
      */
-    private static $_funcBuilder = null;
-
-    /**
-     * Сортировка рандомом
-     *
-     * @param string $field
-     * @param bool $overwrite
-     * @return $this
-     */
-    public function orderRand($field, $overwrite = false)
-    {
-        return $this->order([$field => 'RAND()'], $overwrite);
-    }
+    private static ?FunctionsBuilder $_funcBuilder = null;
 
     /**
      * статичная версия func()
      *
      * @return FunctionsBuilder
      */
-    public static function funct()
+    public static function funct(): FunctionsBuilder
     {
         if (empty(self::$_funcBuilder)) {
             self::$_funcBuilder = new FunctionsBuilder();
@@ -51,10 +35,11 @@ class Query extends \Cake\ORM\Query
     /**
      * статичная версия newExpr()
      *
-     * @param null $rawExpression
+     * @param null|string|array|ExpressionInterface $rawExpression
      * @return QueryExpression
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function expr($rawExpression = null)
+    public static function expr($rawExpression = null): QueryExpression
     {
         $expression = new QueryExpression();
         if ($rawExpression !== null) {

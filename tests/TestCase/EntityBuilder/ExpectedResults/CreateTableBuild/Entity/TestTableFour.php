@@ -12,7 +12,5 @@ use ArtSkills\ORM\Entity;
  */
 class TestTableFour extends Entity
 {
-    /** @inheritdoc */
-    protected $_aliases = [
-    ];
+
 }

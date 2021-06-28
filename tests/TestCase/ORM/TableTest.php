@@ -64,7 +64,6 @@ class TableTest extends AppTestCase
         $expectedData = array_replace($saveData, [
             'col_time' => new Time($saveData['col_time']),
             'id' => $saveResult->id,
-            'bad alias' => null,
         ]);
         $newRecord = $this->TestTableOne->get($saveResult->id);
         $this->assertEntityEqualsArray($expectedData, $newRecord, 'Неправильно создалось');

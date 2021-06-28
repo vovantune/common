@@ -19,61 +19,6 @@ class EntityTest extends AppTestCase
         'app.test_table_two',
     ];
 
-    /** тест работы алиасов */
-    public function testAliases()
-    {
-        $entityId = 88;
-        $entity = $this->TestTableTwo->get($entityId);
-
-        // простой доступ к полям
-        self::assertEquals($entity->table_one_fk, $entity->fieldAlias);
-        self::assertEquals($entity->get('table_one_fk'), $entity->get('fieldAlias'));
-
-        $oldValue = $entity->table_one_fk;
-
-        // при присвоении алиасу обновляется реальное значение
-        $newValue = 54;
-        $entity->fieldAlias = $newValue;
-        self::assertEquals($newValue, $entity->table_one_fk);
-
-        // при использовании set над алиасом обновляется реальное значение
-        $newValue++;
-        $entity->set('fieldAlias', $newValue);
-        self::assertEquals($newValue, $entity->table_one_fk);
-
-        // при использовании set с массивом над алиасом обновляется реальное значение
-        $newValue++;
-        $entity->set(['fieldAlias' => $newValue]);
-        self::assertEquals($newValue, $entity->table_one_fk);
-
-        // при использовании patchEntity над алиасом обновляется реальное значение
-        $newValue++;
-        $entity = $this->TestTableTwo->patchEntity($entity, ['fieldAlias' => $newValue]);
-        self::assertEquals($newValue, $entity->table_one_fk);
-
-        // при присвоении реальному значению обновляется алиас
-        $newValue++;
-        $entity->table_one_fk = $newValue;
-        self::assertEquals($newValue, $entity->fieldAlias);
-
-        // работает getOriginal
-        self::assertEquals($oldValue, $entity->getOriginal('fieldAlias'));
-
-        // алиасы попадают в массив
-        $expectedArray = [
-            'id' => $entityId,
-            'table_one_fk' => $newValue,
-            'fieldAlias' => $newValue,
-            'col_text' => null,
-        ];
-        self::assertEquals($expectedArray, $entity->toArray());
-
-        // при использовании newEntity с алиасом обновляется реальное значение
-        $newValue++;
-        $newEntity = $this->TestTableTwo->newEntity(['fieldAlias' => $newValue]);
-        self::assertEquals($newValue, $newEntity->table_one_fk);
-    }
-
     /** проверка на изменение значения поля */
     public function testChanged()
     {
