@@ -12,7 +12,7 @@ class CsvWriterTest extends AppTestCase
     /**
      * Тест обычной записи файла
      */
-    public function testNormal()
+    public function testNormal(): void
     {
         $testFile = TMP . 'csvWriterTest.csv';
 
@@ -29,7 +29,7 @@ class CsvWriterTest extends AppTestCase
     /**
      * Пытаемся записать в файл который не должен быть доступен
      */
-    public function testWriteToNonExistsDirectory()
+    public function testWriteToNonExistsDirectory(): void
     {
         $this->expectExceptionMessage("Ошибка создания файла");
         $this->expectException(\Exception::class);
@@ -44,7 +44,7 @@ class CsvWriterTest extends AppTestCase
     /**
      * Пытаемся записать в файл который закрыт
      */
-    public function testWriteToClosedFile()
+    public function testWriteToClosedFile(): void
     {
         $this->expectExceptionMessage("Попытка записать в закрытый файл");
         $this->expectException(\Exception::class);
@@ -63,11 +63,11 @@ class CsvWriterTest extends AppTestCase
      *
      * @throws \Exception
      */
-    public function testOtherEncoding()
+    public function testOtherEncoding(): void
     {
         $testFile = TMP . 'csvWriterTest.csv';
 
-        $csvWriter = new CsvWriter($testFile, 'windows-1251');
+        $csvWriter = new CsvWriter($testFile, ';', 'windows-1251');
         $csvWriter->writeRow(['Привет', 'Мир']);
         $csvWriter->writeRow(['Вася', 'Пупкин']);
         $csvWriter->close();
@@ -82,7 +82,7 @@ class CsvWriterTest extends AppTestCase
      *
      * @throws \Exception
      */
-    public function testWriteLeftSymbols()
+    public function testWriteLeftSymbols(): void
     {
         $testFile = TMP . 'csvWriterTest.csv';
 
@@ -99,7 +99,7 @@ class CsvWriterTest extends AppTestCase
     /**
      * Тест перенесеной функции записывающей весь массив
      */
-    public function testWriteData()
+    public function testWriteData(): void
     {
         $fileName = 'CsvTestTemp.csv';
         $data = [
@@ -122,7 +122,7 @@ class CsvWriterTest extends AppTestCase
 
         //Для проверки на корректность записанных данных
         self::assertEquals(true, CsvWriter::writeCsv($fileName, $data), 'Ошибка записи файла');
-        self::assertEquals($data, (new CsvReader($fileName, ','))->getAll(), 'Некорректный массив из CSV файла');
+        self::assertEquals($data, (new CsvReader($fileName, ';'))->getAll(), 'Некорректный массив из CSV файла');
         unlink($fileName);
     }
 }

@@ -28,7 +28,7 @@ class TestTableOne extends Entity
     }
 
     /**
-     * @return array
+     * @return int[]
      */
     protected function _getNewField()
     {

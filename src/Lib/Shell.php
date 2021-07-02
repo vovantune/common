@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
@@ -18,9 +19,9 @@ class Shell
      * @param string|string[] $commands
      * @param bool $withErrors перенаправлять stderr в stdout
      * @param bool $stopOnFail если передан список команд, то останавливаться ли на ошибке (склеивать команды через && или ;)
-     * @return array [успех, вывод, результирующая команда, код возврата]
+     * @return array{0: bool, 1: string[], 2: string, 3: int} [успех, вывод, результирующая команда, код возврата]
      */
-    public static function exec($commands, $withErrors = true, $stopOnFail = true)
+    public static function exec($commands, bool $withErrors = true, bool $stopOnFail = true): array
     {
         $resultCommand = self::_processCommandList($commands, $withErrors, $stopOnFail);
         return self::_exec($resultCommand);
@@ -31,8 +32,9 @@ class Shell
      *
      * @param string $command
      * @param string $outputRedirect
+     * @return void
      */
-    public static function execInBackground($command, $outputRedirect = '/dev/null')
+    public static function execInBackground(string $command, $outputRedirect = '/dev/null')
     {
         exec('nohup ' . $command . ' > ' . escapeshellarg($outputRedirect) . ' 2>&1 &');
     }
@@ -45,9 +47,9 @@ class Shell
      * @param bool $withErrors перенаправлять stderr в stdout
      * @param bool $stopOnFail если передан список команд, то останавливаться ли на ошибке (склеивать команды через && или ;)
      *                         Но если свалится смена директорий, то дальше не пойдёт независимо от этого параметра
-     * @return array [успех, вывод, результирующая команда, код возврата]
+     * @return array{0: bool, 1: string[], 2: string, 3: int} [успех, вывод, результирующая команда, код возврата]
      */
-    public static function execFromDir($directory, $commands, $withErrors = true, $stopOnFail = true)
+    public static function execFromDir(string $directory, $commands, bool $withErrors = true, bool $stopOnFail = true): array
     {
         $resultCommand = self::_processCommandList($commands, $withErrors, $stopOnFail);
         if (!empty($directory) && (getcwd() !== $directory)) {
@@ -61,9 +63,9 @@ class Shell
      * Обёртка вызова exec для целей мока в тесте
      *
      * @param string $command
-     * @return array [успех, вывод, результирующая команда, код возврата]
+     * @return array{0: bool, 1: string[], 2: string, 3: int} [успех, вывод, результирующая команда, код возврата]
      */
-    private static function _exec($command)
+    private static function _exec(string $command): array
     {
         exec($command, $output, $returnCode);
         return [$returnCode === 0, $output, $command, $returnCode];
@@ -72,12 +74,12 @@ class Shell
     /**
      * Взять список команд и склеить их в одну строку в зависимости от параметров
      *
-     * @param string|strings $commands
+     * @param string|string[] $commands
      * @param bool $withErrors
      * @param bool $stopOnFail
      * @return string
      */
-    private static function _processCommandList($commands, $withErrors = true, $stopOnFail = true)
+    private static function _processCommandList($commands, bool $withErrors = true, bool $stopOnFail = true): string
     {
         $commands = (array)$commands;
         if ($stopOnFail) {

@@ -16,7 +16,10 @@ use Cake\Database\Driver;
 class JsonType extends \Cake\Database\Type\JsonType
 {
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
     public function toPHP($value, Driver $driver)
     {
         if ($value === null) {

@@ -6,7 +6,10 @@ use ArtSkills\TestSuite\Fixture\TestFixture;
 
 class TestTableTwoFixture extends TestFixture
 {
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
     public $records = [
         ['id' => '11', 'table_one_fk' => '1000'],
     ];

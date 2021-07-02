@@ -120,7 +120,7 @@ class ExcelReader
      * @param int $rowCount Сколько строк вывести
      * @param int $page Страница документа
      * @param bool $skipEmptyRows Пропускать пустые строки
-     * @return array<int, array<string, string>>|null
+     * @return array<int, array<int, string>>|null
      * @throws InternalException
      * @throws Exception
      */

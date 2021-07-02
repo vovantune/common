@@ -85,11 +85,12 @@ class EntityBuilder
     protected static array $_baseClasses = [];
 
     /**
-     * Задать конфиг
-     *
-     * @param EntityBuilderConfig|null $config
-     * @throws InternalException
-     */
+	 * Задать конфиг
+	 *
+	 * @param EntityBuilderConfig|null $config
+	 * @return void
+	 * @throws InternalException
+	 */
     public static function setConfig(?EntityBuilderConfig $config)
     {
         static::$_config = $config;
@@ -314,12 +315,12 @@ class EntityBuilder
         return $entityName . $postfix;
     }
 
-
-    /**
-     * Проверка, что задан конфиг
-     *
-     * @throws InternalException
-     */
+	/**
+	 * Проверка, что задан конфиг
+	 *
+	 * @return void
+	 * @throws InternalException
+	 */
     private static function _checkConfig()
     {
         if (empty(static::$_config)) {
@@ -438,14 +439,14 @@ class EntityBuilder
         return $hasChanges;
     }
 
-    /**
-     * Добавляем переопределение методов
-     *
-     * @param string|bool $classComment
-     * @param string $entityName
-     * @param string[] $ownMethods
-     * @return string
-     */
+	/**
+	 * Добавляем переопределение методов
+	 *
+	 * @param string $classComment
+	 * @param string $entityName
+	 * @param string[] $ownMethods
+	 * @return string
+	 */
     private static function _buildTableMethodRedefines(string $classComment, string $entityName, array $ownMethods): string
     {
         if (!empty($classComment)) {
@@ -489,12 +490,13 @@ class EntityBuilder
         }
     }
 
-    /**
-     * Список публичных методов без наследования
-     *
-     * @param ReflectionClass $refClass
-     * @return string[]
-     */
+	/**
+	 * Список публичных методов без наследования
+	 *
+	 * @param ReflectionClass $refClass
+	 * @return string[]
+	 * @phpstan-ignore-next-line
+	 */
     private static function _getClassPublicMethods(ReflectionClass $refClass): array
     {
         $methods = [];
@@ -506,12 +508,13 @@ class EntityBuilder
         return $methods;
     }
 
-    /**
-     * Записываем новый комментарий для файла
-     *
-     * @param ReflectionClass $refClass
-     * @param string $newComment
-     */
+	/**
+	 * Записываем новый комментарий для файла
+	 *
+	 * @param ReflectionClass $refClass
+	 * @param string $newComment
+	 * @phpstan-ignore-next-line
+	 */
     private static function _writeNewClassComment(ReflectionClass $refClass, string $newComment)
     {
         $file = new File($refClass->getFileName());

@@ -19,7 +19,10 @@ use ArtSkills\ORM\Table;
  */
 class TestTableTwoTable extends Table
 {
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @phpstan-ignore-next-line
+     */
     public function initialize(array $config)
     {
         parent::initialize($config);

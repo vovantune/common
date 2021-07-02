@@ -17,9 +17,9 @@ class PropertyAccess
     /**
      * Массив значений, которые нужно восстановить
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    private static $_toRestore = [];
+    private static array $_toRestore = [];
 
     /**
      * Запись в статическое свойство

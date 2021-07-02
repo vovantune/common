@@ -11,7 +11,7 @@ class AppCacheTest extends AppTestCase
     /**
      * Чистилка кэша
      */
-    public function testFlush()
+    public function testFlush(): void
     {
         Cache::write('qwe', 123, 'short');
         Cache::write('qwerty', 12345, '_cake_core_');

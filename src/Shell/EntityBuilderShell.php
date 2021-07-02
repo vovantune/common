@@ -9,13 +9,18 @@ use ArtSkills\EntityBuilder\TableDocumentation;
 use ArtSkills\Error\InternalException;
 use ArtSkills\ORM\Entity;
 use ArtSkills\ORM\Table;
+use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Shell;
+use ReflectionException;
 
 class EntityBuilderShell extends Shell
 {
-    /**
-     * Формируем/обновляем сущности
-     */
+	/**
+	 * Формируем/обновляем сущности
+	 *
+	 * @return void
+	 * @throws InternalException
+	 */
     public function main()
     {
         if ($this->_buildEntityAndDoc()) {
@@ -23,9 +28,11 @@ class EntityBuilderShell extends Shell
         }
     }
 
-    /**
-     * инициализация конфига
-     */
+	/**
+	 * инициализация конфига
+	 *
+	 * @return void
+	 */
     private function _setConfig()
     {
         $config = EntityBuilderConfig::create()
@@ -36,9 +43,11 @@ class EntityBuilderShell extends Shell
         TableDocumentation::setConfig($config);
     }
 
-    /**
-     * Создаём класс таблицы и сущности из существующей таблицы в базе
-     */
+	/**
+	 * Создаём класс таблицы и сущности из существующей таблицы в базе
+	 *
+	 * @return void
+	 */
     public function createFromDb()
     {
         $this->_setConfig();
@@ -48,36 +57,36 @@ class EntityBuilderShell extends Shell
         $this->out('Yahaa, update Model folder');
     }
 
-    /**
-     * Генерим сущности и документацию
-     *
-     * @return bool
-     * @throws InternalException
-     */
-    private function _buildEntityAndDoc()
-    {
-        $this->_setConfig();
-        $hasEntityChanges = EntityBuilder::build();
-        $hasDocChanges = TableDocumentation::build();
-        return $hasEntityChanges || $hasDocChanges;
-    }
+	/**
+	 * Генерим сущности и документацию
+	 *
+	 * @return bool
+	 * @throws InternalException|ReflectionException
+	 */
+	private function _buildEntityAndDoc(): bool
+	{
+		$this->_setConfig();
+		$hasEntityChanges = EntityBuilder::build();
+		$hasDocChanges = TableDocumentation::build();
+		return $hasEntityChanges || $hasDocChanges;
+	}
 
-    /**
-     * Добавление команд и их параметров
-     *
-     * @return \Cake\Console\ConsoleOptionParser
-     */
-    public function getOptionParser()
-    {
-        $parser = parent::getOptionParser();
+	/**
+	 * Добавление команд и их параметров
+	 *
+	 * @return ConsoleOptionParser
+	 */
+	public function getOptionParser(): ConsoleOptionParser
+	{
+		$parser = parent::getOptionParser();
 
-        $parser->addSubcommand('createFromDb', [
-            'help' => __('CREATE TABLE class AND Entity class FROM existance DB TABLE'),
-            'parser' => [
-                'arguments' => [
-                    'tableName' => ['help' => __('Real table name'), 'required' => true],
-                ],
-            ],
+		$parser->addSubcommand('createFromDb', [
+			'help' => __('CREATE TABLE class AND Entity class FROM existance DB TABLE'),
+			'parser' => [
+				'arguments' => [
+					'tableName' => ['help' => __('Real table name'), 'required' => true],
+				],
+			],
         ]);
         return $parser;
     }

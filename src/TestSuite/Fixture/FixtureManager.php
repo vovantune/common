@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite\Fixture;
 
 use ArtSkills\Lib\Env;
 use Cake\Core\Configure;
+use Cake\TestSuite\TestCase;
 use Cake\Utility\Inflector;
+use UnexpectedValueException;
 
 /**
  * @property TestFixture[] $_loaded
@@ -17,7 +20,7 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
      *
      * @var string
      */
-    protected $_baseFixtureClass = TestFixture::class;
+    protected string $_baseFixtureClass = TestFixture::class;
 
     /**
      * определяем дефолтный класс фикстур
@@ -32,9 +35,9 @@ class FixtureManager extends \Cake\TestSuite\Fixture\FixtureManager
     /**
      * Переопределил метод из класса FixtureManager. Теперь не требует лишних файлов
      *
-     * @param \Cake\TestSuite\TestCase $test The test suite to load fixtures for.
+     * @param TestCase $test The test suite to load fixtures for.
      * @return void
-     * @throws \UnexpectedValueException when a referenced fixture does not exist.
+     * @throws UnexpectedValueException when a referenced fixture does not exist.
      */
     protected function _loadFixtures($test)
     {

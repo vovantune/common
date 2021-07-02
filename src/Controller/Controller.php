@@ -31,7 +31,7 @@ class Controller extends \Cake\Controller\Controller
      *
      * @var null|string|array|Response
      */
-    private $_errorRedirect = null;
+    private $_errorRedirect = null; // @phpstan-ignore-line
 
     /**
      * Список экшнов, которые всегда должны возвращать джсон.
@@ -106,7 +106,9 @@ class Controller extends \Cake\Controller\Controller
      * Задать редирект при обработке ошибок
      *
      * @param string|array|Response $redirect
+     * @return void
      * @throws InternalException
+     * @phpstan-ignore-next-line
      */
     protected function _setErrorRedirect($redirect)
     {
@@ -118,6 +120,8 @@ class Controller extends \Cake\Controller\Controller
 
     /**
      * Задать, что при обработке ошибок редиректа нет
+     *
+     * @return void
      */
     protected function _setErrorNoRedirect()
     {
@@ -130,7 +134,9 @@ class Controller extends \Cake\Controller\Controller
      * @param string $message
      * @param bool|null|string|array|Response $redirect
      * @param bool $condition
+     * @return void
      * @throws UserException
+     * @phpstan-ignore-next-line
      */
     private function _throwUserErrorAnyResponse(string $message, $redirect, bool $condition)
     {
@@ -147,6 +153,7 @@ class Controller extends \Cake\Controller\Controller
      *
      * @param string $message
      * @param bool $condition
+     * @return void
      * @throws UserException
      */
     protected function _throwUserError(string $message, bool $condition = true)
@@ -160,8 +167,10 @@ class Controller extends \Cake\Controller\Controller
      * @param string $message
      * @param string|array|Response $redirect
      * @param bool $condition
+     * @return void
      * @throws UserException
      * @throws InternalException
+     * @phpstan-ignore-next-line
      */
     protected function _throwUserErrorRedirect(string $message, $redirect, bool $condition = true)
     {
@@ -176,6 +185,7 @@ class Controller extends \Cake\Controller\Controller
      *
      * @param string $message
      * @param bool $condition
+     * @return void
      * @throws UserException
      */
     protected function _throwUserErrorNoRedirect(string $message, bool $condition = true)
@@ -189,6 +199,7 @@ class Controller extends \Cake\Controller\Controller
      * @param string $message
      * @param mixed $addInfo доп информация об ошибке для sentry (SentryLog::KEY_ADD_INFO)
      * @param string|string[]|null $scope scope для логирования ошибки
+     * @return void
      * @throws InternalException
      */
     protected function _throwInternalError(string $message, $addInfo = null, $scope = null)
@@ -199,6 +210,8 @@ class Controller extends \Cake\Controller\Controller
 
     /**
      * Задать, что текущий экшн должен возвращать json
+     *
+     * @return void
      */
     protected function _setIsJsonAction()
     {
@@ -222,9 +235,10 @@ class Controller extends \Cake\Controller\Controller
      * Возвращает ответ без ошибки и прерывает выполнение
      *
      * @param array|ValueObject $jsonData
-     * @return NULL
+     * @return ?Response
+     * @phpstan-ignore-next-line
      */
-    protected function _sendJsonOk($jsonData = [])
+    protected function _sendJsonOk($jsonData = []): ?Response
     {
         if ($jsonData instanceof ValueObject) {
             $jsonData = $jsonData->toArray();
@@ -238,10 +252,11 @@ class Controller extends \Cake\Controller\Controller
      *
      * @param string $message
      * @param array $jsonData дополнительные параметры если нужны
-     * @return NULL
+     * @return ?Response
      * @internal
+     * @phpstan-ignore-next-line
      */
-    protected function _sendJsonError(string $message, array $jsonData = [])
+    protected function _sendJsonError(string $message, array $jsonData = []): ?Response
     {
         return $this->_sendJsonResponse(['status' => self::JSON_STATUS_ERROR, 'message' => $message] + $jsonData);
     }
@@ -252,11 +267,12 @@ class Controller extends \Cake\Controller\Controller
      *
      * @param \Exception $exception
      * @param array $jsonData
-     * @return NULL
+     * @return ?Response
      * @throws PHP7ErrorException
      * @internal
+     * @phpstan-ignore-next-line
      */
-    protected function _sendJsonException(\Exception $exception, array $jsonData = [])
+    protected function _sendJsonException(\Exception $exception, array $jsonData = []): ?Response
     {
         Env::checkTestException($exception);
         if ($exception instanceof UserException) {
@@ -273,6 +289,7 @@ class Controller extends \Cake\Controller\Controller
      * @param array $jsonArray
      * @return null
      * @internal У нас стандартизированный JSON: _sendJsonOk и _sendJsonError
+     * @phpstan-ignore-next-line
      */
     protected function _sendJsonResponse(array $jsonArray)
     {
@@ -300,7 +317,7 @@ class Controller extends \Cake\Controller\Controller
      *
      * @param string $text
      * @param string $contentType
-     * @return null|Response
+     * @return ?Response
      */
     protected function _sendTextResponse(string $text, string $contentType = self::REQUEST_EXTENSION_DEFAULT): ?Response
     {

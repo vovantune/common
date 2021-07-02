@@ -17,7 +17,7 @@ class ConstantMocker
     /**
      * Список мокнутых констант
      *
-     * @var array
+     * @var array<string, string>
      */
     private static $_constantList = [];
 

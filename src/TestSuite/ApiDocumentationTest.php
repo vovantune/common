@@ -24,7 +24,9 @@ class ApiDocumentationTest
      * Тест API документации в JSON и в HTML формате. Может работать относительно долго, ибо строит апи по всему коду.
      *
      * @param array $jsonSchema
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     public function testSchema(array $jsonSchema)
     {
@@ -49,7 +51,9 @@ class ApiDocumentationTest
      * Тест структур
      *
      * @param array $jsonSchema
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _testDefinitions(array $jsonSchema)
     {
@@ -64,7 +68,9 @@ class ApiDocumentationTest
      * @param array $definition
      * @param string $definitionPath
      * @param array $jsonSchema
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _testDefinition(array $definition, string $definitionPath, array $jsonSchema)
     {
@@ -105,7 +111,9 @@ class ApiDocumentationTest
      * @param string $propertyPath
      * @param array $property
      * @param array $jsonSchema
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _testDefinitionElement(string $propertyPath, array $property, array $jsonSchema)
     {
@@ -122,7 +130,9 @@ class ApiDocumentationTest
      * Проверка пулов запросов
      *
      * @param array $jsonSchema
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _testPaths(array $jsonSchema)
     {
@@ -164,7 +174,9 @@ class ApiDocumentationTest
      * @param array $parameter
      * @param string $parameterPath
      * @param array $jsonSchema
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _checkParameter(array $parameter, string $parameterPath, array $jsonSchema)
     {
@@ -192,7 +204,9 @@ class ApiDocumentationTest
      * @param array $object
      * @param string[] $propertyList
      * @param string $errorMessage
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _checkForRequiredProperties(array $object, array $propertyList, string $errorMessage)
     {
@@ -211,7 +225,9 @@ class ApiDocumentationTest
      * @param string $reference
      * @param string $propertyPath
      * @param array $jsonSchema
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _checkReference(string $reference, string $propertyPath, array $jsonSchema)
     {

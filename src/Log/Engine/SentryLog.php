@@ -75,6 +75,7 @@ class SentryLog extends BaseLog
      * доп.инфа
      *
      * @var array
+     * @phpstan-ignore-next-line
      */
     private static array $_addInfo = [];
 
@@ -96,6 +97,7 @@ class SentryLog extends BaseLog
      * Увеличить число отрезаемых уровней трейса для следующей ошибки
      *
      * @param int $add
+     * @return void
      */
     public static function addDeleteTraceLevel(int $add)
     {
@@ -106,7 +108,9 @@ class SentryLog extends BaseLog
      * Добавить доп. инфу в любой момент
      *
      * @param array $info
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     public static function addInfo(array $info)
     {
@@ -115,6 +119,8 @@ class SentryLog extends BaseLog
 
     /**
      * Сказать, что сейчас придёт ошибка из шатдауна
+     *
+     * @return void
      */
     public static function setShutdown()
     {
@@ -150,12 +156,14 @@ class SentryLog extends BaseLog
      * логирование в сентри
      *
      * @param string $level
-     * @param string $message
-     * @param Exception|PHP7ErrorException|null $exception
+     * @param ?string $message
+     * @param Exception|PHP7ErrorException|Throwable|null $exception
      * @param array $context
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
-    private static function _log($level, $message, $exception, array $context = [])
+    private static function _log(string $level, ?string $message, $exception, array $context = [])
     {
         $sentryLevel = array_key_exists($level, self::LEVEL_MAP) ? self::LEVEL_MAP[$level] : Raven_Client::ERROR;
         if (empty($context[self::KEY_IS_HANDLED])
@@ -175,6 +183,8 @@ class SentryLog extends BaseLog
      * @param Exception|PHP7ErrorException|Throwable $exception
      * @param array $context
      * @param bool|null $alert
+     * @return void
+     * @phpstan-ignore-next-line
      * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function logException($exception, array $context = [], $alert = null)
@@ -195,7 +205,7 @@ class SentryLog extends BaseLog
      * Получить уровень лога для исключения, 'error' (с оповещением) или 'warning' (без)
      * по умолчанию оповещения шлются всегда за исключением некоторых неинтересных исключений
      *
-     * @param Exception|PHP7ErrorException $exception
+     * @param Exception|PHP7ErrorException|Throwable $exception
      * @param bool|null $alert
      * @return string
      */
@@ -204,7 +214,7 @@ class SentryLog extends BaseLog
         if ($alert === null) {
             $alert = !($exception instanceof NotFoundException)
                 && !($exception instanceof \Cake\Http\Exception\UnauthorizedException)
-                && !($exception instanceof \Cake\Network\Exception\UnauthorizedException);
+                && !($exception instanceof \Cake\Network\Exception\UnauthorizedException); // @phpstan-ignore-line - ругается неверно
         }
         return ($alert ? 'error' : 'warning');
     }
@@ -213,9 +223,11 @@ class SentryLog extends BaseLog
      * Добавить контекста для отправки в сентри
      *
      * @param array|null $context
+     * @return void
      * @SuppressWarnings(PHPMD.FunctionRule)
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     protected static function _addSentryContext(?array $context = null)
     {
@@ -264,7 +276,9 @@ class SentryLog extends BaseLog
      * @param ?string $message
      * @param Exception|null|PHP7ErrorException|Throwable $exception
      * @param array $context
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     protected static function _sendToSentry(string $level, ?string $message, $exception, array $context)
     {
@@ -304,7 +318,9 @@ class SentryLog extends BaseLog
      * @param string $message
      * @param string $level
      * @param array $traceFull
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     protected static function _addBreadCrumb(string $message, string $level, array $traceFull)
     {
@@ -329,6 +345,7 @@ class SentryLog extends BaseLog
      * @param array $trace
      * @return array
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private static function _sliceTrace(array $trace): array
     {
@@ -368,7 +385,9 @@ class SentryLog extends BaseLog
      *
      * @param array $trace
      * @param int $toSlice
+     * @return void
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private static function _addCallArgs(array $trace, int $toSlice)
     {

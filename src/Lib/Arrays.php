@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
@@ -17,8 +18,10 @@ class Arrays
      * @param int $options
      * @param int $depth
      * @return string
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
-    public static function encode($array, $options = JSON_UNESCAPED_UNICODE, $depth = 512)
+    public static function encode($array, int $options = JSON_UNESCAPED_UNICODE, int $depth = 512): string
     {
         return json_encode($array, $options, $depth);
     }
@@ -30,9 +33,11 @@ class Arrays
      * @param bool $assoc
      * @param int $depth
      * @param int $options
-     * @return mixed
+     * @return array|null|string
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function decode($jsonString, $assoc = true, $depth = 512, $options = 0)
+    public static function decode(string $jsonString, bool $assoc = true, int $depth = 512, int $options = 0)
     {
         return json_decode($jsonString, $assoc, $depth, $options);
     }
@@ -44,8 +49,10 @@ class Arrays
      * @param array $array
      * @param string[] $keys
      * @return array
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
-    public static function filterKeys(array $array, array $keys)
+    public static function filterKeys(array $array, array $keys): array
     {
         return array_intersect_key($array, array_flip($keys));
     }
@@ -55,9 +62,9 @@ class Arrays
      * Возможно, вместо этой функции вам нужен array_flip()
      *
      * @param string[]|int[] $values
-     * @return array
+     * @return array<string|int, string|int>
      */
-    public static function keysFromValues(array $values)
+    public static function keysFromValues(array $values): array
     {
         return array_combine($values, $values);
     }
@@ -65,12 +72,12 @@ class Arrays
     /**
      * Переименовать ключи
      *
-     * @param array $array исхлдный массив
-     * @param array $map старый ключ => новый ключ
+     * @param array<string, mixed> $array исходный массив
+     * @param array<string, string> $map старый ключ => новый ключ
      * @param bool $notExistsNull если не найдено, то не добавлять или добавить null
-     * @return array
+     * @return array<string, mixed>
      */
-    public static function remap(array $array, array $map, $notExistsNull = true)
+    public static function remap(array $array, array $map, bool $notExistsNull = true): array
     {
         $newArray = [];
         foreach ($map as $oldKey => $newKey) {
@@ -89,12 +96,12 @@ class Arrays
     /**
      * Получить значение по ключу с проверками
      *
-     * @param array $array
+     * @param ?array<string|int, mixed> $array
      * @param string|int $key
      * @param mixed $default
      * @return mixed
      */
-    public static function get($array, $key, $default = null)
+    public static function get(?array $array, $key, $default = null)
     {
         if (is_array($array) && array_key_exists($key, $array)) {
             return $array[$key];
@@ -107,13 +114,13 @@ class Arrays
      * Проверить, что значение по ключу равно ожидаемому.
      * С проверкой на существование
      *
-     * @param array $array
+     * @param array<string|int, mixed> $array
      * @param string|int $key
      * @param mixed $value
      * @param bool $strict
      * @return bool
      */
-    public static function equals(array $array, $key, $value, $strict = true)
+    public static function equals(array $array, $key, $value, bool $strict = true): bool
     {
         if ($strict) {
             return array_key_exists($key, $array) && ($array[$key] === $value);
@@ -125,12 +132,12 @@ class Arrays
     /**
      * Проверить, что значение по ключу равно одному из ожидаемых
      *
-     * @param array $array
+     * @param array<string|int, mixed> $array
      * @param string|int $key
-     * @param array $values
+     * @param array<int, mixed> $values
      * @return bool
      */
-    public static function equalsAny(array $array, $key, array $values)
+    public static function equalsAny(array $array, $key, array $values): bool
     {
         return array_key_exists($key, $array) && in_array($array[$key], $values);
     }
@@ -146,6 +153,9 @@ class Arrays
      * @param array $array
      * @param string|string[] $keyPath
      * @param mixed $defaultValue
+     * @return void
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      * @throws InternalException
      */
     public static function initPath(array &$array, $keyPath, $defaultValue)
@@ -163,28 +173,5 @@ class Arrays
         if (!array_key_exists($lastKey, $array)) {
             $array[$lastKey] = $defaultValue;
         }
-    }
-
-
-    /**
-     * strtolower для массива строк
-     *
-     * @param string[] $strings
-     * @return string[]
-     */
-    public static function strToLower(array $strings)
-    {
-        return array_map('strtolower', $strings);
-    }
-
-    /**
-     * trim для массива строк
-     *
-     * @param string[] $strings
-     * @return string[]
-     */
-    public static function trim(array $strings)
-    {
-        return array_map('trim', $strings);
     }
 }

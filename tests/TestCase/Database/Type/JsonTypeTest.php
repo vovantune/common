@@ -27,7 +27,7 @@ class JsonTypeTest extends AppTestCase
     /**
      * Сохранение значения Null в поле типа JSON
      */
-    public function testSaveNull()
+    public function testSaveNull(): void
     {
         Type::map('json', Type\JsonType::class);
         $newEntity = $this->TestTableFive->newEntity([
@@ -35,7 +35,7 @@ class JsonTypeTest extends AppTestCase
         ]);
         $res = $this->TestTableFive->save($newEntity);
         self::assertNotEmpty($res);
-        self::assertNull($res->col_json);
+        self::assertNull($res->col_json); // @phpstan-ignore-line
         $dbValueIsNull = $this->TestTableFive->exists(['col_json IS NULL']);
         self::assertFalse($dbValueIsNull, 'Если этот ассерт завалился, то переопределять JsonType уже не нужно');
 
@@ -45,7 +45,7 @@ class JsonTypeTest extends AppTestCase
         ]);
         $res = $this->TestTableFive->save($newEntity);
         self::assertNotEmpty($res);
-        self::assertNull($res->col_json);
+        self::assertNull($res->col_json); // @phpstan-ignore-line
         $dbValueIsNull = $this->TestTableFive->exists(['col_json IS NULL']);
         self::assertTrue($dbValueIsNull, 'Неправильно работает переопределение JsonType');
     }

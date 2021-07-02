@@ -65,13 +65,14 @@ class File extends \Cake\Filesystem\File
     }
 
     /**
-     * Распаковать архив
-     * по умолчанию рядом с архивом
-     *
-     * @param string $pathToFile
-     * @param string|null $unzipFolder
-     * @throws \Exception
-     */
+	 * Распаковать архив
+	 * по умолчанию рядом с архивом
+	 *
+	 * @param string $pathToFile
+	 * @param string|null $unzipFolder
+	 * @return void
+	 * @throws \Exception
+	 */
     public static function unZip(string $pathToFile, ?string $unzipFolder = null)
     {
         $extension = strstr(pathinfo($pathToFile)['basename'], '.');

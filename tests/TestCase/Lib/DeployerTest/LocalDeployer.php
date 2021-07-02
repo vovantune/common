@@ -20,13 +20,13 @@ class LocalDeployer extends Deployer
     const VERSION = 5;
 
     /** @inheritdoc */
-    protected $_repoName = self::REPO_NAME;
+    protected string $_repoName = self::REPO_NAME;
 
     /** @inheritdoc */
-    protected $_projectSymlink = self::SYMLINK;
+    protected string $_projectSymlink = self::SYMLINK;
 
     /** @inheritdoc */
-    protected $_rotateDeployFolders = [
+    protected array $_rotateDeployFolders = [
         '/var/www/common-1',
         self::DIR_CURRENT,
         self::DIR_NEXT,
@@ -34,16 +34,16 @@ class LocalDeployer extends Deployer
     ];
 
     /** @inheritdoc */
-    protected $_cakeSubPath = self::CAKE_SUB_PATH;
+    protected string $_cakeSubPath = self::CAKE_SUB_PATH;
 
     /** @inheritdoc */
-    protected $_versionFile = self::VERSION_FILE_PATH;
+    protected string $_versionFile = self::VERSION_FILE_PATH;
 
     /** @inheritdoc */
-    protected $_autoMigrate = true;
+    protected ?bool $_autoMigrate = true;
 
     /** @inheritdoc */
-    protected $_copyFileList = [
+    protected array $_copyFileList = [
         self::DIR_CURRENT . DS . self::COPY_FILE,
     ];
 

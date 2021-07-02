@@ -11,7 +11,10 @@ abstract class AppTestCase extends TestCase
 {
     use TestCaseTrait;
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @return void
+     */
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();

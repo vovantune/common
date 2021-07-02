@@ -42,24 +42,21 @@ class TableDocumentation
     private static ?EntityBuilderConfig $_config = null;
 
     /**
-     * Кеш PHPDoc описаний сущностей
-     *
-     * @var array<string, string>
-     */
+	 * Кеш PHPDoc описаний сущностей
+	 *
+	 * @var array<string, array<string, string>>
+	 */
     private static array $_entityAnnotationsCache = [];
 
-    /**
-     * Задать конфиг
-     *
-     * @param ?EntityBuilderConfig $config
-     * @throws InternalException
-     */
+	/**
+	 * Задать конфиг
+	 *
+	 * @param ?EntityBuilderConfig $config
+	 * @return void
+	 */
     public static function setConfig(?EntityBuilderConfig $config)
     {
         static::$_config = $config;
-        if (!empty($config) && !($config instanceof EntityBuilderConfig)) {
-            throw new InternalException('Bad config');
-        }
     }
 
     /**
@@ -216,28 +213,27 @@ class TableDocumentation
     {
         $article = "/**\n * @typedef {Object} " . $className . 'Entity';
         $comment = self::_getTableComment($className);
-        if (!empty($comment)) {
-            $article .= ' ' . $comment;
-        }
-        $article .= "\n";
+		if (!empty($comment)) {
+			$article .= ' ' . $comment;
+		}
+		$article .= "\n";
 
-        $entityAnnotations = self::_getEntityAnnotations($className);
-        if (empty($entityAnnotations['property'])) {
-            return '';
-        }
+		$entityAnnotations = self::_getEntityAnnotations($className);
+		if (empty($entityAnnotations['property'])) {
+			return '';
+		}
 
-        if (!is_array($entityAnnotations['property'])) {
-            $entityAnnotations['property'] = (array)$entityAnnotations['property'];
-        }
-        foreach ($entityAnnotations['property'] as $fieldDescription) {
-            if (preg_match(self::FIELD_INFO, $fieldDescription, $matches)) {
-                $fieldType = array_key_exists($matches[1], self::JS_TYPES) ? self::JS_TYPES[$matches[1]] : $matches[1];
+		$entityAnnotations['property'] = (array)$entityAnnotations['property'];
 
-                $article .= " * @property {" . $fieldType . "} " . $matches[2] . (!empty($matches[3])
-                        ? ' ' . $matches[3] : '') . "\n";
-            } elseif (preg_match(self::DEPENDENCY_ONE_TO_ONE, $fieldDescription, $matches)) {
-                $article .= " * @property {" . $matches[1] . "Entity} " . $matches[2] . ' ' . $matches[3] . ' => ' . $matches[4] . "\n";
-            } elseif (preg_match(self::DEPENDENCY_ONE_TO_MANY, $fieldDescription, $matches)) {
+		foreach ($entityAnnotations['property'] as $fieldDescription) {
+			if (preg_match(self::FIELD_INFO, $fieldDescription, $matches)) {
+				$fieldType = array_key_exists($matches[1], self::JS_TYPES) ? self::JS_TYPES[$matches[1]] : $matches[1];
+
+				$article .= " * @property {" . $fieldType . "} " . $matches[2] . (!empty($matches[3])
+						? ' ' . $matches[3] : '') . "\n";
+			} elseif (preg_match(self::DEPENDENCY_ONE_TO_ONE, $fieldDescription, $matches)) {
+				$article .= " * @property {" . $matches[1] . "Entity} " . $matches[2] . ' ' . $matches[3] . ' => ' . $matches[4] . "\n";
+			} elseif (preg_match(self::DEPENDENCY_ONE_TO_MANY, $fieldDescription, $matches)) {
                 $article .= " * @property {" . $matches[1] . "Entity[]} " . $matches[2] . ' ' . $matches[3] . ' => ' . $matches[4] . "\n";
             }
         }
@@ -253,14 +249,14 @@ class TableDocumentation
      * @return array<string, string>
      * @throws Exception
      */
-    private static function _getEntityAnnotations(string $className): array
-    {
-        if (empty(self::$_entityAnnotationsCache[$className])) {
-            $reader = new Reader(static::$_config->modelNamespace . '\Entity\\' . $className);
-            self::$_entityAnnotationsCache[$className] = $reader->getParameters();
-        }
-        return self::$_entityAnnotationsCache[$className];
-    }
+	private static function _getEntityAnnotations(string $className)
+	{
+		if (empty(self::$_entityAnnotationsCache[$className])) {
+			$reader = new Reader(static::$_config->modelNamespace . '\Entity\\' . $className);
+			self::$_entityAnnotationsCache[$className] = $reader->getParameters();
+		}
+		return self::$_entityAnnotationsCache[$className];
+	}
 
     /**
      * Комментарий к таблице

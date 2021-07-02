@@ -20,7 +20,7 @@ class ExcelWriterTest extends AppTestCase
      * @throws InternalException
      * @throws UserException
      */
-    public function testWrite()
+    public function testWrite(): void
     {
         $testFile = TMP . DS . 'ExcelWriterTest_testWrite.xlsx';
         $writer = new ExcelWriter($testFile);
@@ -68,7 +68,7 @@ class ExcelWriterTest extends AppTestCase
      * @throws InternalException
      * @throws UserException
      */
-    public function testWriteWithHeader()
+    public function testWriteWithHeader(): void
     {
         $testFile = TMP . DS . 'ExcelWriterTest_testWrite.xlsx';
         $writer = new ExcelWriter($testFile);

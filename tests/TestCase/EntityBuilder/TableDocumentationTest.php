@@ -44,7 +44,7 @@ class TableDocumentationTest extends AppTestCase
     /**
      * без конфига
      */
-    public function testNoConfig()
+    public function testNoConfig(): void
     {
         $this->expectExceptionMessage("Не задан конфиг");
         $this->expectException(\Exception::class);
@@ -55,7 +55,7 @@ class TableDocumentationTest extends AppTestCase
     /**
      * плохой конфиг
      */
-    public function testBadConfig()
+    public function testBadConfig(): void
     {
         $this->expectExceptionMessage("Empty value for field 'modelFolder'");
         $this->expectException(\Exception::class);
@@ -66,7 +66,7 @@ class TableDocumentationTest extends AppTestCase
     /**
      * Обновление существующих таблиц и создание для них всего, что нужно
      */
-    public function testBuild()
+    public function testBuild(): void
     {
         /**
          * Он работает на основе существующих классов. если в них неактуальные комменты, то они и останутся

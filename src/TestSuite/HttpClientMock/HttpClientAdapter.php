@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite\HttpClientMock;
 
@@ -11,6 +12,7 @@ use Cake\Http\Client\Response;
  *
  * @package App\Test\Suite
  * @SuppressWarnings(PHPMD.MethodMix)
+ * @SuppressWarnings(PHPMD.MethodProps)
  */
 class HttpClientAdapter extends Stream
 {
@@ -19,20 +21,22 @@ class HttpClientAdapter extends Stream
      *
      * @var array|null
      */
-    private $_currentRequestData = null;
+    private ?array $_currentRequestData = null; // @phpstan-ignore-line
 
     /**
      * Выводить ли информацию о незамоканных запросах
      *
      * @var bool
      */
-    private static $_debugRequests = true;
+    private static bool $_debugRequests = true;
 
     /**
-     * Все запросы проверяются на подмену, а также логипуются
+     * Все запросы проверяются на подмену, а также логируются
      *
      * @param Request $request
      * @return array
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     protected function _send(Request $request)
     {
@@ -64,6 +68,7 @@ class HttpClientAdapter extends Stream
 
     /**
      * @inheritdoc
+     * @phpstan-ignore-next-line
      */
     public function createResponses($headers, $content)
     {
@@ -79,6 +84,8 @@ class HttpClientAdapter extends Stream
 
     /**
      * Включаем вывод запросов в консоль
+     *
+     * @return void
      */
     public static function enableDebug()
     {
@@ -87,6 +94,8 @@ class HttpClientAdapter extends Stream
 
     /**
      * Выключаем вывод запросов в консоль
+     *
+     * @return void
      */
     public static function disableDebug()
     {

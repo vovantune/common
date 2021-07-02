@@ -32,7 +32,7 @@ class MakeLinkTest extends AppTestCase
     }
 
     /** Очистить тестовую папку */
-    private function _clean()
+    private function _clean(): void
     {
         $folder = new Folder(self::TEST_FOLDER);
         $folder->delete();
@@ -40,7 +40,7 @@ class MakeLinkTest extends AppTestCase
     }
 
     /** Тест создания ссылок */
-    public function testCreate()
+    public function testCreate(): void
     {
         mkdir(self::TEST_PROJECT_FOLDER);
         Deployer::makeProjectSymlink(self::TEST_PROJECT_FOLDER, self::TEST_NEW_FOLDER);
@@ -53,7 +53,7 @@ class MakeLinkTest extends AppTestCase
     /**
      * Исходная папка - уже симлинк
      */
-    public function testFailLink()
+    public function testFailLink(): void
     {
         $this->expectExceptionMessage("Передан некорректный каталог проекта");
         $this->expectException(\Exception::class);
@@ -67,7 +67,7 @@ class MakeLinkTest extends AppTestCase
     /**
      * Исходная папка - не папка
      */
-    public function testFailNotFolder()
+    public function testFailNotFolder(): void
     {
         $this->expectExceptionMessage("Передан некорректный каталог проекта");
         $this->expectException(\Exception::class);
@@ -78,7 +78,7 @@ class MakeLinkTest extends AppTestCase
     /**
      * Папка назначения уже существует
      */
-    public function testFailExists()
+    public function testFailExists(): void
     {
         $this->expectExceptionMessage("Такой каталог уже есть");
         $this->expectException(\Exception::class);

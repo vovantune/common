@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite\Fixture;
 
@@ -19,29 +20,29 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
      *
      * @var string
      */
-    protected $_createTableSqlQuery = '';
+    protected string $_createTableSqlQuery = '';
 
     /**
      * Класс теста, для которого загружаются фикстуры
      *
-     * @var string $_testCaseClass
+     * @var ?string $_testCaseClass
      */
-    protected $_testCaseClass = null;
+    protected ?string $_testCaseClass = null;
 
     /**
      * Записи глобальной фикстуры
      * Запоминаем их, чтоб не парсить файл кучу раз
      *
-     * @var array
+     * @var array<int, array<string, mixed>>
      */
-    protected $_defaultFixtureRecords = [];
+    protected array $_defaultFixtureRecords = [];
 
     /**
      * Записи, объявленные в $records класса-фикстуры
      *
-     * @var array
+     * @var array<int, array<string, mixed>>
      */
-    protected $_classFixtureRecords = [];
+    protected array $_classFixtureRecords = [];
 
     /**
      * Папка, в которой лежат фикстуры
@@ -53,11 +54,11 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
     /**
      * Конструктор с функцией установки таблицы
      *
-     * @param null $table
-     * @param string $caseClass
+     * @param ?string $table
+     * @param ?string $caseClass
      * @throws Exception
      */
-    public function __construct($table = null, $caseClass = null)
+    public function __construct(?string $table = null, ?string $caseClass = null)
     {
         $this->_testCaseClass = $caseClass;
         if (!empty($table)) {
@@ -89,7 +90,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
      * Получает запрос CREATE TABLE для текущей таблицы и сохраняет его в $this->_createTableSqlQuery
      * @SuppressWarnings(PHPMD.ErrorControlOperator)
      */
-    private function _getCreateQuery()
+    private function _getCreateQuery(): void
     {
         $connectionName = $this->getTableLocator()->get($this->table)::defaultConnectionName();
         $this->import['connection'] = $connectionName;
@@ -117,9 +118,9 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
     /**
      * Для какого теста загружаем фикстуры
      *
-     * @param string $caseClass
+     * @param ?string $caseClass
      */
-    public function setTestCase($caseClass)
+    public function setTestCase(?string $caseClass): void
     {
         if ($this->_testCaseClass == $caseClass) {
             return;
@@ -133,7 +134,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
      *
      * @return string
      */
-    private function _getFixtureFileName()
+    private function _getFixtureFileName(): string
     {
         $fixtureFile = $this->import['table'] . '.xml';
         if (!empty($this->_testCaseClass)) {
@@ -157,7 +158,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
     /**
      * Загружает данные из наших XML-файликов фикстур и сохраняет их в $this->records
      */
-    private function _loadFixtureData()
+    private function _loadFixtureData(): void
     {
         $fixtureDataFile = $this->_getFixtureFileName();
         if (empty($fixtureDataFile)) {

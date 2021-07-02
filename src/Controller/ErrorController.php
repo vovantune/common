@@ -22,13 +22,14 @@ class ErrorController extends Controller
     }
 
     /**
-     * Скопировано из Cake\Controller\ErrorController
-     * Дописал отсылку ошибок в нашем стиле
-     *
-     * @param Event $event
-     * @return void
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
+	 * Скопировано из Cake\Controller\ErrorController
+	 * Дописал отсылку ошибок в нашем стиле
+	 *
+	 * @param Event $event
+	 * @return void
+	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+	 * @phpstan-ignore-next-line
+	 */
     public function beforeRender(Event $event)
     {
         $this->viewBuilder()->setTemplatePath('Error');

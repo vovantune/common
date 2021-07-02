@@ -2,12 +2,16 @@
 
 namespace ArtSkills\Traits;
 
+/**
+ * Трейт-одиночка.
+ * strict_types специально не объявлено, ибо не работает с ним
+ */
 trait Singleton
 {
-
     /**
      * Объект-одиночка
-     * @var static
+     *
+     * @var ?static
      */
     private static $_instance;
 
@@ -40,7 +44,7 @@ trait Singleton
     public static function getInstance()
     {
         if (empty(static::$_instance)) {
-            static::$_instance = new static();
+            static::$_instance = new static(); // @phpstan-ignore-line
         }
 
         return static::$_instance;

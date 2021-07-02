@@ -107,6 +107,8 @@ class MockTestChildFixture extends MockTestFixture
      * @param string|null $nullableParam
      * @param mixed $requiredParam
      * @param array $mayBeNotArray
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function complexParams(
         &$byRefParam,
@@ -116,7 +118,7 @@ class MockTestChildFixture extends MockTestFixture
         ?string $nullableParam,
         $requiredParam,
         $mayBeNotArray = []
-    ) {
+    ): void {
         // noop
     }
 }

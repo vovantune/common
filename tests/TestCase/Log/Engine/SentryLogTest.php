@@ -104,7 +104,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** простой вызов Log::error */
-    public function testLogError()
+    public function testLogError(): void
     {
         $message = 'test message 1';
         $this->_fileLogMock->singleCall()->expectArgs('error', $message, self::CONTEXT_DEFAULT);
@@ -121,7 +121,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** вызов Log::write (смотрим, что правильный трейс) */
-    public function testLogWrite()
+    public function testLogWrite(): void
     {
         $levelError = 'error';
         $message = 'test message 2';
@@ -139,7 +139,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** вызов Log::warning (смотрим, что другой level) */
-    public function testLogWarn()
+    public function testLogWarn(): void
     {
         $message = 'test message 3';
         $this->_fileLogMock->singleCall()->expectArgs('warning', $message, self::CONTEXT_DEFAULT);
@@ -157,7 +157,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** вызов Log::info (не пошлётся в сенттри) */
-    public function testLogInfo()
+    public function testLogInfo(): void
     {
         $message = 'test message 4';
         $this->_fileLogMock->singleCall()->expectArgs('info', $message, self::CONTEXT_DEFAULT);
@@ -166,7 +166,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** вызов Log::info с отсылкой в сентри */
-    public function testLogInfoSend()
+    public function testLogInfoSend(): void
     {
         $paramSentrySend = [SentryLog::KEY_SENTRY_SEND => true];
         $message = 'test message 5';
@@ -185,7 +185,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** передача доп. параметров */
-    public function testAddData()
+    public function testAddData(): void
     {
         $addData = [
             'asd' => 'qwe',
@@ -218,7 +218,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** передача отпечатка */
-    public function testFingerprint()
+    public function testFingerprint(): void
     {
         $fingerprint = ['test', 'finger', 'print'];
         $fingerprintParam = [SentryLog::KEY_FINGERPRINT => $fingerprint];
@@ -238,7 +238,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** параметр "обработано" - не слать в сентри */
-    public function testIsHandled()
+    public function testIsHandled(): void
     {
         $paramIsHandled = [SentryLog::KEY_IS_HANDLED => true];
         $message = 'test message 8';
@@ -248,7 +248,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** логирование ексепшнов */
-    public function testLogException()
+    public function testLogException(): void
     {
         $message = 'test message 9';
         $this->_fileLogMock->singleCall()->expectArgs(
@@ -261,7 +261,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** логирование неинтересных ексепшнов */
-    public function testLogExceptionWarning()
+    public function testLogExceptionWarning(): void
     {
         $message = 'test message 9.1';
         $this->_fileLogMock->singleCall()->expectArgs(
@@ -279,7 +279,7 @@ class SentryLogTest extends AppTestCase
 
 
     /** ошибки */
-    public function testTriggerError()
+    public function testTriggerError(): void
     {
         $message = 'test message 10';
         $logMessageLike = 'Fatal Error (256): ' . $message;
@@ -303,20 +303,20 @@ class SentryLogTest extends AppTestCase
     }
 
     /** сделать, чтобы тесты не валились из-за тестируемой ошибки */
-    private function _disableFatal()
+    private function _disableFatal(): void
     {
         MethodMocker::mock(ConsoleErrorHandler::class, '_stop')->singleCall(); // если не замокать, тесты остановятся =)
     }
 
     /** сделать, чтобы тестируемый нотис не мешался */
-    private function _disableNotice()
+    private function _disableNotice(): void
     {
         MethodMocker::mock(ConsoleErrorHandler::class, '_displayError')->singleCall(); // чтоб нотис не выводился
         MethodMocker::sniff(ConsoleErrorHandler::class, '_stop')->expectCall(0); // а тут не должно вызываться
     }
 
     /** нотисы шлются в сентри как ошибки */
-    public function testTriggerNotice()
+    public function testTriggerNotice(): void
     {
         $message = 'test message 12';
         $logMessageLike = 'Notice (1024): ' . $message;
@@ -344,7 +344,7 @@ class SentryLogTest extends AppTestCase
      * @SuppressWarnings(PHPMD.ShortVariable)
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
-    public function testNotice()
+    public function testNotice(): void
     {
         $logMessageLike = 'Notice (8): Undefined variable: b';
         $this->_fileLogMock->singleCall()->willReturnAction(
@@ -366,14 +366,14 @@ class SentryLogTest extends AppTestCase
         );
         $this->_disableNotice();
         $line = __LINE__ + 1; // переменная выше используется по ссылке
-        $a = $b; // ошибка
+        $a = $b; // @phpstan-ignore-line ошибка специально
     }
 
     /**
      * сам шатдаун не получится вызвать, но можно вызвать обработчик
      * @SuppressWarnings(PHPMD.MissingImport)
      */
-    public function testShutdownFlag()
+    public function testShutdownFlag(): void
     {
         $testError = [
             'type' => 8,
@@ -404,7 +404,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** вызов лога из лог-трейта */
-    public function testLogTrait()
+    public function testLogTrait(): void
     {
         $message = 'test message 14';
         $this->_fileLogMock->singleCall()->expectArgs('error', $message, self::CONTEXT_DEFAULT);
@@ -422,7 +422,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** плохой вызов нативной функции */
-    public function testBadCall()
+    public function testBadCall(): void
     {
         $logMessageLike = 'Warning (2): getimagesize';
         $this->_fileLogMock->singleCall()->willReturnAction(
@@ -448,7 +448,7 @@ class SentryLogTest extends AppTestCase
     }
 
     /** Добавление хлебных крошек после ошибок */
-    public function testBreadCrumbs()
+    public function testBreadCrumbs(): void
     {
         $this->_sentryLogMock->willReturnValue(null);
 

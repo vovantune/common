@@ -8,7 +8,7 @@ use ArtSkills\TestSuite\AppTestCase;
 class MathTest extends AppTestCase
 {
     /** Тест округления */
-    public function testRoundUpToNearest()
+    public function testRoundUpToNearest(): void
     {
         $testNumber = 0.5;
         self::assertEquals($testNumber, Math::roundUpToNearest($testNumber, 0));

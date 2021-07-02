@@ -9,16 +9,17 @@ use ArtSkills\Lib\Strings;
 use ArtSkills\Log\Engine\SentryLog;
 use Cake\Console\Shell;
 use Cake\Utility\Inflector;
+use Exception;
 
 /**
  * @SuppressWarnings(PHPMD.MethodMix)
  */
 abstract class DeploymentShell extends Shell
 {
-    const TYPE_PRODUCTION = 'production';
-    const TYPE_TEST = 'test';
+    public const TYPE_PRODUCTION = 'production';
+    public const TYPE_TEST = 'test';
 
-    const CAKE_PATH = CAKE_BIN;
+    private const CAKE_PATH = CAKE_BIN;
 
     /**
      * Запустить деплойщика в фоновом режиме
@@ -28,8 +29,9 @@ abstract class DeploymentShell extends Shell
      * @param string $type тип репозитория - продакшн, тест, ...
      * @param string $repo обновляемая репа
      * @param string $branch обновляемая ветка
+     * @return void
      */
-    public static function deployInBg($type, $repo, $branch)
+    public static function deployInBg(string $type, string $repo, string $branch)
     {
         self::_deployInBg($type, compact('repo', 'branch'));
     }
@@ -38,8 +40,9 @@ abstract class DeploymentShell extends Shell
      * Деплой без проверок в фоновом режиме
      *
      * @param string $type
+     * @return void
      */
-    public static function deployCurrentInBg($type)
+    public static function deployCurrentInBg(string $type)
     {
         self::_deployInBg($type, ['current' => true]);
     }
@@ -98,6 +101,8 @@ abstract class DeploymentShell extends Shell
 
     /**
      * Деплой
+     *
+     * @return void
      */
     public function deploy()
     {
@@ -127,6 +132,8 @@ abstract class DeploymentShell extends Shell
 
     /**
      * Откат, ещё не реализован
+     *
+     * @return void
      */
     public function rollBack()
     {
@@ -141,6 +148,8 @@ abstract class DeploymentShell extends Shell
 
     /**
      * Сделать из настоящего проекта симлинк
+     *
+     * @return void
      */
     public function makeProjectSymlink()
     {
@@ -150,7 +159,7 @@ abstract class DeploymentShell extends Shell
         try {
             Deployer::makeProjectSymlink($this->params['project-path'], $this->params['new-folder']);
             $this->out('OK!');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             SentryLog::logException($e);
         }
     }
@@ -159,9 +168,10 @@ abstract class DeploymentShell extends Shell
      * Деплой в фоновом режиме
      *
      * @param string $type
-     * @param array $params
+     * @param array{repo?: string, branch?: string, current?: bool} $params
+     * @return void
      */
-    private static function _deployInBg($type, array $params)
+    private static function _deployInBg(string $type, array $params)
     {
         $stringParams = escapeshellarg(json_encode($params));
         $type = escapeshellarg($type);
@@ -174,10 +184,10 @@ abstract class DeploymentShell extends Shell
      * В зависимости от типа создать объект деплойщика
      *
      * @param string $type
-     * @return \ArtSkills\Lib\Deployer
-     * @throws \Exception
+     * @return Deployer
+     * @throws Exception
      */
-    protected function _getDeployer($type)
+    protected function _getDeployer(string $type): Deployer
     {
         return Deployer::createFromConfig($type);
     }

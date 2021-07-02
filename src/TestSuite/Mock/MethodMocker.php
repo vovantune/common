@@ -5,6 +5,8 @@ namespace ArtSkills\TestSuite\Mock;
 
 use ArtSkills\Error\InternalException;
 use ArtSkills\Traits\Library;
+use Exception;
+use PHPUnit\Framework\Assert;
 use \ReflectionMethod;
 use \PHPUnit\Framework\AssertionFailedError;
 
@@ -30,7 +32,7 @@ class MethodMocker
      * @param string $methodName
      * @param string|null $newAction новое событие метода
      * @return MethodMockerEntity
-     * @throws AssertionFailedError|\Exception
+     * @throws AssertionFailedError|Exception
      */
     public static function mock(string $className, string $methodName, ?string $newAction = null): MethodMockerEntity
     {
@@ -48,7 +50,7 @@ class MethodMocker
      * @param null|callable $sniffAction функция, вызываемая при вызове подслушиваемого метода: function($args,
      *                                   $originalResult) {}, $originalResult - результат выполнения подслушиваемого метода
      * @return MethodMockerEntity
-     * @throws AssertionFailedError|\Exception
+     * @throws AssertionFailedError|Exception
      */
     public static function sniff(string $className, string $methodName, ?callable $sniffAction = null): MethodMockerEntity
     {
@@ -66,7 +68,7 @@ class MethodMocker
      *
      * @param string $className
      * @param string $methodName
-     * @throws AssertionFailedError|\Exception
+     * @throws AssertionFailedError|Exception
      */
     private static function _newMockCheck(string $className, string $methodName): void
     {
@@ -95,7 +97,9 @@ class MethodMocker
      * @param array $args
      * @param mixed $origMethodResult результат выполнения оригинального метода в режиме снифа
      * @return mixed
-     * @throws AssertionFailedError|\Exception
+     * @throws AssertionFailedError|Exception
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function doAction(string $mockKey, array $args, $origMethodResult = null)
     {
@@ -111,7 +115,7 @@ class MethodMocker
      * Возвращаем все подмененные методы
      *
      * @param bool $hasFailed был ли тест завален
-     * @throws AssertionFailedError|\Exception
+     * @throws AssertionFailedError|Exception
      */
     public static function restore(bool $hasFailed = false): void
     {
@@ -119,7 +123,7 @@ class MethodMocker
         foreach (self::$_mockList as $mock) {
             try {
                 $mock->restore($hasFailed);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 if (empty($firstError)) {
                     $firstError = $e;
                 }
@@ -139,7 +143,9 @@ class MethodMocker
      * @param string $methodName
      * @param array|null $args аргументы вызова
      * @return mixed
-     * @throws AssertionFailedError|\Exception
+     * @throws AssertionFailedError|Exception
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function callPrivate($object, string $methodName, $args = null)
     {
@@ -178,13 +184,13 @@ class MethodMocker
      * Зависимость от PHPUnit
      * Определено в одном месте на все классы
      *
-     * @throws AssertionFailedError|InternalException
      * @param string $message
+     * @throws AssertionFailedError|InternalException
      */
     public static function fail(string $message): void
     {
-        if (class_exists(\PHPUnit\Framework\Assert::class) && method_exists(\PHPUnit\Framework\Assert::class, 'fail')) {
-            \PHPUnit\Framework\Assert::fail($message);
+        if (class_exists(Assert::class) && method_exists(Assert::class, 'fail')) {
+            Assert::fail($message);
         } else {
             throw new InternalException($message); // @codeCoverageIgnore
         }
@@ -195,17 +201,17 @@ class MethodMocker
      * Зависимость от PHPUnit
      * Определено в одном месте на все классы
      *
-     * @throws AssertionFailedError|InternalException
      * @param mixed $expected
      * @param mixed $actual
      * @param string $message
+     * @throws AssertionFailedError|InternalException
      */
     public static function assertEquals($expected, $actual, string $message = ''): void
     {
-        if (class_exists(\PHPUnit\Framework\Assert::class) && method_exists(\PHPUnit\Framework\Assert::class, 'assertEquals')) {
-            \PHPUnit\Framework\Assert::assertEquals($expected, $actual, $message);
+        if (class_exists(Assert::class) && method_exists(Assert::class, 'assertEquals')) {
+            Assert::assertEquals($expected, $actual, $message);
         } elseif ($expected != $actual) {
-            throw new InternalException($message, ' expected: ' . print_r($expected, true) . ', actual: ' . print_r($actual, true)); // @codeCoverageIgnore
+            throw new InternalException($message . ' expected: ' . print_r($expected, true) . ', actual: ' . print_r($actual, true)); // @codeCoverageIgnore
         }
     }
 }

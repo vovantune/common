@@ -9,6 +9,7 @@ use ArtSkills\Lib\Git;
 use Cake\Console\Shell;
 use Cake\Core\Configure;
 use Cake\I18n\Time;
+use Exception;
 
 /**
  * Чистилка старых (смерженных с мастером) веток.
@@ -24,8 +25,8 @@ use Cake\I18n\Time;
  */
 class GitBranchTrimShell extends Shell
 {
-    const CONFIGURATION_NAME = 'Git';
-    const DEFAULT_CONFIGURATION = [
+    public const CONFIGURATION_NAME = 'Git';
+    public const DEFAULT_CONFIGURATION = [
         'dir' => '',
         'branchDeleteInterval' => '-7 days',
     ];
@@ -35,17 +36,20 @@ class GitBranchTrimShell extends Shell
      *
      * @var string
      */
-    protected $_fromDir = '';
+    protected string $_fromDir = '';
 
     /**
      * Возраст удаляемых веток
      *
-     * @var int
+     * @var string
      */
-    protected $_branchDeleteInterval = '-7 days';
+    protected string $_branchDeleteInterval = '-7 days';
 
     /**
      * Чистка старых веток
+     *
+     * @return void
+     * @throws Exception
      */
     public function main()
     {
@@ -61,7 +65,7 @@ class GitBranchTrimShell extends Shell
      * Удаление старых неиспользуемых веток
      *
      * @return string[]
-     * @throws \Exception
+     * @throws Exception
      */
     private function _run(): array
     {
@@ -145,7 +149,6 @@ class GitBranchTrimShell extends Shell
      * Из какой директории запускать
      *
      * @return string
-     * @throws InternalException
      */
     protected function _fromDir(): string
     {
@@ -168,7 +171,7 @@ class GitBranchTrimShell extends Shell
         $git = $this->_git();
         $skipBranches = array_merge($skipBranches, [Git::BRANCH_NAME_MASTER, Git::BRANCH_NAME_HEAD]);
         $mergedBranches = $git->getMergedBranches($type);
-        $deleteDateFrom = Time::parse($this->_branchDeleteInterval)->format('Y-m-d');
+        $deleteDateFrom = Time::parse($this->_branchDeleteInterval)->toDateString();
         $log = [];
         foreach ($mergedBranches as $branchName => $lastCommitDate) {
             if ($lastCommitDate > $deleteDateFrom) {

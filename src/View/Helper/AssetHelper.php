@@ -65,6 +65,7 @@ class AssetHelper extends Helper
     /**
      * @inheritdoc
      * формат конфига в AssetHelper.md
+     * @phpstan-ignore-next-line
      */
     protected $_defaultConfig = [
         // для ассетов
@@ -79,14 +80,14 @@ class AssetHelper extends Helper
     /**
      * Загруженные скрипты/стили
      *
-     * @var array
+     * @var string[]
      */
     private array $_loadedAssets = [];
 
     /**
      * Текущие скрипты/стили
      *
-     * @var array
+     * @var string[]
      */
     private array $_newAssets = [];
 
@@ -94,7 +95,7 @@ class AssetHelper extends Helper
      * Ассеты, которые начали обрабатываться, но ещё не закончили
      * Можно было бы использовать $_newAssets, но тогда нельзя было бы отличить дублирующиеся зависимости от круговых зависимостей
      *
-     * @var array
+     * @var array<string, bool>
      */
     private array $_startedAssets = [];
 
@@ -102,22 +103,22 @@ class AssetHelper extends Helper
     /**
      * Загруженные переменные
      *
-     * @var array
+     * @var array<string, mixed>
      */
     private array $_loadedVariables = [];
 
     /**
      * Обязательные для текущго набора скриптов переменные
      *
-     * @var array
+     * @var array<string, mixed>
      */
     private array $_newVariables = [];
 
 
     /**
-     * Объявленные для текущго набора скриптов переменные
+     * Объявленные для текущего набора скриптов переменные
      *
-     * @var array
+     * @var array<string, mixed>
      */
     private array $_definedVariables = [];
 
@@ -132,18 +133,21 @@ class AssetHelper extends Helper
     /**
      * Результат. Массив тегов по блокам
      *
-     * @var array
+     * @var array<string, string[]>
      */
     private array $_result = [];
 
     /**
      * Массив флагов того, был ли уже выведен этот блок
      *
-     * @var array
+     * @var array<string, bool>
      */
     private array $_blockFetched = [];
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
     public function __construct(View $View, array $config = [])
     {
         foreach (static::BLOCKS as $block) {
@@ -157,6 +161,7 @@ class AssetHelper extends Helper
      * Задать счётчик версий ассетов
      *
      * @param int $version
+     * @return void
      * @throws InternalException
      */
     public function setAssetVersion(int $version)
@@ -171,10 +176,11 @@ class AssetHelper extends Helper
     }
 
     /**
-     * Задать зависимость для текущего экшна
+     * Задать зависимость для текущего action
      *
      * @param string $folder
      * @param string $file
+     * @return void
      */
     public function addDependency(string $folder, string $file)
     {
@@ -186,6 +192,7 @@ class AssetHelper extends Helper
      *
      * @param string $folder
      * @param string $file
+     * @return void
      */
     public function addLayoutDependency(string $folder, string $file)
     {
@@ -198,6 +205,7 @@ class AssetHelper extends Helper
      *
      * @param string[] $dependencies
      * @param bool $forLayout зависимость layout или события
+     * @return void
      */
     public function addDependencies(array $dependencies, bool $forLayout = false)
     {
@@ -208,6 +216,8 @@ class AssetHelper extends Helper
 
     /**
      * Закинуть скрипт текущего экшна вниз
+     *
+     * @return void
      */
     public function setCurrentBottom()
     {
@@ -217,11 +227,12 @@ class AssetHelper extends Helper
     /**
      * Задание значений переменных
      *
-     * @param array $variables [название => значение]
-     *                         проставление кавычек строкам и json_encode() массивов сделаются автоматически, передавать сюда такое не нужно!!!
-     *                         и по названиям переменных пройдутся preg_match и инфлектор, чтоб туда не попадало говно
-     * @param bool|array $overwrite можно ли перезаписать переменные, если они уже определены.
-     *                              bool сразу для всех, массив - для каждого по отдельности
+     * @param array<string, mixed> $variables [название => значение]
+     *                                        проставление кавычек строкам и json_encode() массивов сделаются автоматически, передавать сюда такое не нужно!!!
+     *                                        и по названиям переменных пройдутся preg_match и инфлектор, чтоб туда не попадало говно
+     * @param bool|array<string, bool> $overwrite можно ли перезаписать переменные, если они уже определены.
+     *                                            bool сразу для всех, массив - для каждого по отдельности
+     * @return void
      * @throws InternalException если переданы неправильные параметры
      * или при попытке переопределить переменную, когда это не разрешено
      */
@@ -233,11 +244,12 @@ class AssetHelper extends Helper
     /**
      * Задание значений констант
      *
-     * @param array $constants [название => значение]
-     *                         проставление кавычек строкам и json_encode() массивов сделаются автоматически, передавать сюда такое не нужно!!!
-     *                         и по названиям переменных пройдутся preg_match и инфлектор, чтоб туда не попадало говно
-     * @param bool|array $overwrite можно ли перезаписать константы, если они уже определены.
-     *                              bool сразу для всех, массив - для каждого по отдельности
+     * @param array<string, mixed> $constants [название => значение]
+     *                                        проставление кавычек строкам и json_encode() массивов сделаются автоматически, передавать сюда такое не нужно!!!
+     *                                        и по названиям переменных пройдутся preg_match и инфлектор, чтоб туда не попадало говно
+     * @param bool|array<string, bool> $overwrite можно ли перезаписать константы, если они уже определены.
+     *                                            bool сразу для всех, массив - для каждого по отдельности
+     * @return void
      * @throws InternalException если переданы неправильные параметры
      * или при попытке переопределить константу, когда это не разрешено
      */
@@ -269,6 +281,7 @@ class AssetHelper extends Helper
      * Вывести скрипты в шаблон
      *
      * @return string
+     * @throws InternalException
      */
     public function fetchScripts(): string
     {
@@ -279,6 +292,7 @@ class AssetHelper extends Helper
      * Вывести стили в шаблон
      *
      * @return string
+     * @throws InternalException
      */
     public function fetchStyles(): string
     {
@@ -289,6 +303,7 @@ class AssetHelper extends Helper
      * Вывести скрипты в шаблон в нижний блок
      *
      * @return string
+     * @throws InternalException
      */
     public function fetchScriptsBottom(): string
     {
@@ -300,12 +315,13 @@ class AssetHelper extends Helper
      *
      * @param null|string $controller по умолчанию из request
      * @param null|string $action по умолчанию из request
+     * @return void
      * @throws InternalException если была какая-то ошибка
      */
     public function load(string $controller = null, string $action = null)
     {
-        $controller = $this->_getParam($controller, 'controller');
-        $action = $this->_getParam($action, 'action');
+        $controller = $this->_getParam('controller', $controller);
+        $action = $this->_getParam('action', $action);
         try {
             $this->_loadAsset("$controller.$action" . static::LAYOUT_POSTFIX);
             $this->_loadAsset("$controller.$action");
@@ -323,8 +339,9 @@ class AssetHelper extends Helper
      *
      * @param string $controller
      * @param string $action
-     * @param array $config
+     * @param array<string, string[]|string|bool> $config
      * @param bool $merge добавить или перезаписать
+     * @return void
      * @throws InternalException
      */
     protected function _setActionConfig(string $controller, string $action, array $config, bool $merge = true)
@@ -357,21 +374,24 @@ class AssetHelper extends Helper
      * Задать конфиг на текущий экшн
      * формат конфига в AssetHelper.md
      *
-     * @param array $config
+     * @param array<string, string[]|string|bool> $config
      * @param bool $merge добавить или перезаписать
      * @param string $postfix
+     * @return void
+     * @throws InternalException
      */
     protected function _setCurrentConfig(array $config, bool $merge = true, string $postfix = '')
     {
-        $this->_setActionConfig($this->_getParam(null, 'controller'), $this->_getParam(null, 'action') . $postfix, $config, $merge);
+        $this->_setActionConfig($this->_getParam('controller', null), $this->_getParam('action', null) . $postfix, $config, $merge);
     }
 
     /**
      * Задать конфиг на несколько экшнов
      * формат конфига в AssetHelper.md
      *
-     * @param array $configs
+     * @param array<string, string|string[]> $configs
      * @param bool $merge
+     * @return void
      */
     protected function _setConfigs(array $configs, bool $merge = true)
     {
@@ -391,9 +411,10 @@ class AssetHelper extends Helper
      * Задание значений переменных или констант.
      * Разница в проверке именований: переменные в camelCase, константы в UPPER_CASE.
      *
-     * @param array $variables
-     * @param bool|array $overwrite
+     * @param array<string, mixed> $variables
+     * @param bool|array<string, bool> $overwrite
      * @param bool $isVariable переменная или константа.
+     * @return void
      * @throws InternalException
      */
     private function _setVars(array $variables, $overwrite = false, bool $isVariable = true)
@@ -439,19 +460,19 @@ class AssetHelper extends Helper
     /**
      * Возвращает camelCase параметр. Если не задан, то дефолтный
      *
-     * @param string $value
      * @param string $name
+     * @param ?string $defaultValue
      * @return string
      */
-    private function _getParam(?string $value, string $name): string
+    private function _getParam(string $name, ?string $defaultValue): string
     {
-        if (empty($value)) {
-            $value = $this->getView()->getRequest()->getParam($name);
+        if (empty($defaultValue)) {
+            $defaultValue = $this->getView()->getRequest()->getParam($name);
         }
-        if (empty($value)) {
-            $value = self::DEFAULT_PARAMS[$name];
+        if (empty($defaultValue)) {
+            $defaultValue = self::DEFAULT_PARAMS[$name];
         }
-        return Inflector::variable($value);
+        return Inflector::variable($defaultValue);
     }
 
     /**
@@ -469,6 +490,7 @@ class AssetHelper extends Helper
      * Загрузка ассета со всеми зависимостями, переменными и проверками
      *
      * @param string $assetName
+     * @return void
      * @throws InternalException
      */
     private function _loadAsset(string $assetName)
@@ -490,6 +512,7 @@ class AssetHelper extends Helper
      * Загрузка зависимостей
      *
      * @param string $assetName
+     * @return void
      */
     private function _loadDependencies(string $assetName)
     {
@@ -506,6 +529,7 @@ class AssetHelper extends Helper
      * Загрузка переменных
      *
      * @param string $assetName
+     * @return void
      * @throws InternalException если одна переменная объявлена в нескольких ассетах с разными типами
      */
     private function _loadVariables(string $assetName)
@@ -546,6 +570,9 @@ class AssetHelper extends Helper
 
     /**
      * Вывод на страницу
+     *
+     * @return void
+     * @throws InternalException
      */
     private function _render()
     {
@@ -556,6 +583,7 @@ class AssetHelper extends Helper
     /**
      * Вывод переменных
      *
+     * @return void
      * @throws InternalException если какие-то переменные не определены или определены неправильно
      */
     private function _renderVars()
@@ -600,6 +628,7 @@ class AssetHelper extends Helper
     /**
      * Проверить, можно ли добавить ещё переменных
      *
+     * @return void
      * @throws InternalException
      */
     private function _checkCanRenderVars()
@@ -639,6 +668,9 @@ class AssetHelper extends Helper
 
     /**
      * Вывод скриптов и стилей
+     *
+     * @return void
+     * @throws InternalException
      */
     private function _renderAssets()
     {
@@ -682,6 +714,7 @@ class AssetHelper extends Helper
      *
      * @param string $blockName
      * @param string $assetName для сообщения об ошибке
+     * @return void
      * @throws InternalException
      */
     private function _checkCanRenderBlock(string $blockName, string $assetName)
@@ -740,7 +773,7 @@ class AssetHelper extends Helper
     }
 
     /**
-     * Ищем минфицированный файл
+     * Ищем минифицированный файл
      *
      * @param string $path
      * @return string
@@ -813,7 +846,7 @@ class AssetHelper extends Helper
      * Возвращает сгенерированные теги
      *
      * @param null|string $block
-     * @return array
+     * @return array<string, string[]>
      */
     protected function _getResult(?string $block = null): array
     {
@@ -839,6 +872,7 @@ class AssetHelper extends Helper
      * Добавление результата и обновление значений свойств
      *
      * @param bool $appendResult
+     * @return void
      */
     private function _finish(bool $appendResult)
     {

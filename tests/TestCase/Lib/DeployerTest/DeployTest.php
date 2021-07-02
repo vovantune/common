@@ -25,44 +25,44 @@ class DeployTest extends AppTestCase
     /**
      * История команд
      *
-     * @var array
+     * @var string[]
      */
-    private $_executeHistory = [];
+    private array $_executeHistory = [];
 
     /**
      * текущая папка
      *
      * @var string
      */
-    private $_currentDir = '';
+    private string $_currentDir = '';
 
     /**
      * тестовое значение репы
      *
      * @var string
      */
-    private $_repo = '';
+    private string $_repo = '';
 
     /**
      * текущая ветка
      *
      * @var string
      */
-    private $_branch = '';
+    private string $_branch = '';
 
     /**
      * ожидаемый следующий корень для нормальных тестов
      *
      * @var string
      */
-    private $_nextRoot = '';
+    private string $_nextRoot = '';
 
     /**
      * ожидаемая подпапка для нормальных тестов
      *
      * @var string
      */
-    private $_nextRootSub = '';
+    private string $_nextRootSub = '';
 
 
     /** @inheritdoc */
@@ -88,7 +88,7 @@ class DeployTest extends AppTestCase
     }
 
     /** удалить ненужные файлы */
-    private function _cleanFiles()
+    private function _cleanFiles(): void
     {
         $toClean = [
             self::VERSION_FILE_PATH,
@@ -107,7 +107,7 @@ class DeployTest extends AppTestCase
      * Обычный деплой с ротацией
      * Смотрим выполняемые команды
      */
-    public function testDeploy()
+    public function testDeploy(): void
     {
         $mainRoot = LocalDeployer::SYMLINK;
 
@@ -135,7 +135,7 @@ class DeployTest extends AppTestCase
     }
 
     /** Деплой в текущую папку */
-    public function testDeploySingleRoot()
+    public function testDeploySingleRoot(): void
     {
         $singleRoot = LocalDeployer::DIR_CURRENT;
         $rootSub = $singleRoot . DS . LocalDeployer::CAKE_SUB_PATH;
@@ -167,7 +167,7 @@ class DeployTest extends AppTestCase
     }
 
     /** Что если не удалось спуллиться */
-    public function testPullFail()
+    public function testPullFail(): void
     {
         $this->_mockExec(3, '/^git pull 2>&1$/');
         $this->_mockOther(2, 0, 0, 1);
@@ -188,7 +188,7 @@ class DeployTest extends AppTestCase
     }
 
     /** Что если не обновился композер */
-    public function testComposerFail()
+    public function testComposerFail(): void
     {
         $this->_mockExec(4, '/^php composer.phar install/');
         $this->_mockOther(2, 1, 0, 1);
@@ -211,7 +211,7 @@ class DeployTest extends AppTestCase
     }
 
     /** Что если не развернулись миграции */
-    public function testMigrateFail()
+    public function testMigrateFail(): void
     {
         $this->_mockExec(5, '/^vendor\/bin\/phinx migrate 2>&1$/');
         $this->_mockOther(2, 1, 0, 1);
@@ -241,7 +241,7 @@ class DeployTest extends AppTestCase
      * @param string|bool $failPattern для каких команд возвращать неудачу
      * @throws \Exception
      */
-    private function _mockExec($expectTimes, $failPattern = false)
+    private function _mockExec(int $expectTimes, $failPattern = false): void
     {
         MethodMocker::mock(Shell::class, '_exec')
             ->expectCall($expectTimes)
@@ -273,11 +273,11 @@ class DeployTest extends AppTestCase
      * @throws \Exception
      */
     private function _mockOther(
-        $expectTimesChdir = 2,
-        $expectTimesPutenv = 1,
-        $expectTimesLog = 1,
-        $expectFileWrite = 1
-    ) {
+        int $expectTimesChdir = 2,
+        int $expectTimesPutenv = 1,
+        int $expectTimesLog = 1,
+        int $expectFileWrite = 1
+    ): void {
         MethodMocker::sniff(Deployer::class, '_chdir')
             ->expectCall($expectTimesChdir)
             ->willReturnAction(function ($args) {
@@ -300,7 +300,7 @@ class DeployTest extends AppTestCase
      *
      * @param string $message
      */
-    private function _expectException($message)
+    private function _expectException(string $message): void
     {
         MethodMocker::mock(SentryLog::class, 'logException')
             ->singleCall()
@@ -318,8 +318,10 @@ class DeployTest extends AppTestCase
      * @param string $repo
      * @param string $branch
      * @param array $config
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    private function _testNothingHappens($repo, $branch, $config = [])
+    private function _testNothingHappens(string $repo, $branch, $config = []): void
     {
         $this->_mockExec(1);
         $this->_mockOther(2, 0, 1, 0);
@@ -337,25 +339,25 @@ class DeployTest extends AppTestCase
     }
 
     /** не та репа */
-    public function testWrongRepo()
+    public function testWrongRepo(): void
     {
         $this->_testNothingHappens('badRepoName', $this->_branch);
     }
 
     /** не та ветка */
-    public function testWrongBranch()
+    public function testWrongBranch(): void
     {
         $this->_testNothingHappens($this->_repo, 'branchNameThatWillNeverEverExist');
     }
 
     /** не то окружение */
-    public function testWrongEnv()
+    public function testWrongEnv(): void
     {
         $this->_testNothingHappens($this->_repo, $this->_branch, ['isDeployEnv' => false]);
     }
 
     /** не мигрируем по-умолчанию (например, в тестовом окружении) и не разворачиваем композер */
-    public function testNoAutoMigrateNoComposer()
+    public function testNoAutoMigrateNoComposer(): void
     {
         $mainRoot = LocalDeployer::SYMLINK;
 
@@ -364,7 +366,7 @@ class DeployTest extends AppTestCase
 
         $deployer = new LocalDeployer([
             'autoMigrate' => false,
-            'composerCommand' => false,
+            'composerCommand' => null,
         ]);
         $res = $deployer->deploy($this->_repo, $this->_branch);
         self::assertTrue($res);
@@ -381,7 +383,7 @@ class DeployTest extends AppTestCase
     }
 
     /** не перечислены зависимости и не надо копировать файлы */
-    public function testNoCopy()
+    public function testNoCopy(): void
     {
         $mainRoot = LocalDeployer::SYMLINK;
 
@@ -408,7 +410,7 @@ class DeployTest extends AppTestCase
     }
 
     /** не указан composer home, файл версии и опции композера */
-    public function testNoHomeNoVersionNoOptions()
+    public function testNoHomeNoVersionNoOptions(): void
     {
         $mainRoot = LocalDeployer::SYMLINK;
 
@@ -442,7 +444,7 @@ class DeployTest extends AppTestCase
     /**
      * конфликт конфига
      */
-    public function testConfigConflict()
+    public function testConfigConflict(): void
     {
         $this->expectExceptionMessage("Заполнены конфликтующие свойства");
         $this->expectException(\Exception::class);
@@ -454,7 +456,7 @@ class DeployTest extends AppTestCase
     /**
      * не указан automigrate
      */
-    public function testUnsetAutoMigrate()
+    public function testUnsetAutoMigrate(): void
     {
         $this->expectExceptionMessage("Нужно явно указать параметр _autoMigrate");
         $this->expectException(\Exception::class);
@@ -466,7 +468,7 @@ class DeployTest extends AppTestCase
     /**
      * Явно задан параметр миграции, но не задана команда
      */
-    public function testBadAutoMigrate()
+    public function testBadAutoMigrate(): void
     {
         $this->expectExceptionMessage("Явно задан параметр миграции, но не задана команда");
         $this->expectException(\Exception::class);
@@ -479,7 +481,7 @@ class DeployTest extends AppTestCase
     /**
      * не указан главный симлинк
      */
-    public function testNoMainRoot()
+    public function testNoMainRoot(): void
     {
         $this->expectExceptionMessage("Не указан главный симлинк");
         $this->expectException(\Exception::class);
@@ -491,7 +493,7 @@ class DeployTest extends AppTestCase
     /**
      * главный симлинк в списке
      */
-    public function testSymlinkInList()
+    public function testSymlinkInList(): void
     {
         $this->expectExceptionMessage("Главный симлинк задан в списке папок");
         $this->expectException(\Exception::class);
@@ -503,7 +505,7 @@ class DeployTest extends AppTestCase
     /**
      * то же самое, но путь оканчивается на слеш
      */
-    public function testSymlinkInListDs()
+    public function testSymlinkInListDs(): void
     {
         $this->expectExceptionMessage("Главный симлинк задан в списке папок");
         $this->expectException(\Exception::class);
@@ -516,7 +518,7 @@ class DeployTest extends AppTestCase
     /**
      * не проинициализировался гит
      */
-    public function testGitInitFail()
+    public function testGitInitFail(): void
     {
         $this->expectExceptionMessage("Не проинициализировался гит");
         $this->expectException(\Exception::class);
@@ -527,7 +529,7 @@ class DeployTest extends AppTestCase
     /**
      * не указан репозиторий
      */
-    public function testNoRepo()
+    public function testNoRepo(): void
     {
         $this->expectExceptionMessage("Не указан репозиторий");
         $this->expectException(\Exception::class);
@@ -539,7 +541,7 @@ class DeployTest extends AppTestCase
     /**
      * только одна папка в списке
      */
-    public function testOneFolderInList()
+    public function testOneFolderInList(): void
     {
         $this->expectExceptionMessage("явно задайте свойство _singleRoot");
         $this->expectException(\Exception::class);
@@ -551,7 +553,7 @@ class DeployTest extends AppTestCase
     /**
      * дубли в списке папок
      */
-    public function testFolderDuplicates()
+    public function testFolderDuplicates(): void
     {
         $this->expectExceptionMessage("В списке папок есть дубли");
         $this->expectException(\Exception::class);
@@ -563,7 +565,7 @@ class DeployTest extends AppTestCase
     /**
      * плохой файл версий
      */
-    public function testBadVersionFile()
+    public function testBadVersionFile(): void
     {
         $this->expectExceptionMessage("Не могу получить относительный путь из");
         $this->expectException(\Exception::class);

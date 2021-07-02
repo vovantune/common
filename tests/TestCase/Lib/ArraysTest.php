@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\TestCase\Lib;
+namespace ArtSkills\Test\TestCase\Lib;
 
 use ArtSkills\Lib\Arrays;
 use ArtSkills\TestSuite\AppTestCase;
@@ -9,7 +9,7 @@ class ArraysTest extends AppTestCase
 {
 
     /** фильтр части ключей */
-    public function testFilterKeys()
+    public function testFilterKeys(): void
     {
         $array = [
             'a' => 1,
@@ -25,7 +25,7 @@ class ArraysTest extends AppTestCase
     }
 
     /** значения в ключи */
-    public function testKeysFromValues()
+    public function testKeysFromValues(): void
     {
         $values = ['a', 'b', 'c'];
         $expectedResult = [
@@ -36,24 +36,10 @@ class ArraysTest extends AppTestCase
         self::assertEquals($expectedResult, Arrays::keysFromValues($values));
     }
 
-    /** обработка массива строк */
-    public function testTrim()
-    {
-        $strings = [
-            '    asd   asd asd    ',
-            " \n\t",
-        ];
-        $expectedResult = [
-            'asd   asd asd',
-            '',
-        ];
-        self::assertEquals($expectedResult, Arrays::trim($strings));
-    }
-
     /**
      * смена ключей массива
      */
-    public function testRemap()
+    public function testRemap(): void
     {
         $array = [
             'before_1' => 'asd',
@@ -79,7 +65,7 @@ class ArraysTest extends AppTestCase
     }
 
     /** получение */
-    public function testGet()
+    public function testGet(): void
     {
         $default = 'default';
         $hasKey = 'hasKey';
@@ -94,7 +80,7 @@ class ArraysTest extends AppTestCase
     }
 
     /** инициализация значения */
-    public function testInitPath()
+    public function testInitPath(): void
     {
         $array = [];
         $key = 'key1';
@@ -133,7 +119,7 @@ class ArraysTest extends AppTestCase
     /**
      * на пути есть немассив
      */
-    public function testInitPathFail()
+    public function testInitPathFail(): void
     {
         $this->expectExceptionMessage("По ключу nest2 находится не массив");
         $this->expectException(\Exception::class);
@@ -151,7 +137,7 @@ class ArraysTest extends AppTestCase
     }
 
     /** Сравнение */
-    public function testEquals()
+    public function testEquals(): void
     {
         $keyEquals = '_key';
         $keyNotEquals = '_notEq';

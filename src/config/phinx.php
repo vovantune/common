@@ -9,6 +9,7 @@ use ArtSkills\Phinx\Migration\AbstractMigration;
  * @param string $pathsFile файл с константами путей
  * @param string $baseMigrationClass класс, от которого наследовать миграции
  * @return array
+ * @phpstan-ignore-next-line
  */
 function getPhinxConfig(
     $dbConfFile,

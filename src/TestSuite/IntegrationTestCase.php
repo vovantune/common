@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite;
 
@@ -24,14 +25,14 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @var null|MethodMockerEntity
      */
-    protected $_flashSniff = null;
+    protected ?MethodMockerEntity $_flashSniff = null;
 
     /**
      * С чем вызывался флеш
      *
-     * @var array
+     * @var array<int, array{0: string, 1: string[]}>
      */
-    protected $_flashResult = [];
+    protected array $_flashResult = [];
 
     /**
      * Загружаем фикстуру из хранилища
@@ -40,7 +41,7 @@ abstract class IntegrationTestCase extends TestCase
      * @return mixed
      * @throws InternalException
      */
-    protected function _getJsonFixture($fixtureName)
+    protected function _getJsonFixture(string $fixtureName)
     {
         if (Env::hasFixtureFolder()) {
             $fixtureFolder = Env::getFixtureFolder();
@@ -63,8 +64,10 @@ abstract class IntegrationTestCase extends TestCase
      * @param bool $strict Check for object identity
      * @param string $message
      * @return void
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
-    public function assertJsonSubset($subset, $json, $strict = false, $message = '')
+    public function assertJsonSubset($subset, $json, bool $strict = false, $message = '')
     {
         if (is_string($subset)) {
             $subset = json_decode($subset, true);
@@ -79,8 +82,10 @@ abstract class IntegrationTestCase extends TestCase
      * @param string $url
      * @param null|int $responseCode
      * @return array
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
-    public function getJsonResponse($url = '', $responseCode = null)
+    public function getJsonResponse(string $url = '', ?int $responseCode = null): array
     {
         if (!empty($url)) {
             $this->get($url);
@@ -104,8 +109,10 @@ abstract class IntegrationTestCase extends TestCase
      * @param string $url
      * @param string|array $data
      * @return array
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public function postJsonResponse($url, $data)
+    public function postJsonResponse(string $url, $data): array
     {
         $this->post($url, $data);
         return $this->getJsonResponse();
@@ -116,16 +123,18 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param array $expected
      * @param string $message
-     * @param null|int $responseCode
+     * @param int|null $responseCode
      * @param float $delta
      * @param int $maxDepth
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public function assertJsonResponseEquals(
-        $expected,
-        $message = '',
-        $responseCode = null,
-        $delta = 0.0,
-        $maxDepth = 10
+        array $expected,
+        string $message = '',
+        int $responseCode = null,
+        float $delta = 0.0,
+        int $maxDepth = 10
     ) {
         self::assertEquals($expected, $this->getJsonResponse('', $responseCode), $message, $delta, $maxDepth);
     }
@@ -135,16 +144,18 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param array $subset
      * @param string $message
-     * @param null|int $responseCode
+     * @param int|null $responseCode
      * @param float $delta
      * @param int $maxDepth
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public function assertJsonResponseSubset(
-        $subset,
-        $message = '',
-        $responseCode = null,
-        $delta = 0.0,
-        $maxDepth = 10
+        array $subset,
+        string $message = '',
+        int $responseCode = null,
+        float $delta = 0.0,
+        int $maxDepth = 10
     ) {
         $this->assertArraySubsetEquals($subset, $this->getJsonResponse('', $responseCode), $message, $delta, $maxDepth);
     }
@@ -155,17 +166,19 @@ abstract class IntegrationTestCase extends TestCase
      * @param string $expectedMessage
      * @param string $message
      * @param array $expectedData
-     * @param null|int $responseCode
+     * @param int|null $responseCode
      * @param float $delta
      * @param int $maxDepth
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public function assertJsonErrorEquals(
-        $expectedMessage,
-        $message = '',
-        $expectedData = [],
-        $responseCode = null,
-        $delta = 0.0,
-        $maxDepth = 10
+        string $expectedMessage,
+        string $message = '',
+        array $expectedData = [],
+        int $responseCode = null,
+        float $delta = 0.0,
+        int $maxDepth = 10
     ) {
         $expectedResponse = ['status' => Controller::JSON_STATUS_ERROR, 'message' => $expectedMessage] + $expectedData;
         $this->assertJsonResponseEquals($expectedResponse, $message, $responseCode, $delta, $maxDepth);
@@ -179,13 +192,15 @@ abstract class IntegrationTestCase extends TestCase
      * @param array $expectedData
      * @param float $delta
      * @param int $maxDepth
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public function assertJsonInternalErrorEquals(
-        $expectedMessage,
-        $message = '',
-        $expectedData = [],
-        $delta = 0.0,
-        $maxDepth = 10
+        string $expectedMessage,
+        string $message = '',
+        array $expectedData = [],
+        float $delta = 0.0,
+        int $maxDepth = 10
     ) {
         $expectedResponse = ['status' => Controller::JSON_STATUS_ERROR, 'message' => $expectedMessage] + $expectedData;
         $this->assertJsonResponseSubset($expectedResponse, $message, 500, $delta, $maxDepth);
@@ -196,34 +211,40 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param array $expectedData
      * @param string $message
-     * @param null|int $responseCode
+     * @param int|null $responseCode
      * @param float $delta
      * @param int $maxDepth
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public function assertJsonOKEquals(
-        $expectedData = [],
-        $message = '',
-        $responseCode = null,
-        $delta = 0.0,
-        $maxDepth = 10
+        array $expectedData = [],
+        string $message = '',
+        int $responseCode = null,
+        float $delta = 0.0,
+        int $maxDepth = 10
     ) {
         $expectedResponse = ['status' => Controller::JSON_STATUS_OK] + $expectedData;
         $this->assertJsonResponseEquals($expectedResponse, $message, $responseCode, $delta, $maxDepth);
     }
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
     protected function _sendRequest($url, $method, $data = [])
     {
         $this->_flashResult = [];
-        $this->_traitSendRequest($url, $method, $data);
+        $this->_traitSendRequest($url, $method, $data); // @phpstan-ignore-line некорректно работает с переопределением метода трейта
     }
 
     /**
      * Снифф флеша
      *
      * @param int $expectCall
+     * @return void
      */
-    protected function _initFlashSniff($expectCall = MethodMockerEntity::EXPECT_CALL_ONCE)
+    protected function _initFlashSniff(int $expectCall = MethodMockerEntity::EXPECT_CALL_ONCE)
     {
         $this->_flashSniff = MethodMocker::sniff(FlashComponent::class, '__call')
             ->expectCall($expectCall)
@@ -234,6 +255,8 @@ abstract class IntegrationTestCase extends TestCase
 
     /**
      * Проверка, что можно применять ассерты флеша
+     *
+     * @return void
      */
     protected function _checkFlashInited()
     {
@@ -245,10 +268,11 @@ abstract class IntegrationTestCase extends TestCase
     /**
      * Проверка на все вызовы флеша в реквесте
      *
-     * @param array $expectedFlash массив массивов [method, [message]]
+     * @param array<int, array{0: string, 1: string[]}> $expectedFlash массив массивов [method, [message]]
      * @param string $message
+     * @return void
      */
-    private function _assertFlashEquals($expectedFlash, $message = '')
+    private function _assertFlashEquals(array $expectedFlash, string $message = '')
     {
         $this->_checkFlashInited();
         self::assertEquals($expectedFlash, $this->_flashResult, $message);
@@ -259,8 +283,9 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param string $expectedMessage
      * @param string $assertFailMessage
+     * @return void
      */
-    public function assertFlashSuccess($expectedMessage, $assertFailMessage = '')
+    public function assertFlashSuccess(string $expectedMessage, string $assertFailMessage = '')
     {
         $this->assertFlashMany([$expectedMessage => 'success'], $assertFailMessage);
     }
@@ -270,8 +295,9 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param string $expectedMessage
      * @param string $assertFailMessage
+     * @return void
      */
-    public function assertFlashError($expectedMessage, $assertFailMessage = '')
+    public function assertFlashError(string $expectedMessage, string $assertFailMessage = '')
     {
         $this->assertFlashMany([$expectedMessage => 'error'], $assertFailMessage);
     }
@@ -279,10 +305,11 @@ abstract class IntegrationTestCase extends TestCase
     /**
      * Проверка нескольких сообщений флеша
      *
-     * @param array $expectedMessages сообщение => тип
+     * @param array<string, string> $expectedMessages сообщение => тип
      * @param string $assertFailMessage
+     * @return void
      */
-    public function assertFlashMany(array $expectedMessages, $assertFailMessage = '')
+    public function assertFlashMany(array $expectedMessages, string $assertFailMessage = '')
     {
         $expectedFlash = [];
         foreach ($expectedMessages as $expectedMessage => $messageType) {
@@ -294,10 +321,11 @@ abstract class IntegrationTestCase extends TestCase
     /**
      * Проверка, что было много ошибок
      *
-     * @param array $expectedErrors
+     * @param string[] $expectedErrors
      * @param string $assertFailMessage
+     * @return void
      */
-    public function assertFlashManyErrors(array $expectedErrors, $assertFailMessage = '')
+    public function assertFlashManyErrors(array $expectedErrors, string $assertFailMessage = '')
     {
         $this->assertFlashMany(array_fill_keys($expectedErrors, 'error'), $assertFailMessage);
     }
@@ -305,10 +333,11 @@ abstract class IntegrationTestCase extends TestCase
     /**
      * Проверка, что хотя бы один из вызовов флеша был таким
      *
-     * @param array $expectedFlash массив [method, [message]]
+     * @param array{0: string, 1: string[]} $expectedFlash массив [method, [message]]
      * @param string $message
+     * @return void
      */
-    private function _assertInFlash($expectedFlash, $message = '')
+    private function _assertInFlash(array $expectedFlash, string $message = '')
     {
         $this->_checkFlashInited();
         self::assertContains($expectedFlash, $this->_flashResult, $message);
@@ -319,8 +348,9 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param string $expectedMessage
      * @param string $assertFailMessage
+     * @return void
      */
-    public function assertFlashHasSuccess($expectedMessage, $assertFailMessage = '')
+    public function assertFlashHasSuccess(string $expectedMessage, string $assertFailMessage = '')
     {
         $this->_assertInFlash(['success', [$expectedMessage]], $assertFailMessage);
     }
@@ -330,8 +360,9 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param string $expectedMessage
      * @param string $assertFailMessage
+     * @return void
      */
-    public function assertFlashHasError($expectedMessage, $assertFailMessage = '')
+    public function assertFlashHasError(string $expectedMessage, string $assertFailMessage = '')
     {
         $this->_assertInFlash(['error', [$expectedMessage]], $assertFailMessage);
     }
@@ -340,19 +371,12 @@ abstract class IntegrationTestCase extends TestCase
      * Проверка, что флеш не вызывался
      *
      * @param string $message
+     * @return void
      */
-    public function assertNoFlash($message = '')
+    public function assertNoFlash(string $message = '')
     {
         $this->_checkFlashInited();
         self::assertEquals([], $this->_flashResult, $message);
-    }
-
-    /**
-     * Задаёт хедер User-Agent, чтоб срабатывали проверки на линукс
-     */
-    protected function _setLinuxHeaders()
-    {
-        $this->_setHeader('User-Agent', 'linux');
     }
 
     /**
@@ -360,8 +384,9 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param string $refererUrl
      * @param string $webroot
+     * @return void
      */
-    protected function _setReferer($refererUrl, $webroot = '/')
+    protected function _setReferer(string $refererUrl, string $webroot = '/')
     {
         $this->_setHeader('referer', $refererUrl);
         if (!array_key_exists('webroot', $this->_request)) {
@@ -374,8 +399,9 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @param string $name
      * @param string $value
+     * @return void
      */
-    protected function _setHeader($name, $value)
+    protected function _setHeader(string $name, string $value)
     {
         if (empty($this->_request['headers'])) {
             $this->_request['headers'] = [];

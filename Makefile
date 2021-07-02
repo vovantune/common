@@ -7,18 +7,12 @@ TAB=echo "\t"
 help:
 	@$(call H1,Application)
 	$(TAB) make install - composer install
-	$(TAB) make update - composer install и накатка миграций
-	$(TAB) make js-doc - генератор JS документации для ValueObject
 	@$(call H1,Test)
 	$(TAB) make cs - проверка качества кода
 	$(TAB) make cs-fix - автоматическое исправление Code Style
+	$(TAB) make phpmd-check - проверка PHP Mess Detector
+	$(TAB) make phpstan-check - проверка PHP Stan
 	$(TAB) make test - прогон тестов
-	$(call H1,DB)
-	$(TAB) make migrate-exec - накатка миграций
-	$(TAB) make migrate-add name=MigrationFileName - добавление нового файла миграций
-	$(TAB) make migrate-rollback - откат последней миграций
-	$(TAB) make migrate-status - статус миграций
-	$(TAB) make entity-builder - формируем/обновляем сущности
 
 install:
 	./composer.phar install -n
@@ -34,3 +28,6 @@ test: install
 
 phpmd-check:
 	./composer.phar phpmd-check
+
+phpstan-check:
+	./composer.phar phpstan-check

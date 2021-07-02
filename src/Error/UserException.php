@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Error;
 
@@ -15,16 +16,21 @@ class UserException extends Exception
      *
      * @var string
      */
-    protected $_userMessage = '';
+    protected string $_userMessage = '';
 
     /**
      * @inheritdoc
      * по умолчанию выключено
      */
-    protected $_writeToLog = false;
+    protected bool $_writeToLog = false;
 
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @param string $message
+     * @param int $code
+     * @param ?\Exception $previous
+     */
     public function __construct($message = '', $code = 0, $previous = null)
     {
         parent::__construct($message, $code, $previous);
@@ -36,7 +42,7 @@ class UserException extends Exception
      *
      * @return string
      */
-    public function getUserMessage()
+    public function getUserMessage(): string
     {
         return $this->_userMessage;
     }
@@ -48,7 +54,7 @@ class UserException extends Exception
      * @param string $message
      * @return $this
      */
-    public function setUserMessage($message)
+    public function setUserMessage(string $message): self
     {
         $this->_userMessage = (string)$message;
         return $this;

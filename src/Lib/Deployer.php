@@ -17,35 +17,34 @@ use Cake\Log\Log;
  */
 class Deployer
 {
-
     /**
      * Если не используется ротация и деплой идёт по живому
      * Заполнить либо это свойство, либо projectSymlink + rotateDeployFolders
      *
      * @var string
      */
-    protected $_singleRoot = '';
+    protected string $_singleRoot = '';
 
     /**
      * Список заранее созданных папок, между которыми переключается симлинк при деплое
      *
      * @var string[]
      */
-    protected $_rotateDeployFolders = [];
+    protected array $_rotateDeployFolders = [];
 
     /**
      * Симлинк, который будет переключаться, и через который внешний мир обращается к проекту
      *
      * @var string
      */
-    protected $_projectSymlink = '';
+    protected string $_projectSymlink = '';
 
     /**
      * Название репозитория
      *
      * @var string
      */
-    protected $_repoName = '';
+    protected string $_repoName = '';
 
     /**
      * Файлы из этого списка при деплое будут скопированы
@@ -54,7 +53,7 @@ class Deployer
      *
      * @var string[]
      */
-    protected $_copyFileList = [];
+    protected array $_copyFileList = [];
 
     /**
      * Файл с версией
@@ -63,7 +62,7 @@ class Deployer
      *
      * @var string
      */
-    protected $_versionFile = '';
+    protected string $_versionFile = '';
 
 
     /**
@@ -73,14 +72,14 @@ class Deployer
      *
      * @var int|null
      */
-    protected $_currentVersion = null;
+    protected ?int $_currentVersion = null;
 
     /**
      * Если вдруг кейковый проект не является корнем проекта
      *
      * @var string
      */
-    protected $_cakeSubPath = '';
+    protected string $_cakeSubPath = '';
 
     /**
      * Разворачивать ли миграции БД автоматически
@@ -88,7 +87,7 @@ class Deployer
      *
      * @var null|bool
      */
-    protected $_autoMigrate = null;
+    protected ?bool $_autoMigrate = null;
 
     /**
      * Можно ли в текущем окружении деплоить текущую конфигурацию
@@ -96,7 +95,7 @@ class Deployer
      *
      * @var bool|null
      */
-    protected $_isDeployEnv = null;
+    protected ?bool $_isDeployEnv = null;
 
 
     /**
@@ -104,7 +103,7 @@ class Deployer
      *
      * @var bool
      */
-    protected $_composerRequireDev = false;
+    protected bool $_composerRequireDev = false;
 
     /**
      * С какими опциями пускать композер
@@ -112,72 +111,72 @@ class Deployer
      *
      * @var string[]
      */
-    protected $_composerOptions = [
+    protected array $_composerOptions = [
         '--optimize-autoloader',
     ];
 
     /**
      * Команда запуска композера
      *
-     * @var string
+     * @var ?string
      */
-    protected $_composerCommand = 'php composer.phar';
+    protected ?string $_composerCommand = 'php composer.phar';
 
     /**
      * Домашняя папка, без неё композер не работает
      *
      * @var string
      */
-    protected $_composerHome = '/var/www';
+    protected string $_composerHome = '/var/www';
 
     /**
      * Команда запуска финкса
      *
      * @var string
      */
-    protected $_phinxCommand = 'vendor/bin/phinx';
+    protected string $_phinxCommand = 'vendor/bin/phinx';
 
     /**
      * Куда писать результат
      *
      * @var string
      */
-    protected $_logScope = 'deployment';
+    protected string $_logScope = 'deployment';
 
     /**
      * вывод команд
      *
      * @var string[]
      */
-    protected $_output = [];
+    protected array $_output = [];
 
     /**
      * Объект работы с гитом
      *
      * @var Git|null
      */
-    protected $_git = null;
+    protected ?Git $_git = null;
 
     /**
      * Каталог, на который сейчас засимлинкан $_projectSymlink. Вычислимое поле, не трогать
      *
      * @var string
      */
-    protected $_currentRoot = '';
+    protected string $_currentRoot = '';
 
     /**
      * Из какой папки всё будет выполняться. Вычислимое поле, не трогать
      *
      * @var string
      */
-    protected $_runFrom = '';
+    protected string $_runFrom = '';
 
 
     /**
      * конструктор
      *
-     * @param array $config Конфиг. ключ => начение, клиючи - названия свойств этого класса без подчёркивания
-     *                      описание в [доках](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
+     * @param array<string, bool|string|string[]|null> $config Конфиг. ключ => начение, клиючи - названия свойств этого класса без подчёркивания
+     *                                                    описание в [доках](https://github.com/ArtSkills/common/tree/master/src/Lib/Deployer.md)
      * @throws InternalException
      */
     public function __construct(array $config = [])
@@ -203,7 +202,7 @@ class Deployer
         if (empty($configs[$type])) {
             throw new InternalException("Не определён конфиг деплоя '$type'");
         }
-        return new static($configs[$type]);
+        return new static($configs[$type]); // @phpstan-ignore-line
     }
 
     /**
@@ -251,6 +250,7 @@ class Deployer
      *
      * @param string $absProjectPath полный путь до проекта
      * @param string $newFolderName новое название папки, относительный путь в том же каталоге, что и проект
+     * @return void
      * @throws InternalException
      */
     public static function makeProjectSymlink(string $absProjectPath, string $newFolderName)
@@ -268,7 +268,7 @@ class Deployer
             "mv $absProjectPath $newFolderFullName",
             "ln -s $newFolderFullName $absProjectPath",
         ];
-        list($success, $output, $resultCommand) = Shell::exec($commands);
+        [$success, $output, $resultCommand] = Shell::exec($commands);
         opcache_reset();
         if (!$success) {
             throw new InternalException("Ошибка. Команда: $resultCommand, Вывод: " . implode("\n", $output));
@@ -278,7 +278,8 @@ class Deployer
     /**
      * Заполнить свойства из конфига
      *
-     * @param array $config
+     * @param array<string, string|bool|string[]> $config
+     * @return void
      */
     protected function _applyConfig(array $config)
     {
@@ -300,6 +301,7 @@ class Deployer
     /**
      * Делаем проверки заполненности свойств
      *
+     * @return void
      * @throws InternalException
      */
     protected function _checkProperties()
@@ -341,6 +343,7 @@ class Deployer
     /**
      * Сделать нужные преобразования над значениями
      *
+     * @return void
      * @throws InternalException
      */
     protected function _setValues()
@@ -378,6 +381,8 @@ class Deployer
 
     /**
      * Привести все пути к правильному формату
+     *
+     * @return void
      */
     protected function _normalizePaths()
     {
@@ -412,8 +417,8 @@ class Deployer
      * Для файлов, лежащих в текущем корне
      *
      * @param string $fullPath
-     * @throws InternalException
      * @return string
+     * @throws InternalException
      */
     protected function _fullPathToRelative(string $fullPath): string
     {
@@ -469,11 +474,12 @@ class Deployer
         return true;
     }
 
-
     /**
      * Папка, на которую будем переключаться
+     *
+     * @return string
      */
-    protected function _getNextRoot()
+    protected function _getNextRoot(): string
     {
         $currentFolderKey = array_search($this->_currentRoot, $this->_rotateDeployFolders);
         if ($currentFolderKey === (count($this->_rotateDeployFolders) - 1)) {
@@ -488,6 +494,7 @@ class Deployer
      * Переключить на указанную папку
      *
      * @param string $newActualRoot
+     * @return void
      * @throws InternalException
      */
     protected function _setProjectSymlink(string $newActualRoot)
@@ -506,6 +513,7 @@ class Deployer
     /**
      * Скопировать файлы из списка
      *
+     * @return void
      * @throws InternalException
      */
     protected function _copyFiles()
@@ -519,7 +527,6 @@ class Deployer
             $this->_exec("cp $oldPath $newPath", "Не удалось скопировать файл $relativePath");
         }
     }
-
 
     /**
      * Можно ли деплоить
@@ -542,12 +549,13 @@ class Deployer
     /**
      * Обновить репозиторий
      *
+     * @return void
      * @throws InternalException
      */
     protected function _updateRepo()
     {
         $this->_addToOutput(["\n\nGit pull\n"]);
-        list($success, $output) = $this->_git->pullCurrentBranch();
+        [$success, $output] = $this->_git->pullCurrentBranch();
         $this->_addToOutput($output);
         $this->_checkSuccess($success, 'Не удалось спуллиться');
     }
@@ -555,6 +563,7 @@ class Deployer
     /**
      * обновить зависимости композера
      *
+     * @return void
      * @throws InternalException
      */
     protected function _updateComposer()
@@ -579,11 +588,12 @@ class Deployer
      *
      * @param string $command
      * @param string $failMessage
+     * @return void
      * @throws InternalException
      */
     protected function _exec(string $command, string $failMessage)
     {
-        list($success, $output) = Shell::execFromDir($this->_runFrom, $command);
+        [$success, $output] = Shell::execFromDir($this->_runFrom, $command);
         $this->_addToOutput([$command]);
         $this->_addToOutput($output);
         $this->_checkSuccess($success, $failMessage);
@@ -594,6 +604,7 @@ class Deployer
      * Можно было бы делать $this->_exec("cd $dir"), но это не работает =(
      *
      * @param string $dir
+     * @return void
      */
     protected function _chdir(string $dir)
     {
@@ -605,6 +616,7 @@ class Deployer
      * Задание переменной окружения с добавлением записи в лог (и чтоб можно было мокать)
      *
      * @param string $data
+     * @return void
      */
     protected function _putEnv(string $data)
     {
@@ -617,6 +629,7 @@ class Deployer
      *
      * @param bool $condition
      * @param string $errorMessage
+     * @return void
      * @throws InternalException
      */
     protected function _checkSuccess(bool $condition, string $errorMessage)
@@ -630,6 +643,7 @@ class Deployer
      * Запоминаем вывод для дальнейшего лога
      *
      * @param string[] $output
+     * @return void
      */
     protected function _addToOutput(array $output)
     {
@@ -639,6 +653,7 @@ class Deployer
     /**
      * Запустить миграции
      *
+     * @return void
      * @throws InternalException
      */
     protected function _migrateDb()
@@ -662,6 +677,8 @@ class Deployer
 
     /**
      * Обновить файл с версией
+     *
+     * @return void
      */
     protected function _updateVersion()
     {
@@ -676,6 +693,7 @@ class Deployer
      *
      * @param float $timeStart
      * @param float $timeEnd
+     * @return void
      */
     protected function _log(float $timeStart, float $timeEnd)
     {
@@ -693,6 +711,8 @@ class Deployer
 
     /**
      * Сообщить об успехе
+     *
+     * @return void
      */
     protected function _notifySuccess()
     {
@@ -701,6 +721,8 @@ class Deployer
 
     /**
      * Откатиться к предыдущей версии
+     *
+     * @return void
      */
     public function rollback()
     {

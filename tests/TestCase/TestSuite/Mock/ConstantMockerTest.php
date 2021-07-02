@@ -19,7 +19,7 @@ class ConstantMockerTest extends TestCase
     /**
      * Мок константы в классе
      */
-    public function testClassMock()
+    public function testClassMock(): void
     {
         $originalValue = MockTestFixture::TEST_CONSTANT;
         $mockValue = 'qqq';
@@ -34,7 +34,7 @@ class ConstantMockerTest extends TestCase
      * Мок константы в классе.
      * И вызов в том же файле через self
      */
-    public function testClassMockSameFile()
+    public function testClassMockSameFile(): void
     {
         $mockValue = 666;
         ConstantMocker::mock(MockTestFixture::class, self::CLASS_CONST_NAME, $mockValue);
@@ -45,7 +45,7 @@ class ConstantMockerTest extends TestCase
     /**
      * Мок константы вне класса
      */
-    public function testSingleMock()
+    public function testSingleMock(): void
     {
         $originalValue = constant(self::GLOBAL_CONST_NAME);
         $mockValue = 'qqq';
@@ -59,7 +59,7 @@ class ConstantMockerTest extends TestCase
     /**
      * Проверка на существование константы
      */
-    public function testConstantExists()
+    public function testConstantExists(): void
     {
         $this->expectExceptionMessage("is not defined!");
         $this->expectException(AssertionFailedError::class);
@@ -69,7 +69,7 @@ class ConstantMockerTest extends TestCase
     /**
      * Дважды одно и то же мокнули
      */
-    public function testConstantDoubleMock()
+    public function testConstantDoubleMock(): void
     {
         $this->expectExceptionMessage("is already mocked!");
         $this->expectException(AssertionFailedError::class);

@@ -29,8 +29,10 @@ class EntityBuilderTest extends AppTestCase
 
     /**
      * Восстановить содержимое папки Model
+     *
+     * @param bool $beforeTest
      */
-    public static function restoreModelFolder($beforeTest)
+    public static function restoreModelFolder(bool $beforeTest): void
     {
         $modelFolder = new Folder(self::MODEL_PATH);
         $backupFolder = new Folder(__DIR__ . '/Backup');
@@ -74,7 +76,7 @@ class EntityBuilderTest extends AppTestCase
     /**
      * без конфига
      */
-    public function testNoConfig()
+    public function testNoConfig(): void
     {
         $this->expectExceptionMessage("Не задан конфиг");
         $this->expectException(\Exception::class);
@@ -85,7 +87,7 @@ class EntityBuilderTest extends AppTestCase
     /**
      * плохой конфиг
      */
-    public function testBadConfig()
+    public function testBadConfig(): void
     {
         $this->expectExceptionMessage("Empty value for field 'modelFolder'");
         $this->expectException(\Exception::class);
@@ -97,7 +99,7 @@ class EntityBuilderTest extends AppTestCase
     /**
      * Обновление существующих таблиц и создание для них всего, что нужно
      */
-    public function testBuild()
+    public function testBuild(): void
     {
         /**
          * table_one - всё существовало, всё изменилось
@@ -118,7 +120,7 @@ class EntityBuilderTest extends AppTestCase
     /**
      * Файл уже есть
      */
-    public function testCreateExists()
+    public function testCreateExists(): void
     {
         $this->expectExceptionMessage("TestTableTwoTable.php already exists");
         $this->expectException(\Exception::class);
@@ -128,7 +130,7 @@ class EntityBuilderTest extends AppTestCase
     /**
      * Такой таблицы нет
      */
-    public function testCreateBad()
+    public function testCreateBad(): void
     {
         $this->expectExceptionMessage("Table \"bad_table\" does not exist in DB");
         $this->expectException(\Exception::class);
@@ -138,7 +140,7 @@ class EntityBuilderTest extends AppTestCase
     /**
      * Создание новой таблицы
      */
-    public function testCreate()
+    public function testCreate(): void
     {
         $expectedFilePath = self::MODEL_PATH . '/Table/TestTableFourTable.php';
         $actualFilePath = EntityBuilder::createTableClass('test_table_four');

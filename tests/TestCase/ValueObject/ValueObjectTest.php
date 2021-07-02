@@ -12,7 +12,7 @@ class ValueObjectTest extends AppTestCase
     /**
      * Цепочка вызовов и превращение в массив
      */
-    public function test()
+    public function test(): void
     {
         $obj = new ValueObjectFixture();
         self::assertEquals('asd', $obj->field1);
@@ -68,29 +68,29 @@ class ValueObjectTest extends AppTestCase
     /**
      * плохой вызов магического метода
      */
-    public function testBadProperty()
+    public function testBadProperty(): void
     {
         $this->expectExceptionMessage("Undefined property field5");
         $this->expectException(\Exception::class);
         $obj = new ValueObjectFixture();
-        $obj->setField5();
+        $obj->setField5(); // @phpstan-ignore-line
     }
 
     /**
      * плохой вызов магического метода
      */
-    public function testBadParams()
+    public function testBadParams(): void
     {
         $this->expectExceptionMessage("Invalid argument count when calling setField3");
         $this->expectException(\Exception::class);
         $obj = new ValueObjectFixture();
-        $obj->setField3('asd', 'qwe');
+        $obj->setField3('asd', 'qwe'); // @phpstan-ignore-line
     }
 
     /**
      * Инициализация с несуществующим свойством
      */
-    public function testBadInit()
+    public function testBadInit(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Property exported_bad not exists!');

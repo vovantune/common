@@ -20,12 +20,13 @@ class Entity extends \Cake\ORM\Entity
     }
 
     /**
-     * Удалить дочернюю сущность и проставить dirty
-     *
-     * @param string $childEntity
-     * @param null|int $index
-     * @throws InternalException
-     */
+	 * Удалить дочернюю сущность и проставить dirty
+	 *
+	 * @param string $childEntity
+	 * @param null|int $index
+	 * @return void
+	 * @throws InternalException
+	 */
     public function deleteChild(string $childEntity, ?int $index = null)
     {
         if (!array_key_exists($childEntity, $this->_properties)) {

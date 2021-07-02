@@ -43,7 +43,7 @@ class ValueObjectFixture extends ValueObject
     public $field3;
 
     /** @var CakeString */
-    public $field4;
+    public $field4; // @phpstan-ignore-line
 
     /** @var Time */
     public $timeField;

@@ -23,28 +23,28 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Успешный JSON ответ */
-    public function testJsonOk()
+    public function testJsonOk(): void
     {
         $this->get('/test/getJsonOk');
         $this->assertJsonOKEquals(['testProperty' => 123]);
     }
 
     /** Ответ об ошибке */
-    public function testJsonError()
+    public function testJsonError(): void
     {
         $this->get('/test/getJsonError');
         $this->assertJsonErrorEquals('Тестовая ошибка', 'Некорректное сообщение об ошибке', ['errorProperty' => 123]);
     }
 
     /** Пустой JSON ответ */
-    public function testEmptyJson()
+    public function testEmptyJson(): void
     {
         $this->get('/test/getEmptyJson');
         $this->assertJsonOKEquals([]);
     }
 
     /** ValueObject в качестве результата */
-    public function testGetValueObject()
+    public function testGetValueObject(): void
     {
         $this->get('/test/getValueObjectJson');
         $this->assertJsonOKEquals([
@@ -53,7 +53,7 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** ответ с ошибкой из исключения */
-    public function testErrorFromException()
+    public function testErrorFromException(): void
     {
         $this->get('/test/getJsonException');
         $this->assertJsonErrorEquals('test exception', 'Некорректное сообщение об ошибке', ['someData' => 'test']);
@@ -62,7 +62,7 @@ class ControllerTest extends AppControllerTestCase
     /**
      * Если было исключение phpunit
      */
-    public function testUnitException()
+    public function testUnitException(): void
     {
         $this->expectExceptionMessage("test unit exception");
         $this->expectException(AssertionFailedError::class);
@@ -70,7 +70,7 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Стандартная обработка ошибок, json */
-    public function testStandardErrorJson()
+    public function testStandardErrorJson(): void
     {
         MethodMocker::mock(SentryLog::class, 'logException')->expectCall(0);
         $this->get('/test/getStandardErrorJson');
@@ -78,7 +78,7 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Стандартная обработка ошибок, json, немного сконфигурированная обработка */
-    public function testStandardErrorJsonConfigured()
+    public function testStandardErrorJsonConfigured(): void
     {
         MethodMocker::mock(SentryLog::class, 'logException')
             ->singleCall()
@@ -100,7 +100,7 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Стандартная обработка ошибок, html, flash */
-    public function testStandardErrorFlash()
+    public function testStandardErrorFlash(): void
     {
         MethodMocker::mock(SentryLog::class, 'logException')->expectCall(0);
         $this->_initFlashSniff(1);
@@ -110,7 +110,7 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Стандартная обработка ошибок, flash, редирект */
-    public function testStandardErrorRedirect()
+    public function testStandardErrorRedirect(): void
     {
         MethodMocker::mock(SentryLog::class, 'logException')->expectCall(0);
         $this->_initFlashSniff(1);
@@ -120,7 +120,7 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Внутренняя ошибка, отдаёт 5хх; в режиме дебага есть сообщение из ексепшна */
-    public function testInternalError()
+    public function testInternalError(): void
     {
         MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
         $this->_initFlashSniff(0);
@@ -131,9 +131,9 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Внутренняя ошибка, отдаёт 5хх; в режиме продакшна сообщения нет */
-    public function testInternalErrorProduction()
+    public function testInternalErrorProduction(): void
     {
-        Env::setDebug(false);
+        Env::setDebug(false); // @phpstan-ignore-line
         MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
         $this->_initFlashSniff(0);
         $this->get('/test/getInternalError');
@@ -144,7 +144,7 @@ class ControllerTest extends AppControllerTestCase
 
 
     /** Внутренняя ошибка, отдаёт json, в режиме дебага есть информация об ексепшне */
-    public function testInternalErrorJson()
+    public function testInternalErrorJson(): void
     {
         MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
         $this->get('/test/getInternalErrorJson');
@@ -166,7 +166,7 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** проверить, что у внутренних ошибок правильный трейс */
-    public function testInternalErrorTrace()
+    public function testInternalErrorTrace(): void
     {
         MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
         $this->get('/test/getInternalErrorJsonTrace');
@@ -185,9 +185,9 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Внутренняя ошибка, отдаёт json, продакшна сообщения нет */
-    public function testInternalErrorJsonProduction()
+    public function testInternalErrorJsonProduction(): void
     {
-        Env::setDebug(false);
+        Env::setDebug(false); // @phpstan-ignore-line
         MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
         $this->get('/test/getInternalErrorJson');
         $this->assertJsonErrorEquals(
@@ -203,9 +203,9 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** Ещё раз убеждаемся, что трейса на продакшне нет */
-    public function testInternalErrorJsonProductionTrace()
+    public function testInternalErrorJsonProductionTrace(): void
     {
-        Env::setDebug(false);
+        Env::setDebug(false); // @phpstan-ignore-line
         MethodMocker::mock(SentryLog::class, 'logException')->singleCall();
         $this->get('/test/getInternalErrorJsonTrace');
         $this->assertJsonErrorEquals(
@@ -220,7 +220,7 @@ class ControllerTest extends AppControllerTestCase
     }
 
     /** смотрим, как выбираются экшны и шаблоны */
-    public function testActionAndTemplateResolve()
+    public function testActionAndTemplateResolve(): void
     {
         MethodMocker::mock(Log::class, 'write')->expectCall(4);
 

@@ -9,7 +9,10 @@ abstract class AppControllerTestCase extends IntegrationTestCase
 {
     use TestCaseTrait;
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @return void
+     */
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();

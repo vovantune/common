@@ -20,8 +20,9 @@ class MockFileLog extends ClassMockEntity
     /**
      * Вывод ошибка вместо файла в консоль
      *
-     * @param string $level
+     * @param string|int $level
      * @param string $message
+     * @return void
      */
     public static function log($level, $message)
     {

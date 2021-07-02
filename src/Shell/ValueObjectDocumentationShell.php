@@ -18,11 +18,12 @@ class ValueObjectDocumentationShell extends Shell
     protected const SCHEMA_PATH_PREFIX = '#/components/schemas/';
 
     /**
-     * Генератор JS документации для ValueObject
-     *
-     * @param string $workDir Папка, которую нужно парсить
-     * @param string|null $resultFilePath В какой файл писать результат
-     */
+	 * Генератор JS документации для ValueObject
+	 *
+	 * @param string $workDir Папка, которую нужно парсить
+	 * @param string|null $resultFilePath В какой файл писать результат
+	 * @return void
+	 */
     public function main(string $workDir = APP, ?string $resultFilePath = null)
     {
         $swagger = scan([$workDir, __DIR__ . '/../Controller']);
@@ -60,13 +61,14 @@ class ValueObjectDocumentationShell extends Shell
         }
     }
 
-    /**
-     * Формируем typeDef строку
-     *
-     * @param array $objectDefinition
-     * @return string
-     * @SuppressWarnings(PHPMD.MethodArgs)
-     */
+	/**
+	 * Формируем typeDef строку
+	 *
+	 * @param array $objectDefinition
+	 * @return string
+	 * @SuppressWarnings(PHPMD.MethodArgs)
+	 * @phpstan-ignore-next-line
+	 */
     private function _makeObjectDefinitionString(array $objectDefinition): string
     {
         $result = "/**\n * @typedef {" . $this->_getJsTypeName($objectDefinition['type']) . "} " . $objectDefinition['name'] . (!empty($objectDefinition['description']) ? ' ' . $objectDefinition['description'] : '') . "\n";
@@ -97,13 +99,14 @@ class ValueObjectDocumentationShell extends Shell
         }
     }
 
-    /**
-     * Объединяем наследование
-     *
-     * @param array $objectDefinitions
-     * @return array
-     * @SuppressWarnings(PHPMD.MethodArgs)
-     */
+	/**
+	 * Объединяем наследование
+	 *
+	 * @param array $objectDefinitions
+	 * @return array
+	 * @SuppressWarnings(PHPMD.MethodArgs)
+	 * @phpstan-ignore-next-line
+	 */
     private function _mergeInheritanceProperties(array $objectDefinitions): array
     {
         foreach ($objectDefinitions as $objectName => $objectDefinition) {
@@ -124,13 +127,13 @@ class ValueObjectDocumentationShell extends Shell
         return $objectDefinitions;
     }
 
-    /**
-     * Определяем имя класса
-     *
-     * @param Schema $schema
-     * @return array<string, string>
-     * @throws UserException
-     */
+	/**
+	 * Определяем имя класса
+	 *
+	 * @param Schema $schema
+	 * @return array<string, array<array<string>|string>|string|null>
+	 * @throws UserException
+	 */
     private function _getDefinition(Schema $schema): array
     {
         $result = [
@@ -142,18 +145,18 @@ class ValueObjectDocumentationShell extends Shell
         ];
 
         if (!empty($schema->_context)) {
-            if ($schema->type !== UNDEFINED) {
-                $result['type'] = $schema->type;
-            }
-            if ($schema->properties !== UNDEFINED) {
-                $schema->type = 'object';
-                foreach ($schema->properties as $property) {
-                    $insProperty = $this->_getProperty($property);
-                    $result['properties'][$insProperty['name']] = $insProperty;
-                }
-            } elseif ($schema->type === 'array') {
-                $result['type'] = $schema->items->ref . '[]';
-            }
+			if ($schema->type !== UNDEFINED) {
+				$result['type'] = $schema->type;
+			}
+			if ($schema->properties !== UNDEFINED) {
+				$schema->type = 'object';
+				foreach ($schema->properties as $property) {
+					$insProperty = $this->_getProperty($property);
+					$result['properties'][$insProperty['name']] = $insProperty;
+				}
+			} elseif ($schema->type === 'array') { // @phpstan-ignore-line ошибочное умозаключение
+				$result['type'] = $schema->items->ref . '[]';
+			}
 
             if ($schema->description !== UNDEFINED) {
                 $result['description'] = $schema->description;
@@ -187,12 +190,12 @@ class ValueObjectDocumentationShell extends Shell
         return $result;
     }
 
-    /**
-     * Получаем описание свойства
-     *
-     * @param Property $property
-     * @return array<string, string>
-     */
+	/**
+	 * Получаем описание свойства
+	 *
+	 * @param Property $property
+	 * @return array{name: string, description: ?string, type: string}
+	 */
     private function _getProperty(Property $property): array
     {
         $result = [
@@ -218,24 +221,24 @@ class ValueObjectDocumentationShell extends Shell
         return $result;
     }
 
-    /**
-     * Определяем имя класса для схемы
-     *
-     * @param Schema $schema
-     * @return string|string[]
-     * @throws UserException
-     */
-    private function _getSchemaClassName(Schema $schema)
-    {
-        if ($schema->schema !== UNDEFINED) {
-            return $schema->schema;
-        }
-        if ($schema->ref !== UNDEFINED) {
-            return str_replace(self::SCHEMA_PATH_PREFIX, '', $schema->ref);
-        }
+	/**
+	 * Определяем имя класса для схемы
+	 *
+	 * @param Schema $schema
+	 * @return string
+	 * @throws UserException
+	 */
+	private function _getSchemaClassName(Schema $schema): string
+	{
+		if ($schema->schema !== UNDEFINED) {
+			return $schema->schema;
+		}
+		if ($schema->ref !== UNDEFINED) {
+			return str_replace(self::SCHEMA_PATH_PREFIX, '', $schema->ref);
+		}
 
-        if (!empty($schema->_context)) {
-            return $schema->_context->class;
+		if (!empty($schema->_context)) {
+			return $schema->_context->class;
         } elseif (!empty($schema->allOf)) {
             foreach ($schema->allOf as $subSchema) {
                 if ($subSchema->ref === UNDEFINED) { // конечный класс наследования

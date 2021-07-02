@@ -8,6 +8,9 @@ abstract class AbstractMigration extends \Phinx\Migration\AbstractMigration
 {
     /**
      * @inheritdoc
+     *
+     * @param string $tableName
+     * @param array<string, mixed> $options
      */
     public function table($tableName, $options = [])
     {

@@ -14,7 +14,7 @@ class ValueObjectDocumentationShellTest extends AppTestCase
     /**
      * @throws \Exception
      */
-    public function testMain()
+    public function testMain(): void
     {
         $shell = new ValueObjectDocumentationShell();
         $resultFile = __DIR__ . DS . 'results.txt';
