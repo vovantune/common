@@ -18,14 +18,14 @@ class HttpClientMocker
     /**
      * Сниф запросов и ответов
      *
-     * @var array<int, array{request: Request, response: Response}>
+     * @var array<int, array{request: \Cake\Http\Client\Request, response: \Cake\Http\Client\Response}>
      */
     private static array $_sniffList = [];
 
     /**
      * Добавляем элемент
      *
-     * @param array{request: Request, response: Response} $element
+     * @param array{request: \Cake\Http\Client\Request, response: \Cake\Http\Client\Response} $element
      * @return void
      */
     public static function addSniff($element)
@@ -36,7 +36,7 @@ class HttpClientMocker
     /**
      * Выгружаем весь список запросов
      *
-     * @return array<int, array{request: Request, response: Response}>
+     * @return array<int, array{request: \Cake\Http\Client\Request, response: \Cake\Http\Client\Response}>
      */
     public static function getSniffList(): array
     {
