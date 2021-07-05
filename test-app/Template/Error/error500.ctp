@@ -1,6 +1,8 @@
 <?php
+declare(strict_types=1);
+
 /**
-* @var string $message
+ * @var string $message
  */
 ?>
 <h2><?= __d('cake', 'An Internal Error Has Occurred') ?></h2>
