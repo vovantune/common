@@ -29,7 +29,7 @@ class Arrays
     /**
      * json_decode, возвращающий по-умолчанию массив
      *
-     * @param string $jsonString
+     * @param ?string $jsonString
      * @param bool $assoc
      * @param int $depth
      * @param int $options
@@ -37,8 +37,12 @@ class Arrays
      * @phpstan-ignore-next-line
      * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function decode(string $jsonString, bool $assoc = true, int $depth = 512, int $options = 0)
+    public static function decode(?string $jsonString, bool $assoc = true, int $depth = 512, int $options = 0)
     {
+        if (empty($jsonString)) {
+            return null;
+        }
+
         return json_decode($jsonString, $assoc, $depth, $options);
     }
 
