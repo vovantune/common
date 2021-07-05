@@ -360,4 +360,12 @@ class MockTestFixture
     {
         return 1;
     }
+
+    /**
+     * Подмена метода без возвращаемого результата
+     */
+    public static function voidMock(): void
+    {
+        // noop
+    }
 }

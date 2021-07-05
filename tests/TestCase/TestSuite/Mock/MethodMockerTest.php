@@ -62,6 +62,28 @@ class MethodMockerTest extends TestCase
     }
 
     /**
+     * Подмена void метода
+     */
+    public function testVoidMock(): void
+    {
+        MethodMocker::mock(MockTestFixture::class, 'voidMock')
+            ->singleCall()
+            ->willReturnVoid();
+        MockTestFixture::voidMock();
+        self::assertTrue(true); // специально
+    }
+
+    /** Снифф void метода */
+    public function testVoidSniff(): void
+    {
+        MethodMocker::sniff(MockTestFixture::class, 'voidMock')
+            ->willReturnAction(function () {
+                self::assertTrue(true);
+            });
+        MockTestFixture::voidMock();
+    }
+
+    /**
      * тест sniff
      */
     public function testSniff(): void

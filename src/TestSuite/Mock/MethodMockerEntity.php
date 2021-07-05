@@ -516,11 +516,22 @@ class MethodMockerEntity
     }
 
     /**
+     * Мок метод не вернёт ничего
+     *
+     * @return $this
+     */
+    public function willReturnVoid(): self
+    {
+        $this->_isReturnDataSet = false;
+        return $this;
+    }
+
+    /**
      * Событие оригинальной функции
      *
      * @param array $args массив переданных аргументов к оригинальной функции
      * @param mixed $origMethodResult
-     * @return mixed
+     * @return mixed|void
      * @throws AssertionFailedError|Exception
      * @phpstan-ignore-next-line
      * @SuppressWarnings(PHPMD.MethodArgs)
@@ -530,7 +541,10 @@ class MethodMockerEntity
         $this->_checkNotRestored();
         $this->_incCounter();
         $this->_checkArgs($args);
-        return $this->_getReturnValue($args, $origMethodResult);
+
+        if ($this->_isReturnDataSet) {
+            return $this->_getReturnValue($args, $origMethodResult);
+        }
     }
 
     /**
@@ -586,7 +600,7 @@ class MethodMockerEntity
     private function _getReturnValue(array $args, $origMethodResult)
     {
         if (!$this->_isReturnDataSet) {
-            return;
+            return null;
         }
 
         if ($this->_returnValue !== null) {
@@ -687,23 +701,25 @@ class MethodMockerEntity
 
         $flags = $this->_getRunkitFlags($reflectionMethod);
         $mockerClass = MethodMocker::class;
+        $returnType = $this->_getReturnType($reflectionMethod);
+        $voidReturnType = $returnType === 'void';
         // можно было делать не через строки, а через функции
         // но в таком случае ранкит глючит при наследовании
         if ($this->_sniffMode) {
             $origMethodCall = ($flags & RUNKIT7_ACC_STATIC ? 'self::' : '$this->') . $this->getOriginalMethodName();
-            $mockAction = '$result = ' . $origMethodCall . '(...func_get_args()); ' . $mockerClass . "::doAction('" . $this->_id . "'" . ', func_get_args(), $result); return $result;';
+            $mockAction = '$result = ' . $origMethodCall . '(...func_get_args()); ' . $mockerClass . "::doAction('" . $this->_id . "'" . ', func_get_args(), $result);'
+                . (!$voidReturnType ? ' return $result;' : '');
         } else {
             if ($this->_isFullMock) {
                 $mockAction = $this->_action;
             } else {
-                $mockAction = "return " . $mockerClass . "::doAction('" . $this->_id . "', func_get_args());";
+                $mockAction = (!$voidReturnType ? "return " : '') . $mockerClass . "::doAction('" . $this->_id . "', func_get_args());";
             }
         }
 
         // всю инфу вытаскиваем до того, как переименуем
         $docBlock = (string)$reflectionMethod->getDocComment();
         $parameters = $this->_getMethodParameters($reflectionMethod);
-        $returnType = $this->_getReturnType($reflectionMethod);
 
         runkit7_method_rename(
             $this->_class,
