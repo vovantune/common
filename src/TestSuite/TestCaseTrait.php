@@ -93,8 +93,12 @@ trait TestCaseTrait
         }
     }
 
-    /** для локальных действий на setUp */
-    protected function _setUpLocal(): void
+    /**
+     * для локальных действий на setUp
+     *
+     * @return void
+     */
+    protected function _setUpLocal()
     {
         // noop
     }
