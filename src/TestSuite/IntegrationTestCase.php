@@ -41,6 +41,7 @@ abstract class IntegrationTestCase extends TestCase
      * @return array|null|string
      * @throws InternalException
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     protected function _getJsonFixture(string $fixtureName)
     {
