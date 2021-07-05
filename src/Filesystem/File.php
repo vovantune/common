@@ -10,7 +10,7 @@ use ArtSkills\Lib\Strings;
 class File extends \Cake\Filesystem\File
 {
     /** @var string Временная папка внутри TMP для generateTempFilePath() */
-    protected const TEMP_FILE_DIR = 'downloads';
+    protected const TEMP_FILE_DIR = 'temp-files';
 
     /**
      * Зипует файлы
