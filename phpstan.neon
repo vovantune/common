@@ -4,6 +4,6 @@ parameters:
         - src
         - tests
     bootstrapFiles:
-        - src/config/bootstrap.php
         - test-app-conf/paths.php
         - vendor/cakephp/cakephp/src/basics.php
+        - src/config/bootstrap.php
