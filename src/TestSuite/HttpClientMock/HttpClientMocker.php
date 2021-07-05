@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite\HttpClientMock;
 
 use Cake\Http\Client\Request;
-use Cake\Http\Client\Response;
 use PHPUnit\Framework\ExpectationFailedException;
 
 class HttpClientMocker
@@ -13,22 +13,20 @@ class HttpClientMocker
      *
      * @var HttpClientMockerEntity[]
      */
-    private static $_mockCallList = [];
+    private static array $_mockCallList = [];
 
     /**
      * Сниф запросов и ответов
      *
-     * @var array
+     * @var array<int, array{request: \Cake\Http\Client\Request, response: \Cake\Http\Client\Response}>
      */
-    private static $_sniffList = [];
+    private static array $_sniffList = [];
 
     /**
      * Добавляем элемент
      *
-     * @param array $element {
-     * @var Request $request
-     * @var Response $response
-     * }
+     * @param array{request: \Cake\Http\Client\Request, response: \Cake\Http\Client\Response} $element
+     * @return void
      */
     public static function addSniff($element)
     {
@@ -38,9 +36,9 @@ class HttpClientMocker
     /**
      * Выгружаем весь список запросов
      *
-     * @return array
+     * @return array<int, array{request: \Cake\Http\Client\Request, response: \Cake\Http\Client\Response}>
      */
-    public static function getSniffList()
+    public static function getSniffList(): array
     {
         return self::$_sniffList;
     }
@@ -49,8 +47,9 @@ class HttpClientMocker
      * Чистим всё
      *
      * @param bool $hasFailed завалился ли тест
+     * @return void
      */
-    public static function clean($hasFailed = false)
+    public static function clean(bool $hasFailed = false)
     {
         self::$_sniffList = [];
 
@@ -71,9 +70,11 @@ class HttpClientMocker
      * @param string|array $url Полная строка, либо массив вида ['урл', ['arg1' => 1, ...]]
      * @param string $method
      * @return HttpClientMockerEntity
-     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws ExpectationFailedException
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function mock($url, $method)
+    public static function mock($url, string $method): HttpClientMockerEntity
     {
         $mockId = self::_buildKey($url, $method);
         if (isset(self::$_mockCallList[$mockId])) {
@@ -88,10 +89,10 @@ class HttpClientMocker
      * Мок гет запроса
      *
      * @param string $url
-     * @param array $uriArgs
+     * @param array<string, int|string|bool|null> $uriArgs
      * @return HttpClientMockerEntity
      */
-    public static function mockGet($url, array $uriArgs = [])
+    public static function mockGet(string $url, array $uriArgs = []): HttpClientMockerEntity
     {
         if (count($uriArgs)) {
             $mockedUrl = $url . ((strpos($url, '?') === false) ? '?' : '&') . http_build_query($uriArgs);
@@ -106,13 +107,13 @@ class HttpClientMocker
      * Мок пост запроса
      *
      * @param string $url
-     * @param array|string $expectedPostArgs
+     * @param null|array<string, int|string|bool|null>|string $expectedPostArgs
      * @return HttpClientMockerEntity
      */
-    public static function mockPost($url, array $expectedPostArgs = [])
+    public static function mockPost(string $url, $expectedPostArgs = null): HttpClientMockerEntity
     {
         $mock = self::mock($url, Request::METHOD_POST);
-        if (count($expectedPostArgs)) {
+        if ($expectedPostArgs !== null) {
             $mock->expectBody($expectedPostArgs);
         }
         return $mock;
@@ -122,9 +123,9 @@ class HttpClientMocker
      * Проверяем на мок и возвращаем результат
      *
      * @param Request $request
-     * @return null|array ['response' => , 'status' => ]
+     * @return null|array{response: string, status: int}
      */
-    public static function getMockedData(Request $request)
+    public static function getMockedData(Request $request): ?array
     {
         foreach (self::$_mockCallList as $mock) {
             $url = (string)$request->getUri();
@@ -148,7 +149,7 @@ class HttpClientMocker
      * @param string $method
      * @return string
      */
-    private static function _buildKey($url, $method)
+    private static function _buildKey(string $url, string $method): string
     {
         return $url . '#' . $method;
     }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Mailer;
 
@@ -23,6 +24,8 @@ class Email extends \Cake\Mailer\Email
      * Email constructor.
      *
      * @param array|string|null $config Array of configs, or string to load configs from email.php
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     public function __construct($config = null)
     {
@@ -38,8 +41,10 @@ class Email extends \Cake\Mailer\Email
      *
      * @param array|string|null $paramConfig
      * @return array|null
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
-    private function _getTestConfig($paramConfig)
+    private function _getTestConfig($paramConfig): ?array
     {
         if (is_array($paramConfig)) {
             $config = $paramConfig;
@@ -66,7 +71,7 @@ class Email extends \Cake\Mailer\Email
      * @param string $listId
      * @return $this
      */
-    public function addListId($listId)
+    public function addListId(string $listId): Email
     {
         $this->addHeaders([
             'List-Id' => $listId,
@@ -79,8 +84,10 @@ class Email extends \Cake\Mailer\Email
     /**
      * Отправляет письмо обрабатывая исключения
      *
-     * @param null $content
+     * @param ?string $content
      * @return bool|array
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     public function send($content = null)
     {
@@ -122,6 +129,8 @@ class Email extends \Cake\Mailer\Email
      * переопределяем email для тестового режима
      *
      * @inheritdoc
+     * @param string $varName
+     * @param string|array<string|int, string> $email
      * @throws InternalException
      */
     protected function _setEmail($varName, $email, $name)
@@ -133,6 +142,8 @@ class Email extends \Cake\Mailer\Email
      * переопределяем email для тестового режима
      *
      * @inheritdoc
+     * @param string $varName
+     * @param string|array<string|int, string> $email
      * @throws InternalException
      */
     protected function _addEmail($varName, $email, $name)
@@ -143,8 +154,8 @@ class Email extends \Cake\Mailer\Email
     /**
      * Преобразуем массив email адресов
      *
-     * @param array|string $email
-     * @return array|string
+     * @param string|array<string|int, string> $email
+     * @return array<string, string>|string
      * @throws InternalException
      */
     private function _getEmailList($email)
@@ -173,7 +184,7 @@ class Email extends \Cake\Mailer\Email
      * @throws InternalException
      * @throws UserException
      */
-    private function _getEmail($email)
+    private function _getEmail(string $email): string
     {
         if (!Env::isProduction() && !Env::isUnitTest()) {
             $email = Env::getDebugEmail();

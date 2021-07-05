@@ -103,6 +103,7 @@ class MultiThreads
      *
      * @param callable $runFunction
      * @param int $softRunSleep Через сколько секунд запускать следующий поток для первых getProcessLimit() потоков - необходимо для уменьшиния нагрузки на БД
+     * @return void
      */
     public function run(callable $runFunction, int $softRunSleep = 0)
     {
@@ -116,6 +117,8 @@ class MultiThreads
 
     /**
      * Ждём окончания выполнения тредов
+     *
+     * @return void
      */
     public function waitThreads()
     {
@@ -127,10 +130,7 @@ class MultiThreads
             sleep(1);
         }
 
-        $connection = DB::getConnection();
-        if (!$connection->isConnected()) {
-            $connection->connect();
-        }
+        DB::restoreConnection();
     }
 
     /**
@@ -150,6 +150,7 @@ class MultiThreads
     /**
      * Обработчик сигналов от потомков
      *
+     * @return void
      * @internal
      */
     public function childSignalHandler()
@@ -162,15 +163,14 @@ class MultiThreads
 
         //Make sure we get all of the exited children
         while ($pid > 0) {
-            if ($pid) {
-                if (isset($this->_currentJobs[$pid])) {
-                    $this->_processChildExit($pid, $status);
-                } else {
-                    //Oh no, our job has finished before this parent process could even note that it had been launched!
-                    //Let's make note of it and handle it when the parent process is ready for it
-                    $this->_signalQueue[$pid] = $status;
-                }
+            if (isset($this->_currentJobs[$pid])) {
+                $this->_processChildExit($pid, $status);
+            } else {
+                //Oh no, our job has finished before this parent process could even note that it had been launched!
+                //Let's make note of it and handle it when the parent process is ready for it
+                $this->_signalQueue[$pid] = $status;
             }
+
             $pid = pcntl_waitpid(-1, $status, WNOHANG);
         }
     }
@@ -180,6 +180,7 @@ class MultiThreads
      *
      * @param int $pid
      * @param int $status
+     * @return void
      */
     private function _processChildExit(int $pid, int $status)
     {
@@ -205,6 +206,7 @@ class MultiThreads
      *
      * @param callable $runFunction
      * @param int $softRunSleep
+     * @return void
      * @SuppressWarnings(PHPMD.ExitExpression)
      */
     private function _launchJob(callable $runFunction, int $softRunSleep)

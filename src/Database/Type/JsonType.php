@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Database\Type;
 
@@ -16,7 +17,10 @@ use Cake\Database\Driver;
 class JsonType extends \Cake\Database\Type\JsonType
 {
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
     public function toPHP($value, Driver $driver)
     {
         if ($value === null) {

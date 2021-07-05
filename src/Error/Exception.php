@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Error;
 
@@ -10,6 +11,7 @@ use ReflectionClass;
 /**
  * @internal
  * @SuppressWarnings(PHPMD.MethodMix)
+ * @SuppressWarnings(PHPMD.MethodProps)
  */
 class Exception extends \Exception
 {
@@ -19,21 +21,21 @@ class Exception extends \Exception
      *
      * @var bool
      */
-    protected $_writeToLog = true;
+    protected bool $_writeToLog = true;
 
     /**
      * Инфа для логов
      *
      * @var array
      */
-    protected $_logContext = [];
+    protected array $_logContext = []; // @phpstan-ignore-line
 
     /**
      * Слать ли оповещения при ошибке
      *
      * @var bool
      */
-    protected $_alert = true;
+    protected bool $_alert = true;
 
     /**
      * Был ли вызван метод log();
@@ -43,18 +45,19 @@ class Exception extends \Exception
      *
      * @var bool
      */
-    protected $_isLogged = false;
+    protected bool $_isLogged = false;
 
     /**
      * Создание эксепшна в статическом стиле
      *
      * @param string $message
      * @param int $code
-     * @param \Exception $previous
+     * @param \Exception|null $previous
      * @return static
      */
-    public static function instance($message = '', $code = 0, $previous = null)
+    public static function instance(string $message = '', int $code = 0, ?\Exception $previous = null): Exception
     {
+        /** @phpstan-ignore-next-line */
         return new static($message, $code, $previous);
     }
 
@@ -64,9 +67,9 @@ class Exception extends \Exception
      * @param bool $writeToLog
      * @return $this
      */
-    public function setWriteToLog($writeToLog)
+    public function setWriteToLog(bool $writeToLog): Exception
     {
-        $this->_writeToLog = (bool)$writeToLog;
+        $this->_writeToLog = $writeToLog;
         return $this;
     }
 
@@ -76,7 +79,7 @@ class Exception extends \Exception
      * @param string|string[]|null $scope
      * @return $this
      */
-    public function setLogScope($scope)
+    public function setLogScope($scope): Exception
     {
         if ($scope === null) {
             unset($this->_logContext['scope']);
@@ -92,7 +95,7 @@ class Exception extends \Exception
      * @param mixed $info
      * @return $this
      */
-    public function setLogAddInfo($info)
+    public function setLogAddInfo($info): Exception
     {
         if ($info === null) {
             unset($this->_logContext[SentryLog::KEY_ADD_INFO]);
@@ -108,7 +111,7 @@ class Exception extends \Exception
      * @param bool $alert
      * @return $this
      */
-    public function setAlert($alert)
+    public function setAlert(bool $alert): Exception
     {
         $this->_alert = (bool)$alert;
         return $this->setWriteToLog(true);
@@ -120,7 +123,7 @@ class Exception extends \Exception
      * @return bool
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
-    public function getAlert()
+    public function getAlert(): bool
     {
         return $this->_alert;
     }
@@ -131,8 +134,10 @@ class Exception extends \Exception
      * @param array $context
      * @param bool $fullOverwrite
      * @return $this
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public function setLogContext(array $context, $fullOverwrite = false)
+    public function setLogContext(array $context, bool $fullOverwrite = false): Exception
     {
         if ($fullOverwrite) {
             $this->_logContext = $context;
@@ -147,8 +152,11 @@ class Exception extends \Exception
      *
      * @param array|null $context
      * @param null|bool $alert
+     * @return void
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
-    public function log($context = [], $alert = null)
+    public function log(?array $context = [], ?bool $alert = null)
     {
         if ($this->_writeToLog && !$this->_isLogged) {
             $contextResult = (array)$context + $this->_logContext;
@@ -168,7 +176,7 @@ class Exception extends \Exception
      *
      * @return bool
      */
-    public function isLogged()
+    public function isLogged(): bool
     {
         return $this->_isLogged;
     }
@@ -176,9 +184,9 @@ class Exception extends \Exception
     /**
      * Получить место, откуда было брошено исключение,
      *
-     * @return null|array ['file' => , 'line' => ]
+     * @return ?array{file: string, line: string}
      */
-    public function getActualThrowSpot()
+    public function getActualThrowSpot(): ?array
     {
         $trace = $this->getTrace();
         array_unshift($trace, ['file' => $this->getFile(), 'line' => $this->getLine()]);

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Error;
 
@@ -23,7 +24,7 @@ trait ErrorHandlerTrait
         }
         error_reporting($level);
         set_error_handler([$this, 'handleError'], $level);
-        set_exception_handler([$this, 'wrapAndHandleException']);
+        set_exception_handler([$this, 'wrapAndHandleException']); // @phpstan-ignore-line - непонятна причина ругани
         register_shutdown_function(function () {
             $megabytes = Configure::read('Error.extraFatalErrorMemory');
             if ($megabytes === null) {
@@ -51,7 +52,8 @@ trait ErrorHandlerTrait
     /**
      * Залогировать шатдаун
      *
-     * @param array $error
+     * @param array{type:int, message: string, file: string, line: int} $error
+     * @return void
      */
     private function _logShutdown($error)
     {
@@ -91,11 +93,13 @@ trait ErrorHandlerTrait
     /**
      * @inheritdoc
      * все notice и warning логировать как ошибки
+     * @param int|string $level
+     * @phpstan-ignore-next-line
      */
-    protected function _logError($level, $data)
+    protected function _logError($level, $data): bool
     {
         SentryLog::addDeleteTraceLevel(SentryLog::DELETE_TRACE_LEVEL_HANDLER);
-        return parent::_logError(LOG_ERR, $data);
+        return parent::_logError(LOG_ERR, $data); // @phpstan-ignore-line ошибка описания CakePHP
     }
 
     /**

@@ -6,6 +6,8 @@ namespace TestApp\Controller;
 use ArtSkills\Controller\Controller;
 use ArtSkills\Error\InternalException;
 use ArtSkills\Error\UserException;
+use Exception;
+use PHPUnit\Framework\AssertionFailedError;
 
 class TestController extends Controller
 {
@@ -68,7 +70,7 @@ class TestController extends Controller
      */
     public function getJsonException()
     {
-        return $this->_sendJsonException(new \Exception('test exception'), ['someData' => 'test']);
+        return $this->_sendJsonException(new Exception('test exception'), ['someData' => 'test']);
     }
 
     /**
@@ -78,7 +80,7 @@ class TestController extends Controller
      */
     public function getJsonExceptionUnit()
     {
-        return $this->_sendJsonException(new \PHPUnit\Framework\AssertionFailedError('test unit exception'), ['someData' => 'test']);
+        return $this->_sendJsonException(new AssertionFailedError('test unit exception'), ['someData' => 'test']);
     }
 
     /**
@@ -86,7 +88,7 @@ class TestController extends Controller
      *
      * @throws UserException
      */
-    public function getStandardErrorJson()
+    public function getStandardErrorJson(): void
     {
         $this->_setIsJsonAction();
         $this->_throwUserError('test json message');

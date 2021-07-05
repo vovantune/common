@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace ArtSkills\Test\TestCase\Lib\EmailTest;
+namespace ArtSkills\Test\TestCase\Mailer;
 
 use ArtSkills\Mailer\Email;
 use ArtSkills\Mailer\Transport\TestEmailTransport;
@@ -12,7 +13,7 @@ class EmailTest extends AppTestCase
      * Тест на замену домена в адресе почты
      * И работу перма-мокалки
      */
-    public function testChangeRecipient()
+    public function testChangeRecipient(): void
     {
         $text = 'test email text';
         $email = new Email();
@@ -45,7 +46,7 @@ class EmailTest extends AppTestCase
      *
      * @see Email::setToWithDelimiter()
      */
-    public function testSetToWithDelimiter()
+    public function testSetToWithDelimiter(): void
     {
         $email = new Email();
         $email->setToWithDelimiter('tune@nxt.ru tune2@nxt.ru, tune3@nxt.ru; tune4@nxt.ru  ');

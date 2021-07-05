@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Filesystem;
 
@@ -9,7 +10,7 @@ use ArtSkills\Lib\Strings;
 class File extends \Cake\Filesystem\File
 {
     /** @var string Временная папка внутри TMP для generateTempFilePath() */
-    protected const TEMP_FILE_DIR = 'downloads';
+    protected const TEMP_FILE_DIR = 'temp-files';
 
     /**
      * Зипует файлы
@@ -70,6 +71,7 @@ class File extends \Cake\Filesystem\File
      *
      * @param string $pathToFile
      * @param string|null $unzipFolder
+     * @return void
      * @throws \Exception
      */
     public static function unZip(string $pathToFile, ?string $unzipFolder = null)
@@ -99,9 +101,7 @@ class File extends \Cake\Filesystem\File
     public static function generateTempFilePath(string $prefix): string
     {
         $tempDir = TMP . static::TEMP_FILE_DIR;
-        if (!is_dir($tempDir)) {
-            mkdir($tempDir, 0755, true);
-        }
+        Folder::createIfNotExists($tempDir);
         Folder::cleanupDirByLifetime($tempDir, ['.*'], 3600);
         return tempnam($tempDir, $prefix . '-');
     }

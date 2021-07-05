@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite\HttpClientMock;
 
@@ -9,48 +10,50 @@ use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\ExpectationFailedException;
 use ReflectionClass;
 
+/**
+ * @SuppressWarnings(PHPMD.MethodProps)
+ */
 class HttpClientMockerEntity
 {
-
     /**
      * запрос должен быть вызван хотя бы раз
      */
-    const EXPECT_CALL_ONCE = -1;
+    private const EXPECT_CALL_ONCE = -1;
 
     /**
      * Файл, в котором мокнули
      *
      * @var string
      */
-    private $_callerFile = '';
+    private string $_callerFile;
 
     /**
      * Строка вызова к HttpClientMocker::mock
      *
      * @var int
      */
-    private $_callerLine = 0;
+    private int $_callerLine;
 
     /**
      * Мокнутый урл
      *
      * @var string
      */
-    private $_url = '';
+    private string $_url;
 
     /**
      * Метод запроса
      *
      * @var string
      */
-    private $_method = Request::METHOD_GET;
+    private string $_method;
 
     /**
      * POST тело запроса
      *
-     * @var array
+     * @var null|array|string
      */
-    private $_body = null;
+    private $_body = null; // @phpstan-ignore-line
 
     /**
      * Возвращаемый результат
@@ -71,35 +74,35 @@ class HttpClientMockerEntity
      *
      * @var int
      */
-    private $_returnStatusCode = 200;
+    private int $_returnStatusCode = 200;
 
     /**
      * Сколько раз ожидается вызов функции
      *
      * @var int
      */
-    private $_expectedCallCount = self::EXPECT_CALL_ONCE;
+    private int $_expectedCallCount = self::EXPECT_CALL_ONCE;
 
     /**
      * Кол-во вызовов данного мока
      *
      * @var int
      */
-    private $_callCounter = 0;
+    private int $_callCounter = 0;
 
     /**
      * Был ли вызов данного мока
      *
      * @var bool
      */
-    private $_isCalled = false;
+    private bool $_isCalled = false;
 
     /**
      * Мок отработал и все вернул в первоначальный вид
      *
      * @var bool
      */
-    private $_mockChecked = false;
+    private bool $_mockChecked = false;
 
     /**
      * HttpClientMockerEntity constructor.
@@ -107,7 +110,7 @@ class HttpClientMockerEntity
      * @param string $url
      * @param string $method
      */
-    public function __construct($url, $method = Request::METHOD_GET)
+    public function __construct(string $url, string $method = Request::METHOD_GET)
     {
         $this->_url = $url;
         $this->_method = $method;
@@ -138,7 +141,7 @@ class HttpClientMockerEntity
      * @param string $method
      * @return bool
      */
-    public function check($url, $method)
+    public function check(string $url, string $method): bool
     {
         if ($this->_url !== $url) {
             return false;
@@ -155,7 +158,7 @@ class HttpClientMockerEntity
      *
      * @return $this
      */
-    public function singleCall()
+    public function singleCall(): self
     {
         return $this->expectCall(1);
     }
@@ -165,7 +168,7 @@ class HttpClientMockerEntity
      *
      * @return $this
      */
-    public function anyCall()
+    public function anyCall(): self
     {
         return $this->expectCall(self::EXPECT_CALL_ONCE);
     }
@@ -175,7 +178,7 @@ class HttpClientMockerEntity
      *
      * @return $this
      */
-    public function noCalls()
+    public function noCalls(): self
     {
         return $this->expectCall(0);
     }
@@ -186,7 +189,7 @@ class HttpClientMockerEntity
      * @param int $times
      * @return $this
      */
-    public function expectCall($times = 1)
+    public function expectCall(int $times = 1): self
     {
         $this->_expectedCallCount = $times;
         return $this;
@@ -195,11 +198,13 @@ class HttpClientMockerEntity
     /**
      * Заполняем тело запроса для POST и прочих методов
      *
-     * @param array|string $body
+     * @param array|string|null $body
      * @return $this
      * @throws ExpectationFailedException
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public function expectBody($body)
+    public function expectBody($body): self
     {
         if ($this->_method === Request::METHOD_GET) {
             $this->_fail('Body for GET method is not required!');
@@ -212,9 +217,9 @@ class HttpClientMockerEntity
     /**
      * Ожидается пустое тело запроса
      *
-     * @return HttpClientMockerEntity
+     * @return $this
      */
-    public function expectEmptyBody()
+    public function expectEmptyBody(): self
     {
         return $this->expectBody('');
     }
@@ -225,7 +230,7 @@ class HttpClientMockerEntity
      * @param string $value
      * @return $this
      */
-    public function willReturnString($value)
+    public function willReturnString(string $value): self
     {
         $this->_returnAction = null;
         $this->_returnValue = $this->_processResponse($value);
@@ -237,8 +242,10 @@ class HttpClientMockerEntity
      *
      * @param array $value
      * @return $this
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public function willReturnJson($value)
+    public function willReturnJson(array $value): self
     {
         return $this->willReturnString(json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
     }
@@ -249,7 +256,7 @@ class HttpClientMockerEntity
      * @param string $filePath
      * @return HttpClientMockerEntity
      */
-    public function willReturnFile($filePath)
+    public function willReturnFile(string $filePath): self
     {
         if (!is_file($filePath)) {
             $this->_fail($filePath . ' is not a file');
@@ -267,7 +274,7 @@ class HttpClientMockerEntity
      * @param callable $action
      * @return $this
      */
-    public function willReturnAction($action)
+    public function willReturnAction(callable $action): self
     {
         $this->_returnAction = $action;
         $this->_returnValue = null;
@@ -280,7 +287,7 @@ class HttpClientMockerEntity
      * @param int $statusCode
      * @return $this
      */
-    public function willReturnStatus($statusCode)
+    public function willReturnStatus(int $statusCode): self
     {
         if (!is_int($statusCode) || ($statusCode < 100) || ($statusCode > 599)) {
             $this->_fail('Status code should be integer between 100 and 599');
@@ -293,11 +300,11 @@ class HttpClientMockerEntity
      * Мок событие
      *
      * @param Request $request
-     * @return string
+     * @return ?string
      * @throws AssertionFailedError
      * @throws ExpectationFailedException
      */
-    public function doAction($request)
+    public function doAction(Request $request): ?string
     {
         if (($this->_expectedCallCount > self::EXPECT_CALL_ONCE) && ($this->_callCounter >= $this->_expectedCallCount)) {
             $this->_fail('expected ' . $this->_expectedCallCount . ' calls, but more appeared');
@@ -350,7 +357,7 @@ class HttpClientMockerEntity
      *
      * @return int
      */
-    public function getReturnStatusCode()
+    public function getReturnStatusCode(): int
     {
         return $this->_returnStatusCode;
     }
@@ -360,7 +367,7 @@ class HttpClientMockerEntity
      *
      * @return int
      */
-    public function getCallCount()
+    public function getCallCount(): int
     {
         return $this->_callCounter;
     }
@@ -368,7 +375,8 @@ class HttpClientMockerEntity
     /**
      * Финальная проверка на вызовы
      *
-     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @return void
+     * @throws ExpectationFailedException
      */
     public function callCheck()
     {
@@ -397,7 +405,7 @@ class HttpClientMockerEntity
      * @param string $msg
      * @return string
      */
-    private function _getErrorMessage($msg)
+    private function _getErrorMessage(string $msg): string
     {
         return $this->_url . '(mocked in ' . $this->_callerFile . ' line ' . $this->_callerLine . ') - ' . $msg;
     }
@@ -406,9 +414,10 @@ class HttpClientMockerEntity
      * Не прошла проверка, заваливаем тест
      *
      * @param string $message
+     * @return void
      * @throws ExpectationFailedException
      */
-    private function _fail($message)
+    private function _fail(string $message)
     {
         throw new ExpectationFailedException($this->_getErrorMessage($message));
     }
@@ -422,7 +431,7 @@ class HttpClientMockerEntity
      * @return string
      * @throws ExpectationFailedException
      */
-    private function _processResponse($response)
+    private function _processResponse($response): string
     {
         if ($response === null) {
             $response = '';

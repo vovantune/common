@@ -109,7 +109,10 @@ class EntityBuilderConfig extends ValueObject
      */
     public string $tableTemplateFile = '';
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
     public function __construct(array $fillValues = [])
     {
         $this->entityTemplateFile = $this->templatesDir . 'Entity.tpl';
@@ -121,6 +124,7 @@ class EntityBuilderConfig extends ValueObject
     /**
      * Проверить валидность заполнения
      *
+     * @return void
      * @throws InternalException
      */
     public function checkValid()
@@ -141,6 +145,7 @@ class EntityBuilderConfig extends ValueObject
     /**
      * Прописать себя как конфиг, где нужно
      *
+     * @return void
      * @throws InternalException
      */
     public function register()

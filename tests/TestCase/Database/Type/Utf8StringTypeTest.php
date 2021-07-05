@@ -6,6 +6,7 @@ use ArtSkills\Database\Type\Utf8StringType;
 use ArtSkills\ORM\Table;
 use ArtSkills\TestSuite\AppTestCase;
 use Cake\Database\Type;
+use TestApp\Model\Entity\TestTableOne;
 
 // phpcs:ignore
 Type::map('text', Utf8StringType::class);
@@ -31,7 +32,7 @@ class Utf8StringTypeTest extends AppTestCase
     /**
      * Сохраняем эмодзи
      */
-    public function test()
+    public function test(): void
     {
         $this->_setTestNow('2017-11-21 09:00:00');
 
@@ -40,7 +41,7 @@ class Utf8StringTypeTest extends AppTestCase
             'col_text' => "test text Бла бла бла\nППП ggg",
         ]);
         self::assertNotEmpty($svData->id);
-
+        /** @var TestTableOne $dbData */
         $dbData = $this->TestTableOne->get($svData->id);
         $this->assertEntityEqualsEntity($svData, $dbData);
 
@@ -50,6 +51,6 @@ class Utf8StringTypeTest extends AppTestCase
             'col_enum' => 'val1',
             'col_text' => $badText,
         ]);
-        self::assertEquals($resultText, $this->TestTableOne->get($svData->id)->col_text);
+        self::assertEquals($resultText, $this->TestTableOne->get($svData->id)->col_text); // @phpstan-ignore-line
     }
 }

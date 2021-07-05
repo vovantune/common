@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Filesystem\FileTest;
 
@@ -13,7 +14,7 @@ class FileTest extends AppTestCase
      * Тест зиповки
      * @SuppressWarnings(PHPMD.FunctionRule)
      */
-    public function testZip()
+    public function testZip(): void
     {
         $testFile1 = __DIR__ . '/temptest.txt';
         file_put_contents($testFile1, 'temptest');
@@ -39,7 +40,7 @@ class FileTest extends AppTestCase
     /**
      * Тест распаковки
      */
-    public function testUnzip()
+    public function testUnzip(): void
     {
         File::unZip(__DIR__ . '/to_unzip.tar.gz', __DIR__ . '/targz');
         $folder = new Folder(__DIR__ . '/targz');

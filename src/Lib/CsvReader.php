@@ -7,8 +7,8 @@ use ArtSkills\Error\InternalException;
 
 class CsvReader
 {
-    const DEFAULT_ENCODING = 'UTF-8';
-    const DEFAULT_DELIMITER = ';';
+    public const DEFAULT_ENCODING = 'UTF-8';
+    public const DEFAULT_DELIMITER = ';';
 
     /**
      * Указатель на открытый файл
@@ -54,7 +54,7 @@ class CsvReader
      */
     public function getRow()
     {
-        $row = fgetcsv($this->_handle, null, $this->_delimiter);
+        $row = fgetcsv($this->_handle, 0, $this->_delimiter);
         if (empty($row) || (count($row) == 1) && trim($row[0]) === '') {
             return false;
         } else {
@@ -76,10 +76,10 @@ class CsvReader
 
         $result = [];
         fseek($this->_handle, 0);
-        $data = fgetcsv($this->_handle, null, $this->_delimiter);
+        $data = fgetcsv($this->_handle, 0, $this->_delimiter);
         while ($data !== false) {
             $result[] = $data;
-            $data = fgetcsv($this->_handle, null, $this->_delimiter);
+            $data = fgetcsv($this->_handle, 0, $this->_delimiter);
         }
 
         return $result;
@@ -131,6 +131,8 @@ class CsvReader
 
     /**
      * Закрываем открытый файл
+     *
+     * @return void
      */
     private function _closeFile()
     {

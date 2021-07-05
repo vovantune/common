@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Mailer\Transport;
 
@@ -12,6 +13,7 @@ use Cake\Mailer\Email;
  * $sentMessages = TestEmailTransport::getMessages();
  * ```
  * @SuppressWarnings(PHPMD.MethodMix)
+ * @SuppressWarnings(PHPMD.MethodProps)
  */
 class TestEmailTransport extends AbstractTransport
 {
@@ -20,15 +22,17 @@ class TestEmailTransport extends AbstractTransport
      *
      * @var array
      */
-    private static $_messages = [];
+    private static array $_messages = []; // @phpstan-ignore-line
 
     /**
      * Получить список посланных сообщений
      *
      * @param bool $clear
      * @return array
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
-    public static function getMessages($clear = true)
+    public static function getMessages(bool $clear = true): array
     {
         $return = self::$_messages;
         if ($clear) {
@@ -37,9 +41,10 @@ class TestEmailTransport extends AbstractTransport
         return $return;
     }
 
-
     /**
      * Очистить список посланных сообщений
+     *
+     * @return void
      */
     public static function clearMessages()
     {
@@ -49,10 +54,10 @@ class TestEmailTransport extends AbstractTransport
     /**
      * Send mail
      *
-     * @param \Cake\Mailer\Email $email Cake Email
-     * @return array
+     * @param Email $email Cake Email
+     * @return array{headers: string, message: string}
      */
-    public function send(Email $email)
+    public function send(Email $email): array
     {
         self::$_messages[] = [
             'from' => $email->getFrom(),

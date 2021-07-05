@@ -38,6 +38,7 @@ class Query extends \Cake\ORM\Query
      * @param null|string|array|ExpressionInterface $rawExpression
      * @return QueryExpression
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     public static function expr($rawExpression = null): QueryExpression
     {

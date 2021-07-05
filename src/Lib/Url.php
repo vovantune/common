@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
@@ -8,7 +9,8 @@ class Url
 {
     use Library;
 
-    const HTTP = 'http://';
+    public const HTTP = 'http://';
+    public const HTTPS = 'https://';
 
 
     /**
@@ -16,7 +18,7 @@ class Url
      *
      * @return string
      */
-    public static function domain()
+    public static function domain(): string
     {
         return Env::getServerName();
     }
@@ -26,7 +28,7 @@ class Url
      *
      * @return string
      */
-    public static function protocol()
+    public static function protocol(): string
     {
         return Env::getServerProtocol();
     }
@@ -36,7 +38,7 @@ class Url
      *
      * @return string
      */
-    public static function domainAndProtocol()
+    public static function domainAndProtocol(): string
     {
         return self::_build(self::domain(), self::protocol());
     }
@@ -47,7 +49,7 @@ class Url
      * @param string[] $parts
      * @return string
      */
-    public static function path($parts)
+    public static function path(array $parts): string
     {
         return trim(implode('/', $parts));
     }
@@ -58,11 +60,11 @@ class Url
      * @param string $domain
      * @param string $protocol
      * @param string[]|string $parts
-     * @param array|string $query
+     * @param array<string, mixed>|string $query
      * @param string $hash
      * @return string
      */
-    private static function _build($domain, $protocol = '', $parts = [], $query = [], $hash = '')
+    private static function _build(string $domain, string $protocol = '', $parts = [], $query = [], string $hash = ''): string
     {
         $url = '';
         if (!empty($parts)) {
@@ -102,24 +104,24 @@ class Url
      * Создать урл с текущим доменом, указанным путём и параметрами
      *
      * @param string[]|string $parts
-     * @param array|string $query
+     * @param array<string, mixed>|string $query
      * @param string $hash
      * @return string
      */
-    public static function withDomain($parts = [], $query = [], $hash = '')
+    public static function withDomain($parts = [], $query = [], string $hash = ''): string
     {
-        return self::_build(self::domain(), false, $parts, $query, $hash);
+        return self::_build(self::domain(), '', $parts, $query, $hash);
     }
 
     /**
      * http://Текущий домен, или адрес с ним
      *
      * @param string[]|string $parts
-     * @param array|string $query
+     * @param array<string, mixed>|string $query
      * @param string $hash
      * @return string
      */
-    public static function withDomainHttp($parts = [], $query = [], $hash = '')
+    public static function withDomainHttp($parts = [], $query = [], string $hash = ''): string
     {
         return self::_build(self::domain(), 'http', $parts, $query, $hash);
     }
@@ -129,11 +131,11 @@ class Url
      * Текуший протокол://домен, или адрес с ним
      *
      * @param string[]|string $parts
-     * @param array|string $query
+     * @param array<string, mixed>|string $query
      * @param string $hash
      * @return string
      */
-    public static function withDomainAndProtocol($parts = [], $query = [], $hash = '')
+    public static function withDomainAndProtocol($parts = [], $query = [], string $hash = ''): string
     {
         return self::_build(self::domain(), self::protocol(), $parts, $query, $hash);
     }
@@ -143,26 +145,26 @@ class Url
      *
      * @param string $domain
      * @param string[]|string $parts
-     * @param array|string $query
+     * @param array<string, mixed>|string $query
      * @param string $hash
      * @return string
      */
-    public static function withCustomDomain($domain, $parts = [], $query = [], $hash = '')
+    public static function withCustomDomain(string $domain, $parts = [], $query = [], string $hash = ''): string
     {
-        return self::_build($domain, false, $parts, $query, $hash);
+        return self::_build($domain, '', $parts, $query, $hash);
     }
 
     /**
      * Адрес без домена
      *
      * @param string[]|string $parts
-     * @param array|string $query
+     * @param array<string, mixed>|string $query
      * @param string $hash
      * @return string
      */
-    public static function withoutDomain($parts = [], $query = [], $hash = '')
+    public static function withoutDomain($parts = [], $query = [], string $hash = ''): string
     {
-        return self::_build('', false, $parts, $query, $hash);
+        return self::_build('', '', $parts, $query, $hash);
     }
 
 
@@ -170,9 +172,9 @@ class Url
      * Распарсивает строку с параметрами запроса в массив
      *
      * @param string $queryString
-     * @return array
+     * @return array<string, mixed>
      */
-    public static function parseQuery($queryString)
+    public static function parseQuery(string $queryString): array
     {
         parse_str($queryString, $result);
         if (empty($result)) {
@@ -184,10 +186,10 @@ class Url
     /**
      * http_build_query
      *
-     * @param array $parts
+     * @param array<string, mixed> $parts
      * @return string
      */
-    public static function buildQuery(array $parts)
+    public static function buildQuery(array $parts): string
     {
         return http_build_query($parts);
     }
@@ -198,8 +200,8 @@ class Url
      * @param string $url
      * @return bool
      */
-    public static function isHttpUrl($url)
+    public static function isHttpUrl(string $url): bool
     {
-        return Strings::startsWith(trim($url), [self::HTTP, 'https://']);
+        return Strings::startsWith(trim($url), [self::HTTP, self::HTTPS]);
     }
 }

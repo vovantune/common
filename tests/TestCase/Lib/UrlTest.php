@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Lib;
 
@@ -8,7 +9,7 @@ use ArtSkills\TestSuite\AppTestCase;
 class UrlTest extends AppTestCase
 {
     /** простые методы */
-    public function test()
+    public function test(): void
     {
         self::assertEquals('common.artskills.ru', Url::domain());
         self::assertEquals('http', Url::protocol());
@@ -19,7 +20,7 @@ class UrlTest extends AppTestCase
     }
 
     /** генерация урла */
-    public function testGenerate()
+    public function testGenerate(): void
     {
         self::assertEquals('http://common.artskills.ru', Url::withDomainAndProtocol());
         self::assertEquals('http://common.artskills.ru/asd/fgh?asd=fgh&zxc=vbn', Url::withDomainAndProtocol('/asd/fgh', '?asd=fgh&zxc=vbn'));

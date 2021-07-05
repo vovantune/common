@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite;
 
@@ -9,7 +10,10 @@ abstract class AppControllerTestCase extends IntegrationTestCase
 {
     use TestCaseTrait;
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @return void
+     */
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();

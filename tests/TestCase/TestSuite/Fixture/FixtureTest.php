@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\TestSuite\Fixture;
 
@@ -30,7 +31,7 @@ class FixtureTest extends AppTestCase
     /**
      * Тест на получение запросов на создание таблиц
      */
-    public function testGetStructure()
+    public function testGetStructure(): void
     {
         $expectedCreateTable =
             "CREATE TABLE `test_table_one` (
@@ -53,7 +54,7 @@ class FixtureTest extends AppTestCase
     /**
      * Тест на получение данных для загрузки в базу
      */
-    public function testGetData()
+    public function testGetData(): void
     {
         $defaultValue = [
             'id' => '45',
@@ -92,7 +93,7 @@ class FixtureTest extends AppTestCase
     /**
      * Подтягивание моделей в свойства
      */
-    public function testTableModelLoad()
+    public function testTableModelLoad(): void
     {
         self::assertInstanceOf(\Cake\ORM\Table::class, $this->TestTableThree);
         self::assertInstanceOf('\TestApp\Model\Table\TestTableOneTable', $this->TestTableOne);
@@ -101,7 +102,7 @@ class FixtureTest extends AppTestCase
     /**
      * Тест корректной работы загрузки фикстур
      */
-    public function testFixtureLoad()
+    public function testFixtureLoad(): void
     {
         $res = $this->TestTableOne->find()->enableHydration(false)->toArray();
         self::assertEquals(

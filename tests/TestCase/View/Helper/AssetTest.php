@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\View\Helper;
 
@@ -12,6 +13,7 @@ use Cake\View\View;
 
 /**
  * @SuppressWarnings(PHPMD.MethodMix)
+ * @SuppressWarnings(PHPMD.MethodProps)
  */
 class AssetTest extends AppTestCase
 {
@@ -22,28 +24,28 @@ class AssetTest extends AppTestCase
     /**
      * helper
      *
-     * @var AssetHelper
+     * @var ?AssetHelper
      */
-    private $_assetHelper = null;
+    private ?AssetHelper $_assetHelper = null;
 
     /**
      * нужные для тестов файлы
      *
      * @var array
      */
-    private static $_files = [
-        'Test' => [
-            'is_dependent',
-            'is_dependent2',
-            'dependency1',
-            'dependency2',
-            'dependency3',
-            'dependency4',
-        ],
-        'TestManual' => [
-            'file_manual',
-            'file_auto',
-        ],
+    private static $_files = [ // @phpstan-ignore-line
+                               'Test' => [
+                                   'is_dependent',
+                                   'is_dependent2',
+                                   'dependency1',
+                                   'dependency2',
+                                   'dependency3',
+                                   'dependency4',
+                               ],
+                               'TestManual' => [
+                                   'file_manual',
+                                   'file_auto',
+                               ],
     ];
 
     /**
@@ -51,10 +53,10 @@ class AssetTest extends AppTestCase
      *
      * @var array
      */
-    private $_emptyResult = [
-        AssetHelper::BLOCK_SCRIPT => [],
-        AssetHelper::BLOCK_STYLE => [],
-        AssetHelper::BLOCK_SCRIPT_BOTTOM => [],
+    private $_emptyResult = [ // @phpstan-ignore-line
+                              AssetHelper::BLOCK_SCRIPT => [],
+                              AssetHelper::BLOCK_STYLE => [],
+                              AssetHelper::BLOCK_SCRIPT_BOTTOM => [],
     ];
 
     /**
@@ -70,8 +72,10 @@ class AssetTest extends AppTestCase
      * Грузим хелпер
      *
      * @param array $options
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    private function _loadHelper(array $options = [])
+    private function _loadHelper(array $options = []): void
     {
         $request = new ServerRequest($options);
         $this->_assetHelper = new AssetHelper(new View($request));
@@ -109,7 +113,7 @@ class AssetTest extends AppTestCase
     /**
      * @inheritdoc
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
         foreach (array_keys(self::$_files) as $dirName) {
@@ -124,19 +128,15 @@ class AssetTest extends AppTestCase
     /**
      * плохой ключ
      */
-    public function testBadVarsNameNotString()
+    public function testBadVarsNameNotString(): void
     {
         $this->expectExceptionMessage("Название переменной должно быть строкой");
         $this->expectException(InternalException::class);
-        $this->_assetHelper->setVars(
-            [
-                false => 'asd',
-            ]
-        );
+        $this->_assetHelper->setVars([false => 'asd']); // @phpstan-ignore-line
     }
 
     /** Плохие названия переменных */
-    public function testBadVarsInvalidNames()
+    public function testBadVarsInvalidNames(): void
     {
         $invalidNames = [
             '_name',
@@ -167,7 +167,7 @@ class AssetTest extends AppTestCase
     /**
      * не camelCase
      */
-    public function testBadVarsSnakeCase()
+    public function testBadVarsSnakeCase(): void
     {
         $this->expectExceptionMessage("Переменная 'camel_case0' не camelCase");
         $this->expectException(InternalException::class);
@@ -181,7 +181,7 @@ class AssetTest extends AppTestCase
     /**
      * не UPPER_CASE
      */
-    public function testBadConst()
+    public function testBadConst(): void
     {
         $this->expectExceptionMessage("Константа 'upper_case0' не UPPER_CASE");
         $this->expectException(InternalException::class);
@@ -194,7 +194,7 @@ class AssetTest extends AppTestCase
 
 
     /** всё ок */
-    public function testVarGood()
+    public function testVarGood(): void
     {
         $this->_assetHelper->setVars(
             [
@@ -230,7 +230,7 @@ class AssetTest extends AppTestCase
     /**
      * переменные заданы в 2 прохода, все возможные типы; при втором вызове load старые переменные не добавляются
      */
-    public function testVariableValues()
+    public function testVariableValues(): void
     {
         $this->_assetHelper->setVars(
             [
@@ -269,7 +269,7 @@ class AssetTest extends AppTestCase
     /**
      * строки с кавычками и переносами
      */
-    public function testRiskyStrings()
+    public function testRiskyStrings(): void
     {
         $this->_assetHelper->setVars(
             [
@@ -291,7 +291,7 @@ class AssetTest extends AppTestCase
     /**
      * плохое переопределение
      */
-    public function testRewriteNotAllowedAll()
+    public function testRewriteNotAllowedAll(): void
     {
         $this->expectExceptionMessage("Не разрешено переопределять test0");
         $this->expectException(InternalException::class);
@@ -308,7 +308,7 @@ class AssetTest extends AppTestCase
     }
 
     /** Перезапись переменных */
-    public function testRewriteAllowedAll()
+    public function testRewriteAllowedAll(): void
     {
         $this->_assetHelper->setVars(
             [
@@ -332,7 +332,7 @@ class AssetTest extends AppTestCase
     }
 
     /** Перезапись одной переменной */
-    public function testRewriteAllowedOne()
+    public function testRewriteAllowedOne(): void
     {
         $this->_assetHelper->setVars(
             [
@@ -357,7 +357,7 @@ class AssetTest extends AppTestCase
     /**
      * Плохое переопределение
      */
-    public function testRewriteNotAllowedOne()
+    public function testRewriteNotAllowedOne(): void
     {
         $this->expectExceptionMessage("Не разрешено переопределять test4");
         $this->expectException(InternalException::class);
@@ -379,7 +379,7 @@ class AssetTest extends AppTestCase
     /**
      * Переопределение в другой тип
      */
-    public function testRewriteOtherType()
+    public function testRewriteOtherType(): void
     {
         $this->expectExceptionMessage("Попытка переопределить test4 из типа num в string");
         $this->expectException(InternalException::class);
@@ -397,7 +397,7 @@ class AssetTest extends AppTestCase
     }
 
     /** Из null переопределять можно */
-    public function testRewriteNull()
+    public function testRewriteNull(): void
     {
         $this->_assetHelper->setVars(
             [
@@ -421,7 +421,7 @@ class AssetTest extends AppTestCase
     /**
      * Переопределение после загрузки
      */
-    public function testRewriteAfterLoad()
+    public function testRewriteAfterLoad(): void
     {
         $this->expectExceptionMessage("Не разрешено переопределять test0");
         $this->expectException(InternalException::class);
@@ -439,7 +439,7 @@ class AssetTest extends AppTestCase
     }
 
     /** Добавить ещё переменных после загрузки */
-    public function testAddAfterLoad()
+    public function testAddAfterLoad(): void
     {
         $this->_assetHelper->setVars(
             [
@@ -463,7 +463,7 @@ class AssetTest extends AppTestCase
     }
 
     /** пути прописаны вручную */
-    public function testAssetManualExists()
+    public function testAssetManualExists(): void
     {
         MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
             'test',
@@ -494,7 +494,7 @@ class AssetTest extends AppTestCase
     /**
      * файлов, прописанных вручную, нет
      */
-    public function testAssetManualNotExists()
+    public function testAssetManualNotExists(): void
     {
         $this->expectExceptionMessage("Прописанного файла js/TestManual/notExists.js не существует");
         $this->expectException(InternalException::class);
@@ -510,7 +510,7 @@ class AssetTest extends AppTestCase
     }
 
     /** подключение файлов с других сайтов */
-    public function testAssetUrl()
+    public function testAssetUrl(): void
     {
         MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
             'test',
@@ -547,7 +547,7 @@ class AssetTest extends AppTestCase
     /**
      * какой-то плохой урл
      */
-    public function testAssetUrlBad()
+    public function testAssetUrlBad(): void
     {
         $this->expectExceptionMessage("Прописанного файла ftp://asdf");
         $this->expectException(InternalException::class);
@@ -565,7 +565,7 @@ class AssetTest extends AppTestCase
     /**
      * прописанный файл на самом деле папка!
      */
-    public function testAssetManualDir()
+    public function testAssetManualDir(): void
     {
         $this->expectExceptionMessage("Прописанного файла js/TestManual не существует");
         $this->expectException(InternalException::class);
@@ -581,14 +581,14 @@ class AssetTest extends AppTestCase
     }
 
     /** файл выбирается автоматически и его не существует */
-    public function testAutoNotExists()
+    public function testAutoNotExists(): void
     {
         $this->_assetHelper->load('test', 'autoNotExists');
         self::assertEquals($this->_emptyResult, MethodMocker::callPrivate($this->_assetHelper, '_getResult', []), 'Должен быть пустой результат');
     }
 
     /** файл выбирается автоматически он существует */
-    public function testAutoExists()
+    public function testAutoExists(): void
     {
         $this->_assetHelper->load('testManual', 'fileAuto');
         $expectedResult = [
@@ -609,7 +609,7 @@ class AssetTest extends AppTestCase
     }
 
     /** Добавляется префикс */
-    public function testUrlPrefix()
+    public function testUrlPrefix(): void
     {
         $urlPrefix = '/prefix';
         $this->_loadHelper(['webroot' => $urlPrefix]);
@@ -633,7 +633,7 @@ class AssetTest extends AppTestCase
 
 
     /** загрузка с зависимостями */
-    public function testDependencies()
+    public function testDependencies(): void
     {
         touch(WWW_ROOT . 'js/Test/dependency4.min.js'); // минифицированный скрипт
         touch(WWW_ROOT . 'js/Test/dependency2.min.js'); // минифицированный скрипт
@@ -730,7 +730,7 @@ class AssetTest extends AppTestCase
      * Зависимость от самого себя
      * Определяется на этапе записи в конфиг
      */
-    public function testSelfDependency()
+    public function testSelfDependency(): void
     {
         $this->expectExceptionMessage("Зависимость от самого себя test.selfDependent");
         $this->expectException(InternalException::class);
@@ -750,7 +750,7 @@ class AssetTest extends AppTestCase
      * Неявная зависимость от самого себя
      * Определяется при разрешении зависимостей
      */
-    public function testCircularDependencies()
+    public function testCircularDependencies(): void
     {
         $this->expectExceptionMessage("Круговая зависимость у ассета test.selfDependent");
         $this->expectException(InternalException::class);
@@ -781,7 +781,7 @@ class AssetTest extends AppTestCase
     /**
      * Конфигурирование уже загруженного ассета
      */
-    public function testConfigureLoaded()
+    public function testConfigureLoaded(): void
     {
         $this->expectExceptionMessage("Попытка сконфигурировать ассет testManual.fileAuto, который уже загружен");
         $this->expectException(InternalException::class);
@@ -796,7 +796,7 @@ class AssetTest extends AppTestCase
     }
 
     /** добавление переменных, стилей и скриптов полсе того, как был отрисован блок скриптов */
-    public function testAddAfterFetchScript()
+    public function testAddAfterFetchScript(): void
     {
         $this->_assetHelper->setVars(['upperVar' => 'upperValue']);
         $this->_assetHelper->load('testManual', 'fileAuto');
@@ -855,7 +855,7 @@ class AssetTest extends AppTestCase
     }
 
     /** добавление переменных, стилей и скриптов полсе того, как был отрисован блок стилей */
-    public function testAddAfterFetchStyle()
+    public function testAddAfterFetchStyle(): void
     {
         $this->_assetHelper->setVars(['upperVar' => 'upperValue']);
         $this->_assetHelper->load('testManual', 'fileAuto');
@@ -918,7 +918,7 @@ class AssetTest extends AppTestCase
     }
 
     /** добавление переменных, стилей и скриптов полсе того, как был отрисован блок скриптов */
-    public function testAddAfterFetchBottom()
+    public function testAddAfterFetchBottom(): void
     {
         $this->_assetHelper->setVars(['upperVar' => 'upperValue']);
         MethodMocker::callPrivate($this->_assetHelper, '_setActionConfig', [
@@ -985,7 +985,7 @@ class AssetTest extends AppTestCase
     /**
      * Добавление переменных после того, как все блоки были выведены
      */
-    public function testAddVarsAfterFetchScripts()
+    public function testAddVarsAfterFetchScripts(): void
     {
         $this->expectExceptionMessage("Все блоки для переменных уже были выведены");
         $this->expectException(InternalException::class);
@@ -998,7 +998,7 @@ class AssetTest extends AppTestCase
     /**
      * тесты параметров load
      */
-    public function testLoadParams()
+    public function testLoadParams(): void
     {
         $this->_loadHelper([
             'params' => [
@@ -1083,9 +1083,9 @@ class AssetTest extends AppTestCase
     }
 
     /**
-     * тесты на подгрузку списка обязательных переменных из зависиммостей, тесты проверок объявления и типов обязательных переменных
+     * тесты на подгрузку списка обязательных переменных из зависимостей, тесты проверок объявления и типов обязательных переменных
      */
-    public function testLoadAssetVars()
+    public function testLoadAssetVars(): void
     {
         MethodMocker::callPrivate($this->_assetHelper, '_setConfigs', [
             [

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Filesystem\FolderTest;
 
@@ -11,7 +12,7 @@ class FolderTest extends AppTestCase
     /**
      * Проверка чистилки файлов
      */
-    public function testCleanupDirByLifetime()
+    public function testCleanupDirByLifetime(): void
     {
         $csvFile = __DIR__ . '/temp.csv';
         $pdfFile = __DIR__ . '/temp.pdf';

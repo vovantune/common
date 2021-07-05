@@ -22,6 +22,7 @@ class ValueObjectDocumentationShell extends Shell
      *
      * @param string $workDir Папка, которую нужно парсить
      * @param string|null $resultFilePath В какой файл писать результат
+     * @return void
      */
     public function main(string $workDir = APP, ?string $resultFilePath = null)
     {
@@ -66,6 +67,7 @@ class ValueObjectDocumentationShell extends Shell
      * @param array $objectDefinition
      * @return string
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _makeObjectDefinitionString(array $objectDefinition): string
     {
@@ -103,6 +105,7 @@ class ValueObjectDocumentationShell extends Shell
      * @param array $objectDefinitions
      * @return array
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _mergeInheritanceProperties(array $objectDefinitions): array
     {
@@ -128,7 +131,7 @@ class ValueObjectDocumentationShell extends Shell
      * Определяем имя класса
      *
      * @param Schema $schema
-     * @return array<string, string>
+     * @return array<string, array<array<string>|string>|string|null>
      * @throws UserException
      */
     private function _getDefinition(Schema $schema): array
@@ -151,7 +154,7 @@ class ValueObjectDocumentationShell extends Shell
                     $insProperty = $this->_getProperty($property);
                     $result['properties'][$insProperty['name']] = $insProperty;
                 }
-            } elseif ($schema->type === 'array') {
+            } elseif ($schema->type === 'array') { // @phpstan-ignore-line ошибочное умозаключение
                 $result['type'] = $schema->items->ref . '[]';
             }
 
@@ -191,7 +194,7 @@ class ValueObjectDocumentationShell extends Shell
      * Получаем описание свойства
      *
      * @param Property $property
-     * @return array<string, string>
+     * @return array{name: string, description: ?string, type: string}
      */
     private function _getProperty(Property $property): array
     {
@@ -222,10 +225,10 @@ class ValueObjectDocumentationShell extends Shell
      * Определяем имя класса для схемы
      *
      * @param Schema $schema
-     * @return string|string[]
+     * @return string
      * @throws UserException
      */
-    private function _getSchemaClassName(Schema $schema)
+    private function _getSchemaClassName(Schema $schema): string
     {
         if ($schema->schema !== UNDEFINED) {
             return $schema->schema;

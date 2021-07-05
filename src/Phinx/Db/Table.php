@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Phinx\Db;
 
@@ -9,6 +10,11 @@ class Table extends \Phinx\Db\Table
     /**
      * @inheritdoc
      * Проверка дефолтных значений и комментов к полям
+     *
+     * @param string $columnName
+     * @param ?string $type
+     * @param array<string, mixed> $options
+     * @return static
      */
     public function addColumn($columnName, $type = null, $options = [])
     {

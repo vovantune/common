@@ -13,7 +13,7 @@ class DefaultReaderFormatTest extends AppTestCase
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws Exception
      */
-    public function testSkipEmptyRows()
+    public function testSkipEmptyRows(): void
     {
         $testFile = __DIR__ . DS . 'test_xls.xls';
 

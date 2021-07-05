@@ -8,6 +8,7 @@ use Cake\Core\Configure;
 use Cake\Error\PHP7ErrorException;
 use Exception;
 use PHPUnit\Framework\AssertionFailedError;
+use Throwable;
 
 /**
  * @method static string getServerName()
@@ -45,10 +46,9 @@ class Env
      * Обращение к конфигу по названию метода, а не параметром
      *
      * @param string $name
-     * @param array $arguments
+     * @param array<int, mixed> $arguments
      * @return mixed
      * @throws InternalException
-     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function __callStatic(string $name, array $arguments = [])
     {
@@ -67,7 +67,6 @@ class Env
             $configKey = lcfirst(Strings::replacePrefix($name, $prefix));
             return Configure::write($configKey, $arguments[0]);
         }
-
 
         throw new InternalException("Undefined method $name");
     }
@@ -144,18 +143,9 @@ class Env
     }
 
     /**
-     * Лёгкая проверка, на линуксе юзер или нет
-     *
-     * @return bool
-     */
-    public static function isUserLinux(): bool
-    {
-        $userAgent = env('HTTP_USER_AGENT');
-        return (empty($userAgent) || (stristr($userAgent, 'Linux') || stristr($userAgent, 'Mac OS')));
-    }
-
-    /**
      * Включить режим дебага
+     *
+     * @return void
      */
     public static function enableDebug()
     {
@@ -165,8 +155,9 @@ class Env
     /**
      * Прокидывает PHPUnit exception'ы дальше, чтоб в тесты правильно валились
      *
-     * @param Exception|PHP7ErrorException $exception
-     * @throws AssertionFailedError|PHP7ErrorException
+     * @param Exception|PHP7ErrorException|Throwable $exception
+     * @return void
+     * @throws AssertionFailedError
      */
     public static function checkTestException($exception)
     {

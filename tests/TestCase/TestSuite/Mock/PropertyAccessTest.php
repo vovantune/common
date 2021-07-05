@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 class PropertyAccessTest extends TestCase
 {
     /** тест чтения и записи */
-    public function test()
+    public function test(): void
     {
         $testObject = new MockTestFixture();
         self::assertSame('testProtected', PropertyAccess::get($testObject, '_protectedProperty'), 'Не прочиталось protected свойство');
@@ -32,7 +32,7 @@ class PropertyAccessTest extends TestCase
     /**
      * тест несуществующего свойства
      */
-    public function testBadProperty()
+    public function testBadProperty(): void
     {
         $this->expectExceptionMessage("does not exist");
         $this->expectException(\Exception::class);
@@ -42,7 +42,7 @@ class PropertyAccessTest extends TestCase
     /**
      * Изменение статических свойств с возможностью восстановления
      */
-    public function testStaticRestore()
+    public function testStaticRestore(): void
     {
         $className = MockTestFixture::class;
         $propertyName = '_privateProperty';
@@ -64,7 +64,7 @@ class PropertyAccessTest extends TestCase
     /**
      * Восстановление свойства, которое не было изменено
      */
-    public function testRestoreNotModified()
+    public function testRestoreNotModified(): void
     {
         $this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
         $this->expectException(AssertionFailedError::class);
@@ -74,7 +74,7 @@ class PropertyAccessTest extends TestCase
     /**
      * Восстановление свойства 2 раза
      */
-    public function testRestoreTwice()
+    public function testRestoreTwice(): void
     {
         $this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
         $this->expectException(AssertionFailedError::class);
@@ -89,7 +89,7 @@ class PropertyAccessTest extends TestCase
     /**
      * Восстановление всех статических свойств
      */
-    public function testStaticRestoreAll()
+    public function testStaticRestoreAll(): void
     {
         $className = MockTestFixture::class;
         $originalValue = PropertyAccess::getStatic($className, '_privateProperty');
@@ -115,7 +115,7 @@ class PropertyAccessTest extends TestCase
     /**
      * Восстановление свойства после восстановления всего
      */
-    public function testRestoreAfterRestoreAll()
+    public function testRestoreAfterRestoreAll(): void
     {
         $this->expectExceptionMessage("MockTestFixture::_privateProperty was not modified");
         $this->expectException(AssertionFailedError::class);

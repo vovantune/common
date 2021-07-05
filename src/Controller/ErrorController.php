@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Controller;
 
@@ -28,6 +29,7 @@ class ErrorController extends Controller
      * @param Event $event
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @phpstan-ignore-next-line
      */
     public function beforeRender(Event $event)
     {

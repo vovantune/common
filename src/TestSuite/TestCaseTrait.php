@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite;
 
@@ -34,25 +35,25 @@ trait TestCaseTrait
      *
      * @var ClassMockEntity[]
      */
-    private $_permanentMocksList = [];
+    private array $_permanentMocksList = [];
 
     /**
      * Отключённые постоянные моки
      *
-     * @var array className => true
+     * @var array<string, bool> className => true
      */
-    private $_disabledMocks = [];
+    private array $_disabledMocks = [];
 
     /**
      * Список правильно проинициализированных таблиц
      *
-     * @var array
+     * @var string[]
      */
-    private static $_tableRegistry = [];
+    private static array $_tableRegistry = [];
 
 
     /** вызывать в реальном setUpBeforeClass */
-    protected static function _setUpBeforeClass()
+    protected static function _setUpBeforeClass(): void
     {
         static::_clearSingletones();
     }
@@ -60,7 +61,7 @@ trait TestCaseTrait
     /**
      * Инициализация тестового окружения
      */
-    protected function _setUp()
+    protected function _setUp(): void
     {
         $this->_clearCache();
         $this->_initPermanentMocks();
@@ -73,33 +74,37 @@ trait TestCaseTrait
     /**
      * Чиста тестового окружения
      */
-    protected function _tearDown()
+    protected function _tearDown(): void
     {
         /** @var TestCase $this */
         ConstantMocker::restore();
         PropertyAccess::restoreStaticAll();
         Time::setTestNow(null); // сбрасываем тестовое время
         TestEmailTransport::clearMessages();
-        $this->_tearDownLocal();
+        $this->_tearDownLocal(); // @phpstan-ignore-line
 
         try {
             MethodMocker::restore($this->hasFailed());
         } finally {
-            $this->_destroyPermanentMocks();
-            $this->_disabledMocks = [];
+            $this->_destroyPermanentMocks(); // @phpstan-ignore-line
+            $this->_disabledMocks = []; // @phpstan-ignore-line
 
             HttpClientMocker::clean($this->hasFailed());
         }
     }
 
-    /** для локальных действий на setUp */
+    /**
+     * для локальных действий на setUp
+     *
+     * @return void
+     */
     protected function _setUpLocal()
     {
         // noop
     }
 
     /** для локальных действий на tearDown */
-    protected function _tearDownLocal()
+    protected function _tearDownLocal(): void
     {
         // noop
     }
@@ -110,7 +115,7 @@ trait TestCaseTrait
      *
      * @param string $mockClass
      */
-    protected function _disablePermanentMock($mockClass)
+    protected function _disablePermanentMock(string $mockClass): void
     {
         $this->_disabledMocks[$mockClass] = true;
     }
@@ -118,7 +123,7 @@ trait TestCaseTrait
     /**
      * Чистка кеша
      */
-    protected function _clearCache()
+    protected function _clearCache(): void
     {
         AppCache::flushExcept(['_cake_core_', '_cake_model_']);
     }
@@ -126,7 +131,7 @@ trait TestCaseTrait
     /**
      * loadModel на все таблицы фикстур
      */
-    protected function _loadFixtureModels()
+    protected function _loadFixtureModels(): void
     {
         if (empty($this->fixtures)) {
             return;
@@ -148,7 +153,7 @@ trait TestCaseTrait
      *
      * @throws InternalException
      */
-    private function _initPermanentMocks()
+    private function _initPermanentMocks(): void
     {
         $permanentMocks = [
             // folder => namespace
@@ -180,7 +185,7 @@ trait TestCaseTrait
     /**
      * Сбрасываем все перманентые моки
      */
-    private function _destroyPermanentMocks()
+    private function _destroyPermanentMocks(): void
     {
         foreach ($this->_permanentMocksList as $mockClass) {
             $mockClass::destroy();
@@ -192,7 +197,7 @@ trait TestCaseTrait
      * очищаем одиночек
      * то, что одиночки создаются 1 раз, иногда может очень мешать
      */
-    protected static function _clearSingletones()
+    protected static function _clearSingletones(): void
     {
         $singletones = static::_getSingletones();
         foreach ($singletones as $className) {
@@ -210,7 +215,7 @@ trait TestCaseTrait
      *
      * @return string[]
      */
-    protected static function _getSingletones()
+    protected static function _getSingletones(): array
     {
         // Приходится использовать метод, ибо переопределить свойство при использовании трейта нельзя
         // А заполнить свойство не получится, ибо _clearSingletones статичен
@@ -227,7 +232,7 @@ trait TestCaseTrait
      *                                Полезно тем, что в базу микросекунды всё равно не сохранятся
      * @return Time
      */
-    protected function _setTestNow($time = null, $clearMicroseconds = true)
+    protected function _setTestNow($time = null, bool $clearMicroseconds = true): Time
     {
         if (!($time instanceof Time)) {
             $time = new Time($time);
@@ -250,16 +255,18 @@ trait TestCaseTrait
      * @param int $maxDepth
      * @param bool $canonicalize
      * @param bool $ignoreCase
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public function assertArraySubsetEquals(
         array $expected,
         array $actual,
-        $message = '',
-        $delta = 0.0,
-        $maxDepth = 10,
-        $canonicalize = false,
-        $ignoreCase = false
-    ) {
+        string $message = '',
+        float $delta = 0.0,
+        int $maxDepth = 10,
+        bool $canonicalize = false,
+        bool $ignoreCase = false
+    ): void {
         $actual = array_intersect_key($actual, $expected);
         self::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }
@@ -272,14 +279,16 @@ trait TestCaseTrait
      * @param string $message
      * @param float $delta
      * @param int $maxDepth
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public function assertEntitySubset(
         array $expectedSubset,
         Entity $entity,
-        $message = '',
-        $delta = 0.0,
-        $maxDepth = 10
-    ) {
+        string $message = '',
+        float $delta = 0.0,
+        int $maxDepth = 10
+    ): void {
         $this->assertArraySubsetEquals($expectedSubset, $entity->toArray(), $message, $delta, $maxDepth);
     }
 
@@ -295,10 +304,10 @@ trait TestCaseTrait
     public function assertEntityEqualsEntity(
         Entity $expectedEntity,
         Entity $actualEntity,
-        $message = '',
-        $delta = 0.0,
-        $maxDepth = 10
-    ) {
+        string $message = '',
+        float $delta = 0.0,
+        int $maxDepth = 10
+    ): void {
         self::assertEquals($expectedEntity->toArray(), $actualEntity->toArray(), $message, $delta, $maxDepth);
     }
 
@@ -310,14 +319,16 @@ trait TestCaseTrait
      * @param string $message
      * @param float $delta
      * @param int $maxDepth
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     public function assertEntityEqualsArray(
         array $expectedArray,
         Entity $actualEntity,
-        $message = '',
-        $delta = 0.0,
-        $maxDepth = 10
-    ) {
+        string $message = '',
+        float $delta = 0.0,
+        int $maxDepth = 10
+    ): void {
         self::assertEquals($expectedArray, $actualEntity->toArray(), $message, $delta, $maxDepth);
     }
 
@@ -331,12 +342,12 @@ trait TestCaseTrait
      * @param bool $ignoreCase
      */
     public function assertFileEqualsString(
-        $expectedString,
-        $actualFile,
-        $message = '',
-        $canonicalize = false,
-        $ignoreCase = false
-    ) {
+        string $expectedString,
+        string $actualFile,
+        string $message = '',
+        bool $canonicalize = false,
+        bool $ignoreCase = false
+    ): void {
         self::assertFileExists($actualFile, $message);
         self::assertEquals(
             $expectedString,

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
@@ -9,7 +10,7 @@ use Exception;
  * Запись в CSV файл. Работает в двух решимах:
  *  - Построчная запись (для больших объёмов данных)
  * ```php
- * $svFile = new CsvWriter('svFile.csv', 'cp1251', ',');
+ * $svFile = new CsvWriter('svFile.csv', ',', 'cp1251');
  * while ($data = $query->fetchRow()) {
  *     $svFile->writeRow($data);
  * }
@@ -17,36 +18,41 @@ use Exception;
  * ```
  * - Запись ассоциативного массива целиком
  * ```php
- * $result = CsvWriter::writeCsv('svFile.csv', $lines, 'cp1251', ',');
+ * $result = CsvWriter::writeCsv('svFile.csv', $lines, ',', 'cp1251');
  * ```
  * @SuppressWarnings(PHPMD.MethodMix)
  */
 class CsvWriter
 {
+    public const DEFAULT_ENCLOSURE = '"';
+
     /**
      * Указатель на файл
      *
-     * @var resource
+     * @var ?resource
      */
-    private $_handle = null;
+    private $_handle;
     /**
      * Разделитель колонок
      *
      * @var string
      */
-    private $_delimiter = ';';
+    private string $_delimiter = CsvReader::DEFAULT_DELIMITER;
 
     /**
      * CsvWriter constructor.
      *
      * @param string $filename
-     * @param string $encoding
      * @param string $delimiter
+     * @param string $encoding
      * @throws InternalException
      * @SuppressWarnings(PHPMD.ErrorControlOperator)
      */
-    public function __construct($filename, $encoding = "UTF-8", $delimiter = ';')
-    {
+    public function __construct(
+        string $filename,
+        string $delimiter = CsvReader::DEFAULT_DELIMITER,
+        string $encoding = CsvReader::DEFAULT_ENCODING
+    ) {
         // phpcs:ignore
         @$this->_handle = fopen($filename, 'w');
 
@@ -57,15 +63,14 @@ class CsvWriter
         $this->_delimiter = $delimiter;
     }
 
-
     /**
      * Запись строки
      *
-     * @param array $row
-     * @return mixed
+     * @param array<string|int, string|int|bool|float|null> $row
+     * @return int
      * @throws Exception
      */
-    public function writeRow($row)
+    public function writeRow(array $row): int
     {
         if (!$this->_handle) {
             throw new Exception('Попытка записать в закрытый файл');
@@ -75,6 +80,8 @@ class CsvWriter
 
     /**
      * Закрывает файл
+     *
+     * @return void
      */
     public function close()
     {
@@ -83,7 +90,7 @@ class CsvWriter
     }
 
     /**
-     * Деструктов и в Африке деструктор
+     * Деструктор и в Африке деструктор
      */
     public function __destruct()
     {
@@ -96,19 +103,19 @@ class CsvWriter
      * Выгружает CSV файл из массива data
      *
      * @param string $filename
-     * @param array $data
-     * @param string $encoding
+     * @param array<string|int, array<string|int, string|int|bool|float|null>> $data
      * @param string $delimiter
+     * @param string $encoding
      * @param string $enclosure
      * @return bool
      */
     public static function writeCsv(
-        $filename,
-        $data,
-        $encoding = "UTF-8",
-        $delimiter = ',',
-        $enclosure = '"'
-    ) {
+        string $filename,
+        array $data,
+        string $delimiter = CsvReader::DEFAULT_DELIMITER,
+        string $encoding = CsvReader::DEFAULT_ENCODING,
+        string $enclosure = self::DEFAULT_ENCLOSURE
+    ): bool {
         $handle = fopen($filename, 'w');
         stream_filter_append($handle, 'convert.iconv.UTF-8/' . $encoding);
         if (!$handle) {

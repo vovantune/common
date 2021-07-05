@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
@@ -15,7 +16,7 @@ class Strings
      * @param string|string[] $prefixes
      * @return bool
      */
-    public static function startsWith($string, $prefixes)
+    public static function startsWith(string $string, $prefixes): bool
     {
         foreach ((array)$prefixes as $prefix) {
             if (stripos($string, $prefix) === 0) {
@@ -32,7 +33,7 @@ class Strings
      * @param string|string[] $postfixes
      * @return bool
      */
-    public static function endsWith($string, $postfixes)
+    public static function endsWith(string $string, $postfixes): bool
     {
         $stringLength = strlen($string);
         foreach ((array)$postfixes as $postfix) {
@@ -53,7 +54,7 @@ class Strings
      * @param string $replacement
      * @return string
      */
-    public static function replacePrefix($string, $prefix, $replacement = '')
+    public static function replacePrefix(string $string, string $prefix, string $replacement = ''): string
     {
         return $replacement . (substr($string, strlen($prefix)));
     }
@@ -68,7 +69,7 @@ class Strings
      * @param string $replacement
      * @return string
      */
-    public static function replacePostfix($string, $postfix, $replacement = '')
+    public static function replacePostfix(string $string, string $postfix, string $replacement = ''): string
     {
         return (substr($string, 0, -strlen($postfix))) . $replacement;
     }
@@ -82,7 +83,7 @@ class Strings
      * @param bool $concatOnFail добавить $replacement в случае отсутствия префикса или нет
      * @return string
      */
-    public static function replaceIfStartsWith($string, $prefixes, $replacement = '', $concatOnFail = false)
+    public static function replaceIfStartsWith(string $string, $prefixes, string $replacement = '', bool $concatOnFail = false): string
     {
         foreach ((array)$prefixes as $prefix) {
             if (self::startsWith($string, $prefix)) {
@@ -104,7 +105,7 @@ class Strings
      * @param bool $concatOnFail добавить $replacement в случае отсутствия префикса или нет
      * @return string
      */
-    public static function replaceIfEndsWith($string, $postfixes, $replacement = '', $concatOnFail = false)
+    public static function replaceIfEndsWith(string $string, $postfixes, string $replacement = '', bool $concatOnFail = false): string
     {
         foreach ((array)$postfixes as $postfix) {
             if (self::endsWith($string, $postfix)) {
@@ -126,7 +127,7 @@ class Strings
      * @param string $string
      * @return string
      */
-    public static function lastPart($delimiter, $string)
+    public static function lastPart(string $delimiter, string $string): string
     {
         $tmp = explode($delimiter, $string);
         return array_pop($tmp);
@@ -140,14 +141,15 @@ class Strings
      * @param string $enc
      * @return string
      */
-    public static function mbUcFirst($string, $enc = 'utf-8')
+    public static function mbUcFirst(string $string, string $enc = 'utf-8'): string
     {
-        $string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_substr(
-            $string,
-            1,
-            mb_strlen($string, $enc) - 1,
-            $enc
-        );
+        $string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc)
+            . mb_substr(
+                $string,
+                1,
+                mb_strlen($string, $enc) - 1,
+                $enc
+            );
         return $string;
     }
 
@@ -158,14 +160,15 @@ class Strings
      * @param string $enc
      * @return string
      */
-    public static function mbLcFirst($string, $enc = 'utf-8')
+    public static function mbLcFirst(string $string, string $enc = 'utf-8'): string
     {
-        $string = mb_strtolower(mb_substr($string, 0, 1, $enc), $enc) . mb_substr(
-            $string,
-            1,
-            mb_strlen($string, $enc) - 1,
-            $enc
-        );
+        $string = mb_strtolower(mb_substr($string, 0, 1, $enc), $enc)
+            . mb_substr(
+                $string,
+                1,
+                mb_strlen($string, $enc) - 1,
+                $enc
+            );
         return $string;
     }
 }

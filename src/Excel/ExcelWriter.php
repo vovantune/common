@@ -122,6 +122,7 @@ class ExcelWriter
      * @throws InternalException
      *
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     public function writeSheetHeader(string $pageName, array $rowData, ?array $rowStyles = null, ?float $height = null): self
     {
@@ -129,7 +130,6 @@ class ExcelWriter
 
         $rowStyles = (!empty($rowStyles) ? $rowStyles : []) + self::STYLE_DEFAULT_HEADER;
         foreach ($this->_fieldMap[$pageName] as $element) {
-            /** @var FieldMapElement $element */
             if (empty($element)) {
                 continue;
             }
@@ -157,6 +157,7 @@ class ExcelWriter
      * @return array [types, widths]
      *
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _getSheetTypes(string $pageName): array
     {
@@ -199,6 +200,7 @@ class ExcelWriter
      * @throws InternalException
      *
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     public function writeSheetRow(string $pageName, array $rowData, ?array $rowStyles = null, ?float $height = null): self
     {
@@ -229,6 +231,7 @@ class ExcelWriter
      * @return array
      *
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _buildSheetRow(string $pageName, array $rowData, ?array $rowStyles = null, ?float $height = null): array
     {
@@ -273,6 +276,7 @@ class ExcelWriter
      * @return array
      *
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _buildDefaultRowStyle(?array $rowStyle): array
     {
@@ -291,6 +295,8 @@ class ExcelWriter
 
     /**
      * Закрывает файл
+     *
+     * @return void
      */
     public function close()
     {

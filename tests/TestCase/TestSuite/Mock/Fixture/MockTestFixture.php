@@ -290,6 +290,8 @@ class MockTestFixture
      * @param string|null $nullableParam
      * @param mixed $requiredParam
      * @param array $mayBeNotArray
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function complexParams(
         &$byRefParam,
@@ -299,7 +301,7 @@ class MockTestFixture
         ?string $nullableParam,
         $requiredParam,
         $mayBeNotArray = []
-    ) {
+    ): void {
         // noop
     }
 
@@ -314,6 +316,8 @@ class MockTestFixture
      * @param bool $boolParam
      * @param null $nullParam
      * @return array
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function defaultValues(
         array $arrayParam = ['a' => [null]],
@@ -328,8 +332,8 @@ class MockTestFixture
     /**
      * Функция с вариадиком
      *
-     * @param int[] ...$variadicParam
-     * @return array
+     * @param int ...$variadicParam
+     * @return int[]
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public static function variadicParam(int ...$variadicParam)

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Lib;
 
@@ -10,7 +11,7 @@ class RusGramTest extends AppTestCase
     /**
      * Склонение
      */
-    public function testDeclension()
+    public function testDeclension(): void
     {
         $words = ['рубль', 'рубля', 'рублей'];
 
@@ -24,14 +25,14 @@ class RusGramTest extends AppTestCase
     /**
      * Дата по-русски
      */
-    public function testGetRussianDate()
+    public function testGetRussianDate(): void
     {
         self::assertEquals('11 Окт октябрь Вс', RusGram::getRussianDate('d M FI D', '2015-10-11'), 'Некорректное формирование даты');
         self::assertEquals('11 октября Воскресенье', RusGram::getRussianDate('d FR l', '2015-10-11'), 'Некорректное формирование даты');
     }
 
     /** Число в строку */
-    public function testNumberToString()
+    public function testNumberToString(): void
     {
         self::assertEquals('сто тысяч рублей 00 копеек', RusGram::numberToString(100000));
         self::assertEquals('семь тысяч пятьсот сорок шесть рублей 08 копеек', RusGram::numberToString(7546.08));

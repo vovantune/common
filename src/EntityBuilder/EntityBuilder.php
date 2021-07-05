@@ -8,7 +8,6 @@ use ArtSkills\Lib\Arrays;
 use ArtSkills\Lib\DB;
 use ArtSkills\Lib\Misc;
 use ArtSkills\Lib\Strings;
-use ArtSkills\TestSuite\Mock\PropertyAccess;
 use ArtSkills\Traits\Library;
 use ArtSkills\Filesystem\File;
 use ArtSkills\Filesystem\Folder;
@@ -88,6 +87,7 @@ class EntityBuilder
      * Задать конфиг
      *
      * @param EntityBuilderConfig|null $config
+     * @return void
      * @throws InternalException
      */
     public static function setConfig(?EntityBuilderConfig $config)
@@ -314,10 +314,10 @@ class EntityBuilder
         return $entityName . $postfix;
     }
 
-
     /**
      * Проверка, что задан конфиг
      *
+     * @return void
      * @throws InternalException
      */
     private static function _checkConfig()
@@ -441,7 +441,7 @@ class EntityBuilder
     /**
      * Добавляем переопределение методов
      *
-     * @param string|bool $classComment
+     * @param string $classComment
      * @param string $entityName
      * @param string[] $ownMethods
      * @return string
@@ -494,6 +494,7 @@ class EntityBuilder
      *
      * @param ReflectionClass $refClass
      * @return string[]
+     * @phpstan-ignore-next-line
      */
     private static function _getClassPublicMethods(ReflectionClass $refClass): array
     {
@@ -511,6 +512,7 @@ class EntityBuilder
      *
      * @param ReflectionClass $refClass
      * @param string $newComment
+     * @phpstan-ignore-next-line
      */
     private static function _writeNewClassComment(ReflectionClass $refClass, string $newComment)
     {

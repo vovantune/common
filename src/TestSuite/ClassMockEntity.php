@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite;
 
@@ -8,7 +9,9 @@ namespace ArtSkills\TestSuite;
 abstract class ClassMockEntity
 {
     /**
-     * Базовый метод, который и инциализирует все подмены
+     * Базовый метод, который и иницализирует все подмены
+     *
+     * @return void
      */
     public static function init()
     {
@@ -16,6 +19,8 @@ abstract class ClassMockEntity
 
     /**
      * Вызов после каждого теста
+     *
+     * @return void
      */
     public static function destroy()
     {

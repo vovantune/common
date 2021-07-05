@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Config;
 
@@ -8,7 +9,7 @@ class FunctionsTest extends AppTestCase
 {
 
     /** функция для удобства использования вложенных ассоциаций */
-    public function testAssoc()
+    public function testAssoc(): void
     {
         self::assertEquals('Table1', assoc('Table1'));
         self::assertEquals(
@@ -18,14 +19,14 @@ class FunctionsTest extends AppTestCase
     }
 
     /** функция для удобства использования полей с названием таблицы */
-    public function testField()
+    public function testField(): void
     {
         self::assertEquals('Table.field', field('Table', 'field'));
         self::assertEquals('Table.field >=', field('Table', 'field', '>='));
     }
 
     /** функция для удобства формирования списка условий для where */
-    public function testFieldsWhere()
+    public function testFieldsWhere(): void
     {
         $conditions = [
             'Table1' => [
@@ -54,7 +55,7 @@ class FunctionsTest extends AppTestCase
      * функция для удобства формирования списка условий для where
      * дублирование ключей массива
      */
-    public function testFieldsWhereDuplicate()
+    public function testFieldsWhereDuplicate(): void
     {
         $this->expectExceptionMessage("Дублируется ключ Table1.field1");
         $this->expectException(\Exception::class);
@@ -69,7 +70,7 @@ class FunctionsTest extends AppTestCase
     }
 
     /** функция для удобства формирования списка полей для select */
-    public function testFieldsSelect()
+    public function testFieldsSelect(): void
     {
         $fields = [
             'Table1' => [
@@ -102,7 +103,7 @@ class FunctionsTest extends AppTestCase
      * функция для удобства формирования списка полей для select
      * дублирование ключей массива
      */
-    public function testFieldsSelectDuplicate()
+    public function testFieldsSelectDuplicate(): void
     {
         $this->expectExceptionMessage("Дублируется ключ alias");
         $this->expectException(\Exception::class);

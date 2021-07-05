@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\TestSuite\PermanentMocks;
 
@@ -20,8 +21,9 @@ class MockFileLog extends ClassMockEntity
     /**
      * Вывод ошибка вместо файла в консоль
      *
-     * @param string $level
+     * @param string|int $level
      * @param string $message
+     * @return void
      */
     public static function log($level, $message)
     {

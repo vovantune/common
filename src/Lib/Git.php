@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
@@ -13,12 +14,12 @@ class Git
     // одиночка оставлен для обратной совместимости
     use Singleton;
 
-    const BRANCH_NAME_MASTER = 'master';
-    const BRANCH_NAME_HEAD = 'HEAD';
+    public const BRANCH_NAME_MASTER = 'master';
+    public const BRANCH_NAME_HEAD = 'HEAD';
 
-    const BRANCH_TYPE_REMOTE = 'remote';
-    const BRANCH_TYPE_LOCAL = 'local';
-    const BRANCH_TYPE_ALL = 'all';
+    public const BRANCH_TYPE_REMOTE = 'remote';
+    public const BRANCH_TYPE_LOCAL = 'local';
+    public const BRANCH_TYPE_ALL = 'all';
 
 
     /**
@@ -26,42 +27,42 @@ class Git
      *
      * @var string
      */
-    const GIT_COMMAND_SERVER = '/var/www/git.sh -i /var/www/github';
+    private const GIT_COMMAND_SERVER = '/var/www/git.sh -i /var/www/github';
 
     /**
      * Команда запуска git на локальных тачках
      *
      * @var string
      */
-    const GIT_COMMAND_LOCAL = 'git';
+    private const GIT_COMMAND_LOCAL = 'git';
 
     /**
      * Текущая ветка
      *
      * @var string
      */
-    private $_currentBranch = '';
+    private string $_currentBranch = '';
 
     /**
      * Команда запуска git
      *
      * @var string
      */
-    private $_gitCommand = '';
+    private string $_gitCommand;
 
     /**
      * Список спулленных веток, чтоб не пуллить по нескольку раз
      *
-     * @var string[]
+     * @var array<string, bool>
      */
-    private $_pulledBranches = [];
+    private array $_pulledBranches = [];
 
     /**
      * Папка с репозиторием
      *
      * @var string
      */
-    private $_directory = '';
+    private string $_directory;
 
     /**
      * Выбираем, какой командой обращаться к гиту; вытаскиваем текущую ветку
@@ -69,12 +70,12 @@ class Git
      * @param string $directory папка репозитория
      *                          возможность передать пустой параметр оставлена для обратной совместимости
      */
-    public function __construct($directory = '')
+    public function __construct(string $directory = '')
     {
         $this->_directory = realpath($directory);
         $this->_gitCommand = $this->_chooseGitCommand();
         if (!empty($this->_gitCommand)) {
-            list($success, $output) = $this->_execute('rev-parse --abbrev-ref HEAD');
+            [$success, $output] = $this->_execute('rev-parse --abbrev-ref HEAD');
 
             if ($success && !empty($output)) {
                 $this->_currentBranch = $output[0];
@@ -87,7 +88,7 @@ class Git
      *
      * @return string
      */
-    protected function _chooseGitCommand()
+    protected function _chooseGitCommand(): string
     {
         if (Env::isTestServer() || Env::isProduction()) {
             return self::GIT_COMMAND_SERVER;
@@ -101,9 +102,9 @@ class Git
      * Выполняем команду
      *
      * @param string $command
-     * @return array [успех, вывод]
+     * @return array{0: bool, 1: string[], 2: string, 3: int} [успех, вывод, результирующая команда, код возврата]
      */
-    private function _execute($command)
+    private function _execute(string $command): array
     {
         return Shell::execFromDir($this->_directory, $this->_gitCommand . ' ' . $command);
     }
@@ -113,7 +114,7 @@ class Git
      *
      * @return string
      */
-    public function getCurrentBranchName()
+    public function getCurrentBranchName(): string
     {
         return $this->_currentBranch;
     }
@@ -124,7 +125,7 @@ class Git
      * @param string $name
      * @return bool
      */
-    public function checkout($name)
+    public function checkout(string $name): bool
     {
         if ($this->_currentBranch == $name) {
             return true;
@@ -139,9 +140,9 @@ class Git
      * Выгружаем список доступных веток в git
      *
      * @param string $type локальная или удалённая
-     * @return array
+     * @return string[]
      */
-    public function getBranchList($type)
+    public function getBranchList(string $type): array
     {
         if (empty($this->_currentBranch)) {
             return [];
@@ -163,7 +164,7 @@ class Git
             default:
                 return [];
         }
-        list($success, $branchList) = $this->_execute('branch' . $commandParam);
+        [$success, $branchList] = $this->_execute('branch' . $commandParam);
         if (!$success) {
             return [];
         }
@@ -184,7 +185,7 @@ class Git
      * @param string $name
      * @return bool
      */
-    private function _checkout($name)
+    private function _checkout(string $name): bool
     {
         if ($this->_currentBranch == $name) {
             return true;
@@ -206,7 +207,7 @@ class Git
      * @param string $type локальная или удалённая
      * @return bool
      */
-    public function deleteBranch($name, $type)
+    public function deleteBranch(string $name, string $type): bool
     {
         if (empty($this->_currentBranch)
             || (($name == $this->_currentBranch) && ($type == self::BRANCH_TYPE_LOCAL))
@@ -227,9 +228,9 @@ class Git
      * Возвращает список веток, смерженных с мастером, с датами последнего коммита
      *
      * @param string $type локальная или удалённая
-     * @return array
+     * @return array<string, string>
      */
-    public function getMergedBranches($type)
+    public function getMergedBranches(string $type): array
     {
         if (empty($this->_currentBranch)) {
             return [];
@@ -244,14 +245,14 @@ class Git
         }
 
         $command = 'for-each-ref --format="%(refname) %(authordate:short)" ' . $namePattern . ' --merged';
-        list($success, $branchList) = $this->_execFromMaster($command);
+        [$success, $branchList] = $this->_execFromMaster($command);
         if (!$success || empty($branchList)) {
             return [];
         }
 
         $branchDates = [];
         foreach ($branchList as $branchData) {
-            list($branchName, $lastCommitDate) = explode(' ', $branchData);
+            [$branchName, $lastCommitDate] = explode(' ', $branchData);
             $branchName = str_replace($namePattern . '/', '', $branchName);
             if (empty($branchName)) {
                 continue;
@@ -267,15 +268,15 @@ class Git
      * Исполняет команду, находясь в мастере и переключает ветку обратно. Возвращает вывод команды
      *
      * @param string $command
-     * @return array [bool success, output]
+     * @return array{0: bool, 1: string[], 2: string, 3: int} [успех, вывод, результирующая команда, код возврата]
      */
-    private function _execFromMaster($command)
+    private function _execFromMaster(string $command): array
     {
         $currentBranch = $this->_currentBranch;
         if (!$this->_checkout(self::BRANCH_NAME_MASTER)
             || !$this->pullCurrentBranch()[0]
         ) {
-            return [false, []];
+            return [false, [], $command, 0];
         }
 
         $result = $this->_execute($command);
@@ -286,9 +287,9 @@ class Git
     /**
      * Делаем git pull для активной ветки
      *
-     * @return array [bool success, output]
+     * @return array{0: bool, 1: string[], 2?: string, 3?: int} [успех, вывод, результирующая команда, код возврата]
      */
-    public function pullCurrentBranch()
+    public function pullCurrentBranch(): array
     {
         $currentBranch = $this->_currentBranch;
         if (empty($currentBranch)) {
@@ -310,7 +311,7 @@ class Git
      *
      * @return bool success
      */
-    public function updateRefs()
+    public function updateRefs(): bool
     {
         if (empty($this->_currentBranch)) {
             return false;
@@ -324,7 +325,7 @@ class Git
      * @param string $branchName
      * @return bool
      */
-    public function changeCurrentBranch($branchName)
+    public function changeCurrentBranch(string $branchName): bool
     {
         if (empty($this->_currentBranch) || !in_array($branchName, $this->getBranchList(self::BRANCH_TYPE_REMOTE))) {
             return false;
@@ -336,10 +337,10 @@ class Git
     /**
      * Вернуть нужные данные из запроса хука гитхаба
      *
-     * @param array $requestData
-     * @return null|array repo branch commit
+     * @param array<string, mixed> $requestData
+     * @return ?array{repo: string, branch: string, commit: string} repo branch commit
      */
-    public static function parseGithubRequest($requestData)
+    public static function parseGithubRequest(array $requestData): ?array
     {
         if (empty($requestData['payload'])) {
             return null;

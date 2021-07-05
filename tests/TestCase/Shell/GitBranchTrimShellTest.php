@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Shell;
 
@@ -7,7 +8,6 @@ use ArtSkills\Lib\Git;
 use ArtSkills\Shell\GitBranchTrimShell;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
-use ArtSkills\TestSuite\Mock\PropertyAccess;
 use Cake\Core\Configure;
 use Cake\I18n\Time;
 
@@ -17,7 +17,7 @@ class GitBranchTrimShellTest extends AppTestCase
      * Тест того, что вызывалось при запуске
      * @group Git
      */
-    public function test()
+    public function test(): void
     {
         MethodMocker::mock(GitBranchTrimShell::class, '_canDeleteRemote')
             ->willReturnValue(true);
@@ -72,10 +72,10 @@ class GitBranchTrimShellTest extends AppTestCase
     /**
      * Мокаем _execute в Git
      *
-     * @param array $history
+     * @param string[] $history
      * @throws \Exception
      */
-    private function _mockExecute(&$history)
+    private function _mockExecute(array &$history): void
     {
         MethodMocker::mock(Shell::class, '_exec')
             ->willReturnAction(function ($args) use (&$history) {
@@ -90,12 +90,12 @@ class GitBranchTrimShellTest extends AppTestCase
     }
 
     /**
-     * Список комманд, использованных для получения списка веток
+     * Список команд, использованных для получения списка веток
      *
      * @param string $type
-     * @return array|bool
+     * @return string[]|bool
      */
-    private function _getCommandListMerged($type)
+    private function _getCommandListMerged(string $type)
     {
         $list = [];
         if ($type == Git::BRANCH_TYPE_REMOTE) {
@@ -109,13 +109,13 @@ class GitBranchTrimShellTest extends AppTestCase
     }
 
     /**
-     * Список комманд, использованных для удаления ветки
+     * Список команд, использованных для удаления ветки
      *
      * @param string $branchDelete
      * @param string $type
-     * @return array|bool
+     * @return string[]|bool
      */
-    private function _getCommandListDelete($branchDelete, $type)
+    private function _getCommandListDelete(string $branchDelete, string $type)
     {
         $list = $this->_getCommandListMerged($type);
         if (empty($list)) {

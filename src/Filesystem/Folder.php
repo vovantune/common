@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Filesystem;
 
@@ -10,11 +11,11 @@ use Cake\I18n\Time;
 class Folder extends \Cake\Filesystem\Folder
 {
     /**
-     * Путь к папке, которого может не существрвать
+     * Путь к папке, которого может не существовать
      *
-     * @var string
+     * @var ?string
      */
-    private $_virtualPath = null;
+    private ?string $_virtualPath;
 
     /** @inheritdoc */
     public function __construct($path = null, $create = false, $mode = false)
@@ -28,7 +29,7 @@ class Folder extends \Cake\Filesystem\Folder
      *
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         if (empty($this->path)) {
             return false;
@@ -43,7 +44,7 @@ class Folder extends \Cake\Filesystem\Folder
      * @param int $mode
      * @return bool
      */
-    public function createSelf($mode = 0755)
+    public function createSelf(int $mode = 0755): bool
     {
         if (empty($this->_virtualPath)) {
             return false;
@@ -57,21 +58,27 @@ class Folder extends \Cake\Filesystem\Folder
      *
      * @return bool
      */
-    public function exists()
+    public function exists(): bool
     {
         return !empty($this->path) && is_dir($this->path);
     }
 
-    /** @inheritdoc */
-    public function copy($options)
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
+    public function copy($options): bool
     {
         $res = parent::copy($options);
         $this->cd($this->_virtualPath);
         return $res;
     }
 
-    /** @inheritdoc */
-    public function move($options)
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
+    public function move($options): bool
     {
         $res = parent::move($options);
         $this->path = $this->_virtualPath;
@@ -83,15 +90,16 @@ class Folder extends \Cake\Filesystem\Folder
      * по шаблону $exp с временем жизни больше $lifetime и удаляет
      *
      * @param string $dirPath
-     * @param string|array $expressions регулярные выражения по которым надо чистить файл
+     * @param string|string[] $expressions регулярные выражения по которым надо чистить файл
      * @param int $lifetime время жизни файла в секундах
-     * @param array $pathBlacklist исключить пути
+     * @param string[] $pathBlacklist исключить пути
+     * @return void
      */
     public static function cleanupDirByLifetime(
-        $dirPath,
+        string $dirPath,
         $expressions = ['.*\.pdf'],
-        $lifetime = 300,
-        $pathBlacklist = []
+        int $lifetime = 300,
+        array $pathBlacklist = []
     ) {
         $currentTime = Time::now()->getTimestamp();
         $expressions = (array)$expressions;
@@ -120,7 +128,7 @@ class Folder extends \Cake\Filesystem\Folder
      * @param int $mode
      * @return string
      */
-    public static function createIfNotExists($path, $mode = 0755)
+    public static function createIfNotExists(string $path, int $mode = 0755): string
     {
         if (!is_dir($path)) {
             mkdir($path, $mode);

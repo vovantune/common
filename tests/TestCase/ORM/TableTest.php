@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\ORM;
 
@@ -32,13 +33,14 @@ class TableTest extends AppTestCase
     /**
      * Получение сущности разными способами
      */
-    public function testGetEntity()
+    public function testGetEntity(): void
     {
         self::assertInstanceOf(TestTableOneTable::class, TestTableOneTable::instance(), 'Не сработало получение инстанса');
 
         self::assertFalse($this->TestTableOne->getEntity(-1)); // не выкинулся ексепшн
 
         $testId = 45;
+        /** @var TestTableOne $testEntity */
         $testEntity = $this->TestTableOne->getEntity($testId, ['contain' => 'TestTableTwo']);
         self::assertInstanceOf(TestTableOne::class, $testEntity, 'Не вернулась сущность');
         self::assertEquals($testId, $testEntity->id, 'Вернулась не та сущность');
@@ -49,7 +51,7 @@ class TableTest extends AppTestCase
     /**
      * Сохранение в одно действие
      */
-    public function testSaveArr()
+    public function testSaveArr(): void
     {
         // сохранение новой записи
         $saveData = [
@@ -65,6 +67,7 @@ class TableTest extends AppTestCase
             'col_time' => new Time($saveData['col_time']),
             'id' => $saveResult->id,
         ]);
+        /** @var TestTableOne $newRecord */
         $newRecord = $this->TestTableOne->get($saveResult->id);
         $this->assertEntityEqualsArray($expectedData, $newRecord, 'Неправильно создалось');
 
@@ -77,6 +80,7 @@ class TableTest extends AppTestCase
         self::assertInstanceOf(TestTableOne::class, $saveResult, 'Неправильный результат сохранения при редактировании');
 
         $expectedData['col_text'] = $newText;
+        /** @var TestTableOne $newRecord */
         $newRecord = $this->TestTableOne->get($newRecord->id);
         $this->assertEntityEqualsArray($expectedData, $newRecord, 'Неправильно отредактировалось');
 
@@ -89,6 +93,7 @@ class TableTest extends AppTestCase
         self::assertInstanceOf(TestTableOne::class, $saveResult, 'Неправильный результат сохранения при редактировании по id');
 
         $expectedData['col_text'] = $newText;
+        /** @var TestTableOne $newRecord */
         $newRecord = $this->TestTableOne->get($newRecord->id);
         $this->assertEntityEqualsArray($expectedData, $newRecord, 'Неправильно отредактировалось по id');
     }
@@ -96,43 +101,45 @@ class TableTest extends AppTestCase
     /**
      * Редактирование связанных сущностей
      */
-    public function testChildEdit()
+    public function testChildEdit(): void
     {
         $testId = 45;
         $assoc = 'TestTableTwo';
 
         // если дочерняя сущность dirty, а родительская - нет, то дочерняя сохранится
         $newText = 'test text ololo';
+        /** @var TestTableOne $testEntity */
         $testEntity = $this->TestTableOne->getEntity($testId, ['contain' => $assoc]);
         self::assertNotEquals($newText, $testEntity->TestTableTwo[0]->col_text);
         $testEntity->TestTableTwo[0]->col_text = $newText;
-        $this->TestTableOne->save($testEntity);
+        $this->TestTableOne->save($testEntity);// @phpstan-ignore-line
         $testEntity = $this->TestTableOne->getEntity($testId, ['contain' => $assoc]);
-        self::assertEquals($newText, $testEntity->TestTableTwo[0]->col_text);
+        self::assertEquals($newText, $testEntity->TestTableTwo[0]->col_text);// @phpstan-ignore-line
 
         // смена способа сохранения дочерних сущностей
+        /** @var TestTableOne $testEntity */
         $testEntity = $this->TestTableOne->getEntity($testId, ['contain' => $assoc]);
-        self::assertEquals(HasMany::SAVE_APPEND, $this->TestTableOne->$assoc->getSaveStrategy());
+        self::assertEquals(HasMany::SAVE_APPEND, $this->TestTableOne->$assoc->getSaveStrategy());// @phpstan-ignore-line
         self::assertCount(2, $testEntity->TestTableTwo);
         $testEntity->deleteChild($assoc, 1);
-        $this->TestTableOne->save($testEntity);
+        $this->TestTableOne->save($testEntity);// @phpstan-ignore-line
         // на самом деле не удалилась
         $testEntity = $this->TestTableOne->getEntity($testId, ['contain' => $assoc]);
-        self::assertCount(2, $testEntity->TestTableTwo);
+        self::assertCount(2, $testEntity->TestTableTwo);// @phpstan-ignore-line
 
         // а теперь удалится
         $testEntity->deleteChild($assoc, 1);
-        $this->TestTableOne->save($testEntity, ['assocStrategies' => [$assoc => HasMany::SAVE_REPLACE]]);
+        $this->TestTableOne->save($testEntity, ['assocStrategies' => [$assoc => HasMany::SAVE_REPLACE]]);// @phpstan-ignore-line
         // стратегия изменилась ровно на одно сохранение
-        self::assertEquals(HasMany::SAVE_APPEND, $this->TestTableOne->$assoc->getSaveStrategy());
+        self::assertEquals(HasMany::SAVE_APPEND, $this->TestTableOne->$assoc->getSaveStrategy());// @phpstan-ignore-line
         $testEntity = $this->TestTableOne->getEntity($testId, ['contain' => $assoc]);
-        self::assertCount(1, $testEntity->TestTableTwo);
+        self::assertCount(1, $testEntity->TestTableTwo);// @phpstan-ignore-line
     }
 
     /**
      * exists с contain
      */
-    public function testExistsContain()
+    public function testExistsContain(): void
     {
         //существование записи
         $exists = $this->TestTableTwo->exists(['id' => 89]);
@@ -145,7 +152,7 @@ class TableTest extends AppTestCase
     /**
      * Попытка вставить запись с плохим внешним ключом
      */
-    public function testBadFK()
+    public function testBadFK(): void
     {
         $this->expectExceptionMessage("a foreign key constraint fails");
         $this->expectException(\PDOException::class);
@@ -156,7 +163,7 @@ class TableTest extends AppTestCase
      * Получаем запись с блокировкой
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function testFindAndLock()
+    public function testFindAndLock(): void
     {
         MethodMocker::sniff(Table::class, 'save')->expectCall(1);
         MethodMocker::sniff(Query::class, 'sql', function ($args, $result) {
@@ -187,7 +194,7 @@ class TableTest extends AppTestCase
     /**
      * Поиск записи с блокировкой при пустом результате
      */
-    public function testFindAndLockEmpty()
+    public function testFindAndLockEmpty(): void
     {
         MethodMocker::sniff(Table::class, 'save')->expectCall(0);
         $query = $this->TestTableTwo->find()->where(['id' => 26]);
@@ -198,7 +205,7 @@ class TableTest extends AppTestCase
     /**
      * короткое описание опций для findList
      */
-    public function testShortFindList()
+    public function testShortFindList(): void
     {
         // одно поле - и ключ и значение
         $classicList = $this->TestTableTwo->find('list', [

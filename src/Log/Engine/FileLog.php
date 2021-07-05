@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Log\Engine;
 
@@ -17,7 +18,10 @@ use Cake\Error\Debugger;
  */
 class FileLog extends \Cake\Log\Engine\FileLog
 {
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @phpstan-ignore-next-line
+     */
     public function log($level, $message, array $context = [])
     {
         if (!empty($context[SentryLog::KEY_ADD_INFO])) {

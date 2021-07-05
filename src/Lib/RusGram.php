@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
@@ -12,19 +13,19 @@ class RusGram
     use Library;
 
     /**
-     * Скланение в зависимости от значения $digit
+     * Склонение в зависимости от значения $digit
      *
-     * @param int $digit
-     * @param array $expressionList массив из 3 фраз - [именительный, винительный, родительный]
+     * @param int|float $digit
+     * @param string[] $expressionList массив из 3 фраз - [именительный, винительный, родительный]
      * @param bool $returnOnlyWord - не возвращать в строке число $digit
      * @return string
      */
-    public static function declension($digit, $expressionList, $returnOnlyWord = false)
+    public static function declension($digit, array $expressionList, bool $returnOnlyWord = false): string
     {
         if (empty($expressionList[2])) {
             $expressionList[2] = $expressionList[1];
         }
-        $rest = preg_replace('/\D+/s', '', $digit) % 100;
+        $rest = preg_replace('/\D+/s', '', (string)$digit) % 100;
         if ($returnOnlyWord) {
             $digit = '';
         }
@@ -51,7 +52,7 @@ class RusGram
      * @param string|int $date дата в формате unixtime или Y-m-d строка
      * @return string
      */
-    public static function getRussianDate($format, $date)
+    public static function getRussianDate(string $format, $date): string
     {
         $monthList = [
             'January' => 'январь',
@@ -188,14 +189,14 @@ class RusGram
                 }
                 // units without rub & kop
                 if ($uk > 1) {
-                    $out[] = self::_morph($v, $unit[$uk][0], $unit[$uk][1], $unit[$uk][2]);
+                    $out[] = self::_morph((int)$v, $unit[$uk][0], $unit[$uk][1], $unit[$uk][2]);
                 }
             } //foreach
         } else {
             $out[] = $nul;
         }
         $out[] = self::_morph(intval($rub), $unit[1][0], $unit[1][1], $unit[1][2]); // rub
-        $out[] = $kop . ' ' . self::_morph($kop, $unit[0][0], $unit[0][1], $unit[0][2]); // kop
+        $out[] = $kop . ' ' . self::_morph((int)$kop, $unit[0][0], $unit[0][1], $unit[0][2]); // kop
         return trim(preg_replace('/ {2,}/', ' ', join(' ', $out)));
     }
 
@@ -209,7 +210,7 @@ class RusGram
      * @return string
      * @SuppressWarnings(PHPMD.ShortVariable)
      */
-    private static function _morph($n, $f1, $f2, $f5)
+    private static function _morph(int $n, string $f1, string $f2, string $f5): string
     {
         $n = abs(intval($n)) % 100;
         if ($n > 10 && $n < 20) {

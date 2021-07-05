@@ -44,7 +44,7 @@ class TableDocumentation
     /**
      * Кеш PHPDoc описаний сущностей
      *
-     * @var array<string, string>
+     * @var array<string, array<string, string>>
      */
     private static array $_entityAnnotationsCache = [];
 
@@ -52,14 +52,11 @@ class TableDocumentation
      * Задать конфиг
      *
      * @param ?EntityBuilderConfig $config
-     * @throws InternalException
+     * @return void
      */
     public static function setConfig(?EntityBuilderConfig $config)
     {
         static::$_config = $config;
-        if (!empty($config) && !($config instanceof EntityBuilderConfig)) {
-            throw new InternalException('Bad config');
-        }
     }
 
     /**
@@ -226,9 +223,8 @@ class TableDocumentation
             return '';
         }
 
-        if (!is_array($entityAnnotations['property'])) {
-            $entityAnnotations['property'] = (array)$entityAnnotations['property'];
-        }
+        $entityAnnotations['property'] = (array)$entityAnnotations['property'];
+
         foreach ($entityAnnotations['property'] as $fieldDescription) {
             if (preg_match(self::FIELD_INFO, $fieldDescription, $matches)) {
                 $fieldType = array_key_exists($matches[1], self::JS_TYPES) ? self::JS_TYPES[$matches[1]] : $matches[1];

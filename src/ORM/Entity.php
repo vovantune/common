@@ -24,6 +24,7 @@ class Entity extends \Cake\ORM\Entity
      *
      * @param string $childEntity
      * @param null|int $index
+     * @return void
      * @throws InternalException
      */
     public function deleteChild(string $childEntity, ?int $index = null)

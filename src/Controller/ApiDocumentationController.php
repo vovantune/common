@@ -74,6 +74,7 @@ class ApiDocumentationController extends Controller
      *
      * @return array
      * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
      */
     private function _getJson(): array
     {

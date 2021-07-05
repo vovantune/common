@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\View\Helper;
 
@@ -33,7 +34,7 @@ class FormTest extends AppTestCase
     }
 
     /** Дописывание текста сразу после инпута */
-    public function testAppend()
+    public function testAppend(): void
     {
         // по-умолчанию
         $result = $this->_helper->control('test');
@@ -72,7 +73,7 @@ class FormTest extends AppTestCase
     }
 
     /** Изменение шаблона контейнера и добавление ему атрибутов */
-    public function testContainer()
+    public function testContainer(): void
     {
         // класс контейнера
         $result = $this->_helper->control('test', [
@@ -117,7 +118,7 @@ class FormTest extends AppTestCase
     }
 
     /** изменение шаблона инпута */
-    public function testInputChange()
+    public function testInputChange(): void
     {
         // другой инпут
         $result = $this->_helper->control('test', [

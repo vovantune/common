@@ -1,9 +1,13 @@
 <?php
+declare(strict_types=1);
+
 namespace ArtSkills\Lib;
 
+use ArtSkills\Filesystem\File;
 use ArtSkills\Http\Client;
 use ArtSkills\Traits\Library;
 use Cake\Http\Client\Response;
+use SimpleXMLElement;
 
 class Http
 {
@@ -20,12 +24,16 @@ class Http
      * Работает по типу file_get_contents но только для url
      *
      * @param string $url
+     * @param array|string $data
+     * @param array $options
      * @return string|null
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function getContent(string $url): ?string
+    public static function getContent(string $url, $data = [], array $options = []): ?string
     {
         $request = static::_makeRequest();
-        $result = static::_getRequest($url, $request);
+        $result = static::_getRequest($url, $request, $data, $options);
 
         if (!empty($result)) {
             return $result->getStringBody();
@@ -41,6 +49,8 @@ class Http
      * @param array|string $data
      * @param array $options
      * @return array|null
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function getJson(string $url, $data = [], array $options = []): ?array
     {
@@ -55,8 +65,10 @@ class Http
      * @param array|string $data
      * @param array $options
      * @return array|null
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function postJson(string $url, $data, array $options = [])
+    public static function postJson(string $url, $data, array $options = []): ?array
     {
         $request = self::_makeRequest();
         return static::_getResponseJson($request->post($url, $data, $options));
@@ -69,6 +81,8 @@ class Http
      * @param array|string $data
      * @param array $options
      * @return array|null
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function putJson(string $url, $data, array $options = []): ?array
     {
@@ -80,12 +94,16 @@ class Http
      * Возвращает XML ответ
      *
      * @param string $url
-     * @return \SimpleXMLElement|null
+     * @param array|string $data
+     * @param array $options
+     * @return SimpleXMLElement|null
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function getXml(string $url): ?\SimpleXMLElement
+    public static function getXml(string $url, $data = '', array $options = []): ?SimpleXMLElement
     {
         $request = static::_makeRequest();
-        $result = static::_getRequest($url, $request);
+        $result = static::_getRequest($url, $request, $data, $options);
         if (!empty($result)) {
             return $result->getXml();
         } else {
@@ -99,9 +117,11 @@ class Http
      * @param string $url
      * @param array|string $data
      * @param array $options
-     * @return \SimpleXMLElement|null
+     * @return SimpleXMLElement|null
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function postXml(string $url, $data, array $options = []): ?\SimpleXMLElement
+    public static function postXml(string $url, $data, array $options = []): ?SimpleXMLElement
     {
         $request = static::_makeRequest();
         $result = $request->post($url, $data, $options);
@@ -125,7 +145,7 @@ class Http
     {
 
         if (empty($targetFile)) {
-            $targetFile = TMP . uniqid() . '.tmp';
+            $targetFile = File::generateTempFilePath('download');
         }
 
         // phpcs:ignore
@@ -160,6 +180,8 @@ class Http
      *
      * @param Response|null $response
      * @return array|null
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     private static function _getResponseJson(?Response $response): ?array
     {
@@ -178,6 +200,8 @@ class Http
      * @param array|string $data
      * @param array $options
      * @return Response|null
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     private static function _getRequest(string $url, Client $request, $data = [], array $options = []): ?Response
     {
@@ -189,7 +213,7 @@ class Http
      *
      * @return Client
      */
-    private static function _makeRequest(): ?Client
+    private static function _makeRequest(): Client
     {
         if (static::$_httpClient == null) {
             static::$_httpClient = new Client();

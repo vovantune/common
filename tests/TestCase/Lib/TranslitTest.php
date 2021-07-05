@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Lib;
 
@@ -10,7 +11,7 @@ class TranslitTest extends AppTestCase
     /**
      * Транслитерация строки
      */
-    public function testTransliterate()
+    public function testTransliterate(): void
     {
         self::assertEquals('Vasya Pupkin', Translit::transliterate('Вася Пупкин'));
         self::assertEquals('Petya 123 Xmur', Translit::transliterate('Петя 123 Xmur'));
@@ -19,7 +20,7 @@ class TranslitTest extends AppTestCase
     /**
      * Псевдоним строки на английском языке
      */
-    public function testGenerateUrlAlias()
+    public function testGenerateUrlAlias(): void
     {
         self::assertEquals('vasya_pupkyan_556', Translit::generateUrlAlias('Вася  Пупкян-_-#556/\\"'));
     }

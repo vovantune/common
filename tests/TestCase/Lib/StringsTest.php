@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Lib;
 
@@ -9,7 +10,7 @@ class StringsTest extends AppTestCase
 {
 
     /** проверка префикса */
-    public function testStartsWith()
+    public function testStartsWith(): void
     {
         $prefix = 'prefix';
         $testStr = "{$prefix}asdfg";
@@ -23,7 +24,7 @@ class StringsTest extends AppTestCase
     }
 
     /** проверка постфикса */
-    public function testEndsWith()
+    public function testEndsWith(): void
     {
         $postfix = 'postfix';
         $testStr = "asdfg{$postfix}";
@@ -37,7 +38,7 @@ class StringsTest extends AppTestCase
     }
 
     /** замена префикса */
-    public function testReplacePrefix()
+    public function testReplacePrefix(): void
     {
         $prefix = 'prefix';
         $replacement = 'replacement';
@@ -47,7 +48,7 @@ class StringsTest extends AppTestCase
     }
 
     /** замена постфикса */
-    public function testReplacePostfix()
+    public function testReplacePostfix(): void
     {
         $postfix = 'postfix';
         $replacement = 'replacement';
@@ -57,7 +58,7 @@ class StringsTest extends AppTestCase
     }
 
     /** замена по условию */
-    public function testReplaceIfStarts()
+    public function testReplaceIfStarts(): void
     {
         $prefix = 'prefix';
         $restStr = 'asdfg';
@@ -80,7 +81,7 @@ class StringsTest extends AppTestCase
     }
 
     /** замена по условию */
-    public function testReplaceIfEnds()
+    public function testReplaceIfEnds(): void
     {
         $postfix = 'postfix';
         $restStr = 'asdfg';

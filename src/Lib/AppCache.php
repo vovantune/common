@@ -16,17 +16,19 @@ class AppCache
      *
      * @var string[]
      */
-    protected static $_excludeFlushCacheList = ['session'];
+    protected static array $_excludeFlushCacheList = ['session'];
 
     /**
      * Время жизни кеша в дебаг-режиме
      *
      * @var string
      */
-    protected static $_debugCacheDuration = '+30 seconds';
+    protected static string $_debugCacheDuration = '+30 seconds';
 
     /**
      * Почистить весь кеш
+     *
+     * @return void
      */
     public static function flushAll()
     {
@@ -37,7 +39,8 @@ class AppCache
      * Чистит кэш за исключением переданных конфигов
      * По умолчанию исключает static::$_excludeFlushCacheList
      *
-     * @param null|array $skipConfigs
+     * @param null|string[] $skipConfigs
+     * @return void
      */
     public static function flushExcept(?array $skipConfigs = null)
     {
@@ -57,6 +60,8 @@ class AppCache
      * Инициализация конфига кэша для bootstrap.php
      *
      * @return array
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function getConfig(): array
     {

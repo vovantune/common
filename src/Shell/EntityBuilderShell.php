@@ -9,12 +9,17 @@ use ArtSkills\EntityBuilder\TableDocumentation;
 use ArtSkills\Error\InternalException;
 use ArtSkills\ORM\Entity;
 use ArtSkills\ORM\Table;
+use Cake\Console\ConsoleOptionParser;
 use Cake\Console\Shell;
+use ReflectionException;
 
 class EntityBuilderShell extends Shell
 {
     /**
      * Формируем/обновляем сущности
+     *
+     * @return void
+     * @throws InternalException
      */
     public function main()
     {
@@ -25,6 +30,8 @@ class EntityBuilderShell extends Shell
 
     /**
      * инициализация конфига
+     *
+     * @return void
      */
     private function _setConfig()
     {
@@ -38,6 +45,8 @@ class EntityBuilderShell extends Shell
 
     /**
      * Создаём класс таблицы и сущности из существующей таблицы в базе
+     *
+     * @return void
      */
     public function createFromDb()
     {
@@ -52,9 +61,9 @@ class EntityBuilderShell extends Shell
      * Генерим сущности и документацию
      *
      * @return bool
-     * @throws InternalException
+     * @throws InternalException|ReflectionException
      */
-    private function _buildEntityAndDoc()
+    private function _buildEntityAndDoc(): bool
     {
         $this->_setConfig();
         $hasEntityChanges = EntityBuilder::build();
@@ -65,9 +74,9 @@ class EntityBuilderShell extends Shell
     /**
      * Добавление команд и их параметров
      *
-     * @return \Cake\Console\ConsoleOptionParser
+     * @return ConsoleOptionParser
      */
-    public function getOptionParser()
+    public function getOptionParser(): ConsoleOptionParser
     {
         $parser = parent::getOptionParser();
 

@@ -6,7 +6,7 @@ use ArtSkills\Error\InternalException;
 /**
  * Функция для удобства создания вложенных ассоциаций. Соединяет аргументы через точку
  *
- * @param string[] ...$names
+ * @param string ...$names
  * @return string
  */
 function assoc(...$names): string
@@ -22,7 +22,7 @@ function assoc(...$names): string
  * @param ?string $operation сравнения, (NOT) IN, LIKE, IS NULL, и всё такое
  * @return string
  */
-function field(string $tableAlias, string $fieldName, ?string $operation = null)
+function field(string $tableAlias, string $fieldName, ?string $operation = null): string
 {
     return $tableAlias . '.' . $fieldName . (empty($operation) ? '' : ' ' . $operation);
 }
@@ -57,9 +57,9 @@ function field(string $tableAlias, string $fieldName, ?string $operation = null)
  *    ]);
  * ```
  *
- * @param array $conditionsByTable
+ * @param array<string, array<string, mixed>> $conditionsByTable
+ * @return array<string, mixed>
  * @throws InternalException при дублировании ключей
- * @return array
  */
 function fieldsWhere(array $conditionsByTable): array
 {
@@ -112,9 +112,9 @@ function fieldsWhere(array $conditionsByTable): array
  *    ]);
  * ```
  *
- * @param array $fieldsByTable
- * @throws InternalException при дублировании ключей
+ * @param array<string, array<string|int, mixed>> $fieldsByTable
  * @return string[]
+ * @throws InternalException при дублировании ключей
  */
 function fieldsSelect(array $fieldsByTable): array
 {

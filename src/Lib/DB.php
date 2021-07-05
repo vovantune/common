@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
 use ArtSkills\Traits\Library;
 use Cake\Database\Connection;
 use Cake\Database\Statement\MysqlStatement;
+use Cake\Database\StatementInterface;
 use Cake\Datasource\ConnectionManager;
 
 /**
@@ -24,17 +26,18 @@ class DB
      * @param bool $useAliases
      * @return Connection
      */
-    public static function getConnection($name = self::CONNECTION_DEFAULT, $useAliases = true)
+    public static function getConnection(string $name = self::CONNECTION_DEFAULT, bool $useAliases = true): Connection
     {
-        return ConnectionManager::get($name, $useAliases);
+        return ConnectionManager::get($name, $useAliases); // @phpstan-ignore-line
     }
 
     /**
      * переподсоединиться, если отвалился
      *
      * @param string $connectionName
+     * @return void
      */
-    public static function restoreConnection($connectionName = self::CONNECTION_DEFAULT)
+    public static function restoreConnection(string $connectionName = self::CONNECTION_DEFAULT)
     {
         $connection = self::getConnection($connectionName);
         if (!$connection->isConnected()) {
@@ -47,9 +50,9 @@ class DB
      *
      * @param string $sql
      * @param string $connectionName
-     * @return MysqlStatement
+     * @return MysqlStatement|StatementInterface
      */
-    public static function customQuery($sql, $connectionName = self::CONNECTION_DEFAULT)
+    public static function customQuery(string $sql, string $connectionName = self::CONNECTION_DEFAULT): StatementInterface
     {
         return self::getConnection($connectionName)->execute($sql);
     }

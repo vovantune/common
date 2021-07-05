@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\View\Helper;
 
@@ -20,7 +21,7 @@ class FormHelper extends \Cake\View\Helper\FormHelper
      * inputDiv - input обёрнутый в div для настраиваемости (например, чтобы вешать на него классы col из бутстрапа)
      * noDivContainer - без контейнера, только содержимое
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $_resetTemplates = [
         'inputContainer' => '<div class="input {{type}}{{required}}{{containerClass}}"{{containerAttrs}}>{{content}}{{append}}</div>',
@@ -30,7 +31,12 @@ class FormHelper extends \Cake\View\Helper\FormHelper
         'inputDiv' => '<div{{divAttrs}}><input type="{{type}}" name="{{name}}"{{attrs}}/></div>',
     ];
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     *
+     * @param View $View
+     * @param array<string, string> $config
+     */
     public function __construct(View $View, array $config = [])
     {
         $this->_defaultConfig['templates'] = $this->_resetTemplates += $this->_defaultConfig['templates'];
@@ -48,6 +54,9 @@ class FormHelper extends \Cake\View\Helper\FormHelper
      * 'containerClass' - сокращение для ['container']['class'], строка;
      * 'inputTemplate' - использовать нестандартный шаблон для инпута, строка;
      * 'divAttrs' - атрибуты для тега div в шаблоне 'inputDiv', массив;
+     *
+     * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     protected function _parseOptions($fieldName, $options)
     {
@@ -106,6 +115,8 @@ class FormHelper extends \Cake\View\Helper\FormHelper
      * @inheritdoc
      * Добавил возможность использовать кастомный контейнер $options['options']['templateVars']['container'] . 'Container';
      * И там же добавил 'containerClass' 'containerAttrs' для добавления классов и атрибутов контейнеру
+     *
+     * @phpstan-ignore-next-line
      */
     protected function _inputContainerTemplate($options)
     {

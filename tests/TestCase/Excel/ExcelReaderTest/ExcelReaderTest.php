@@ -17,7 +17,7 @@ class ExcelReaderTest extends AppTestCase
     /**
      * Косячный файл
      */
-    public function testNEFile()
+    public function testNEFile(): void
     {
         $this->expectException(InvalidArgumentException::class);
         ExcelReader::get(__DIR__, [FieldMapElement::create('test', 1)]);
@@ -26,7 +26,7 @@ class ExcelReaderTest extends AppTestCase
     /**
      * Файл некорректного формата
      */
-    public function testIncorrectFile()
+    public function testIncorrectFile(): void
     {
         $this->expectExceptionMessage("Unable to identify a reader for this file");
         $this->expectException(Exception::class);
@@ -36,7 +36,7 @@ class ExcelReaderTest extends AppTestCase
     /**
      * Проверка файла XLSX
      */
-    public function testGetCheckField()
+    public function testGetCheckField(): void
     {
         $this->expectException(IncorrectCheckException::class);
         $testFile = __DIR__ . DS . 'test_xlsx.xlsx';
@@ -44,7 +44,7 @@ class ExcelReaderTest extends AppTestCase
     }
 
     /** Читаем XLS с проверкой */
-    public function testGetXls()
+    public function testGetXls(): void
     {
         $testFile = __DIR__ . DS . 'test_xls.xls';
         $result = ExcelReader::get($testFile, [
@@ -75,7 +75,7 @@ class ExcelReaderTest extends AppTestCase
     /**
      * Читаем в формате XLSX
      */
-    public function testGetXlsx()
+    public function testGetXlsx(): void
     {
         $testFile = __DIR__ . DS . 'test_xlsx.xlsx';
         $result = ExcelReader::get($testFile, [
@@ -114,7 +114,7 @@ class ExcelReaderTest extends AppTestCase
     }
 
     /** Чтение в формате ODS */
-    public function testGetOds()
+    public function testGetOds(): void
     {
         $testFile = __DIR__ . DS . 'test_ods.ods';
         $result = ExcelReader::get($testFile, [
@@ -143,7 +143,7 @@ class ExcelReaderTest extends AppTestCase
     }
 
     /** Получение строк */
-    public function testGetRows()
+    public function testGetRows(): void
     {
         $testFile = __DIR__ . DS . 'test_xls.xls';
 

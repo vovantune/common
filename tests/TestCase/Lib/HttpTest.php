@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Lib;
 
-use ArtSkills\Http\Client;
 use ArtSkills\Lib\Http;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientMocker;
@@ -18,7 +18,7 @@ class HttpTest extends AppTestCase
      *
      * @throws \Exception
      */
-    public function testGetJson()
+    public function testGetJson(): void
     {
         $testJson = ['thisIs' => 'Json test'];
         HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
@@ -38,7 +38,7 @@ class HttpTest extends AppTestCase
      *
      * @throws \Exception
      */
-    public function testGetContent()
+    public function testGetContent(): void
     {
         $testString = 'lala';
         HttpClientMocker::mock('http://testapi.com', Request::METHOD_GET)
@@ -58,7 +58,7 @@ class HttpTest extends AppTestCase
      *
      * @throws \Exception
      */
-    public function testPostContent()
+    public function testPostContent(): void
     {
         $testJson = ['thisIs' => 'Json test'];
         $testData = ['testData' => '123'];
@@ -80,7 +80,7 @@ class HttpTest extends AppTestCase
      *
      * @throws \Exception
      */
-    public function testPutContent()
+    public function testPutContent(): void
     {
         $testJson = ['thisIs' => 'Json test'];
         $testData = ['testData' => '123'];
@@ -104,7 +104,7 @@ class HttpTest extends AppTestCase
      *
      * @throws \Exception
      */
-    public function testGetXml()
+    public function testGetXml(): void
     {
         $testXml = '<?xml version="1.0" encoding="utf-8"?>
 					<!DOCTYPE recipe>
@@ -119,19 +119,19 @@ class HttpTest extends AppTestCase
 					   </composition>
 					   <instructions>
 						 <step>
-							Смешать все ингредиенты и тщательно замесить. 
+							Смешать все ингредиенты и тщательно замесить.
 						 </step>
 						 <step>
-							Закрыть тканью и оставить на один час в тёплом помещении. 
+							Закрыть тканью и оставить на один час в тёплом помещении.
 						 </step>
-						 <!-- 
+						 <!--
 							<step>
-							   Почитать вчерашнюю газету. 
+							   Почитать вчерашнюю газету.
 							</step>
 							 - это сомнительный шаг...
 						  -->
 						 <step>
-							Замесить ещё раз, положить на противень и поставить в духовку. 
+							Замесить ещё раз, положить на противень и поставить в духовку.
 						 </step>
 					   </instructions>
 					</recipe>';
@@ -154,7 +154,7 @@ class HttpTest extends AppTestCase
     }
 
     /** POST xml запрос */
-    public function testPostXML()
+    public function testPostXML(): void
     {
         $testXml = '<?xml version="1.0" encoding="utf-8"?>
 					<!DOCTYPE recipe>
@@ -169,19 +169,19 @@ class HttpTest extends AppTestCase
 					   </composition>
 					   <instructions>
 						 <step>
-							Смешать все ингредиенты и тщательно замесить. 
+							Смешать все ингредиенты и тщательно замесить.
 						 </step>
 						 <step>
-							Закрыть тканью и оставить на один час в тёплом помещении. 
+							Закрыть тканью и оставить на один час в тёплом помещении.
 						 </step>
-						 <!-- 
+						 <!--
 							<step>
-							   Почитать вчерашнюю газету. 
+							   Почитать вчерашнюю газету.
 							</step>
 							 - это сомнительный шаг...
 						  -->
 						 <step>
-							Замесить ещё раз, положить на противень и поставить в духовку. 
+							Замесить ещё раз, положить на противень и поставить в духовку.
 						 </step>
 					   </instructions>
 					</recipe>';
@@ -207,7 +207,7 @@ class HttpTest extends AppTestCase
     /**
      * Проверяем загрузку на сесуществующем пути
      */
-    public function testDownloadError()
+    public function testDownloadError(): void
     {
         $file = Http::downloadFile('file:///Такого пути не существует');
         self::assertEmpty($file, 'Я сказал не существует!');
@@ -216,7 +216,7 @@ class HttpTest extends AppTestCase
     /**
      * Проверяем попытку записи в никуда
      */
-    public function testWriteError()
+    public function testWriteError(): void
     {
         $file = Http::downloadFile('file:///' . __FILE__, '/404Folder/file');
         self::assertEmpty($file, 'Этот файл не должен был появится');
