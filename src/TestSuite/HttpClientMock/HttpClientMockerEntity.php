@@ -25,28 +25,28 @@ class HttpClientMockerEntity
      *
      * @var string
      */
-    private string $_callerFile = '';
+    private string $_callerFile;
 
     /**
      * Строка вызова к HttpClientMocker::mock
      *
      * @var int
      */
-    private int $_callerLine = 0;
+    private int $_callerLine;
 
     /**
      * Мокнутый урл
      *
      * @var string
      */
-    private string $_url = '';
+    private string $_url;
 
     /**
      * Метод запроса
      *
      * @var string
      */
-    private string $_method = Request::METHOD_GET;
+    private string $_method;
 
     /**
      * POST тело запроса

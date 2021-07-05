@@ -20,13 +20,13 @@ class Email extends \Cake\Mailer\Email
 
     const ANY_EMAIL_PATTERN = '/^[а-яa-z0-9]{1}[а-яa-z0-9\.\-\_]+@[а-яa-z0-9\.\-]+\.[а-яa-z]{2,}+$/iu';
 
-	/**
-	 * Email constructor.
-	 *
-	 * @param array|string|null $config Array of configs, or string to load configs from email.php
-	 * @SuppressWarnings(PHPMD.MethodArgs)
-	 * @phpstan-ignore-next-line
-	 */
+    /**
+     * Email constructor.
+     *
+     * @param array|string|null $config Array of configs, or string to load configs from email.php
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
+     */
     public function __construct($config = null)
     {
         if (Env::isUnitTest()) {
@@ -36,24 +36,24 @@ class Email extends \Cake\Mailer\Email
         $this->addHeaders(['Precedence' => 'bulk']);
     }
 
-	/**
-	 * Преобразовать конфиг для тестов
-	 *
-	 * @param array|string|null $paramConfig
-	 * @return array|null
-	 * @SuppressWarnings(PHPMD.MethodArgs)
-	 * @phpstan-ignore-next-line
-	 */
-	private function _getTestConfig($paramConfig): ?array
-	{
-		if (is_array($paramConfig)) {
-			$config = $paramConfig;
-		} else {
-			if (empty($paramConfig)) {
-				$confKey = 'default';
-			} else {
-				$confKey = $paramConfig;
-			}
+    /**
+     * Преобразовать конфиг для тестов
+     *
+     * @param array|string|null $paramConfig
+     * @return array|null
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
+     */
+    private function _getTestConfig($paramConfig): ?array
+    {
+        if (is_array($paramConfig)) {
+            $config = $paramConfig;
+        } else {
+            if (empty($paramConfig)) {
+                $confKey = 'default';
+            } else {
+                $confKey = $paramConfig;
+            }
 
             $config = static::getConfig($confKey);
         }
@@ -71,7 +71,7 @@ class Email extends \Cake\Mailer\Email
      * @param string $listId
      * @return $this
      */
-    public function addListId($listId)
+    public function addListId(string $listId): Email
     {
         $this->addHeaders([
             'List-Id' => $listId,
@@ -81,14 +81,14 @@ class Email extends \Cake\Mailer\Email
         return $this;
     }
 
-	/**
-	 * Отправляет письмо обрабатывая исключения
-	 *
-	 * @param ?string $content
-	 * @return bool|array
-	 * @SuppressWarnings(PHPMD.MethodArgs)
-	 * @phpstan-ignore-next-line
-	 */
+    /**
+     * Отправляет письмо обрабатывая исключения
+     *
+     * @param ?string $content
+     * @return bool|array
+     * @SuppressWarnings(PHPMD.MethodArgs)
+     * @phpstan-ignore-next-line
+     */
     public function send($content = null)
     {
         try {
@@ -125,40 +125,40 @@ class Email extends \Cake\Mailer\Email
         return $this;
     }
 
-	/**
-	 * переопределяем email для тестового режима
-	 *
-	 * @inheritdoc
-	 * @param string $varName
-	 * @param string|array<string|int, string> $email
-	 * @throws InternalException
-	 */
+    /**
+     * переопределяем email для тестового режима
+     *
+     * @inheritdoc
+     * @param string $varName
+     * @param string|array<string|int, string> $email
+     * @throws InternalException
+     */
     protected function _setEmail($varName, $email, $name)
     {
         return parent::_setEmail($varName, $this->_getEmailList($email), $name);
     }
 
     /**
-	 * переопределяем email для тестового режима
-	 *
-	 * @inheritdoc
-	 * @param string $varName
-	 * @param string|array<string|int, string> $email
-	 * @throws InternalException
-	 */
-	protected function _addEmail($varName, $email, $name)
+     * переопределяем email для тестового режима
+     *
+     * @inheritdoc
+     * @param string $varName
+     * @param string|array<string|int, string> $email
+     * @throws InternalException
+     */
+    protected function _addEmail($varName, $email, $name)
     {
         return parent::_addEmail($varName, $this->_getEmailList($email), $name);
     }
 
     /**
-	 * Преобразуем массив email адресов
-	 *
-	 * @param string|array<string|int, string> $email
-	 * @return array<string, string>|string
-	 * @throws InternalException
-	 */
-	private function _getEmailList($email)
+     * Преобразуем массив email адресов
+     *
+     * @param string|array<string|int, string> $email
+     * @return array<string, string>|string
+     * @throws InternalException
+     */
+    private function _getEmailList($email)
     {
         if (!is_array($email)) {
             return $this->_getEmail($email);
@@ -185,17 +185,17 @@ class Email extends \Cake\Mailer\Email
      * @throws UserException
      */
     private function _getEmail(string $email): string
-	{
-		if (!Env::isProduction() && !Env::isUnitTest()) {
-			$email = Env::getDebugEmail();
-			if (empty($email)) {
-				throw new InternalException('Не прописан debugEmail в конфиге!');
-			}
-		}
-		if (!preg_match(self::ANY_EMAIL_PATTERN, $email)) {
-			throw new UserException("Некорректный email: $email");
-		}
-		if (preg_match('/[а-я]/i', $email)) {
+    {
+        if (!Env::isProduction() && !Env::isUnitTest()) {
+            $email = Env::getDebugEmail();
+            if (empty($email)) {
+                throw new InternalException('Не прописан debugEmail в конфиге!');
+            }
+        }
+        if (!preg_match(self::ANY_EMAIL_PATTERN, $email)) {
+            throw new UserException("Некорректный email: $email");
+        }
+        if (preg_match('/[а-я]/i', $email)) {
             [$name, $domain] = explode('@', $email);
             $email = idn_to_ascii($name, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) . '@' . idn_to_ascii($domain, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
         }

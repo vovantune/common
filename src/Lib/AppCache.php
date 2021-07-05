@@ -16,7 +16,7 @@ class AppCache
      *
      * @var string[]
      */
-    protected static $_excludeFlushCacheList = ['session'];
+    protected static array $_excludeFlushCacheList = ['session'];
 
     /**
      * Время жизни кеша в дебаг-режиме
@@ -61,6 +61,7 @@ class AppCache
      *
      * @return array
      * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     public static function getConfig(): array
     {

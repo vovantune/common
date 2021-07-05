@@ -19,7 +19,7 @@ class ConstantMocker
      *
      * @var array<string, string>
      */
-    private static $_constantList = [];
+    private static array $_constantList = [];
 
     /**
      * Заменяем значение константы

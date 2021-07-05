@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\View\Helper;
 
@@ -12,6 +13,7 @@ use Cake\View\View;
 
 /**
  * @SuppressWarnings(PHPMD.MethodMix)
+ * @SuppressWarnings(PHPMD.MethodProps)
  */
 class AssetTest extends AppTestCase
 {
@@ -22,7 +24,7 @@ class AssetTest extends AppTestCase
     /**
      * helper
      *
-     * @var AssetHelper
+     * @var ?AssetHelper
      */
     private ?AssetHelper $_assetHelper = null;
 
@@ -71,6 +73,7 @@ class AssetTest extends AppTestCase
      *
      * @param array $options
      * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     private function _loadHelper(array $options = []): void
     {

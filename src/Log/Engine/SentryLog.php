@@ -75,9 +75,8 @@ class SentryLog extends BaseLog
      * доп.инфа
      *
      * @var array
-     * @phpstan-ignore-next-line
      */
-    private static array $_addInfo = [];
+    private static array $_addInfo = []; // @phpstan-ignore-line
 
     /**
      * Сколько уровней неинформативного трейса отрезать
@@ -182,19 +181,19 @@ class SentryLog extends BaseLog
      *
      * @param Exception|PHP7ErrorException|Throwable $exception
      * @param array $context
-     * @param bool|null $alert
+     * @param bool|null $isAlert
      * @return void
      * @phpstan-ignore-next-line
      * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function logException($exception, array $context = [], $alert = null)
+    public static function logException($exception, array $context = [], ?bool $isAlert = null)
     {
         Env::checkTestException($exception);
         if (($exception instanceof \ArtSkills\Error\Exception) && (!$exception->isLogged())) {
             $exception->log();
             return;
         }
-        $level = self::_getExceptionLevel($exception, $alert);
+        $level = self::_getExceptionLevel($exception, $isAlert);
         if (empty($context[self::KEY_NO_FILE_LOG])) {
             Log::write($level, $exception->getMessage(), [self::KEY_IS_HANDLED => true] + $context);
         }
@@ -206,17 +205,17 @@ class SentryLog extends BaseLog
      * по умолчанию оповещения шлются всегда за исключением некоторых неинтересных исключений
      *
      * @param Exception|PHP7ErrorException|Throwable $exception
-     * @param bool|null $alert
+     * @param bool|null $isAlert
      * @return string
      */
-    protected static function _getExceptionLevel($exception, ?bool $alert = null)
+    protected static function _getExceptionLevel($exception, ?bool $isAlert = null): string
     {
-        if ($alert === null) {
-            $alert = !($exception instanceof NotFoundException)
+        if ($isAlert === null) {
+            $isAlert = !($exception instanceof NotFoundException)
                 && !($exception instanceof \Cake\Http\Exception\UnauthorizedException)
                 && !($exception instanceof \Cake\Network\Exception\UnauthorizedException); // @phpstan-ignore-line - ругается неверно
         }
-        return ($alert ? 'error' : 'warning');
+        return ($isAlert ? 'error' : 'warning');
     }
 
     /**

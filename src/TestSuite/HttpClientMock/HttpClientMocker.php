@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace ArtSkills\TestSuite\HttpClientMock;
 
 use Cake\Http\Client\Request;
-use Cake\Http\Client\Response;
 use PHPUnit\Framework\ExpectationFailedException;
 
 class HttpClientMocker
@@ -39,7 +38,7 @@ class HttpClientMocker
      *
      * @return array<int, array{request: Request, response: Response}>
      */
-    public static function getSniffList()
+    public static function getSniffList(): array
     {
         return self::$_sniffList;
     }

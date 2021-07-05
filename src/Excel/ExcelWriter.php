@@ -130,7 +130,6 @@ class ExcelWriter
 
         $rowStyles = (!empty($rowStyles) ? $rowStyles : []) + self::STYLE_DEFAULT_HEADER;
         foreach ($this->_fieldMap[$pageName] as $element) {
-            /** @var FieldMapElement $element */
             if (empty($element)) {
                 continue;
             }

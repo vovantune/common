@@ -49,7 +49,7 @@ class TestFixture extends \Cake\TestSuite\Fixture\TestFixture
      *
      * @var string
      */
-    protected $_fixtureFolder = '';
+    protected string $_fixtureFolder = '';
 
     /**
      * Конструктор с функцией установки таблицы

@@ -22,7 +22,7 @@ function assoc(...$names): string
  * @param ?string $operation сравнения, (NOT) IN, LIKE, IS NULL, и всё такое
  * @return string
  */
-function field(string $tableAlias, string $fieldName, ?string $operation = null)
+function field(string $tableAlias, string $fieldName, ?string $operation = null): string
 {
     return $tableAlias . '.' . $fieldName . (empty($operation) ? '' : ' ' . $operation);
 }

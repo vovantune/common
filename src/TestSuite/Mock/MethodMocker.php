@@ -23,7 +23,7 @@ class MethodMocker
      *
      * @var MethodMockerEntity[]
      */
-    private static $_mockList = [];
+    private static array $_mockList = [];
 
     /**
      * Мокаем метод
@@ -147,7 +147,7 @@ class MethodMocker
      * @phpstan-ignore-next-line
      * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public static function callPrivate($object, string $methodName, $args = null)
+    public static function callPrivate($object, string $methodName, ?array $args = null)
     {
         if (is_string($object)) {
             $className = $object;

@@ -113,7 +113,7 @@ class PropertyAccess
      * @param string $propertyName
      * @param mixed $value
      */
-    public static function set($object, string $propertyName, $value): void
+    public static function set(object $object, string $propertyName, $value): void
     {
         $property = new ReflectionProperty($object, $propertyName);
         $property->setAccessible(true);
@@ -142,7 +142,7 @@ class PropertyAccess
      * @param string $propertyName
      * @return mixed
      */
-    public static function get($object, string $propertyName)
+    public static function get(object $object, string $propertyName)
     {
         $property = new ReflectionProperty(get_class($object), $propertyName);
         $property->setAccessible(true);

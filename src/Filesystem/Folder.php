@@ -11,11 +11,11 @@ use Cake\I18n\Time;
 class Folder extends \Cake\Filesystem\Folder
 {
     /**
-     * Путь к папке, которого может не существрвать
+     * Путь к папке, которого может не существовать
      *
-     * @var string
+     * @var ?string
      */
-    private ?string $_virtualPath = null;
+    private ?string $_virtualPath;
 
     /** @inheritdoc */
     public function __construct($path = null, $create = false, $mode = false)

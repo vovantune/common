@@ -38,7 +38,7 @@ abstract class IntegrationTestCase extends TestCase
      * Загружаем фикстуру из хранилища
      *
      * @param string $fixtureName
-     * @return mixed
+     * @return array|null|string
      * @throws InternalException
      */
     protected function _getJsonFixture(string $fixtureName)
@@ -67,7 +67,7 @@ abstract class IntegrationTestCase extends TestCase
      * @SuppressWarnings(PHPMD.MethodArgs)
      * @phpstan-ignore-next-line
      */
-    public function assertJsonSubset($subset, $json, bool $strict = false, $message = '')
+    public function assertJsonSubset($subset, string $json, bool $strict = false, string $message = '')
     {
         if (is_string($subset)) {
             $subset = json_decode($subset, true);

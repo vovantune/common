@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Shell;
 
@@ -7,7 +8,6 @@ use ArtSkills\Lib\Git;
 use ArtSkills\Shell\GitBranchTrimShell;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\Mock\MethodMocker;
-use ArtSkills\TestSuite\Mock\PropertyAccess;
 use Cake\Core\Configure;
 use Cake\I18n\Time;
 

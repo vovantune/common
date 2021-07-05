@@ -48,7 +48,7 @@ class Git
      *
      * @var string
      */
-    private string $_gitCommand = '';
+    private string $_gitCommand;
 
     /**
      * Список спулленных веток, чтоб не пуллить по нескольку раз
@@ -62,7 +62,7 @@ class Git
      *
      * @var string
      */
-    private string $_directory = '';
+    private string $_directory;
 
     /**
      * Выбираем, какой командой обращаться к гиту; вытаскиваем текущую ветку

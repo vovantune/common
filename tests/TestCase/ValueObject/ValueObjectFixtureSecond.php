@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vladimirtunikov
- * Date: 12.05.17
- * Time: 17:05
- */
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\ValueObject;
 

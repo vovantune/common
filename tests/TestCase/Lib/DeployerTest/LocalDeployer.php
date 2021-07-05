@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Lib\DeployerTest;
 
 use ArtSkills\Lib\Deployer;
-use ArtSkills\Lib\Env;
 
 class LocalDeployer extends Deployer
 {

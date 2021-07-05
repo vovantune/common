@@ -143,7 +143,8 @@ class Strings
      */
     public static function mbUcFirst(string $string, string $enc = 'utf-8'): string
     {
-        $string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc) . mb_substr(
+        $string = mb_strtoupper(mb_substr($string, 0, 1, $enc), $enc)
+            . mb_substr(
                 $string,
                 1,
                 mb_strlen($string, $enc) - 1,
@@ -161,7 +162,8 @@ class Strings
      */
     public static function mbLcFirst(string $string, string $enc = 'utf-8'): string
     {
-        $string = mb_strtolower(mb_substr($string, 0, 1, $enc), $enc) . mb_substr(
+        $string = mb_strtolower(mb_substr($string, 0, 1, $enc), $enc)
+            . mb_substr(
                 $string,
                 1,
                 mb_strlen($string, $enc) - 1,

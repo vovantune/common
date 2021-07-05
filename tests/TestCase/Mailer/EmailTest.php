@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace ArtSkills\Test\TestCase\Lib\EmailTest;
+namespace ArtSkills\Test\TestCase\Mailer;
 
 use ArtSkills\Mailer\Email;
 use ArtSkills\Mailer\Transport\TestEmailTransport;

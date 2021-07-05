@@ -149,7 +149,7 @@ class Url
      * @param string $hash
      * @return string
      */
-    public static function withCustomDomain(string $domain, $parts = [], $query = [], string $hash = '')
+    public static function withCustomDomain(string $domain, $parts = [], $query = [], string $hash = ''): string
     {
         return self::_build($domain, '', $parts, $query, $hash);
     }
@@ -189,7 +189,7 @@ class Url
      * @param array<string, mixed> $parts
      * @return string
      */
-    public static function buildQuery(array $parts)
+    public static function buildQuery(array $parts): string
     {
         return http_build_query($parts);
     }

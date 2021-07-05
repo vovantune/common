@@ -7,7 +7,6 @@ use ArtSkills\Traits\Library;
 use Cake\Database\Connection;
 use Cake\Database\Statement\MysqlStatement;
 use Cake\Database\StatementInterface;
-use Cake\Datasource\ConnectionInterface;
 use Cake\Datasource\ConnectionManager;
 
 /**

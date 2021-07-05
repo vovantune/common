@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Lib;
 
-use ArtSkills\Lib\DB;
 use ArtSkills\Lib\Env;
 use ArtSkills\Lib\MultiThreads;
 use ArtSkills\TestSuite\AppTestCase;

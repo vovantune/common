@@ -28,7 +28,7 @@ class Exception extends \Exception
      *
      * @var array
      */
-    protected $_logContext = []; // @phpstan-ignore-line
+    protected array $_logContext = []; // @phpstan-ignore-line
 
     /**
      * Слать ли оповещения при ошибке
@@ -135,8 +135,9 @@ class Exception extends \Exception
      * @param bool $fullOverwrite
      * @return $this
      * @phpstan-ignore-next-line
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
-    public function setLogContext(array $context, bool $fullOverwrite = false)
+    public function setLogContext(array $context, bool $fullOverwrite = false): Exception
     {
         if ($fullOverwrite) {
             $this->_logContext = $context;

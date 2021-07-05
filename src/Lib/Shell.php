@@ -34,7 +34,7 @@ class Shell
      * @param string $outputRedirect
      * @return void
      */
-    public static function execInBackground(string $command, $outputRedirect = '/dev/null')
+    public static function execInBackground(string $command, string $outputRedirect = '/dev/null')
     {
         exec('nohup ' . $command . ' > ' . escapeshellarg($outputRedirect) . ' 2>&1 &');
     }

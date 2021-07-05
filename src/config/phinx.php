@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use ArtSkills\Phinx\Migration\AbstractMigration;
 
@@ -12,10 +13,10 @@ use ArtSkills\Phinx\Migration\AbstractMigration;
  * @phpstan-ignore-next-line
  */
 function getPhinxConfig(
-    $dbConfFile,
-    $pathsFile,
-    $baseMigrationClass = AbstractMigration::class
-) {
+    string $dbConfFile,
+    string $pathsFile,
+    string $baseMigrationClass = AbstractMigration::class
+): array {
     $phinxConfig = [
         'migration_base_class' => $baseMigrationClass,
         'paths' => [

@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Test\TestCase\Lib;
 
-use ArtSkills\Http\Client;
 use ArtSkills\Lib\Http;
 use ArtSkills\TestSuite\AppTestCase;
 use ArtSkills\TestSuite\HttpClientMock\HttpClientMocker;

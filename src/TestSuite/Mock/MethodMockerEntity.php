@@ -31,42 +31,42 @@ class MethodMockerEntity
      *
      * @var string
      */
-    private string $_id = '';
+    private string $_id;
 
     /**
      * Файл, в котором мокнули
      *
      * @var string
      */
-    private string $_callerFile = '';
+    private string $_callerFile;
 
     /**
      * Строка вызова к MethodMocker::mock
      *
      * @var int
      */
-    private int $_callerLine = 0;
+    private int $_callerLine;
 
     /**
      * Класс метода
      *
      * @var string
      */
-    private string $_class = '';
+    private string $_class;
 
     /**
      * Мокаемый метод
      *
      * @var string
      */
-    private string $_method = '';
+    private string $_method;
 
     /**
      * Новое подменяемое событие
      *
      * @var callable|string|null
      */
-    private $_action = null;
+    private $_action;
 
     /**
      * Сколько раз ожидается вызов функции
@@ -136,7 +136,7 @@ class MethodMockerEntity
      *
      * @var bool
      */
-    private bool $_sniffMode = false;
+    private bool $_sniffMode;
 
     /**
      * Дополнительная переменная, которую можно использовать в _returnAction
@@ -171,7 +171,7 @@ class MethodMockerEntity
      *
      * @var bool
      */
-    private bool $_isFullMock = false;
+    private bool $_isFullMock;
 
     /**
      * MethodMockerEntity constructor.
