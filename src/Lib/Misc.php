@@ -1,15 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
 class Misc
 {
-
-    /**
-     * Нулевое время
-     */
-    const ZERO_TIME = '0000-00-00 00:00:00';
-
     /**
      * Разбить полное название класса на неймспейс и класс
      *
@@ -17,7 +12,7 @@ class Misc
      * @param bool $onlyClass
      * @return string|string[]
      */
-    public static function namespaceSplit($class, $onlyClass = false)
+    public static function namespaceSplit(string $class, bool $onlyClass = false)
     {
         $pos = strrpos($class, '\\');
         if ($pos === false) {
@@ -38,7 +33,7 @@ class Misc
      * @param string[] ...$parts
      * @return string
      */
-    public static function implodeDs(...$parts)
+    public static function implodeDs(...$parts): string
     {
         return trim(implode(DS, $parts));
     }
