@@ -40,6 +40,7 @@ abstract class IntegrationTestCase extends TestCase
      * @param string $fixtureName
      * @return array|null|string
      * @throws InternalException
+     * @SuppressWarnings(PHPMD.MethodArgs)
      */
     protected function _getJsonFixture(string $fixtureName)
     {
