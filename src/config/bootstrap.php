@@ -40,7 +40,7 @@ if (!defined('CORE_VERSION')) {
             $version = 0;
         }
     }
-    define('CORE_VERSION', $version);
+    define('CORE_VERSION', (int)$version);
     unset($version);
 }
 
