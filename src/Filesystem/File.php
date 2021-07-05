@@ -66,14 +66,14 @@ class File extends \Cake\Filesystem\File
     }
 
     /**
-	 * Распаковать архив
-	 * по умолчанию рядом с архивом
-	 *
-	 * @param string $pathToFile
-	 * @param string|null $unzipFolder
-	 * @return void
-	 * @throws \Exception
-	 */
+     * Распаковать архив
+     * по умолчанию рядом с архивом
+     *
+     * @param string $pathToFile
+     * @param string|null $unzipFolder
+     * @return void
+     * @throws \Exception
+     */
     public static function unZip(string $pathToFile, ?string $unzipFolder = null)
     {
         $extension = strstr(pathinfo($pathToFile)['basename'], '.');
@@ -101,9 +101,7 @@ class File extends \Cake\Filesystem\File
     public static function generateTempFilePath(string $prefix): string
     {
         $tempDir = TMP . static::TEMP_FILE_DIR;
-        if (!is_dir($tempDir)) {
-            mkdir($tempDir, 0755, true);
-        }
+        Folder::createIfNotExists($tempDir);
         Folder::cleanupDirByLifetime($tempDir, ['.*'], 3600);
         return tempnam($tempDir, $prefix . '-');
     }

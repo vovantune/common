@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ArtSkills\Lib;
 
+use ArtSkills\Filesystem\File;
 use ArtSkills\Http\Client;
 use ArtSkills\Traits\Library;
 use Cake\Http\Client\Response;
@@ -144,7 +145,7 @@ class Http
     {
 
         if (empty($targetFile)) {
-            $targetFile = TMP . uniqid() . '.tmp';
+            $targetFile = File::generateTempFilePath('download');
         }
 
         // phpcs:ignore
