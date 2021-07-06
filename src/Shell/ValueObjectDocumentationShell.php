@@ -138,7 +138,7 @@ class ValueObjectDocumentationShell extends Shell
     {
         $result = [
             'name' => $this->_getSchemaClassName($schema),
-            'type' => null,
+            'type' => 'object',
             'description' => null,
             'properties' => [],
             'mergeProperties' => [],
@@ -164,6 +164,10 @@ class ValueObjectDocumentationShell extends Shell
         } elseif (!empty($schema->allOf)) { // наследование классов
             foreach ($schema->allOf as $subSchema) {
                 if ($subSchema->ref === UNDEFINED) { // по логике либы это является конечным элементом наследования
+                    if ($subSchema->properties === UNDEFINED) {
+                        Log::error('Не могу получить свойства');
+                        continue;
+                    }
                     foreach ($subSchema->properties as $property) {
                         $insProperty = $this->_getProperty($property);
                         $result['properties'][$insProperty['name']] = $insProperty;
@@ -211,6 +215,8 @@ class ValueObjectDocumentationShell extends Shell
             }
         } elseif ($property->type === UNDEFINED && $property->ref !== UNDEFINED) {
             $result['type'] = str_replace(self::SCHEMA_PATH_PREFIX, '', $property->ref);
+        } elseif ($property->type === UNDEFINED && count($property->oneOf) === 1 && $property->oneOf[0]->ref !== UNDEFINED) {
+            $result['type'] = str_replace(self::SCHEMA_PATH_PREFIX, '', $property->oneOf[0]->ref);
         } elseif ($property->type === UNDEFINED) {
             Log::error("Incorrect property type for " . $property->_context->namespace . '\\' . $property->_context->class . '::' . $property->property);
         }
